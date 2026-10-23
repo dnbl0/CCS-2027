@@ -5,7 +5,7 @@ class LandingTest < ActionDispatch::IntegrationTest
     get "/"
 
     assert_response :success
-    assert_select "body.page-home h1", "Collection Navigator"
+    assert_select "body.page-home h1", "Collections Navigator"
     assert_select ".ccs-hero__search search form"
     assert_select ".ccs-hero__search a.advanced_search[href=?]", "/catalog/advanced"
     assert_select ".home-card__title a", count: 6
@@ -14,12 +14,12 @@ class LandingTest < ActionDispatch::IntegrationTest
     assert_select ".ccs-section--help, .ccs-section--faq", count: 0
   end
 
-  test "the Collection Navigator card searches all five collections" do
+  test "the Collections Navigator card searches all five collections" do
     get "/"
 
     assert_select ".home-card__text", /search all five collections/
     assert_select "a.home-textbutton[href=?]", "/catalog?search_field=all_fields", text: /University museums and collections/
-    assert_select ".home-card__title a[href=?]", "/catalog?search_field=all_fields", text: "Collection Navigator"
+    assert_select ".home-card__title a[href=?]", "/catalog?search_field=all_fields", text: "Collections Navigator"
   end
 
   test "a bare search page goes to the home page with the hero search" do
@@ -33,7 +33,7 @@ class LandingTest < ActionDispatch::IntegrationTest
       get path
 
       assert_select ".sticky-search[data-controller=sticky-search][inert][aria-hidden=true]", count: 1
-      assert_select ".sticky-search a.site-header__title[href=?]", "/", text: "Collection Navigator"
+      assert_select ".sticky-search a.site-header__title[href=?]", "/", text: "Collections Navigator"
       assert_select ".sticky-search form.search-query-form[action=?][method=get]", "/catalog"
       assert_select ".sticky-search select[name=search_field]#sticky_search_field"
       assert_select ".sticky-search input[name=q]#sticky_q"

@@ -1,5 +1,5 @@
 <%# Home page, from public/index.html of the static site %>
-<% content_for :title, "Collection Navigator - University of Melbourne" %>
+<% content_for :title, "Collections Navigator - University of Melbourne" %>
 <% content_for :body_class, "page-home ccs-home" %>
 <main id="main-content" class="home-main-content">
 
@@ -9,8 +9,8 @@
         <div class="ccs-hero__content">
           <div class="ccs-hero__group">
             <div class="ccs-hero__group">
-              <h1 id="home-title" class="ccs-hero__title">Collection Navigator</h1>
-              <p class="ccs-hero__text">Collection Navigator brings together the University of Melbourne’s rich and diverse cultural collections into a single discovery experience.</p>
+              <h1 id="home-title" class="ccs-hero__title">Collections Navigator</h1>
+              <p class="ccs-hero__text">Collections Navigator brings together the University of Melbourne’s rich and diverse cultural collections into a single discovery experience.</p>
             </div>
             <div class="ccs-hero__search">
               <%= render NexusCcs::HeroSearchComponent.new(blacklight_config: blacklight_config) %>
@@ -22,9 +22,9 @@
     </section>
 
     <!-- Section component: introduction (162:1273 / 162:3463) -->
-    <section class="ccs-section home-about" aria-label="About Collection Navigator">
+    <section class="ccs-section home-about" aria-label="About Collections Navigator">
       <div class="ccs-section__inner home-about__inner">
-        <h2 class="home-about__statement">Welcome to Collection Navigator. A New Way to Discover the University’s Cultural Collections</h2>
+        <h2 class="home-about__statement">Welcome to Collections Navigator. A New Way to Discover the University’s Cultural Collections</h2>
         <p class="home-about__text">The University of Melbourne's cultural collections are unrivalled among Australian universities, spanning historical and contemporary items in the fields of visual arts, rare books, medical history, botany, zoology, and geology, as well as the disciplines of science, engineering and information technology. The University is also custodian to extensive archival holdings, and significant Aboriginal and Torres Strait Islander cultural heritage material, which is of greatest importance to communities of origin and their descendants.</p>
       </div>
     </section>
@@ -32,8 +32,8 @@
         <section class="ccs-section home-collections" aria-labelledby="browse-collections">
       <div class="ccs-section__inner">
         <header class="home-collections__header">
-          <h2 id="browse-collections" class="ccs-section__heading">Collections currently available in Collection Navigator</h2>
-          <p class="home-collections__description">Collection Navigator will bring together the University of Melbourne’s 30+ cultural collections via a single discovery experience. Collection Navigator is part of a broader vision to make the University’s cultural collections more discoverable, accessible and connected, supporting teaching, learning, research and public use. All University collections will join Collection Navigator over time.</p>
+          <h2 id="browse-collections" class="ccs-section__heading">Collections currently available in Collections Navigator</h2>
+          <p class="home-collections__description">Collections Navigator will bring together the University of Melbourne’s 30+ cultural collections via a single discovery experience. Collections Navigator is part of a broader vision to make the University’s cultural collections more discoverable, accessible and connected, supporting teaching, learning, research and public use. All University collections will join Collections Navigator over time.</p>
         </header>
         <ul class="home-collections__list">
         <li class="home-card">
@@ -79,8 +79,8 @@
         <li class="home-card">
           <div class="home-card__media"><img class="home-card__image" src="<%= asset_path("site/collections-breakout.jpg") %>" alt=""></div>
           <div class="home-card__body">
-            <h3 class="home-card__title"><a class="home-card__link" href="<%= search_action_path(search_field: "all_fields") %>">Collection Navigator</a></h3>
-            <p class="home-card__text">Collection Navigator will make accessible the University of Melbourne’s 30+ cultural collections via a single discovery experience. You can search all five collections now, and more will be available over time; for more information about other cultural collections at the University of Melbourne, visit <a href="https://museumsandcollections.unimelb.edu.au/collections">museumsandcollections.unimelb.edu.au/collections</a>.</p>
+            <h3 class="home-card__title"><a class="home-card__link" href="<%= search_action_path(search_field: "all_fields") %>">Collections Navigator</a></h3>
+            <p class="home-card__text">Collections Navigator will make accessible the University of Melbourne’s 30+ cultural collections via a single discovery experience. You can search all five collections now, and more will be available over time; for more information about other cultural collections at the University of Melbourne, visit <a href="https://museumsandcollections.unimelb.edu.au/collections">museumsandcollections.unimelb.edu.au/collections</a>.</p>
             <a class="home-textbutton" href="<%= search_action_path(search_field: "all_fields") %>">University museums and collections<span class="sr-only"> (searches all five collections)</span><img class="home-textbutton__image" src="<%= asset_path("site/icon-arrow-right.svg") %>" alt=""></a>
           </div>
         </li>

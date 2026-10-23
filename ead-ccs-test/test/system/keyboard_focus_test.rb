@@ -3,7 +3,7 @@ require "application_system_test_case"
 # Keyboard and screen-reader checks from the 2026-10-22 accessibility audit (WCAG 2.4.3 Focus Order, 2.4.11 Focus Not
 # Obscured, 4.1.2 Name Role Value, 2.4.4 Link Purpose): the search overlay and the phone menu drawer keep Tab inside
 # themselves while they cover the page, the site's custom dropdowns are named by their label and then their value, and the
-# "Collection Navigator" home link keeps its name when a phone menu section is open. Names are read from Chrome's own
+# "Collections Navigator" home link keeps its name when a phone menu section is open. Names are read from Chrome's own
 # accessibility tree, so they are what a screen reader is given.
 class KeyboardFocusTest < ApplicationSystemTestCase
   setup do
@@ -127,8 +127,8 @@ class KeyboardFocusTest < ApplicationSystemTestCase
     home = "a.site-header__title[href='/']:not(.sticky-search *)"
     assert_selector ".site-header__section", text: "Browse records", visible: true
     assert_no_selector "a.site-header__section", visible: :all
-    assert_selector home, text: "Collection Navigator", visible: true
-    assert_equal "Collection Navigator", accessible_name(home)
+    assert_selector home, text: "Collections Navigator", visible: true
+    assert_equal "Collections Navigator", accessible_name(home)
     assert_no_selector "a[href='/']", text: "Browse records", visible: :all
 
     box = page.evaluate_script(<<~JS)
@@ -145,6 +145,6 @@ class KeyboardFocusTest < ApplicationSystemTestCase
 
     find("button.site-header__menu").click # Close: the drawer and its section close together
     assert_no_selector ".site-header__section", visible: true
-    assert_selector home, text: "Collection Navigator", visible: true
+    assert_selector home, text: "Collections Navigator", visible: true
   end
 end

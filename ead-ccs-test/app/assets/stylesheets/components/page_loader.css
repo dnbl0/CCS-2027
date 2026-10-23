@@ -1,5 +1,5 @@
 /*
- * Page loading screen: a full-window navy cover with a spinner and "Loading Collection Navigator" that
+ * Page loading screen: a full-window navy cover with a spinner and "Loading Collections Navigator" that
  * shows from the first paint until the page has finished loading (app/javascript/page_loader.js adds
  * .page-ready to <html> on the window's load event). It is drawn with the <html> element's pseudo-elements so it
  * needs no markup and works in every layout, Blacklight's own included.
@@ -8,7 +8,7 @@
  * never left covered. With reduced motion the spinner is a still ring and the cover does not fade.
  */
 html:not(.page-ready)::before {
-  content: "Loading Collection Navigator";
+  content: "Loading Collections Navigator";
   position: fixed;
   inset: 0;
   z-index: 3000;

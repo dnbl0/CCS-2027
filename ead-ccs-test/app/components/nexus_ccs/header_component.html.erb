@@ -25,14 +25,14 @@
     </div>
 
     <div class="site-header__bar">
-      <%= link_to "Collection Navigator", root_path, class: "site-header__title", data: { site_header_target: "title" } %>
+      <%= link_to "Collections Navigator", root_path, class: "site-header__title", data: { site_header_target: "title" } %>
       <%# Phones: an open menu section's name is shown under the home link as plain text, so the link is never renamed or hidden -%>
       <span class="site-header__title site-header__section" data-site-header-target="section" hidden></span>
 
       <nav id="site-nav" class="site-nav" aria-label="Primary navigation" data-site-header-target="nav">
         <div class="site-nav__search">
           <%= form_with url: all_records_path, method: :get, html: { role: "search" } do |form| %>
-            <%= form.label :q, "Search Collection Navigator", for: "site-nav-q", class: "visually-hidden" %>
+            <%= form.label :q, "Search Collections Navigator", for: "site-nav-q", class: "visually-hidden" %>
             <%= form.search_field :q, id: "site-nav-q", placeholder: "Search", autocomplete: "off", maxlength: QueryRules::MAX_LENGTH %>
             <button type="submit" aria-label="Search"><%= image_tag "site/icon-search-onaccent.svg", alt: "" %></button>
           <% end %>

@@ -15,7 +15,7 @@ class StickySearchTest < ApplicationSystemTestCase
     assert_no_selector ".sticky-search.is-visible"
     scroll_to 1200
     assert_selector ".sticky-search.is-visible"
-    assert_selector ".sticky-search a.site-header__title", text: "Collection Navigator"
+    assert_selector ".sticky-search a.site-header__title", text: "Collections Navigator"
     assert_selector ".sticky-search a.advanced_search"
     assert_selector ".sticky-search input#sticky_q"
     scroll_to 0

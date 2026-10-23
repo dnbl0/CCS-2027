@@ -1,7 +1,7 @@
 <%# Blacklight's bookmarks page (documents come from BookmarksController / Blacklight::Bookmarks), laid out like the
     other pages: the page banner, then the saved records as the result cards, each with its Save / Saved toggle
     and a link to open it. Rendered in the "pages" layout (see BookmarksController). %>
-<% content_for :title, "#{t('nexus_ccs.saved.list_title')} — Collection Navigator — University of Melbourne" %>
+<% content_for :title, "#{t('nexus_ccs.saved.list_title')} — Collections Navigator — University of Melbourne" %>
 <% content_for :body_class, "page-saved" %>
 <%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.saved.list_title"), description: t("nexus_ccs.saved.list_description")) %>
 

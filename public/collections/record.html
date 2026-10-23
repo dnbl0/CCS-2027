@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="description" content="View collection record details, metadata and media in the University of Melbourne Collection Navigator.">
-<title>Collection Record — Collection Navigator — University of Melbourne</title>
+<meta name="description" content="View collection record details, metadata and media in the University of Melbourne Collections Navigator.">
+<title>Collection Record — Collections Navigator — University of Melbourne</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="../runtime-libs.js"></script>
@@ -75,11 +75,11 @@
       </button>
     </div>
     <div class="ccs-nav__bottom">
-      <a class="ccs-nav__title" href="/index.html">Collection Navigator</a>
+      <a class="ccs-nav__title" href="/index.html">Collections Navigator</a>
       <nav id="ccs-primary-nav" class="ccs-nav__primary" aria-label="Primary navigation">
         <div class="ccs-nav__drawer-search">
           <form class="ccs-nav__form-search" role="search" action="/search/search-results.html" method="get">
-            <label for="ccs-drawer-q" class="sr-only record-form__label-search-cultural-collections">Search Collection Navigator</label>
+            <label for="ccs-drawer-q" class="sr-only record-form__label-search-cultural-collections">Search Collections Navigator</label>
             <input class="ccs-drawer-q" id="ccs-drawer-q" name="q" type="text" autocomplete="off" placeholder="Search">
             <button class="record-form__button-search" type="submit" aria-label="Search"><img class="record-form__button-image" src="/images/home/icon-search-onaccent.svg" alt=""></button>
           </form>
@@ -698,7 +698,7 @@ class Component extends DCLogic {
     const R = CCS && CCS.records[id];
     const notFound = !!CCS && !R;
     this.curId = R ? R.id : id;
-    try { document.title = R ? `${R.title} — Collection Navigator — University of Melbourne` : (notFound ? 'Record not found — Collection Navigator — University of Melbourne' : document.title); } catch (e) {}
+    try { document.title = R ? `${R.title} — Collections Navigator — University of Melbourne` : (notFound ? 'Record not found — Collections Navigator — University of Melbourne' : document.title); } catch (e) {}
     if (!R) return { licKey: 'Rights Reserved', notFound, found: false, pageTitle: notFound ? 'Record not found' : '', rec: { title: '', type: '', byline: '', citation: '', unit: '', assetId: '', hasDA: false, images: [], slides: [], subjects: [], advisories: [], rights: [] },
       fields: [], related: [], mediaRows: [], thumbs: [], noDA: false, showRelated: false, viewerRef: this.viewerRef,
       yes: true, cur: { src: '', label: '' }, curAlt: '', isImage: false, isVideo: false, isAudio: false, isPdf: false, curBroken: false, onImgLoad() {}, onMeta() {}, multi: false, imgCount: '', liveText: '',

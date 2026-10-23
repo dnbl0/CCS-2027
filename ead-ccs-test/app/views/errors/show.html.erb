@@ -9,7 +9,7 @@
   "400" => { title: "We couldn't read that address", lead: "The address contains something we can't read, such as a broken or incomplete web address. Check it, or start a new search." },
   "406" => { title: "We can't show it that way", lead: "This page isn't available in the form that was asked for. Go to the page itself, or start a new search." }
 }.fetch(@code) %>
-<% content_for :title, "#{copy[:title]} - Collection Navigator - University of Melbourne" %>
+<% content_for :title, "#{copy[:title]} - Collections Navigator - University of Melbourne" %>
 <% content_for :body_class, "page-error" %>
 
 <%= render NexusCcs::PageBannerComponent.new(title: copy[:title]) %>

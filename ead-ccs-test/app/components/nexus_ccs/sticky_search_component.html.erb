@@ -2,7 +2,7 @@
 <div class="sticky-search position-fixed top-0 start-0 end-0" inert aria-hidden="true"
      data-controller="sticky-search" data-sticky-search-banner-value="<%= BANNERS %>">
   <div class="sticky-search__inner d-flex align-items-center py-2">
-    <%= link_to "Collection Navigator", helpers.root_path, class: "site-header__title sticky-search__title" %>
+    <%= link_to "Collections Navigator", helpers.root_path, class: "site-header__title sticky-search__title" %>
     <%= render NexusCcs::StickySearchBarComponent.new(blacklight_config: blacklight_config) %>
   </div>
 </div>

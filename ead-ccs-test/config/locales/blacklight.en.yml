@@ -1,6 +1,6 @@
 en:
   blacklight:
-    application_name: 'Collection Navigator'
+    application_name: 'Collections Navigator'
     # The range filters' fields, after Airbnb's price range
     range_limit:
       range_begin_short: From

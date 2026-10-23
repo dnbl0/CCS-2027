@@ -18,7 +18,7 @@
     <%# Narrow screens: one link back to the parent page %>
     <%= link_to (parent ? parent.last : helpers.root_path), class: "breadcrumb-bar__back" do %>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
-      <span><%= parent ? parent.first : "Collection Navigator" %></span>
+      <span><%= parent ? parent.first : "Collections Navigator" %></span>
     <% end %>
   </nav>
   <%= render NexusCcs::SavedBarComponent.new %>
