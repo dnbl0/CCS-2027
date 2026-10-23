@@ -338,3 +338,15 @@
   - "0000_0278~1_PF.jpg"
 "emu-8798":  # By the Engineering School, Melbourne University (University Art Collection)
   - "1976_0021~1_PF.jpg"
+
+# Matched with Dean (2026-10-23): BUS.S_1 and MOF.T_1 by the accession numbers in the earlier prototype's
+# lib/record_thumbnails.rb; GIL.S_2 by the series in the image; the others on Dean's confirmation.
+"emu-17537":  # Untitled [Nude figure in a chair], Hugh Ramsay (University Art Collection)
+  - "0000_013~1_PF.jpg"
+  - "0000_013~2_PF.jpg"
+"emu-103581":  # Tranie Gorge, Rammey Ramsey (University Art Collection)
+  - "Gorge-PF.jpg"
+"emu-108188":  # Shout on the hills of glory, Stephen Bush (University Art Collection)
+  - "BUS.S_1.jpg"
+"emu-108229":  # A small town at the turn of the century #5, Simryn Gill (University Art Collection)
+  - "GIL.S_2.jpg"
