@@ -41,6 +41,13 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert component(FIELDS).rows.find { |row| row.label == "UoM ID" }.copy
   end
 
+  test "the UoM ID names the EMu system: M&C's EMu records are emu-umc, Vernon ids are unchanged" do
+    uom_id = ->(fields) { component(fields).rows.find { |row| row.label == "UoM ID" }.values }
+
+    assert_equal [ "emu-umc-1" ], uom_id.(FIELDS)
+    assert_equal [ "vernon-MHM00394" ], uom_id.(FIELDS.merge("id" => "vernon-MHM00394"))
+  end
+
   test "the rights fields are in the Copyright card, not in the details list" do
     c = component(FIELDS)
     fields = c.rows.map(&:field)

@@ -50,8 +50,18 @@ module NexusCcs
           list << Row.new(label: config.label, values: values, field: name) if values.any?
         end
         index = list.index { |row| row.field.in?(%w[named_collection_ssim collection_ssim]) } || list.size
-        list.insert(index, Row.new(label: "UoM ID", values: [ document.id.to_s ], field: "id", copy: true))
+        list.insert(index, Row.new(label: "UoM ID", values: [ uom_id ], field: "id", copy: true))
       end
+    end
+
+    # The University has three EMu systems (emu-umc, emu-feit, emu-prints), so the UoM ID names which one. Every EMu
+    # record here comes from Museums & Collections' (emu-umc). The record's URL keeps its Solr id (emu-400329).
+    UOM_ID_PREFIXES = { "emu-" => "emu-umc-" }.freeze
+
+    def uom_id
+      id = document.id.to_s
+      prefix, uom_prefix = UOM_ID_PREFIXES.find { |solr_prefix, _| id.start_with?(solr_prefix) }
+      prefix ? id.sub(prefix, uom_prefix) : id
     end
 
     def link_to_value?(row) = row.field.in?(LINK_FIELDS)

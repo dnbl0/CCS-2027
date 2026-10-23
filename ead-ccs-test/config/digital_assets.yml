@@ -2,7 +2,7 @@
 # (public/collection-data.js); the first file is the thumbnail. Files are the original names;
 # bin/rails digital_assets:thumbnails makes public/digital-assets/thumbs/<name>.jpg from them.
 
-"0.0216":
+"00.0216":
   - "GM00.0216_1.jpg"
 "1973.0004.000.000":
   - "1973_0004_000_000_1.jpg"
@@ -82,7 +82,7 @@
   - "2006_0111 web.jpg"
 "2023.012.001":
   - "Nyarrin-Nyarrin Patrick Mung Mung cropped.jpg"
-"4.0164":
+"04.0164":
   - "GMC 04.0164.jpg"
   - "GMC 04.0164 verso.jpg"
 "HFA3310":
@@ -199,9 +199,10 @@
 "emu-400237":  # Conductors baton (Grainger Museum Collection)
   - "GMC_00_0034~1_PF.jpg"
   - "GMC_00_0034~2_PF.jpg"
-"emu-400330":  # Contrabass sarrusophone carrying case (Grainger Museum Collection)
-  - "GMC_00_0071~1_PF.jpg"
+"emu-400329":  # Contrabass sarrusophone (Grainger Museum Collection): the DAM files are named for the case (00.0071) but
+  # show the instrument, so they are on the instrument's record (00.0070); the front (~2) first, as the stakeholder asked
   - "GMC_00_0071~2_PF.jpg"
+  - "GMC_00_0071~1_PF.jpg"
 "emu-400336":  # Alto sarrusophone (Grainger Museum Collection)
   - "GMC_00_0077~1_PF.jpg"
   - "GMC_00_0077~2_PF.jpg"
@@ -209,9 +210,9 @@
   - "GMC_00_0081~1_PF.jpg"
   - "GMC_00_0081~2_PF.jpg"
   - "GMC_00_0081~3_PF.jpg"
-"emu-400351":  # Oboe (Grainger Museum Collection)
-  - "GMC_00_0092~1_PF.jpg"
+"emu-400351":  # Oboe (Grainger Museum Collection): the front (~2) first, as the stakeholder asked
   - "GMC_00_0092~2_PF.jpg"
+  - "GMC_00_0092~1_PF.jpg"
 "emu-400394":  # Sanxian (San-Hsien) (Grainger Museum Collection)
   - "GMC_00_0108~1_PF.jpg"
   - "GMC_00_0108~2_PF.jpg"

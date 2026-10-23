@@ -66,7 +66,7 @@ module Collections
         "id"                  => document_id(irn),
         "source_system_ssi"   => name,
         "source_identifier_ssi" => irn,
-        "accession_number_ssim" => row.values(ACCESSION),
+        "accession_number_ssim" => row.values(ACCESSION).map { |number| AccessionNumber.restore(number, row.value(COLLECTION)) },
         "source_reference_tsim" => row.values(SUMMARY_DATA),
 
         "collection_ssim"       => row.values(COLLECTION),
