@@ -87,4 +87,13 @@ class RecordLayoutTest < ActiveSupport::TestCase
   test "the Responsible collection link opens the whole collection, as the Search collections menu does" do
     assert_equal BrowseMenu.query(BrowseMenu::COLLECTION_FIELD, "Grainger Museum Collection"), component(FIELDS).responsible_collection_query
   end
+
+  test "every link to the record's collection or named collection opens all of it; other details keep the search's default" do
+    c = component(FIELDS)
+
+    assert_equal BrowseMenu.query("collection_ssim", "Grainger Museum Collection"), c.filter_query("collection_ssim", "Grainger Museum Collection")
+    assert_equal BrowseMenu.query("named_collection_ssim", "Rupert Bunny Collection"), c.filter_query("named_collection_ssim", "Rupert Bunny Collection")
+    assert_equal({ f: { "material_ssim" => [ "Paper" ] } }, c.filter_query("material_ssim", "Paper"))
+    assert_equal c.filter_query("collection_ssim", "Grainger Museum Collection"), c.responsible_collection_query
+  end
 end

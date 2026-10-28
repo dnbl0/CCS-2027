@@ -35,7 +35,15 @@ module NexusCcs
         .select { |tag| tag.value.present? }
     end
 
-    def tag_path(tag) = helpers.search_action_path(f: { tag.field => [ tag.value ] })
+    def tag_path(tag) = helpers.search_action_path(filter_query(tag.field, tag.value))
+
+    # Fields that name a collection: their links open all of it, as the header's Search collections menu does
+    # (BrowseMenu, docs/adr/0004). Any other detail keeps the search's default.
+    WHOLE_SET_FIELDS = [ BrowseMenu::COLLECTION_FIELD, "named_collection_ssim" ].freeze
+
+    def filter_query(field, value)
+      WHOLE_SET_FIELDS.include?(field) ? BrowseMenu.query(field, value) : { f: { field => [ value ] } }
+    end
 
     # The details list: Title, then every workbook field the record has a value for, the UoM ID (the record's own
     # id, with a Copy button) just before the collection
@@ -67,7 +75,7 @@ module NexusCcs
     def link_to_value?(row) = row.field.in?(LINK_FIELDS)
 
     def value_path(row, value)
-      helpers.search_action_path(f: { row.field => [ value ] })
+      helpers.search_action_path(filter_query(row.field, value))
     end
 
     # The "Copyright" card
@@ -76,8 +84,7 @@ module NexusCcs
     def licence = Array(document["licence_type_ssim"]).first
     def responsible_collection = Array(document["collection_ssim"]).first
 
-    # The Responsible collection link opens all of the collection, as the Browse records menu does (docs/adr/0004)
-    def responsible_collection_query = BrowseMenu.query(BrowseMenu::COLLECTION_FIELD, responsible_collection)
+    def responsible_collection_query = filter_query(BrowseMenu::COLLECTION_FIELD, responsible_collection)
 
     # "Title. Date. Creator. Material. © Rights. Collection."
     def caption
