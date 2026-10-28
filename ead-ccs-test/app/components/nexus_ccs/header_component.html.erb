@@ -18,7 +18,7 @@
           <% end %>
         </ul>
       </nav>
-      <%= render NexusCcs::SavedBarComponent.new(placement: :header) if saved_in_header? && !home_page? %>
+      <%= render NexusCcs::SavedBarComponent.new(placement: :header) if chrome.saved_bar == :header %>
       <button type="button" class="site-header__search-toggle" aria-label="Open search" data-action="site-header#openSearch">
         <%= image_tag "site/icon-search-onaccent.svg", alt: "" %>
       </button>
@@ -89,7 +89,7 @@
             </div>
           </li>
           <%# Phones only: the header's top strip is hidden there, and the home page has no breadcrumb strip to hold the bar -%>
-          <% if saved_in_header? && Rails.configuration.x.saved_records %>
+          <% if chrome.saved_link_in_phone_menu? && Rails.configuration.x.saved_records %>
             <li class="site-nav__saved-item"><%= render NexusCcs::SavedBarComponent.new(placement: :drawer) %></li>
           <% end %>
         </ul>
@@ -117,6 +117,6 @@
 
 <%= render NexusCcs::BreadcrumbComponent.new(items: breadcrumbs) %>
 
-<%= search_bar if show_search_banner? %>
-<%= render NexusCcs::RecordBannerComponent.new(title: record_title) if show_record_banner? %>
-<%= render NexusCcs::PageBannerComponent.new(title: helpers.t("blacklight.advanced_search.form.title")) if show_advanced_search_banner? %>
+<%= search_bar if chrome.banner == :search %>
+<%= render NexusCcs::RecordBannerComponent.new(title: record_title) if chrome.banner == :record %>
+<%= render NexusCcs::PageBannerComponent.new(title: helpers.t("blacklight.advanced_search.form.title")) if chrome.banner == :advanced_search %>

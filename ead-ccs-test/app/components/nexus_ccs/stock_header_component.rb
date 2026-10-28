@@ -2,13 +2,9 @@
 
 module NexusCcs
   # The UoM header for the branded stock record page (BrandedStockCatalogController): the site's header, unchanged,
-  # with the breadcrumb of a record page. HeaderComponent only recognises the real catalog controller, so the
-  # trail is given here; it draws no search banner or title band, as the page under it is Blacklight's own.
+  # with the breadcrumb of a record page and no search banner or title band, as the page under it is Blacklight's own
+  # (PageChrome.stock_record).
   class StockHeaderComponent < HeaderComponent
-    def breadcrumbs = [ [ "Search results", search_action_url ], [ record_title, nil ] ]
-
-    def show_search_banner? = false
-
-    def show_record_banner? = false
+    def chrome = @chrome ||= PageChrome.stock_record(record_title: record_title, results_url: search_action_url)
   end
 end

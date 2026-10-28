@@ -12,20 +12,13 @@ module NexusCcs
       with_search_bar(component: NexusCcs::SearchBannerComponent) unless search_bar
     end
 
-    # [label, href] pairs for the breadcrumb bar; the last item is the current page.
-    def breadcrumbs
-      case helpers.controller_name
-      when "catalog"
-        case helpers.action_name
-        when "index" then helpers.has_search_parameters? ? [ [ "Search results", nil ] ] : []
-        when "show" then [ [ "Search results", results_url ], [ record_title, nil ] ]
-        when "advanced_search" then [ [ "Advanced Search", nil ] ]
-        else []
-        end
-      when "bookmarks" then [ [ I18n.t("nexus_ccs.saved.list_title"), nil ] ]
-      else []
-      end
+    # Which trail, banner and saved-bar place this page has (PageChrome)
+    def chrome
+      @chrome ||= PageChrome.for(controller: helpers.controller_name, action: helpers.action_name,
+                                 searching: helpers.controller_name == "catalog" && helpers.has_search_parameters?, page: self)
     end
+
+    def breadcrumbs = chrome.breadcrumbs
 
     # Back to the visitor's last search; with none, the records that have a digital asset as the mosaic (a bare
     # /catalog goes to the home page).
@@ -33,22 +26,6 @@ module NexusCcs
       params = helpers.current_search_session&.query_params.presence
       search_action_url(params || { f: { has_digital_asset: [ "with" ] }, search_field: "all_fields", view: "masonry" })
     end
-
-    # The saved-records bar sits in the breadcrumb strip. A page with no breadcrumb (the home page, the bare search
-    # page) keeps it in the header's top strip instead; the content pages draw their own strip (PageBreadcrumbsComponent).
-    def saved_in_header? = breadcrumbs.empty? && (helpers.controller_name != "pages" || helpers.action_name == "home")
-
-    # The home page carries the bar over the hero photo (pages/home.html.erb), not in the header's top strip.
-    def home_page? = helpers.controller_name == "pages" && helpers.action_name == "home"
-
-    # A record's page has its title band instead of the search banner, and Blacklight's own advanced search page
-    # (unmodified) is the search, so the site's search banner does not repeat above it.
-    def show_search_banner? = helpers.controller_name == "catalog" && !%w[show advanced_search].include?(helpers.action_name)
-
-    # The advanced search page has the page banner (its h1) under the breadcrumb strip, as the content pages do
-    def show_advanced_search_banner? = helpers.controller_name == "catalog" && helpers.action_name == "advanced_search"
-
-    def show_record_banner? = helpers.controller_name == "catalog" && helpers.action_name == "show"
 
     def record_title
       document = helpers.instance_variable_get(:@document)

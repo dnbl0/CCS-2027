@@ -50,5 +50,10 @@ _Avoid_: bookmarks (on screen), favourites
 Blacklight's own record page, at `/stock/:id` and `/branded-stock/:id`, kept for two records so stakeholders can compare it with
 the site's record page ([ADR 0006](docs/adr/0006-stock-record-pages-for-two-records.md)).
 
+**Page chrome**:
+The parts of the header that change with the page: the breadcrumb trail, the banner under it (search, record title or page
+banner) and where the saved-records bar sits. Decided in one place, `PageChrome` (tested in `test/models/page_chrome_test.rb`).
+_Avoid_: header state, layout flags
+
 **Data model workbook**:
 `CCS Field labels and filters.xlsx`: the source of truth for field labels and which fields are filters.
