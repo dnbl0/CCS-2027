@@ -79,7 +79,7 @@
             <% if responsible_collection %>
               <div class="record-copyright__item">
                 <dt>Responsible collection</dt>
-                <dd><%= link_to responsible_collection, helpers.search_action_path(f: { collection_ssim: [ responsible_collection ] }) %></dd>
+                <dd><%= link_to responsible_collection, helpers.search_action_path(responsible_collection_query) %></dd>
               </div>
             <% end %>
           </dl>

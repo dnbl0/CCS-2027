@@ -25,7 +25,7 @@ class SiteChromeTest < ActiveSupport::TestCase
     assert_selector "header.site-header"
     assert_selector ".site-header__utility nav a", count: NexusCcs::SiteNavigation::AUDIENCE.size
     assert_selector "button.site-header__search-toggle[aria-label='Open search']"
-    assert_selector "#site-nav-records li a[href^='/catalog?f%5Bcollection_ssim%5D']", count: NexusCcs::SiteNavigation.collections.size
+    assert_selector "#site-nav-records li a[href^='/catalog?any_assets=1&f%5Bcollection_ssim%5D']", count: NexusCcs::SiteNavigation.collections.size
     assert_selector "#search-overlay form[role=search]"
     assert_selector "#site-nav form[role=search]"
   end
@@ -58,10 +58,14 @@ class SiteChromeTest < ActiveSupport::TestCase
     assert_no_selector "nav.topbar" # Blacklight's own top navbar is replaced
   end
 
-  test "Browse records opens the catalog on the All Fields search, and lists a Browse link for each collection" do
+  test "Browse records opens the catalog on the All Fields search, and groups its links under three headings" do
     render_header(url: "/catalog")
     assert_selector "#site-nav-records a.site-nav__panel-title[href='/catalog?search_field=all_fields']", text: "Browse records"
-    assert_selector "#site-nav-records .site-nav__panel-list a", text: "Browse Grainger Museum Collection"
+    assert_selector "#site-nav-records .site-nav__group-title", count: 3
+    assert_selector "#site-nav-group-collections + ul a", text: "Grainger Museum Collection"
+    assert_selector "#site-nav-records ul[aria-labelledby='site-nav-group-types'] a", text: "Archives"
+    assert_selector "#site-nav-records .site-nav__browse-more a", text: /\AAll( [\d,]+)? records\z/
+    assert_selector "#site-nav-records .site-nav__browse-more a[href='/catalog/advanced']", text: "Advanced search"
     assert_no_selector "a", text: "Search all records"
   end
 

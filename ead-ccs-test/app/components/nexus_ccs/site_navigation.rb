@@ -24,6 +24,9 @@ module NexusCcs
       collections.find { |_label, _value, collection_slug| collection_slug == slug }&.second
     end
 
+    # The query that opens a whole collection (the header menu, the home page's cards, the old /collections/<slug> addresses)
+    def self.whole_collection_query(slug) = BrowseMenu.query(BrowseMenu::COLLECTION_FIELD, facet_value(slug))
+
     def self.slug_for(facet_value)
       collections.find { |_label, value, _slug| value == facet_value }&.last
     end

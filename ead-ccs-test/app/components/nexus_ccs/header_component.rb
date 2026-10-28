@@ -57,8 +57,26 @@ module NexusCcs
 
     def audience_links = SiteNavigation::AUDIENCE
 
-    def collection_links
-      SiteNavigation.collections.map { |label, _facet_value, slug| SiteNavigation::Link.new(label, helpers.collection_results_path(slug)) }
+    # The Browse records menu: its groups of links, then the totals under them (BrowseMenu)
+    def browse_counts = @browse_counts ||= BrowseMenu.counts
+
+    def browse_groups = BrowseMenu.groups(browse_counts)
+
+    def browse_path(item) = helpers.search_action_path(BrowseMenu.query(item.field, item.value))
+
+    def all_records_browse_path = helpers.search_action_path(BrowseMenu.all_records_query)
+
+    def with_images_path = helpers.search_action_path(f: { has_digital_asset: [ "with" ] }, search_field: "all_fields")
+
+    def total_count = browse_counts[:total]
+
+    def with_images_count = browse_counts[BrowseMenu::WITH_IMAGES]
+
+    # "13,408" plus "records" for screen readers; nothing when the count is unknown
+    def record_count(count)
+      return if count.nil?
+
+      tag.span(class: "site-nav__count") { safe_join([ helpers.number_with_delimiter(count), tag.span(" records", class: "visually-hidden") ]) }
     end
 
     def help_links

@@ -16,15 +16,32 @@ class PagesTest < ActionDispatch::IntegrationTest
       get "/collections/#{slug}"
 
       assert_response :moved_permanently, slug
-      assert_redirected_to "/catalog?#{{ f: { collection_ssim: [ facet_value ] }, search_field: "all_fields" }.to_query}"
+      assert_redirected_to whole_collection_path(facet_value)
     end
   end
 
-  test "the collection links go to the results filtered to that collection" do
+  # Browsing a collection shows all of it: the any_assets marker keeps the default "With a digital asset" filter
+  # off (docs/adr/0004), or a collection with few or no images (Harry Brookes Allen has none) opens nearly empty.
+  test "the home page's collection cards open the whole collection" do
     get "/"
     NexusCcs::SiteNavigation.collections.each do |_label, facet_value, _slug|
-      assert_select ".home-card__link[href=?]", "/catalog?#{{ f: { collection_ssim: [ facet_value ] }, search_field: "all_fields" }.to_query}"
+      assert_select ".home-card__link[href=?]", whole_collection_path(facet_value), text: facet_value
+      assert_select "a.home-textbutton[href=?]", whole_collection_path(facet_value), text: /Search this Collection/
     end
+  end
+
+  test "the header's Browse records menu opens the whole collection" do
+    get "/"
+    NexusCcs::SiteNavigation.collections.each do |label, facet_value, _slug|
+      assert_select "#site-nav-records .site-nav__panel-list a[href=?]", whole_collection_path(facet_value), text: /\A#{Regexp.escape(label)}/
+    end
+  end
+
+  test "a whole collection is searched as asked: the default filter is not added" do
+    facet_value = NexusCcs::SiteNavigation.collections.first[1]
+    get whole_collection_path(facet_value)
+
+    assert_not response.redirect?
   end
 
   test "the record pages have Blacklight's Cite page but not its Email or SMS pages" do
@@ -118,7 +135,7 @@ class PagesTest < ActionDispatch::IntegrationTest
   test "the site header links to the pages, and has no Contact page of its own" do
     get "/help"
 
-    assert_select "#site-nav-records li a[href^='/catalog?f%5Bcollection_ssim%5D']", count: 5
+    assert_select "#site-nav-records li a[href^='/catalog?any_assets=1&f%5Bcollection_ssim%5D']", count: 5
     assert_select "#site-nav-collections", count: 0
     assert_select "#site-nav a[href='/collections']", count: 0
     assert_select "#site-nav-help a[href='/help#faq']"
@@ -144,5 +161,11 @@ class PagesTest < ActionDispatch::IntegrationTest
 
     assert_select "#country-acknowledgement p.text-body-secondary"
     assert_select "#country-acknowledgement .text-secondary", count: 0
+  end
+
+  private
+
+  def whole_collection_path(facet_value)
+    "/catalog?#{{ any_assets: "1", f: { collection_ssim: [ facet_value ] }, search_field: "all_fields" }.to_query}"
   end
 end

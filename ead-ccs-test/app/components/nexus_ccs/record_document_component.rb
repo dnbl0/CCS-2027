@@ -76,6 +76,9 @@ module NexusCcs
     def licence = Array(document["licence_type_ssim"]).first
     def responsible_collection = Array(document["collection_ssim"]).first
 
+    # The Responsible collection link opens all of the collection, as the Browse records menu does (docs/adr/0004)
+    def responsible_collection_query = BrowseMenu.query(BrowseMenu::COLLECTION_FIELD, responsible_collection)
+
     # "Title. Date. Creator. Material. © Rights. Collection."
     def caption
       parts = [ heading, Array(document["production_date_ssim"]).first, Array(document["creator_ssim"]).first(2).join("; "),

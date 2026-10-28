@@ -1,0 +1,19 @@
+<section class="collection-intro" aria-labelledby="collection-intro-title">
+  <div class="collection-intro__inner">
+    <h2 id="collection-intro-title" class="collection-intro__title"><%= collection["name"] %></h2>
+    <p class="collection-intro__blurb"><%= collection["blurb"] %></p>
+    <% if named_collections.any? %>
+      <details class="collection-intro__more">
+        <summary class="collection-intro__label"><span class="collection-intro__label-text">Named collections (<%= named_collections.size %>)</span></summary>
+        <ul class="collection-intro__named">
+          <% named_collections.each do |entry| %>
+            <li><%= link_to entry["name"], named_path(entry) %></li>
+          <% end %>
+        </ul>
+      </details>
+    <% end %>
+    <% if collection["visit_url"].present? %>
+      <p class="collection-intro__visit"><%= link_to "Plan a visit", collection["visit_url"] %></p>
+    <% end %>
+  </div>
+</section>

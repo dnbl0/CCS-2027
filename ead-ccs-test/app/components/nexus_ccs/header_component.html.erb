@@ -44,15 +44,27 @@
                     data-site-header-target="trigger" data-action="site-header#toggleSection">
               <span>Browse records</span><%= image_tag "site/icon-expand.svg", alt: "" %>
             </button>
-            <div id="site-nav-records" class="site-nav__panel">
+            <div id="site-nav-records" class="site-nav__panel site-nav__panel--browse">
               <button type="button" class="site-nav__back" data-action="site-header#back"><%= back_label %></button>
               <%= link_to all_records_link_path, class: "site-nav__panel-title" do %>
                 <%= image_tag "site/icon-arrow-footer.svg", alt: "" %>Browse records
               <% end %>
-              <ul class="site-nav__panel-list">
-                <% collection_links.each do |link| %>
-                  <li><%= link_to link.href do %><%= image_tag "site/icon-arrow-footer.svg", alt: "" %>Browse <%= link.label %><% end %></li>
+              <div class="site-nav__groups">
+                <% browse_groups.each do |group| %>
+                  <div class="site-nav__group">
+                    <p class="site-nav__group-title" id="site-nav-group-<%= group.id %>"><%= group.heading %></p>
+                    <ul class="site-nav__panel-list" aria-labelledby="site-nav-group-<%= group.id %>">
+                      <% group.items.each do |item| %>
+                        <li><%= link_to browse_path(item) do %><span class="site-nav__item-label"><%= item.label %></span> <%= record_count(item.count) %><% end %></li>
+                      <% end %>
+                    </ul>
+                  </div>
                 <% end %>
+              </div>
+              <ul class="site-nav__browse-more">
+                <li><%= link_to all_records_browse_path do %><%= total_count ? "All #{helpers.number_with_delimiter(total_count)} records" : "All records" %><% end %></li>
+                <li><%= link_to with_images_path do %>Only records with images<%= " (#{helpers.number_with_delimiter(with_images_count)})" if with_images_count %><% end %></li>
+                <li><%= link_to "Advanced search", helpers.advanced_search_catalog_path %></li>
               </ul>
             </div>
           </li>

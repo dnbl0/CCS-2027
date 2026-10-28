@@ -1,0 +1,125 @@
+/* The introduction above results filtered to one collection (NexusCcs::CollectionIntroComponent) */
+/* Only on the results page, which runs the full width: the same side padding as the search banner above it */
+.collection-intro {
+  padding: var(--ccs-space-6) var(--space-32) 0;
+}
+
+.collection-intro__inner {
+  padding-bottom: var(--ccs-space-5);
+  border-bottom: 1px solid var(--ccs-border-panel);
+}
+
+@media (max-width: 768px) {
+  .collection-intro {
+    padding-inline: var(--space-16);
+  }
+}
+
+.collection-intro__title {
+  margin: 0 0 var(--ccs-space-2);
+  font-family: var(--ccs-font-heading);
+  font-size: 1.875rem;
+  font-weight: var(--ccs-font-weight-regular);
+  line-height: 1.15;
+  color: var(--ccs-navy-1100);
+}
+
+.collection-intro__blurb {
+  max-width: 48rem;
+  margin: 0 0 var(--ccs-space-4);
+  font-size: var(--ccs-font-size-lg);
+  line-height: 1.5;
+  color: var(--ccs-text-secondary);
+}
+
+/* Named collections: a disclosure, closed at first, so the results stay near the top on a phone */
+.collection-intro__more {
+  margin: 0 0 var(--ccs-space-4);
+}
+
+/* The summary keeps its own display (so browsers keep its disclosure role); the text inside it is styled */
+.collection-intro__label {
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-link);
+  list-style: none;
+  cursor: pointer;
+}
+
+.collection-intro__label::-webkit-details-marker {
+  display: none;
+}
+
+.collection-intro__label-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ccs-space-2);
+  min-height: 44px;
+}
+
+/* The disclosure's state, drawn: a chevron pointing down when closed, up when open */
+.collection-intro__label-text::after {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.collection-intro__more[open] > .collection-intro__label .collection-intro__label-text::after {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+.collection-intro__label:hover {
+  color: var(--ccs-text-link-hover);
+  text-decoration: underline;
+}
+
+.collection-intro__label:focus-visible {
+  outline: 2px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.collection-intro__named {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-2);
+  margin: var(--ccs-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.collection-intro__named a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--ccs-space-2) var(--ccs-space-4);
+  border: 1px solid var(--ccs-border-brand);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-navy-1100);
+  text-decoration: none;
+}
+
+.collection-intro__named a:hover {
+  background: var(--ccs-cyan-100);
+  text-decoration: underline;
+}
+
+.collection-intro__named a:focus-visible,
+.collection-intro__visit a:focus-visible {
+  outline: 2px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.collection-intro__visit {
+  margin: 0;
+}
+
+.collection-intro__visit a {
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-link);
+}
+
+.collection-intro__visit a:hover {
+  color: var(--ccs-text-link-hover);
+}

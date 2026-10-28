@@ -151,3 +151,24 @@ a.site-header__title:hover { color: var(--ccs-cyan-400); text-decoration: underl
   .site-nav > ul.site-nav__audience > li > a:hover { color: var(--ccs-sage-150); text-decoration: underline; }
 }
 @media (prefers-reduced-motion: reduce) { .site-nav__trigger img { transition: none; } }
+
+/* Browse records menu (BrowseMenu): three groups of links with record counts, then the totals */
+.site-nav__group-title { margin: 0 0 var(--ccs-space-2); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); letter-spacing: 0.02em; color: var(--ccs-cyan-250); }
+.site-nav__panel--browse .site-nav__panel-list a { align-items: baseline; justify-content: space-between; }
+.site-nav__count { flex: none; font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-regular); color: var(--ccs-neutral-300); font-variant-numeric: tabular-nums; }
+.site-nav__browse-more { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2) var(--ccs-space-6); margin: var(--ccs-space-5) 0 0; padding: var(--ccs-space-4) 0 0; border-top: 1px solid var(--ccs-navy-750); list-style: none; }
+.site-nav__browse-more a { font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-white); text-decoration: none; }
+.site-nav__browse-more a:hover { text-decoration: underline; color: var(--ccs-cyan-400); }
+
+@media (min-width: 1024px) {
+  .site-nav__panel--browse { width: min(50rem, calc(100vw - 2rem)); }
+  .site-nav__groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ccs-space-6); margin-top: var(--ccs-space-2); padding-top: var(--ccs-space-4); border-top: 1px solid var(--ccs-navy-750); }
+  .site-nav__panel--browse .site-nav__panel-list { margin: 0; padding: 0; border-top: 0; }
+}
+
+@media (max-width: 1023px) {
+  .site-nav__group-title { margin: 0; padding: var(--ccs-space-4) 18px var(--ccs-space-2); border-bottom: 1px solid var(--ccs-navy-750); }
+  .site-nav__browse-more { display: block; margin: 0; padding: 0; border-top: 0; }
+  .site-nav__browse-more li { border-bottom: 1px solid var(--ccs-navy-750); }
+  .site-nav__browse-more a { display: flex; align-items: center; min-height: 57px; padding: var(--ccs-space-4) 18px; }
+}
