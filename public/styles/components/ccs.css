@@ -232,7 +232,7 @@
 .ccs-section--hero { padding: 0; background: var(--brand-1200); color: var(--white-100); }
 .ccs-hero { display: flex; min-height: 543px; }
 /* No overflow:hidden on the hero: it clipped the search bar's collections dropdown. The image is clipped by its own box instead. */
-.ccs-hero__content { position: relative; z-index: var(--z-1); flex: none; box-sizing: border-box; width: 55%; display: flex; align-items: center; padding: 72px 0 96px max(var(--space-32), calc((100% - var(--layout-content-wide)) / 2)); }
+.ccs-hero__content { position: relative; z-index: var(--z-1); flex: none; box-sizing: border-box; width: 55%; display: flex; align-items: center; padding: 72px var(--space-48) 96px max(var(--space-32), calc((100% - var(--layout-content-wide)) / 2)); }
 .ccs-hero__content > div { width: 620px; max-width: 100%; display: flex; flex-direction: column; gap: var(--space-32); }
 .ccs-hero__title { margin: 0 0 var(--space-12); font-family: "Fraunces", serif; font-size: var(--font-size-title-1); font-weight: var(--font-weight-regular); line-height: var(--line-height-tight); letter-spacing: -0.48px; color: var(--white-100); font-variation-settings: "SOFT" 50, "WONK" 0, "opsz" 9; }
 .ccs-hero__text { margin: 0; font-size: var(--font-size-body-lg); color: var(--white-100); }

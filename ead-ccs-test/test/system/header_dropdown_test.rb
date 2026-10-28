@@ -8,9 +8,9 @@ class HeaderDropdownTest < ApplicationSystemTestCase
     page.current_window.resize_to(1400, 900)
   end
 
-  test "the open Browse records panel is narrower than the window and sits against the header's right edge" do
+  test "the open Search collections panel is narrower than the window and sits against the header's right edge" do
     visit root_path
-    find(".site-nav__trigger", text: "Browse records").click
+    find(".site-nav__trigger", text: "Search collections").click
     assert_selector "#site-nav-records", visible: :visible
 
     box = page.evaluate_script("(() => { const r = document.getElementById('site-nav-records').getBoundingClientRect(); const h = document.querySelector('.site-header').getBoundingClientRect(); return { left: r.left, right: r.right, width: r.width, top: r.top, headerBottom: h.bottom, headerRight: h.right, vw: document.documentElement.clientWidth } })()")
@@ -24,7 +24,7 @@ class HeaderDropdownTest < ApplicationSystemTestCase
     dim = "(() => { const s = getComputedStyle(document.querySelector('.site-header'), '::after'); return s.content === 'none' ? null : s.backgroundColor })()"
     assert_nil page.evaluate_script(dim)
 
-    find(".site-nav__trigger", text: "Browse records").click
+    find(".site-nav__trigger", text: "Search collections").click
     assert_selector ".site-nav__trigger[aria-expanded=true]"
     assert_equal "rgba(0, 0, 0, 0.65)", page.evaluate_script(dim)
 

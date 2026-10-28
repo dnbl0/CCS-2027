@@ -30,7 +30,7 @@ class PagesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the header's Browse records menu opens the whole collection" do
+  test "the header's Search collections menu opens the whole collection" do
     get "/"
     NexusCcs::SiteNavigation.collections.each do |label, facet_value, _slug|
       assert_select "#site-nav-records .site-nav__panel-list a[href=?]", whole_collection_path(facet_value), text: /\A#{Regexp.escape(label)}/
@@ -123,10 +123,10 @@ class PagesTest < ActionDispatch::IntegrationTest
     assert_select ".site-nav a[href='/about']", count: 1
   end
 
-  test "the header lists Browse records, About and Help in that order" do
+  test "the header lists Search collections, About and Help in that order" do
     get "/about"
 
-    labels = [ "Browse records", "About", "Help" ]
+    labels = [ "Search collections", "About", "Help" ]
     items = css_select(".site-nav > ul > li").map { |item| item.text.squish }
     assert_equal labels, items.first(3).map { |text| labels.find { |label| text.start_with?(label) } }
     assert_select "#site-nav a[href='https://about.unimelb.edu.au']", count: 0

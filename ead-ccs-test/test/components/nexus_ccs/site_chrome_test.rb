@@ -19,7 +19,7 @@ class SiteChromeTest < ActiveSupport::TestCase
     end
   end
 
-  test "header has the audience links, search toggle and a Browse records menu that links to the collection pages" do
+  test "header has the audience links, search toggle and a Search collections menu that links to the collection pages" do
     render_header
 
     assert_selector "header.site-header"
@@ -43,7 +43,7 @@ class SiteChromeTest < ActiveSupport::TestCase
     render_header
 
     assert_selector "header[data-controller='site-header']"
-    assert_selector "button.site-nav__trigger[aria-expanded='false'][data-action='site-header#toggleSection']", count: 2 # Browse records and Help
+    assert_selector "button.site-nav__trigger[aria-expanded='false'][data-action='site-header#toggleSection']", count: 2 # Search collections and Help
     assert_selector "button.site-header__menu[aria-controls='site-nav'][aria-expanded='false']"
     assert_selector "#site-nav-records button.site-nav__back"
   end
@@ -58,15 +58,14 @@ class SiteChromeTest < ActiveSupport::TestCase
     assert_no_selector "nav.topbar" # Blacklight's own top navbar is replaced
   end
 
-  test "Browse records opens the catalog on the All Fields search, and groups its links under three headings" do
+  test "Search all records opens the catalog on the All Fields search, and groups its links under three headings" do
     render_header(url: "/catalog")
-    assert_selector "#site-nav-records a.site-nav__panel-title[href='/catalog?search_field=all_fields']", text: "Browse records"
+    assert_selector "#site-nav-records a.site-nav__panel-title[href='/catalog?search_field=all_fields']", text: "Search all records"
     assert_selector "#site-nav-records .site-nav__group-title", count: 3
     assert_selector "#site-nav-group-collections + ul a", text: "Grainger Museum Collection"
     assert_selector "#site-nav-records ul[aria-labelledby='site-nav-group-types'] a", text: "Archives"
     assert_selector "#site-nav-records .site-nav__browse-more a", text: /\AAll( [\d,]+)? records\z/
     assert_selector "#site-nav-records .site-nav__browse-more a[href='/catalog/advanced']", text: "Advanced search"
-    assert_no_selector "a", text: "Search all records"
   end
 
   test "the bare search page has no breadcrumb" do

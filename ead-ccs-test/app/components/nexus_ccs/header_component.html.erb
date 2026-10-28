@@ -42,12 +42,12 @@
           <li>
             <button type="button" class="site-nav__trigger" aria-expanded="false" aria-controls="site-nav-records"
                     data-site-header-target="trigger" data-action="site-header#toggleSection">
-              <span>Browse records</span><%= image_tag "site/icon-expand.svg", alt: "" %>
+              <span>Search collections</span><%= image_tag "site/icon-expand.svg", alt: "" %>
             </button>
             <div id="site-nav-records" class="site-nav__panel site-nav__panel--browse">
               <button type="button" class="site-nav__back" data-action="site-header#back"><%= back_label %></button>
               <%= link_to all_records_link_path, class: "site-nav__panel-title" do %>
-                <%= image_tag "site/icon-arrow-footer.svg", alt: "" %>Browse records
+                <%= image_tag "site/icon-arrow-footer.svg", alt: "" %>Search all records
               <% end %>
               <div class="site-nav__groups">
                 <% browse_groups.each do |group| %>

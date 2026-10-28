@@ -125,11 +125,11 @@ class KeyboardFocusTest < ApplicationSystemTestCase
     find("button.site-nav__trigger[aria-controls=site-nav-records]").click
 
     home = "a.site-header__title[href='/']:not(.sticky-search *)"
-    assert_selector ".site-header__section", text: "Browse records", visible: true
+    assert_selector ".site-header__section", text: "Search collections", visible: true
     assert_no_selector "a.site-header__section", visible: :all
     assert_selector home, text: "Collections Navigator", visible: true
     assert_equal "Collections Navigator", accessible_name(home)
-    assert_no_selector "a[href='/']", text: "Browse records", visible: :all
+    assert_no_selector "a[href='/']", text: "Search collections", visible: :all
 
     box = page.evaluate_script(<<~JS)
       (() => {

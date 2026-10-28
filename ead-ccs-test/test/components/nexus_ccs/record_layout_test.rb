@@ -84,7 +84,7 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_includes js, 'static targets = ["source", "button", "status", "label"]'
   end
 
-  test "the Responsible collection link opens the whole collection, as the Browse records menu does" do
+  test "the Responsible collection link opens the whole collection, as the Search collections menu does" do
     assert_equal BrowseMenu.query(BrowseMenu::COLLECTION_FIELD, "Grainger Museum Collection"), component(FIELDS).responsible_collection_query
   end
 end

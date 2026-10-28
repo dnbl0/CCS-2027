@@ -41,7 +41,7 @@ Source: research agent, 2026-10-12 (code read only, app not run). Rails text liv
 | A1 | About | Default | Happy | `/about` | Hero with h1 and image; link strip of 5 anchors; intro; Journey (dark, 3 steps, 2 links); Myer split; Support list + CTA; About the data (4 paragraphs); 5 cards; "Contact and support" | about.html.erb | Both |
 | A2 | About | Anchor jump | Edge | link strip | Smooth scroll; no active state documented | help.css:113 | Both |
 | A3 | About | Mobile | Edge | <=1000, <=768 | 2-column grids go to 1; hero padding changes; hero image min-height 220px | about.css:299-330 | Both |
-| A4 | About | mailto | Edge | n/a | "Send feedback" `mailto:ccs-feedback@unimelb.edu.au` | about.html.erb:104 | Both |
+| A4 | About | mailto | Edge | n/a | "Send feedback" `mailto:collections-navigator@unimelb.edu.au` | about.html.erb:104 | Both |
 | T1 | Contact | Default | Happy | `/contact` | Banner; side "On this page" nav (4 links); MDHS group lists 3 emails (all `MDHS-museum@`); M&C group 2 "Access Request Form" links (external smartsheet, new tab) | contact.html.erb:18-31 | Both |
 | T2 | Contact | General enquiries | Happy | n/a | Phone `tel:136352`, international `tel:+61390355511`, address, site-feedback mailto with italic note | contact.html.erb:34-42 | Both |
 | T3 | Contact | "Before you get in touch" | Happy | n/a | 3-step ordered list + link to Access and information | contact.html.erb:44-52 | Both |
