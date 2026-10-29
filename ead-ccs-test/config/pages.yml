@@ -279,32 +279,3 @@ collections:
     website:
       url: https://storeroom.its.unimelb.edu.au/umc/art?page=collection-areas
       summary: Opening hours, exhibitions, events and visitor information.
-# The header's Browse records menu, beside the collections (SitePages.menu): the types and named collections it features.
-# label is what the menu shows; value is the Solr facet value it opens (all of it: BrowseMenu, docs/adr/0004).
-browse_menu:
-  types:
-    field: classification_ssim
-    heading: Browse by type
-    items:
-    - label: Art and design
-      value: Art and design
-    - label: Archives
-      value: Archive
-    - label: Music scores
-      value: Music scores
-    - label: Photography
-      value: Photography
-    - label: Medical instruments
-      value: Medical and Surgical Equipment and Instruments
-  named:
-    field: named_collection_ssim
-    heading: Featured named collections
-    items:
-    - label: Gerard Herbst Posters
-      value: Gerard Herbst Poster Collection
-    - label: Royal Women's Hospital
-      value: Royal Women's Hospital Collection
-    - label: Grimwade Bequest
-      value: Russell and Mab Grimwade Bequest
-    - label: Rupert Bunny Collection
-      value: Rupert Bunny Collection

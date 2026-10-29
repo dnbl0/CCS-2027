@@ -1,21 +1,19 @@
 require "test_helper"
 
 class BrowseMenuTest < ActiveSupport::TestCase
-  COUNTS = { [ "collection_ssim", "Grainger Museum Collection" ] => 13_408, [ "classification_ssim", "Archive" ] => 5_572, total: 40_962 }.freeze
+  COUNTS = { [ "collection_ssim", "Grainger Museum Collection" ] => 13_408 }.freeze
 
-  test "three groups: the collections in menu order, then the featured types and named collections" do
+  test "one group: the collections in menu order" do
     groups = BrowseMenu.groups(COUNTS)
 
-    assert_equal [ "Museums and collections", "Browse by type", "Featured named collections" ], groups.map(&:heading)
+    assert_equal [ "Museums and collections" ], groups.map(&:heading)
     assert_equal SitePages.menu.map(&:first), groups.first.items.map(&:label)
-    assert groups.all? { |group| group.items.any? }
   end
 
   test "each link knows its record count, and an unknown count is nil" do
-    collections, types = BrowseMenu.groups(COUNTS)
+    collections, = BrowseMenu.groups(COUNTS)
 
     assert_equal 13_408, collections.items.find { |item| item.value == "Grainger Museum Collection" }.count
-    assert_equal 5_572, types.items.find { |item| item.label == "Archives" }.count
     assert_nil collections.items.find { |item| item.value == "Medical History Museum" }.count
   end
 
@@ -39,17 +37,16 @@ class BrowseMenuTest < ActiveSupport::TestCase
   end
 
   test "the counts come from one Solr request, one facet query per link" do
-    connection = FakeConnection.new(response: { "response" => { "numFound" => 40_962 }, "facet_counts" => { "facet_queries" => { %(classification_ssim:"Archive") => 5_572 } } })
+    connection = FakeConnection.new(response: { "response" => { "numFound" => 40_962 }, "facet_counts" => { "facet_queries" => { %(collection_ssim:"Grainger Museum Collection") => 13_408 } } })
 
     counts = BrowseMenu.counts(connection)
 
-    assert_equal 40_962, counts[:total]
-    assert_equal 5_572, counts[[ "classification_ssim", "Archive" ]]
+    assert_equal 13_408, counts[[ "collection_ssim", "Grainger Museum Collection" ]]
     assert_equal 1, connection.requests.size
     path, params = connection.requests.first
     assert_equal "select", path
     assert_equal 0, params[:rows]
-    assert_includes params[:"facet.query"], %(named_collection_ssim:"Royal Women's Hospital Collection")
+    assert_includes params[:"facet.query"], %(collection_ssim:"Medical History Museum")
     assert_includes params[:"facet.query"], %(has_digital_asset_bsi:"true")
   end
 

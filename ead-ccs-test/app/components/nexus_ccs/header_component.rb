@@ -34,18 +34,14 @@ module NexusCcs
 
     def audience_links = SiteNavigation::AUDIENCE
 
-    # The Browse records menu: its groups of links, then the totals under them (BrowseMenu)
+    # The Search collections menu: the collections, then the records with images under them (BrowseMenu)
     def browse_counts = @browse_counts ||= BrowseMenu.counts
 
     def browse_groups = BrowseMenu.groups(browse_counts)
 
     def browse_path(item) = helpers.search_action_path(BrowseMenu.query(item.field, item.value))
 
-    def all_records_browse_path = helpers.search_action_path(BrowseMenu.all_records_query)
-
     def with_images_path = helpers.search_action_path(f: { has_digital_asset: [ "with" ] }, search_field: "all_fields")
-
-    def total_count = browse_counts[:total]
 
     def with_images_count = browse_counts[BrowseMenu::WITH_IMAGES]
 

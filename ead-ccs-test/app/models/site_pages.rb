@@ -8,9 +8,6 @@ module SitePages
   class << self
     def browse = data.fetch("browse")
 
-    # What the header's Browse records menu features besides the collections (BrowseMenu)
-    def browse_menu = data.fetch("browse_menu")
-
     # The landing page data of a collection, by slug; nil for an unknown one
     def collection(slug) = data.fetch("collections")[slug]
 

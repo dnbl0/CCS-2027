@@ -58,13 +58,15 @@ class SiteChromeTest < ActiveSupport::TestCase
     assert_no_selector "nav.topbar" # Blacklight's own top navbar is replaced
   end
 
-  test "Search all records opens the catalog on the All Fields search, and groups its links under three headings" do
+  test "Search all records opens the catalog on the All Fields search; the menu lists only the collections" do
     render_header(url: "/catalog")
     assert_selector "#site-nav-records a.site-nav__panel-title[href='/catalog?search_field=all_fields']", text: "Search all records"
-    assert_selector "#site-nav-records .site-nav__group-title", count: 3
+    assert_selector "#site-nav-records .site-nav__group-title", count: 1, text: "Museums and collections"
     assert_selector "#site-nav-group-collections + ul a", text: "Grainger Museum Collection"
-    assert_selector "#site-nav-records ul[aria-labelledby='site-nav-group-types'] a", text: "Archives"
-    assert_selector "#site-nav-records .site-nav__browse-more a", text: /\AAll( [\d,]+)? records\z/
+    assert_no_text "Browse by type"
+    assert_no_text "Featured named collections"
+    assert_no_selector "#site-nav-records .site-nav__browse-more a", text: /\AAll( [\d,]+)? records\z/
+    assert_selector "#site-nav-records .site-nav__browse-more a", text: /\AOnly records with images/
     assert_selector "#site-nav-records .site-nav__browse-more a[href='/catalog/advanced']", text: "Advanced search"
   end
 
