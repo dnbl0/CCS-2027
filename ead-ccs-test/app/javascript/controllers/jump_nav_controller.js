@@ -12,9 +12,12 @@ export default class extends Controller {
   connect() {
     this.queued = false
     this.schedule = this.schedule.bind(this)
+    this.followFormerId = this.followFormerId.bind(this)
     window.addEventListener("scroll", this.schedule, { passive: true })
     window.addEventListener("resize", this.schedule)
     window.addEventListener("hashchange", this.schedule)
+    window.addEventListener("hashchange", this.followFormerId)
+    this.followFormerId()
     this.schedule()
   }
 
@@ -22,6 +25,21 @@ export default class extends Controller {
     window.removeEventListener("scroll", this.schedule)
     window.removeEventListener("resize", this.schedule)
     window.removeEventListener("hashchange", this.schedule)
+    window.removeEventListener("hashchange", this.followFormerId)
+  }
+
+  // A renamed section keeps its old ids in data-former-ids (e.g. the About page's Trust section, once #myer), so an
+  // address with an old #id still lands on it: the address is corrected to the new id and the page jumps there.
+  followFormerId() {
+    let id
+    try { id = decodeURIComponent(window.location.hash.slice(1)) } catch { return }
+    if (!id || document.getElementById(id)) return
+
+    const section = document.querySelector(`[data-former-ids~="${CSS.escape(id)}"]`)
+    if (!section) return
+
+    history.replaceState(history.state, "", `#${section.id}`)
+    section.scrollIntoView({ behavior: "instant", block: "start" })
   }
 
   schedule() {

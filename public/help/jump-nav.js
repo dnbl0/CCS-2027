@@ -29,15 +29,43 @@
     window.requestAnimationFrame(function () { queued = false; update(); });
   }
 
+  // A page opened at an address with a #section lands on it. The template layer redraws the page after the browser has
+  // made its own jump, which leaves the page at the top, so the jump is made again as the page changes, until the reader
+  // takes over (scrolls, clicks, types) or the page has settled. A renamed section keeps its old ids in data-former-ids
+  // (e.g. the About page's Trust section, once #myer): an address with an old #id is corrected to the new id first.
+  var landing = !!window.location.hash;
+  function stopLanding() { landing = false; }
+  function land() {
+    if (!landing) return;
+    var id;
+    try { id = decodeURIComponent(window.location.hash.slice(1)); } catch (e) { landing = false; return; }
+    var section = id && (document.getElementById(id) || document.querySelector('[data-former-ids~="' + CSS.escape(id) + '"]'));
+    if (!section) return;
+    if (section.id !== id) history.replaceState(history.state, '', '#' + section.id);
+    section.scrollIntoView({ behavior: 'instant', block: 'start' });
+  }
+  ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function (type) {
+    window.addEventListener(type, stopLanding, { once: true, passive: true });
+  });
+  window.addEventListener('load', function () { land(); setTimeout(stopLanding, 3000); }, { once: true });
+
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule);
   window.addEventListener('hashchange', schedule);
-  document.addEventListener('DOMContentLoaded', schedule);
-  window.addEventListener('load', schedule);
+  // A later visit to an old #id (the address bar, an old link) is corrected the same way, once; jumps to a section's
+  // current id are left to the browser, so they still scroll smoothly
+  window.addEventListener('hashchange', function () {
+    var id;
+    try { id = decodeURIComponent(window.location.hash.slice(1)); } catch (e) { return; }
+    if (!id || document.getElementById(id)) return;
+    landing = true; land(); landing = false;
+  });
+  document.addEventListener('DOMContentLoaded', function () { land(); schedule(); });
   // The template layer can redraw the menu after load (it did on slower machines, so no link was marked until the reader
   // scrolled): mark it again whenever the page changes. A redraw that only repeats the current marking changes nothing,
   // so this does not loop.
-  new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+  new MutationObserver(function () { land(); schedule(); }).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+  land();
   schedule();
 
   // Smooth scrolling for jumps within the page (styles/pages/help.css: html.smooth-scroll) comes on only once the first

@@ -16,6 +16,16 @@ class HelpJumpNavTest < ApplicationSystemTestCase
     assert_equal "auto", evaluate_script("document.documentElement.classList.remove('smooth-scroll'), getComputedStyle(document.documentElement).scrollBehavior")
   end
 
+  # A renamed section keeps its old id in data-former-ids, so a link shared before the rename still lands on it
+  test "an address with a renamed section's old #id lands on the section under its new id" do
+    page.driver.set_cookie("country_acknowledged", "1")
+    visit "/about#myer"
+
+    assert_equal "#sidney-myer-university-trust", evaluate_script("window.location.hash")
+    assert_operator evaluate_script("Math.abs(document.getElementById('sidney-myer-university-trust').getBoundingClientRect().top)"), :<, 200
+    assert_selector "a.jump-nav__link[aria-current=location]", text: "The Sidney Myer University Trust"
+  end
+
   test "the jump navigation marks the section being read as the reader scrolls" do
     visit help_path
     assert_selector "a.jump-nav__link[aria-current=location]", text: "Frequently Asked Questions"
