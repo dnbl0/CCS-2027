@@ -39,4 +39,15 @@
   // so this does not loop.
   new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
   schedule();
+
+  // Smooth scrolling for jumps within the page (styles/pages/help.css: html.smooth-scroll) comes on only once the first
+  // load has settled, as in the Rails app's smooth_scroll.js: a page opened at an address with a #section must land there
+  // at once, and an animated first jump can be cut short and leave the page at the top.
+  function enableSmoothScroll() {
+    window.requestAnimationFrame(function () {
+      window.requestAnimationFrame(function () { document.documentElement.classList.add('smooth-scroll'); });
+    });
+  }
+  if (document.readyState === 'complete') enableSmoothScroll();
+  else window.addEventListener('load', enableSmoothScroll, { once: true });
 })();

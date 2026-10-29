@@ -161,7 +161,7 @@ body.page-help .help-layout__content .help-section__contact {
   }
 }
 
-/* Help topic grid; smooth scrolling for in-page anchors */
+/* Help topic grid */
 .help-topics-grid{grid-template-columns:repeat(3,1fr)}
 @media (max-width:900px){
   .help-topics-grid{grid-template-columns:repeat(2,1fr)}
@@ -169,7 +169,11 @@ body.page-help .help-layout__content .help-section__contact {
 @media (max-width:560px){
   .help-topics-grid{grid-template-columns:1fr}
 }
-@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+/* Smooth scrolling for jumps within a page, turned on once the first load has settled (Rails: app/javascript/smooth_scroll.js; static: help/jump-nav.js).
+   A page opened at an address with a #section lands there at once: an animated first jump can be cut short (slow load,
+   background tab) and leave the page at the top. html:not(.smooth-scroll) outranks Bootstrap's own smooth-scrolling rule on :root. */
+html:not(.smooth-scroll){scroll-behavior:auto}
+@media (prefers-reduced-motion:no-preference){html.smooth-scroll{scroll-behavior:smooth}}
 
 /* Jump navigation: the University's "Inside page with blue header and jump nav" template (unimelb.edu.au/web/matrix-cms/templates).
    Desktop: a sticky "On this page" menu in the left column, divided from the content by a 1px rule.
