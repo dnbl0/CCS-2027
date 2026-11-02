@@ -74,14 +74,17 @@ class ModalScrollLockTest < ApplicationSystemTestCase
     assert_no_selector "#country-acknowledgement[open]"
   end
 
+  # The record page has other dialog buttons (Cite this record); this one opens the leaving-site dialog
+  LEAVING_SITE_OPENER = "button[data-action='dialog#open']:not(.cite__button)".freeze
+
   test "the leaving-site dialog locks the page, and Escape, the Close button and the backdrop each release it where it was" do
     visit search_catalog_path(any_assets: "1", q: "skull")
     first(".result-card .document-title-heading a").click
-    assert_selector "button[data-action='dialog#open']"
+    assert_selector LEAVING_SITE_OPENER
 
     [ -> { page.driver.browser.keyboard.type(:Escape) }, -> { find("dialog[open] .modal-close").click }, -> { page.driver.browser.mouse.click(x: 6, y: 6) } ].each do |close|
       scroll_page_to(200)
-      find("button[data-action='dialog#open']").trigger("click")
+      find(LEAVING_SITE_OPENER).trigger("click")
       assert_selector "dialog[open]"
       assert_locked_and_unmoved(200)
       close.call
