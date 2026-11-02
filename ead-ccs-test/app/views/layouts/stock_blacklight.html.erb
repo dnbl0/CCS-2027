@@ -62,7 +62,7 @@
 
     <%= yield :hero if content_for?(:hero) %>
 
-    <main id="main-container" class="<%= container_classes %> py-5" aria-label="<%= t('blacklight.main.aria.main_container') %>">
+    <main id="main-container" class="<%= container_classes %> py-5">
       <%= content_for(:container_header) %>
 
       <%= render 'shared/flash_msg', layout: 'shared/flash_messages' if flash.any? %>
