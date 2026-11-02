@@ -1,0 +1,31 @@
+<%# One named list (CCS-389): its records as the result cards, newest added first, each with its Save and Add to list
+    controls (Add to list also takes the record out of this list). %>
+<% content_for :title, "#{@list.name} — #{t('nexus_ccs.lists.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-saved page-lists" %>
+<%= render NexusCcs::PageBannerComponent.new(title: @list.name) %>
+
+<main class="saved-main" id="main-content">
+  <div class="saved-main__inner">
+    <div class="saved-toolbar">
+      <h2 class="saved-toolbar__count" tabindex="-1" <%= tag.attributes(data: { controller: ("focus-on-load" if flash[:notice].present?) }.compact) %>><%= t("nexus_ccs.lists.records", count: @items.size) %></h2>
+      <div class="saved-toolbar__actions">
+        <%= link_to t("nexus_ccs.lists.back_to_lists"), lists_path, class: "btn btn-outline-primary" %>
+        <%= link_to t("nexus_ccs.lists.actions.rename"), edit_list_path(@list), class: "btn btn-outline-primary",
+                    aria: { label: t("nexus_ccs.lists.actions.rename_named", name: @list.name) } %>
+        <%= button_to t("nexus_ccs.lists.actions.delete"), list_path(@list), method: :delete, class: "btn btn-outline-danger",
+                      form: { class: "d-inline" }, aria: { label: t("nexus_ccs.lists.actions.delete_named", name: @list.name) },
+                      data: { turbo_confirm: t("nexus_ccs.lists.delete_confirm", name: @list.name) } %>
+      </div>
+    </div>
+    <% if @items.empty? %>
+      <div class="saved-empty">
+        <p class="saved-empty__text"><%= t("nexus_ccs.lists.empty_list") %></p>
+        <%= link_to t("nexus_ccs.saved_searches.start_searching"), root_path, class: "btn btn-primary" %>
+      </div>
+    <% else %>
+      <h2 class="visually-hidden"><%= t("nexus_ccs.lists.menu.heading") %></h2>
+      <% if @missing.positive? %><p class="saved-lists-note"><%= t("nexus_ccs.lists.missing_records") %></p><% end %>
+      <%= render_document_index_with_view :list, @documents %>
+    <% end %>
+  </div>
+</main>

@@ -18,6 +18,7 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     names = (1..count).map { |n| "a#{n}.jpg" }
     {
       "title_tsim" => [ "Cary Pocket microscope" ],
+      "licence_type_ssim" => [ "Public domain - Copyright expired" ],
       "digital_asset_paths_ssim" => names.map { |n| "/digital-assets/thumbs/#{n}" },
       "digital_asset_large_paths_ssim" => names.map { |n| "/digital-assets/large/#{n}" }
     }
@@ -39,6 +40,40 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_selector ".digital-assets__others li", count: 2
     assert_selector "a.digital-assets__other[href='/digital-assets/large/a2.jpg'][target=_blank][rel=noopener] img[src='/digital-assets/thumbs/a2.jpg']"
     assert_selector "a img[alt='Cary Pocket microscope, image 3 of 3 (opens full size in a new tab)']"
+  end
+
+  test "an open record has no notice, and its media can be downloaded" do
+    render_for(assets(3).merge("digital_media_ssim" => [ "video|video/mp4|/v.mp4|Film", "pdf|application/pdf|/d.pdf|Report" ]))
+
+    assert_no_selector ".access-notice"
+    assert_selector "video:not([controlslist])"
+    assert_selector "video a[href='/v.mp4']", text: "Download Film"
+    assert_selector "a.digital-assets__pdf[href='/d.pdf']"
+  end
+
+  test "a view-only record shows the viewer and a notice, with nothing that downloads" do
+    render_for(assets(3).merge("licence_type_ssim" => [ "Copyright - Current" ],
+                               "digital_media_ssim" => [ "video|video/mp4|/v.mp4|Film", "pdf|application/pdf|/d.pdf|Report" ]))
+
+    assert_selector ".access-notice--view-only a", text: "Request access to download this item"
+    assert_selector "figure.digital-assets__main img[src='/digital-assets/large/a1.jpg']"
+    assert_selector "video[controlslist=nodownload]"
+    assert_no_selector "video a, a[href='/v.mp4'], a[href='/d.pdf'], .digital-assets__pdf"
+    assert_no_selector "a[href*='/digital-assets/']" # thumbnails are buttons, not links to the files
+    assert_selector "button.digital-assets__other[data-media-viewer-large='/digital-assets/large/a2.jpg'] img[alt='Cary Pocket microscope, image 2 of 3']"
+    assert_selector ".digital-assets__licence", text: "Copyright - Current"
+  end
+
+  test "a request record withholds every asset, and its path, but keeps the notice, licence and metadata" do
+    render_for(assets(3).merge("licence_type_ssim" => [ "ICIP Rights" ], "digital_media_ssim" => [ "video|video/mp4|/v.mp4|Film" ]))
+
+    assert_selector ".access-notice--request", text: "This item is available on request"
+    assert_selector ".access-notice a", text: "Request access to this item"
+    assert_no_selector "img, video, audio, figure, .digital-assets__others, [data-media-viewer-target=image]"
+    assert_no_selector "button[aria-label='Full screen']"
+    assert_selector ".digital-assets__licence", text: "ICIP Rights"
+    assert_selector "button[aria-label='Media metadata']"
+    %w[/digital-assets /v.mp4 a1.jpg].each { |path| assert_not_includes rendered_content, path }
   end
 
   test "a record without assets renders nothing" do

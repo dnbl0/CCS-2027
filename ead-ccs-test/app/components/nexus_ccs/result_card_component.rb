@@ -19,8 +19,9 @@ module NexusCcs
       super
     end
 
+    # Not for a record whose asset is withheld (AccessPolicy :request): its card is the "no media" one
     def media_path
-      document["thumbnail_path_ssi"].presence
+      document["thumbnail_path_ssi"].presence if AccessPolicy.view?(document)
     end
 
     def media?

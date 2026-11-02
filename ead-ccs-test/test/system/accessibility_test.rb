@@ -59,13 +59,13 @@ class AccessibilityTest < ApplicationSystemTestCase
   StockCatalogController.prepend(StockSolr)
   BrandedStockCatalogController.prepend(StockSolr)
 
-  def stock_document(id, images)
+  def stock_document(id, images, licence: "Public domain - Copyright expired")
     fields = { "id" => id, "title_tsim" => [ "Untitled [Timber eucalypt specimen cabinet]" ], "format" => [ "Object" ],
                "object_type_ssim" => [ "chest of drawers", "Item" ], "production_date_ssim" => [ "[c. 1919—20]" ],
                "creator_display_ssim" => [ "Grimwade, Sir Wilfrid Russell CBE (1879 \u2013 1955)" ], "production_place_ssim" => [ "Oceania", "Australia" ],
                "accession_number_ssim" => [ "1973.0755.000.A.000.L" ], "collection_ssim" => [ "University Art Collection" ],
                "classification_ssim" => [ "Architecture, buildings and furniture", "furniture - storage / display" ], "subject_ssim" => [ "Architecture, design and furniture" ],
-               "licence_type_ssim" => [ "Public domain - Copyright expired" ], "credit_line_tsim" => [ "The University of Melbourne Art Collection" ],
+               "licence_type_ssim" => [ licence ], "credit_line_tsim" => [ "The University of Melbourne Art Collection" ],
                "rights_ssim" => [ "[Public domain - Copyright expired] Public Domain / no known copyright restrictions" ],
                "digital_asset_large_paths_ssim" => images.map { |name| "/digital-assets/large/#{name}.jpg" },
                "digital_asset_paths_ssim" => images.map { |name| "/digital-assets/thumbs/#{name}.jpg" } }
@@ -99,6 +99,21 @@ class AccessibilityTest < ApplicationSystemTestCase
       assert_selector ".modal.show"
       wait_until_opaque(".modal.show")
       assert_accessible
+    end
+  end
+
+  # Content classification (AccessPolicy): the notice for a view-only record (beside the viewer) and a request record (in place of it)
+  { "view-only" => "Copyright - Current", "request" => "ICIP Rights" }.each do |tier, licence|
+    test "a #{tier} record page has the access notice and no axe violations" do
+      StockSolr.documents = { "emu-9044" => stock_document("emu-9044", %w[a b], licence: licence) }
+      visit "/stock/emu-9044"
+      assert_selector "h1"
+      assert_selector ".access-notice a[href='/access_requests/new?document_id=emu-9044']"
+      assert_no_selector ".access-notice [role], .access-notice [aria-live]"
+      assert_selector "picture[data-openseadragon]" if tier == "view-only"
+      assert_no_selector "picture[data-openseadragon]" if tier == "request"
+      # aria-hidden-focus is the closed media metadata modal, which the page-wide test above also trips here (not this change's)
+      assert_accessible(except: [ "aria-hidden-focus" ])
     end
   end
 

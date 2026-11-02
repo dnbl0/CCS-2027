@@ -21,13 +21,17 @@ class StockCatalogTest < ActionDispatch::IntegrationTest
   setup { Rails.configuration.x.stock_record_ids = %w[vernon-MHM00394 multi pd] }
   teardown { Rails.configuration.x.stock_record_ids = nil }
 
+  # A document a test hands the controller in place of the ones above
+  mattr_accessor :override
+  teardown { StockCatalogTest.override = nil }
+
   FakeService = Struct.new(:doc) do
     def fetch(*) = doc
   end
 
   # Stands in for Solr on this controller only
   module FakeSolr
-    def search_service = FakeService.new({ "multi" => MULTI, "pd" => PD }.fetch(params[:id], DOC))
+    def search_service = FakeService.new(StockCatalogTest.override || { "multi" => MULTI, "pd" => PD }.fetch(params[:id], DOC))
   end
   StockCatalogController.prepend(FakeSolr)
   BrandedStockCatalogController.prepend(FakeSolr)
@@ -241,5 +245,38 @@ class StockCatalogTest < ActionDispatch::IntegrationTest
     assert_select "#document.document h1"
     assert_select "table.document-metadata"
     assert_select ".record-banner, .record-summary, .digital-assets, .persistent-link", false
+  end
+
+  # Content classification (AccessPolicy): the viewer and the notice for each tier. The image path must not be in the page of a withheld record.
+  def with_licence(id, licence) = SolrDocument.new(MULTI.to_h.merge("id" => id, "licence_type_ssim" => [ licence ])).tap { |doc| doc.instance_variable_set(:@response, DOC.response) }
+
+  test "an open record has the viewer and no notice" do
+    get "/stock/pd"
+
+    assert_select "picture[data-openseadragon]"
+    assert_select ".access-notice", false
+  end
+
+  test "a view-only record has the viewer, the thumbnails and the notice with its request link, and no link to an image file" do
+    StockCatalogTest.override = with_licence("multi", "Copyright - Current")
+    get "/stock/multi"
+
+    assert_select "picture[data-openseadragon]"
+    assert_select "[data-media-thumbnails] button", 3
+    assert_select ".access-notice--view-only a[href='/access_requests/new?document_id=multi']", text: "Request access to download this item"
+    assert_select "a[href*='/digital-assets/']", false
+  end
+
+  test "a request record has the notice instead of the viewer, and none of its image paths are in the page" do
+    StockCatalogTest.override = with_licence("multi", "ICIP Rights")
+    %w[/stock/multi /branded-stock/multi].each do |path|
+      get path
+
+      assert_response :success
+      assert_select ".access-notice--request a[href='/access_requests/new?document_id=multi']", text: "Request access to this item"
+      assert_select "picture[data-openseadragon], [data-media-thumbnails], [id$=-full-page]", false
+      assert_not_includes response.body, "/digital-assets/"
+      assert_select "#document h1", text: "Test record" # the metadata is still shown
+    end
   end
 end

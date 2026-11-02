@@ -1,0 +1,56 @@
+<%# The access request form (CCS-69), in the site's page layout (AccessRequestsController): the page banner, the record asked
+    about, then the form. A failed send shows an error summary that takes focus, and each field its own message. %>
+<% content_for :title, "#{t('nexus_ccs.access_requests.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-saved page-access-request" %>
+<% errors = @access_request.errors %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.access_requests.title"), description: t("nexus_ccs.access_requests.description_#{@request_type}")) %>
+
+<main class="saved-main" id="main-content">
+  <div class="saved-main__inner access-form">
+    <% if errors.any? && !flash.now[:alert] %>
+      <div class="access-form__summary" role="group" aria-labelledby="error-summary-title" tabindex="-1" autofocus data-testid="error-summary"
+           data-controller="error-summary" data-action="click->error-summary#focusField">
+        <h2 id="error-summary-title" class="access-form__summary-title"><%= t("nexus_ccs.access_requests.error_summary_title") %></h2>
+        <p><%= t("nexus_ccs.access_requests.error_summary_intro") %></p>
+        <ul>
+          <% errors.attribute_names.each do |attribute| %>
+            <li><%= link_to errors.messages_for(attribute).first, "#access_request_#{attribute}" %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <dl class="access-form__record">
+      <dt><%= t("nexus_ccs.access_requests.record_label") %></dt>
+      <dd><%= link_to document_presenter(@document).heading, solr_document_path(@document.id) %></dd>
+      <dt><%= t("nexus_ccs.access_requests.type_label") %></dt>
+      <dd><%= t("nexus_ccs.access_requests.type_#{@request_type}") %></dd>
+    </dl>
+
+    <%= form_with model: @access_request, url: access_requests_path, class: "access-form__form", html: { novalidate: true } do |form| %>
+      <%= hidden_field_tag :document_id, @document.id, id: nil %>
+      <p class="access-form__note"><%= t("nexus_ccs.access_requests.required_note") %></p>
+
+      <%= render "access_requests/field", form: form, attribute: :name, type: :text, required: true, autocomplete: "name" %>
+      <%= render "access_requests/field", form: form, attribute: :email, type: :email, required: true, autocomplete: "email" %>
+      <%= render "access_requests/field", form: form, attribute: :organisation, type: :text, required: false, autocomplete: "organization" %>
+      <%= render "access_requests/field", form: form, attribute: :purpose, type: :textarea, required: true, autocomplete: nil %>
+
+      <%# A trap for scripts that fill in every field: out of sight and out of the tab order, and hidden from screen readers %>
+      <div class="access-form__trap" aria-hidden="true">
+        <label for="access_request_website"><%= t("nexus_ccs.access_requests.fields.honeypot") %> <%= t("nexus_ccs.access_requests.hint_empty") %></label>
+        <input type="text" id="access_request_website" name="website" tabindex="-1" autocomplete="off" value="">
+      </div>
+
+      <section class="access-form__privacy" aria-labelledby="privacy-title">
+        <h2 id="privacy-title" class="access-form__privacy-title"><%= t("nexus_ccs.access_requests.privacy_title") %></h2>
+        <p><%= t("nexus_ccs.access_requests.privacy") %></p>
+      </section>
+
+      <div class="access-form__actions">
+        <%= form.submit t("nexus_ccs.access_requests.submit"), class: "btn btn-primary", data: { turbo_submits_with: nil } %>
+        <%= link_to t("nexus_ccs.access_requests.back_to_record"), solr_document_path(@document.id), class: "btn btn-outline-primary" %>
+      </div>
+    <% end %>
+  </div>
+</main>

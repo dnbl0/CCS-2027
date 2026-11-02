@@ -22,7 +22,8 @@ default: &default
 
 development:
   <<: *default
-  database: ead_ccs_development
+  # DB_SUFFIX gives a separate checkout (a git worktree) its own databases, e.g. DB_SUFFIX=_lists
+  database: ead_ccs_development<%= ENV["DB_SUFFIX"] %>
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
@@ -56,7 +57,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: ead_ccs_test
+  database: ead_ccs_test<%= ENV["DB_SUFFIX"] %>
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is

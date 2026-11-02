@@ -6,6 +6,9 @@
         sibling of it, not a child, so opening the panel (a position: absolute slide) can never feed back into
         the centred image's layout (see digital_assets.css). %>
     <div class="digital-assets__media-area">
+      <% if withheld? %>
+        <%= render NexusCcs::AccessNoticeComponent.new(document: @document) %>
+      <% end %>
       <% if main %>
         <figure class="digital-assets__main">
           <%= image_tag main.first, alt: alt(1), class: "digital-assets__image", data: { media_viewer_target: "image" } %>
@@ -16,14 +19,14 @@
         <figure class="digital-assets__media">
           <% case item[:kind] %>
           <% when "video" %>
-            <video controls preload="metadata" class="digital-assets__video" aria-label="<%= media_title(item) %>">
+            <video controls <%= "controlsList=nodownload" unless downloadable? %> preload="metadata" class="digital-assets__video" aria-label="<%= media_title(item) %>">
               <source src="<%= item[:url] %>" type="<%= item[:type] %>">
-              <a href="<%= item[:url] %>">Download <%= media_title(item) %></a>
+              <% if downloadable? %><a href="<%= item[:url] %>">Download <%= media_title(item) %></a><% end %>
             </video>
           <% when "audio" %>
-            <audio controls preload="metadata" class="digital-assets__audio" aria-label="<%= media_title(item) %>">
+            <audio controls <%= "controlsList=nodownload" unless downloadable? %> preload="metadata" class="digital-assets__audio" aria-label="<%= media_title(item) %>">
               <source src="<%= item[:url] %>" type="<%= item[:type] %>">
-              <a href="<%= item[:url] %>">Download <%= media_title(item) %></a>
+              <% if downloadable? %><a href="<%= item[:url] %>">Download <%= media_title(item) %></a><% end %>
             </audio>
           <% else %>
             <%= link_to "Open #{media_title(item)} (PDF, opens in a new tab)", item[:url], target: "_blank", rel: "noopener", class: "digital-assets__pdf" %>
@@ -32,6 +35,10 @@
         </figure>
       <% end %>
     </div>
+
+    <% if tier == :view_only %>
+      <%= render NexusCcs::AccessNoticeComponent.new(document: @document) %>
+    <% end %>
 
     <% if metadata? %>
       <aside id="media-metadata" class="digital-assets__panel" aria-labelledby="media-metadata-heading" aria-hidden="true" data-media-viewer-target="panel">
@@ -57,9 +64,16 @@
     <ul class="digital-assets__others">
       <% others.each_with_index do |(large, thumbnail), index| %>
         <li>
-          <%= link_to large, class: "digital-assets__other", target: "_blank", rel: "noopener",
-                data: { action: "media-viewer#show", media_viewer_large: large, media_viewer_alt: alt(index + 2) } do %>
-            <%= image_tag thumbnail, alt: "#{alt(index + 2)} (opens full size in a new tab)", loading: "lazy" %>
+          <% if downloadable? %>
+            <%= link_to large, class: "digital-assets__other", target: "_blank", rel: "noopener",
+                  data: { action: "media-viewer#show", media_viewer_large: large, media_viewer_alt: alt(index + 2) } do %>
+              <%= image_tag thumbnail, alt: "#{alt(index + 2)} (opens full size in a new tab)", loading: "lazy" %>
+            <% end %>
+          <% else %>
+            <%# No link to the file: the thumbnail only changes the image on show %>
+            <button type="button" class="digital-assets__other" data-action="media-viewer#show" data-media-viewer-large="<%= large %>" data-media-viewer-alt="<%= alt(index + 2) %>">
+              <%= image_tag thumbnail, alt: alt(index + 2), loading: "lazy" %>
+            </button>
           <% end %>
         </li>
       <% end %>
@@ -78,8 +92,10 @@
           <button type="button" class="digital-assets__button" aria-controls="media-metadata" aria-expanded="false" aria-label="Media metadata" title="Media metadata"
                   data-media-viewer-target="infoButton" data-action="media-viewer#togglePanel"><%= icon("media-info") %></button>
         <% end %>
+        <% unless withheld? %>
         <button type="button" class="digital-assets__button" aria-label="Full screen" title="Full screen" hidden
                 data-media-viewer-target="fullscreenButton" data-action="media-viewer#toggleFullscreen"><%= icon("media-fullscreen") %></button>
+        <% end %>
       </div>
     </div>
   </div>

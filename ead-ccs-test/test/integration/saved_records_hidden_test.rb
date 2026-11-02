@@ -25,6 +25,7 @@ class SavedRecordsHiddenTest < ActionDispatch::IntegrationTest
     assert_select "[data-role=bookmark-counter]", count: 0
     assert_select ".bookmark-toggle, .result-card__save, .record-summary__save", count: 0
     assert_select "a[href='/bookmarks']", count: 0
+    assert_select ".list-menu, a[href='/lists']", count: 0
   end
 
   test "the content pages show no saved bar" do
@@ -54,6 +55,19 @@ class SavedRecordsHiddenTest < ActionDispatch::IntegrationTest
     assert_response :not_found
 
     delete "/bookmarks/clear"
+    assert_response :not_found
+  end
+
+  test "the named lists and their requests are a 404" do
+    get "/lists"
+    assert_response :not_found
+    get "/lists/new"
+    assert_response :not_found
+    post "/lists", params: { list: { name: "Violins" } }
+    assert_response :not_found
+    post "/lists/1/items", params: { document_id: "x" }
+    assert_response :not_found
+    delete "/lists/1"
     assert_response :not_found
   end
 

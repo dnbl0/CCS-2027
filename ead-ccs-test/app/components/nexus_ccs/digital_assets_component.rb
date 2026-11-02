@@ -4,7 +4,9 @@ module NexusCcs
   # A record's media on its page, after the CCS UI "Record-detail" media section: a dark band with the large
   # image (a row of thumbnails under it when there are several), a "Media metadata" panel that slides over the
   # band's right edge, and a toolbar with the licence and the buttons for that panel and for full screen.
-  # Renders nothing for a record without assets. Registered, through NexusCcs::RecordEmbedComponent, as the show
+  # Renders nothing for a record without assets. What it shows follows AccessPolicy: all of it for :open; for :view_only no
+  # download (the media players' download button, the PDF link and the thumbnails' links to the files go) and a notice; for
+  # :request none of the assets, only the notice, the licence and the media metadata. Registered, through NexusCcs::RecordEmbedComponent, as the show
   # page's document_embed_component. Behaviour: controllers/media_viewer_controller.js.
   class DigitalAssetsComponent < Blacklight::Component
     # The advisory every record carries (the demo's wording)
@@ -15,15 +17,26 @@ module NexusCcs
 
     def initialize(presenter:, document_counter: nil, **)
       @document = presenter.document
+      @tier = AccessPolicy.tier(@document)
     end
 
+    attr_reader :tier
+
+    # The record has assets, whether or not the policy lets them be shown
     def render?
-      large_paths.any? || media.any?
+      Array(@document["digital_asset_large_paths_ssim"]).any? || Array(@document["digital_media_ssim"]).any?
     end
 
-    # Audio, video and PDF files: [{ kind:, type:, url:, label: }]
+    def withheld? = tier == :request
+    def downloadable? = tier == :open
+
+    # Audio, video and PDF files: [{ kind:, type:, url:, label: }]. A PDF can only be read by opening the file, so it is
+    # left out when the file may not be downloaded.
     def media
-      Array(@document["digital_media_ssim"]).map { |entry| Collections::DigitalMedia.parse(entry) }
+      return [] if withheld?
+
+      items = Array(@document["digital_media_ssim"]).map { |entry| Collections::DigitalMedia.parse(entry) }
+      downloadable? ? items : items.select { |item| %w[video audio].include?(item[:kind]) }
     end
 
     # Pairs of [large image path, thumbnail path], in display order.
@@ -86,7 +99,8 @@ module NexusCcs
 
     private
 
-    def large_paths = Array(@document["digital_asset_large_paths_ssim"])
-    def thumbnail_paths = Array(@document["digital_asset_paths_ssim"])
+    # Nothing of a withheld asset reaches the page, not even as a path
+    def large_paths = withheld? ? [] : Array(@document["digital_asset_large_paths_ssim"])
+    def thumbnail_paths = withheld? ? [] : Array(@document["digital_asset_paths_ssim"])
   end
 end

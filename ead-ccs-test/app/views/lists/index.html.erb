@@ -1,0 +1,57 @@
+<%# The visitor's named lists (CCS-389), laid out like the search history: the page banner, then a table of lists with Rename
+    and Delete icon buttons. Each list opens to its records. %>
+<% content_for :title, "#{t('nexus_ccs.lists.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-saved page-lists" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.lists.title"), description: t("nexus_ccs.lists.description")) %>
+
+<main class="saved-main" id="main-content">
+  <div class="saved-main__inner">
+    <%# After a list is made, renamed or deleted the notice is announced, and focus lands here rather than at the top %>
+    <% focus = flash[:notice].present? ? { controller: "focus-on-load" } : {} %>
+    <div class="saved-toolbar">
+      <h2 class="saved-toolbar__count" tabindex="-1" data-controller="<%= focus[:controller] %>"><%= t("nexus_ccs.lists.count", count: @lists.size) %></h2>
+      <div class="saved-toolbar__actions">
+        <%= link_to t("nexus_ccs.saved_records"), bookmarks_path, class: "btn btn-outline-primary" %>
+        <%= link_to t("nexus_ccs.lists.new_list"), new_list_path, class: "btn btn-primary" %>
+      </div>
+    </div>
+    <% if @lists.empty? %>
+      <div class="saved-empty">
+        <p class="saved-empty__text"><%= t("nexus_ccs.lists.empty") %></p>
+        <%= link_to t("nexus_ccs.saved_searches.start_searching"), root_path, class: "btn btn-outline-primary" %>
+      </div>
+    <% else %>
+      <div class="table-responsive list-table">
+        <table class="table table-hover align-middle lists">
+          <caption class="visually-hidden"><%= t("nexus_ccs.lists.caption") %></caption>
+          <thead>
+            <tr>
+              <th scope="col"><%= t("nexus_ccs.lists.column_name") %></th>
+              <th scope="col"><%= t("nexus_ccs.lists.column_records") %></th>
+              <th scope="col" class="history-actions-heading"><%= t("nexus_ccs.lists.column_actions") %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @lists.each do |list| %>
+              <tr>
+                <th scope="row" class="lists__name"><%= link_to list.name, list_path(list) %></th>
+                <td><%= list.list_items.size %></td>
+                <td class="history-actions">
+                  <div class="history-actions__group" data-controller="action-tooltip">
+                    <%= link_to edit_list_path(list), class: "history-action", data: { action_tooltip_text: t("nexus_ccs.lists.actions.rename") } do %>
+                      <%= list_action_content(:rename, list.name) %>
+                    <% end %>
+                    <%= button_to list_path(list), method: :delete, class: "history-action", form: { class: "history-actions__form" },
+                                  data: { action_tooltip_text: t("nexus_ccs.lists.actions.delete"), turbo_confirm: t("nexus_ccs.lists.delete_confirm", name: list.name) } do %>
+                      <%= list_action_content(:delete, list.name) %>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </div>
+</main>

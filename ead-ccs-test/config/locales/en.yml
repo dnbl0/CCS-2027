@@ -52,7 +52,165 @@ en:
         failure: "Sorry, there was a problem removing the record."
         success: "Record removed from your saved list."
 
+  activerecord:
+    errors:
+      models:
+        access_request:
+          attributes:
+            name:
+              blank: "Enter your name"
+              too_long: "Your name must be %{count} characters or fewer"
+            email:
+              blank: "Enter your email address"
+              invalid: "Enter your email address in the format name@example.com"
+              too_long: "Your email address must be %{count} characters or fewer"
+            organisation:
+              too_long: "Your organisation must be %{count} characters or fewer"
+            purpose:
+              blank: "Enter how you plan to use the record"
+              too_long: "How you plan to use the record must be %{count} characters or fewer"
+        list:
+          attributes:
+            base:
+              too_many_lists: "You can have at most %{count} lists. Delete one to make a new one."
+        list_item:
+          attributes:
+            base:
+              list_full: "A list can hold at most %{count} records. Remove one to add another."
+
   nexus_ccs:
+    access_requests:
+      title: "Request access"
+      # Placeholder wording throughout this block: the University must approve the privacy, retention and next-steps text.
+      description_view: "This record is not available to view online. You can ask for access, and the collection's staff will decide."
+      description_download: "This record can be viewed online but not downloaded. You can ask for a copy, and the collection's staff will decide."
+      record_label: "Record"
+      type_label: "What you are asking for"
+      type_view: "Permission to view this record"
+      type_download: "A copy of this record to download"
+      back_to_record: "Back to the record"
+      required_note: "Fields marked * are required."
+      too_many: "Too many requests were sent from your connection. Wait an hour, then try again."
+      error_summary_title: "There is a problem"
+      error_summary_intro: "Fix these to send your request:"
+      hint_empty: "Leave this field empty"
+      fields:
+        name: "Your name"
+        name_hint: "As you would like the staff to address you."
+        email: "Email address"
+        email_hint: "The staff reply here. For example, name@example.com."
+        organisation: "Organisation (optional)"
+        organisation_hint: "For example, your university, museum or community group."
+        purpose: "How you plan to use this record"
+        purpose_hint: "Tell the staff what the record is for, such as research, teaching, an exhibition or a publication."
+        honeypot: "Website"
+      privacy_title: "How we use your details"
+      privacy: "We keep your name, email address, organisation and answers so that staff can decide on your request and reply to you. Only the University staff who manage this collection can see them. We do not use them for anything else. [Placeholder wording: the University must approve how long the details are kept.]"
+      submit: "Send request"
+      confirmation:
+        title: "Request sent"
+        description: "Your request has been recorded."
+        heading: "What you asked for"
+        record: "Record"
+        type: "Request"
+        name: "Name"
+        email: "Email address"
+        organisation: "Organisation"
+        purpose: "How you plan to use it"
+        next_title: "What happens next"
+        # Placeholder wording: the University must approve the next steps and any time frame.
+        next: "Staff who manage this collection will read your request and reply to the email address above. You do not need to send it again. [Placeholder wording: the University must confirm the process and how long it takes.]"
+        no_email: "This site does not send a confirmation email."
+        back_to_record: "Back to the record"
+        keep_searching: "Keep searching"
+    search_history:
+      title: "Search history"
+      description: "The searches you have made in this browser, newest first. Open one to run it again, or save the ones you want to keep."
+      recent: "Your recent searches"
+      column_search: "Search"
+      column_filters: "Filters"
+      column_actions: "Actions"
+      no_term: "All records"
+      caption: "Searches from %{day}"
+      removed: "Search removed from your history."
+      not_found: "That search is no longer in your history."
+      actions:
+        save: "Save"
+        share: "Share"
+        delete: "Delete"
+        save_named: "Save search: %{query}"
+        share_named: "Share search: %{query}"
+        delete_named: "Delete search: %{query}"
+    saved_searches:
+      title: "Saved searches"
+      description: "The searches you chose to keep. Open one to run it again."
+      list_heading: "Your saved searches"
+      column_name: "Search"
+      column_saved: "Saved"
+      empty: "You have not saved any searches yet. Save one from your search history."
+      empty_link: "Go to your search history"
+      start_searching: "Start searching"
+      save: "Save this search"
+      save_named: "Save this search: %{query}"
+      saved: "Search saved."
+      removed: "Search removed from your saved searches."
+      not_found: "That search is no longer in your history, so it could not be saved."
+      failure: "Sorry, there was a problem saving the search."
+    lists:
+      title: "Your lists"
+      description: "Lists you have made on this device. Add records to a list from a search result or a record page."
+      list_heading: "Your lists"
+      count:
+        one: "%{count} list"
+        other: "%{count} lists"
+      records:
+        one: "%{count} record"
+        other: "%{count} records"
+      empty: "You have not made any lists yet."
+      empty_list: "This list has no records yet. Add one with Add to list on a search result or a record page."
+      new_list: "New list"
+      new_title: "New list"
+      edit_title: "Rename list"
+      name_label: "List name"
+      name_hint: "Up to %{limit} characters. You can have up to %{max_lists} lists, with up to %{max_records} records each."
+      name_error_prefix: "List name"
+      create: "Create list"
+      save_name: "Save name"
+      cancel: "Cancel"
+      back_to_lists: "Back to your lists"
+      saved_records: "Saved records"
+      your_lists: "Your lists"
+      error_summary: "There is a problem"
+      caption: "Your lists"
+      column_name: "List"
+      column_records: "Records"
+      column_actions: "Actions"
+      missing_records: "Some records in this list are no longer in the collection."
+      created: "List %{name} created."
+      created_with_record: "List %{name} created, and the record added to it."
+      renamed: "List renamed to %{name}."
+      deleted: "List %{name} deleted."
+      delete_confirm: "Delete the list %{name}? Its records stay in the collection."
+      added: "Added to %{name}."
+      removed: "Removed from %{name}."
+      not_found: "That list no longer exists."
+      already_in: "That record is already in %{name}."
+      failure: "Sorry, that did not work: %{reason}"
+      actions:
+        rename: "Rename"
+        delete: "Delete"
+        rename_named: "Rename list: %{name}"
+        delete_named: "Delete list: %{name}"
+      menu:
+        button: "Add to list"
+        button_named: "Add to list: %{title}"
+        heading: "Your lists"
+        add: "Add to %{name}"
+        remove: "Remove from %{name}"
+        in_list: "In list"
+        new_label: "New list name"
+        new_submit: "Create and add"
+        none: "You have no lists yet."
     save:
       absent: "Save"
       present: "Saved"
@@ -76,6 +234,15 @@ en:
       close: "Close"
     facets:
       pending: "No records have this information yet."
+    access_notice:
+      view_only:
+        title: "You can view this item, but not download it"
+        body: "To download it, ask the collection team for access. Your request needs approval."
+        link: "Request access to download this item"
+      request:
+        title: "This item is available on request"
+        body: "The image or file is not shown here. To see it, ask the collection team for access. Your request needs approval."
+        link: "Request access to this item"
 
   catalog:
     country_acknowledgement:

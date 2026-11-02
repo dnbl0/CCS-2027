@@ -1,0 +1,73 @@
+<%# Blacklight's search history page, in the site's page layout (SearchHistoryController): the page banner, then the
+    searches grouped by the day they were made (CCS-206), each with a Save this search button when saving is on (CCS-130). %>
+<% content_for :title, "#{t('nexus_ccs.search_history.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-saved page-search-history" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.search_history.title"), description: t("nexus_ccs.search_history.description")) %>
+
+<main class="saved-main" id="main-content">
+  <div class="saved-main__inner">
+    <% searches = SearchHistoryDays.without_redirected(@searches.to_a) %>
+    <% if searches.empty? %>
+      <div class="saved-empty">
+        <p class="saved-empty__text"><%= t("blacklight.search_history.no_history") %></p>
+        <%= link_to t("nexus_ccs.saved_searches.start_searching"), root_path, class: "btn btn-primary" %>
+      </div>
+    <% else %>
+      <div class="saved-toolbar">
+        <h2 class="saved-toolbar__count"><%= t("nexus_ccs.search_history.recent") %></h2>
+        <%= link_to t("blacklight.search_history.clear.action_title"), blacklight.clear_search_history_path,
+                    data: { turbo_confirm: t("blacklight.search_history.clear.action_confirm"), turbo_method: :delete },
+                    class: "btn btn-outline-primary" %>
+      </div>
+      <% SearchHistoryDays.group(searches).each_with_index do |(day, day_searches), day_index| %>
+        <section class="search-history-day" aria-labelledby="search-history-day-<%= day_index %>">
+          <h3 id="search-history-day-<%= day_index %>" class="search-history-day__heading"><%= day %></h3>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle search-history">
+              <caption class="visually-hidden"><%= t("nexus_ccs.search_history.caption", day: day) %></caption>
+              <thead>
+                <tr>
+                  <th scope="col"><%= t("nexus_ccs.search_history.column_search") %></th>
+                  <th scope="col"><%= t("nexus_ccs.search_history.column_filters") %></th>
+                  <th scope="col" class="history-actions-heading"><%= t("nexus_ccs.search_history.column_actions") %></th>
+                </tr>
+              </thead>
+              <tbody>
+                <% day_searches.each do |search| %>
+                  <% term, filters = search_history_cells(search.query_params) %>
+                  <% term_text = strip_tags(term) %>
+                  <tr>
+                    <td class="query"><%= term %></td>
+                    <td class="filters"><%= filters %></td>
+                    <td class="history-actions">
+                      <div class="history-actions__group" data-controller="action-tooltip">
+                        <% if Rails.configuration.x.saved_records %>
+                          <%= button_to saved_searches_path(search_id: search.id), method: :post, class: "history-action",
+                                        form: { class: "history-actions__form" }, data: { action_tooltip_text: t("nexus_ccs.search_history.actions.save") } do %>
+                            <%= history_action_content(:save, term_text) %>
+                          <% end %>
+                        <% end %>
+                        <div class="history-actions__form" data-controller="clipboard">
+                          <span hidden data-clipboard-target="source" data-copy="<%= search_action_url(search_state.reset(search.query_params).to_hash) %>"></span>
+                          <button type="button" class="history-action" data-action="clipboard#copy" data-clipboard-target="button"
+                                  data-action-tooltip-text="<%= t("nexus_ccs.search_history.actions.share") %>">
+                            <%= history_action_content(:share, term_text) %>
+                          </button>
+                          <span class="visually-hidden" role="status" data-clipboard-target="status"></span>
+                        </div>
+                        <%= button_to search_history_entry_path(search), method: :delete, class: "history-action",
+                                      form: { class: "history-actions__form" }, data: { action_tooltip_text: t("nexus_ccs.search_history.actions.delete") } do %>
+                          <%= history_action_content(:delete, term_text) %>
+                        <% end %>
+                      </div>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      <% end %>
+    <% end %>
+  </div>
+</main>

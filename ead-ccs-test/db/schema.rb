@@ -10,28 +10,70 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_10_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_03_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
+  create_table "access_requests", force: :cascade do |t|
+    t.string "document_id", null: false
+    t.string "document_title", null: false
+    t.string "request_type", null: false
+    t.string "name", null: false
+    t.string "email", null: false
+    t.string "organisation"
+    t.text "purpose", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["document_id"], name: "index_access_requests_on_document_id"
+    t.index ["status"], name: "index_access_requests_on_status"
+  end
+
   create_table "bookmarks", id: :serial, force: :cascade do |t|
-    t.datetime "created_at", precision: nil, null: false
+    t.integer "user_id", null: false
+    t.string "user_type"
     t.string "document_id"
     t.string "document_type"
     t.binary "title"
+    t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.integer "user_id", null: false
-    t.string "user_type"
     t.index ["document_id"], name: "index_bookmarks_on_document_id"
     t.index ["user_id"], name: "index_bookmarks_on_user_id"
   end
 
+  create_table "list_items", force: :cascade do |t|
+    t.bigint "list_id", null: false
+    t.string "document_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["list_id", "document_id"], name: "index_list_items_on_list_id_and_document_id", unique: true
+    t.index ["list_id"], name: "index_list_items_on_list_id"
+  end
+
+  create_table "lists", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "user_id, lower((name)::text)", name: "index_lists_on_user_id_and_lower_name", unique: true
+    t.index ["user_id"], name: "index_lists_on_user_id"
+  end
+
+  create_table "saved_searches", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.jsonb "query_params", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_saved_searches_on_user_id"
+  end
+
   create_table "searches", id: :serial, force: :cascade do |t|
-    t.datetime "created_at", precision: nil, null: false
     t.binary "query_params"
-    t.datetime "updated_at", precision: nil, null: false
     t.integer "user_id"
     t.string "user_type"
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["user_id"], name: "index_searches_on_user_id"
   end
 

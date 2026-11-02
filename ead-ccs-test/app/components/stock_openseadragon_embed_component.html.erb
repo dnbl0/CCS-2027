@@ -8,6 +8,9 @@
       <p class="display-6 text-white m-0" aria-hidden="true"><%= presenter.heading %></p>
     </header>
 
+    <% if withheld? %>
+      <div class="container pb-5"><%= render NexusCcs::AccessNoticeComponent.new(document: presenter.document) %></div>
+    <% else %>
     <article class="container pb-3 d-flex align-items-center gap-3">
       <% if count > 1 %>
         <button type="button" id="<%= @id_prefix %>-previous" class="btn btn-dark rounded-circle p-2 lh-1 flex-shrink-0 focus-ring" title="Previous image" aria-label="Previous image">
@@ -24,6 +27,10 @@
       <% end %>
     </article>
 
+    <% if tier == :view_only %>
+      <div class="container pb-3"><%= render NexusCcs::AccessNoticeComponent.new(document: presenter.document) %></div>
+    <% end %>
+
     <% if count > 1 %>
       <nav class="container pb-4" aria-label="Images" data-media-thumbnails data-viewer="<%= viewer_id %>">
         <ul class="list-unstyled d-flex justify-content-center flex-wrap gap-2 m-0 p-0">
@@ -37,6 +44,7 @@
         </ul>
       </nav>
     <% end %>
+    <% end %>
   </section>
 
   <section id="<%= @id_prefix %>-toolbar" class="bg-body-tertiary" aria-label="Media toolbar">
@@ -49,11 +57,13 @@
             </button>
           </li>
         <% end %>
+        <% unless withheld? %>
         <li>
           <button type="button" id="<%= @id_prefix %>-full-page" class="btn btn-link p-1 lh-1" data-tooltip-title="Full screen" aria-label="Full screen">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" /></svg>
           </button>
         </li>
+        <% end %>
       </menu>
     </div>
   </section>

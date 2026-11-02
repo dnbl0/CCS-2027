@@ -24,8 +24,16 @@ Rails.application.routes.draw do
           delete "clear"
         end
       end
+      resources :saved_searches, only: [ :index, :create, :destroy ]
+      # Named lists (CCS-389); a list's records are added and removed at /lists/:list_id/items
+      resources :lists do
+        resources :items, controller: "list_items", only: [ :create, :destroy ]
+      end
     end
   end
+
+  # Asking for access to a record (CCS-69): the form, and the confirmation only the requester's own session can open
+  resources :access_requests, only: [ :new, :create, :show ]
 
   # The new record page, for the records in StockRecords only (any other id is a 404): Blacklight out of the box (StockCatalogController),
   # and the same page in the UoM header, breadcrumb and footer (BrandedStockCatalogController). The site's own record page, /catalog/:id,
@@ -44,6 +52,9 @@ Rails.application.routes.draw do
 
   # Browse collections is gone (the sitemap keeps Blacklight's own pages): its address goes to the collection cards on the home
   # page, and each old collection landing page goes to the results filtered to that collection.
+  # Take one search out of the history (Blacklight draws /search_history and /search_history/clear)
+  delete "search_history/:id", to: "search_history#destroy", as: :search_history_entry, constraints: { id: /\d+/ }
+
   get "collections", to: redirect("/#browse-collections", status: 301)
   get "collections/:slug", to: redirect(status: 301) { |params, _request|
     "/catalog?#{NexusCcs::SiteNavigation.whole_collection_query(params[:slug]).to_query}"

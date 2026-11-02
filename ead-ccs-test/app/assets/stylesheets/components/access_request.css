@@ -1,0 +1,128 @@
+/*
+ * The access request form (/access_requests/new) and its confirmation, inside the saved-records page container
+ * (saved_records.css). Fields use Bootstrap's .form-control; an error is red text with an icon, and a red border.
+ */
+.access-form {
+  max-width: 48rem;
+  margin-inline: 0;
+}
+
+.access-form__summary {
+  margin-bottom: var(--ccs-space-5);
+  padding: var(--ccs-space-5);
+  background: var(--ccs-surface-error);
+  border: 1px solid var(--ccs-border-error);
+}
+
+/* Focused when the page loads so it is read out; its own border carries the meaning, not a focus ring over it */
+.access-form__summary:focus {
+  outline: none;
+}
+
+.access-form__summary-title {
+  margin: 0 0 var(--ccs-space-2);
+  font-size: var(--ccs-font-size-lg);
+}
+
+.access-form__summary ul {
+  margin: 0;
+  padding-left: var(--ccs-space-5);
+}
+
+.access-form__summary a {
+  color: var(--ccs-text-error);
+  display: inline-block;
+  min-height: 24px;
+}
+
+.access-form__record {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--ccs-space-2) var(--ccs-space-5);
+  margin-bottom: var(--ccs-space-5);
+}
+
+.access-form__record dt {
+  font-weight: 600;
+}
+
+.access-form__record dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.access-form__purpose {
+  white-space: pre-line;
+}
+
+.access-form__field {
+  margin-bottom: var(--ccs-space-5);
+}
+
+.access-form__label {
+  display: block;
+  margin-bottom: var(--ccs-space-1);
+  font-weight: 600;
+}
+
+.access-form__hint {
+  margin: 0 0 var(--ccs-space-2);
+  color: var(--ccs-text-secondary);
+}
+
+.access-form__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ccs-space-2);
+  margin: 0 0 var(--ccs-space-2);
+  color: var(--ccs-text-error);
+  font-weight: 600;
+}
+
+.access-form__error-icon {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.1rem;
+}
+
+.access-form__field--error .form-control {
+  border: 2px solid var(--ccs-border-error);
+}
+
+/* The trap field is out of sight but still in the page, so a script that fills every field fills it */
+.access-form__trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.access-form__privacy {
+  margin-bottom: var(--ccs-space-5);
+  padding: var(--ccs-space-4) var(--ccs-space-5);
+  background: var(--ccs-surface-subtle);
+}
+
+.access-form__privacy-title {
+  margin: 0 0 var(--ccs-space-2);
+  font-size: var(--ccs-font-size-lg);
+}
+
+.access-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-4);
+}
+
+@media (max-width: 576px) {
+  .access-form__record {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .access-form__record dd {
+    margin-bottom: var(--ccs-space-3);
+  }
+}

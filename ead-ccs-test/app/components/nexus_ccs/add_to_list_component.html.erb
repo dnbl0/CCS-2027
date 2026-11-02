@@ -1,0 +1,43 @@
+<div class="list-menu" data-controller="list-menu" data-action="keydown->list-menu#escape">
+  <%# Shown by JavaScript; without it the panel below is always open -%>
+  <button type="button" class="list-menu__button" hidden aria-expanded="false" aria-controls="<%= panel_id %>"
+          data-list-menu-target="button" data-action="list-menu#toggle">
+    <%= helpers.list_icon(:add, css_class: "list-menu__icon") %>
+    <span class="list-menu__text"><%= t("nexus_ccs.lists.menu.button") %><span class="visually-hidden">: <%= title %></span></span>
+  </button>
+  <div class="list-menu__panel" id="<%= panel_id %>" data-list-menu-target="panel">
+    <p class="list-menu__heading"><%= t("nexus_ccs.lists.menu.heading") %></p>
+    <% if lists.any? %>
+      <%= form_with url: "#", method: :post, class: "list-menu__form", data: { turbo: true } do %>
+        <%= hidden_field_tag :document_id, document_id, id: nil %>
+        <ul class="list-menu__lists">
+          <% lists.each do |list| %>
+            <% item = item_id(list) %>
+            <li>
+              <% if item %>
+                <button type="submit" class="list-menu__item list-menu__item--in" name="_method" value="delete"
+                        formaction="<%= list_item_path(list, item) %>">
+                  <%= helpers.list_icon(:check, css_class: "list-menu__icon") %>
+                  <span><%= t("nexus_ccs.lists.menu.remove", name: list.name) %></span>
+                </button>
+              <% else %>
+                <button type="submit" class="list-menu__item" formaction="<%= list_items_path(list) %>">
+                  <%= helpers.list_icon(:add, css_class: "list-menu__icon") %>
+                  <span><%= t("nexus_ccs.lists.menu.add", name: list.name) %></span>
+                </button>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    <% else %>
+      <p class="list-menu__none"><%= t("nexus_ccs.lists.menu.none") %></p>
+    <% end %>
+    <%= form_with url: lists_path, method: :post, class: "list-menu__form list-menu__new", data: { turbo: true }, html: { novalidate: true } do %>
+      <%= hidden_field_tag :document_id, document_id, id: nil %>
+      <label class="list-menu__label" for="<%= panel_id %>-name"><%= t("nexus_ccs.lists.menu.new_label") %></label>
+      <input type="text" class="form-control list-menu__input" id="<%= panel_id %>-name" name="list[name]" maxlength="<%= List::NAME_LIMIT %>" required autocomplete="off">
+      <button type="submit" class="btn btn-outline-primary list-menu__create"><%= t("nexus_ccs.lists.menu.new_submit") %></button>
+    <% end %>
+  </div>
+</div>
