@@ -43,7 +43,7 @@ class SiteChromeTest < ActiveSupport::TestCase
     render_header
 
     assert_selector "header[data-controller='site-header']"
-    assert_selector "button.site-nav__trigger[aria-expanded='false'][data-action='site-header#toggleSection']", count: 2 # Search collections and Help
+    assert_selector "button.site-nav__trigger[aria-expanded='false'][data-action='site-header#toggleSection']", count: 3 # Search collections, Help and My saved items
     assert_selector "button.site-header__menu[aria-controls='site-nav'][aria-expanded='false']"
     assert_selector "#site-nav-records button.site-nav__back"
   end
@@ -68,6 +68,15 @@ class SiteChromeTest < ActiveSupport::TestCase
     assert_no_selector "#site-nav-records .site-nav__browse-more a", text: /\AAll( [\d,]+)? records\z/
     assert_selector "#site-nav-records .site-nav__browse-more a", text: /\AOnly records with images/
     assert_selector "#site-nav-records .site-nav__browse-more a[href='/catalog/advanced']", text: "Advanced Search"
+  end
+
+  test "My saved items lists the visitor's own pages: saved records, lists, saved searches and the search history" do
+    render_header(url: "/catalog")
+    assert_selector "button.site-nav__trigger[aria-controls='site-nav-saved']", text: "My saved items"
+    assert_selector "#site-nav-saved a[href='/bookmarks']", text: "Saved records"
+    assert_selector "#site-nav-saved a[href='/lists']", text: "Your lists"
+    assert_selector "#site-nav-saved a[href='/saved_searches']", text: "Saved searches"
+    assert_selector "#site-nav-saved a[href='/search_history']", text: "Search history"
   end
 
   test "the bare search page has no breadcrumb" do

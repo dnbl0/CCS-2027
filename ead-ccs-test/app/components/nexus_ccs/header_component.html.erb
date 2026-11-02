@@ -87,6 +87,20 @@
               </ul>
             </div>
           </li>
+          <li>
+            <button type="button" class="site-nav__trigger" aria-expanded="false" aria-controls="site-nav-saved"
+                    data-site-header-target="trigger" data-action="site-header#toggleSection">
+              My saved items<%= image_tag "site/icon-expand.svg", alt: "" %>
+            </button>
+            <div id="site-nav-saved" class="site-nav__panel">
+              <button type="button" class="site-nav__back" data-action="site-header#back"><%= back_label %></button>
+              <ul class="site-nav__panel-list">
+                <% saved_links.each do |link| %>
+                  <li><%= link_to link.href, aria: { current: (helpers.current_page?(link.href) ? "page" : nil) } do %><%= image_tag "site/icon-arrow-footer.svg", alt: "" %><%= link.label %><% end %></li>
+                <% end %>
+              </ul>
+            </div>
+          </li>
           <%# Phones only: the header's top strip is hidden there, and the home page has no breadcrumb strip to hold the bar -%>
           <% if chrome.saved_link_in_phone_menu? && Rails.configuration.x.saved_records %>
             <li class="site-nav__saved-item"><%= render NexusCcs::SavedBarComponent.new(placement: :drawer) %></li>
