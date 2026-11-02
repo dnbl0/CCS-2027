@@ -10,6 +10,11 @@
 class StockOpenseadragonEmbedComponent < Blacklight::Gallery::OpenseadragonEmbedComponent
   IMAGES_FIELD = "digital_asset_large_paths_ssim"
   THUMBNAILS_FIELD = "digital_asset_paths_ssim"
+  # What AccessPolicy lets the visitor do with the record's images: a :request record gets the notice in place of the viewer
+  # (no image URL reaches the page), a :view_only record gets the viewer and the notice, an :open record the viewer alone.
+  def tier = @tier ||= AccessPolicy.tier(presenter.document)
+  def withheld? = tier == :request
+
   def osd_config
     super.except(:zoomInButton, :zoomOutButton, :homeButton).merge(
       showZoomControl: false, showHomeControl: false, mouseNavEnabled: false, keyboardNavEnabled: false,
