@@ -67,7 +67,7 @@ class SiteChromeTest < ActiveSupport::TestCase
     assert_no_text "Featured named collections"
     assert_no_selector "#site-nav-records .site-nav__browse-more a", text: /\AAll( [\d,]+)? records\z/
     assert_selector "#site-nav-records .site-nav__browse-more a", text: /\AOnly records with images/
-    assert_selector "#site-nav-records .site-nav__browse-more a[href='/catalog/advanced']", text: "Advanced search"
+    assert_selector "#site-nav-records .site-nav__browse-more a[href='/catalog/advanced']", text: "Advanced Search"
   end
 
   test "the bare search page has no breadcrumb" do
