@@ -12,6 +12,7 @@ class PersonalPagesRobotsTest < ActionDispatch::IntegrationTest
   ].freeze
 
   test "every personal page, whatever its status, says noindex, nofollow in X-Robots-Tag, with indexing on" do
+    needs_solr
     with_env("SEO_INDEXING" => "on") do
       GET_PATHS.each do |path|
         get path

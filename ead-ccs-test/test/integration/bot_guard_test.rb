@@ -43,6 +43,7 @@ class BotGuardTest < ActionDispatch::IntegrationTest
   end
 
   test "BOT_CONTROLS=off lifts the 403" do
+    needs_solr
     with_env("BOT_CONTROLS" => "off") do
       get "/catalog/emu-9044/metadata", headers: BOT
       assert_not_equal 403, response.status
@@ -72,6 +73,7 @@ class BotGuardTest < ActionDispatch::IntegrationTest
   end
 
   test "the limit is per IP address and per kind of request" do
+    needs_solr
     with_env("RATE_LIMIT" => "on", "RATE_LIMIT_RECORD_PER_MINUTE" => "2", "RATE_LIMIT_SEARCH_PER_MINUTE" => "2") do
       3.times { get "/catalog/emu-9044", headers: BROWSER }
       assert_response :too_many_requests
