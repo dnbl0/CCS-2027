@@ -5,9 +5,6 @@
 
 <main class="saved-main" id="main-content">
   <div class="saved-main__inner">
-    <% if flash[:notice] || flash[:alert] %>
-      <p class="saved-searches__flash" role="status"><%= flash[:notice] || flash[:alert] %></p>
-    <% end %>
     <% if @saved_searches.empty? %>
       <div class="saved-empty">
         <p class="saved-empty__text"><%= t("nexus_ccs.saved_searches.empty") %></p>

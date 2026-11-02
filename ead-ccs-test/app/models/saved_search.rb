@@ -13,12 +13,48 @@ class SavedSearch < ApplicationRecord
   # Newest first, as the saved searches page lists them
   scope :recent, -> { order(created_at: :desc, id: :desc) }
 
-  # The name given to a saved search when the visitor does not type one
-  # TODO(human): turn the search's parameters (string keys, e.g. "q", "search_field", "f" => { "collection_ssim" => [...] })
-  # into a short readable name for the saved searches page.
+  # The name given to a saved search when the visitor does not type one: its terms, then its filters, as
+  # "skull · Grainger Museum, With a digital asset". A search with neither is "All records". Cut to NAME_LIMIT.
+  # params: the search's parameters (string keys, e.g. "q", "f" => { "collection_ssim" => [...] }, "clause" for Advanced search)
   def self.default_name(params)
-    "Saved search"
+    params = params.to_h.deep_stringify_keys
+    name = [ terms(params).join(" "), filters(params).join(", ") ].compact_blank.join(" · ")
+
+    (name.presence || "All records").truncate(NAME_LIMIT)
   end
+
+  # The words searched for: the search box, or each Advanced search clause's words
+  def self.terms(params)
+    clauses = params["clause"].is_a?(Hash) ? params["clause"].values.filter_map { |clause| clause["query"] if clause.is_a?(Hash) } : []
+
+    [ params["q"], *clauses ].compact_blank.map { |term| term.to_s.squish }
+  end
+
+  # What the search is narrowed to: each filter's values, and a year range as "1900–1950"
+  def self.filters(params)
+    values = %w[f f_inclusive].flat_map do |key|
+      params[key].is_a?(Hash) ? params[key].flat_map { |field, chosen| Array(chosen).map { |value| filter_label(field, value) } } : []
+    end
+    years = params["range"].is_a?(Hash) ? params["range"].values.filter_map { |range| year_range(range) } : []
+
+    values + years
+  end
+
+  # The Digital asset filter stores "with"; the page says "With a digital asset"
+  def self.filter_label(field, value)
+    return "With a digital asset" if field == SearchDefaults::DIGITAL_ASSET_FIELD && value == "with"
+
+    value.to_s.squish
+  end
+
+  def self.year_range(range)
+    return unless range.is_a?(Hash)
+
+    from, to = range.values_at("begin", "end").map(&:presence)
+    [ from, to ].compact.join("–") if from || to
+  end
+
+  private_class_method :terms, :filters, :filter_label, :year_range
 
   # What the results page needs to repeat the search
   def search_params = query_params.to_h.symbolize_keys

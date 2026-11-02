@@ -76,8 +76,9 @@ class SavedSearchesTest < ActionDispatch::IntegrationTest
     follow_redirect!
 
     assert_response :success
-    assert_select ".saved-searches__flash", text: "Search saved."
-    assert_select "table.saved-searches td.saved-searches__name a[href*='q=skull']"
+    assert_select ".alert, [role=alert], [role=status]", text: /Search saved\./ # the layout's notice
+    assert_select "table.saved-searches td.saved-searches__name a[href*='q=skull']", text: "skull"
+    assert_equal 1, response.body.scan("Search saved.").size, "the notice is shown once"
   end
 
   test "a search that is not in the visitor's own history cannot be saved" do
