@@ -1,0 +1,22 @@
+<%# One labelled field of the access request form: label, hint, then the inline error. The hint is read before the error
+    (Topic - Forms), and the input is described by both. locals: form, attribute, type (:text, :email or :textarea), required, autocomplete %>
+<% error = form.object.errors.messages_for(attribute).first %>
+<% key = "nexus_ccs.access_requests.fields" %>
+<% id = "access_request_#{attribute}" %>
+<div class="access-form__field<%= " access-form__field--error" if error %>">
+  <label for="<%= id %>" class="access-form__label">
+    <%= t("#{key}.#{attribute}") %><% if required %> <span aria-hidden="true">*</span><% end %>
+  </label>
+  <p id="<%= id %>-hint" class="access-form__hint"><%= t("#{key}.#{attribute}_hint") %></p>
+  <% if error %>
+    <p id="<%= id %>-error" class="access-form__error"><%= image_tag "site/icon-error.svg", alt: "", class: "access-form__error-icon" %><span class="visually-hidden">Error: </span><%= error %></p>
+  <% end %>
+  <% options = { id: id, class: "form-control", required: required, "aria-required": (required ? "true" : nil), maxlength: AccessRequest::LIMITS[attribute],
+                 autocomplete: autocomplete, "aria-invalid": (error ? "true" : nil),
+                 "aria-describedby": [ "#{id}-hint", (error ? "#{id}-error" : nil) ].compact.join(" ") } %>
+  <% if type == :textarea %>
+    <%= form.text_area attribute, **options, rows: 6 %>
+  <% else %>
+    <%= form.public_send(type == :email ? :email_field : :text_field, attribute, **options) %>
+  <% end %>
+</div>

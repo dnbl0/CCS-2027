@@ -28,6 +28,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # Asking for access to a record (CCS-69): the form, and the confirmation only the requester's own session can open
+  resources :access_requests, only: [ :new, :create, :show ]
+
   # The new record page, for the records in StockRecords only (any other id is a 404): Blacklight out of the box (StockCatalogController),
   # and the same page in the UoM header, breadcrumb and footer (BrandedStockCatalogController). The site's own record page, /catalog/:id,
   # is unchanged.

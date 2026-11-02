@@ -97,4 +97,12 @@ class PageChromeTest < ActiveSupport::TestCase
       assert_equal :breadcrumb, page.saved_bar
     end
   end
+
+  test "the access request form: the way back to the results, then the page, with no banner" do
+    form = chrome("access_requests", "new")
+
+    assert_equal [ [ "Search results", "/catalog?q=grainger" ], [ "Request access", nil ] ], form.breadcrumbs
+    assert_nil form.banner
+    assert_equal :breadcrumb, form.saved_bar
+  end
 end
