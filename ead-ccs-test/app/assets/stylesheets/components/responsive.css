@@ -1,0 +1,140 @@
+/*
+ * Responsive and reflow fixes (CCS-63, BR-16.07; docs/responsive-audit-2026-11.md). Loaded last in application.css, so
+ * each rule only adjusts a component that is styled in its own file. WCAG 2.2: 1.4.10 Reflow (320px, no sideways page
+ * scroll), 1.4.4 Resize text (200%), 1.4.12 Text spacing, 2.5.8 Target size (at least 24px; 44px where a finger taps).
+ */
+
+/* Long words and strings break instead of widening the page: headings, the persistent link, citations */
+:where(h1, h2, h3, h4, dd, .persistent-link__text) {
+  overflow-wrap: anywhere;
+}
+
+/* Text links in the page's content: the clickable box is at least 24px tall (the line box of 16px text is 22px, and 18px
+   in the stock record's 14px lists). Padding on an inline link adds to the area that takes the click without moving the
+   lines. Buttons, and links styled as them, keep their own size. */
+:is(main, #main-container, dl, dd) a:not(.btn, .arrow-link, [class*="button"], :has(img, svg)) {
+  padding-block: 0.25rem;
+}
+
+/* The Copy and View full record buttons and the read-only persistent link: 24px at least, 44px where there is room */
+.record-copy,
+.persistent-link__browser .uom-action {
+  min-height: 1.5rem;
+}
+
+.persistent-link__url {
+  min-height: 1.5rem;
+}
+
+/* The phone menu's UniMelb audience links were 20px tall (site_header.css); they are 44px rows now, the gap between them
+   moved into the row */
+@media (max-width: 1023px) {
+  .site-nav > ul.site-nav__audience {
+    gap: 0;
+    padding-block: var(--ccs-space-3);
+  }
+
+  .site-nav > ul.site-nav__audience > li > a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+/* The record page's title sits beside the Save and Add to list buttons; on a phone they stack under the title (the
+   title broke a word, "Ethelred a", in the narrow column left beside them) */
+@media (max-width: 599px) {
+  .record-summary__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .record-summary__save {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+    flex-wrap: wrap;
+    margin-top: var(--ccs-space-3);
+  }
+
+  .record-summary__inner > .record-summary__tags {
+    grid-column: 1;
+  }
+}
+
+/* Text at 200%, or the user's letter and line spacing, on a phone: rows wrap instead of widening the page */
+.site-footer__acknowledgement .site-footer__inner > *,
+.site-footer__flags {
+  min-width: 0;
+}
+
+.site-footer__flags {
+  flex-wrap: wrap;
+}
+
+.digital-assets__controls {
+  flex: none;
+}
+
+.digital-assets__button {
+  width: 40px;
+  height: 40px;
+}
+
+#sortAndPerPage .view-type-group {
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 599px) {
+  #sortAndPerPage .view-type {
+    max-width: 100%;
+  }
+
+  .breadcrumb-strip {
+    flex-wrap: wrap;
+  }
+
+  .breadcrumb-strip > .site-nav__saved {
+    flex: 1 1 auto;
+  }
+
+  .search-banner .input-group,
+  .ccs-hero__search .input-group {
+    flex-wrap: wrap;
+  }
+}
+
+/* The results toolbar's right-hand group (Filters, sort, page size, view buttons) wraps when large text fills the row */
+#sortAndPerPage .search-widgets,
+#sortAndPerPage .search-widgets > * {
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* The view buttons are 48px square (3rem), so large text made the pair wider than the phone; 44px and not scaling with the text */
+@media (max-width: 599px) {
+  #sortAndPerPage .view-type-group .btn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* The licence chip and the two buttons: the chip can shrink to its words, and the row wraps when large text needs it */
+.digital-assets__toolbar-inner {
+  flex-wrap: wrap;
+}
+
+.digital-assets__licence {
+  flex: 0 1 auto;
+  min-width: min(100%, 8rem);
+}
+
+.digital-assets__licence > span {
+  min-width: 0;
+}
+
+/* The facet "more" modal's value links were 22px tall (the modal sits outside <main>, so the rule above does not reach it) */
+#blacklight-modal a.facet-select {
+  display: inline-block;
+  padding-block: 0.25rem;
+}
