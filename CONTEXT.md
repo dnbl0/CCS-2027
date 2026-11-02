@@ -57,3 +57,23 @@ _Avoid_: header state, layout flags
 
 **Data model workbook**:
 `CCS Field labels and filters.xlsx`: the source of truth for field labels and which fields are filters.
+
+**Access tier**:
+What a visitor may do with a record's digital assets: `open` (view and download), `view_only` (view; download on request) or
+`request` (view on request and approval). Derived from the record's licence by `AccessPolicy`
+([ADR 0007](docs/adr/0007-access-policy-is-derived-from-the-licence.md)). Metadata is shown on every tier.
+_Avoid_: permission level, rights status
+
+**Sensitive record**:
+A record whose assets the visitor is asked about before they are shown (`Sensitivity`). The visitor's choice is kept in their
+session; it never overrides the access tier.
+
+**Guest**:
+A visitor, identified only by their session cookie; there is no sign-in ([ADR 0008](docs/adr/0008-guest-users-without-login.md)).
+_Avoid_: user, account
+
+**Ingest**:
+The University dev team's process that fills Solr from EMu, Vernon and the DAM. This repository's `Collections::Indexer` fills
+a core from the committed CSV exports for development, CI and demos only ([ADR 0011](docs/adr/0011-solr-is-read-only-for-the-app.md)).
+
+See [docs/architecture.md](docs/architecture.md) for how these fit together.

@@ -1,18 +1,16 @@
 ## What changed and why
 
-<!-- One or two sentences. Link the Jira story if there is one. -->
-
-## Where
-
-- [ ] Static site (`public/`, `scripts/`, `tests/`)
-- [ ] Rails/Blacklight app (`ead-ccs-test/`)
+<!-- One or two sentences. Link the Jira story if there is one (CCS-123). -->
 
 ## Checks
 
-- [ ] `npm test` passes (static) and/or `bin/rails test`, `bin/rubocop` and `bin/brakeman` pass (Rails)
-- [ ] A change to the header, search overlay or footer was made in `src/partials/` and `npm run sync:partials` was run
-- [ ] A change to a collection page was made in `src/collection-landing.template.html` and `npm run build:collections` was run
+- [ ] `bin/ci` passes in `ead-ccs-test/` (rubocop, erb_lint, brakeman, bundler-audit, locale and docs checks, tests with and without Solr); `bin/ci --system` if a page, script or style changed
+- [ ] A test pins the new behaviour; a test that reads Solr calls `needs_solr`
+- [ ] New sentences are in `config/locales/` and `ruby script/i18n_check.rb` passes
+- [ ] A new environment variable is in `docs/configuration.md`; a new decision has an ADR in `docs/adr/`
+- [ ] No new gem (or the team agreed, and the Gemfile says why), no secret, no personal data
+- [ ] The branch name is not `feature/*`, `bugfix/*` or `enhance/*` unless I want it merged without waiting for CI (see CONTRIBUTING.md)
 
 ## Screenshots (for any visible change)
 
-<!-- Desktop (1440px) and mobile (390px), before and after. -->
+<!-- Desktop (1440px) and mobile (390px), before and after. Keyboard and screen reader behaviour if it changed. -->
