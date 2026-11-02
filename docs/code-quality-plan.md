@@ -26,7 +26,7 @@ search bar on the home page (the Rails app keeps its Blacklight bar) and font fa
 ## Progress
 
 - **Done 2026-10-07 (Phase 1):** decision taken (shared source for tokens, CSS and images; copy stays separate), items
-  2 and 3 built (`scripts/sync-rails-assets.js`, `scripts/parity.js`, both in CI), item 4 settled by documentation,
+  2 and 3 built (`scripts/sync-rails-assets.js`, `scripts/parity.js`, `parity.js` was later removed from CI and the repo), item 4 settled by documentation,
   and items 6 and part of 5 done (CI split into `ci.yml` and `rails-ci.yml` with path filters, the Rails job gained
   gem and importmap audits).
 - Item 5 changed: `ead-ccs-test/.github/workflows/deploy.yaml` builds and deploys the Rails image through the

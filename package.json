@@ -1,5 +1,5 @@
 {
-  "name": "ccs-static",
+  "name": "ccs-2027",
   "version": "1.0.0",
   "description": "A comprehensive web platform for discovering and searching the University of Melbourne's cultural collections spanning visual arts, cartography, medical history, zoology, archives, and more.",
   "main": "index.js",
@@ -18,23 +18,22 @@
     "lint:rails-css": "stylelint --config ead-ccs-test/.stylelintrc.json --config-basedir . \"ead-ccs-test/app/assets/stylesheets/**/*.css\"",
     "sync:partials": "node scripts/sync-partials.js",
     "sync:rails": "node scripts/sync-rails-assets.js",
-    "parity": "node scripts/parity.js",
     "style:snapshot": "node scripts/style-snapshot.js",
     "style:diff": "node scripts/style-diff.js",
     "test": "node scripts/run-tests.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dnbl0/CCS-Static-latest.git"
+    "url": "git+https://github.com/dnbl0/CCS-2027.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/dnbl0/CCS-Static-latest/issues"
+    "url": "https://github.com/dnbl0/CCS-2027/issues"
   },
-  "homepage": "https://github.com/dnbl0/CCS-Static-latest#readme",
+  "homepage": "https://github.com/dnbl0/CCS-2027#readme",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "axe-core": "^4.13.0",

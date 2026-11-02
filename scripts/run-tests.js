@@ -31,7 +31,6 @@ const CHECKS = [
   'node tests/style-diff.test.js',
   'node tests/pages-build.test.js',
   'node tests/accessibility.test.js',
-  'node scripts/sync-rails-assets.js --check',
   'node tests/modal-scroll-lock.test.js',
   'node tests/help-jump-nav.test.js'
 ];

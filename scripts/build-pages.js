@@ -1,5 +1,5 @@
 // Builds the static site for GitHub Pages into dist/.
-//   BASE_PATH=/CCS-2026-MVP node scripts/build-pages.js     (project site served under a sub-path)
+//   BASE_PATH=/example-base node scripts/build-pages.js     (project site served under a sub-path)
 //   node scripts/build-pages.js                              (served from the root, e.g. a custom domain)
 //
 // What this does for GitHub Pages, which has no server-side rules:

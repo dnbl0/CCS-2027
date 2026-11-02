@@ -15,4 +15,4 @@ commit: d27d12645c50
 |---|---|
 | `public/contact.html` (was Contact Us.dc.html) | script.js (CONTACT_GROUPS, COLLECTION_CONTACTS, renderContact, contactCardHTML) |
 
-Note: this file records a one-off content sync from the source prototype repo (2026-09-28); it is not kept up to date. This repository's own GitHub remote is https://github.com/dnbl0/CCS-Static-latest (see README.md for CI and deployment).
+Note: this file records a one-off content sync from the source prototype repo (2026-09-28); it is not kept up to date. This repository's own GitHub remote is https://github.com/dnbl0/CCS-2027 (see README.md for CI and deployment).

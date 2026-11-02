@@ -1,5 +1,7 @@
 # Handoff (2026-10-16)
 
+> Historical. Written when this code lived in the 2026 repos. The 2026 repos, GitHub Pages publishing and the `parity` check are no longer part of this project: see `docs/decoupling-from-2026.md`. Repo names below are the 2026 ones.
+
 For the next Claude agent (any account) continuing Dean's work. Dean is non-technical: decide, do, report briefly; ask only what blocks you. Dean's standing rule: do routine tasks (PRs, merges on green checks, org syncs, rollouts) without asking; still ask before destructive actions. Read `CLAUDE.md` (agent coordination) first.
 
 ## State

@@ -93,8 +93,8 @@ class BulkDownloadsTest < ActionDispatch::IntegrationTest
   end
 
   test "a selection over the file limit is refused with the limit stated, and offers no download" do
+    original = BulkDownload::MAX_FILES # before needs_solr: a skip still runs the ensure below, which restores it
     needs_solr
-    original = BulkDownload::MAX_FILES
     BulkDownload.send(:remove_const, :MAX_FILES)
     BulkDownload.const_set(:MAX_FILES, 1)
     post "/downloads/review", params: { ids: [ OPEN, OPEN_TWO ] }

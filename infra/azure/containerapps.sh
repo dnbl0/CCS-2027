@@ -23,7 +23,7 @@ set -euo pipefail
 : "${PG:?set PG (Postgres server name, e.g. ccs-pg-80e9cc)}"
 : "${ENVNAME:?set ENVNAME (existing Container Apps environment)}"
 : "${TAG:?set TAG (image tag, use the commit SHA)}"
-MEDIA_BASE_URL="${MEDIA_BASE_URL:-https://enterprise-services-group.github.io/CCS-2026-MVP/assets/data}"
+: "${MEDIA_BASE_URL:?set MEDIA_BASE_URL (where the audio, video and PDF files are served from, no trailing slash)}"
 
 az account set --subscription "$SUBSCRIPTION"
 az extension add --name containerapp --upgrade --only-show-errors

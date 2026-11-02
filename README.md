@@ -2,7 +2,9 @@
 
 A static front-end prototype for searching and browsing the University of Melbourne's cultural collections (Grainger Museum, Medical History Museum, University Art Collection, Harry Brookes Allen Museum, Henry Forman Atkinson Dental Museum, and a few smaller collections).
 
-**Design system**: UoM Gen 3 | **Bootstrap**: 5.3.3 (built locally) | **Hosting**: GitHub Pages | **Repository**: https://github.com/Enterprise-Services-Group/CCS-2026-MVP
+**Design system**: UoM Gen 3 | **Bootstrap**: 5.3.3 (built locally) | **Hosting**: Azure Container Apps (the Rails app) | **Repository**: https://github.com/Enterprise-Services-Group/CCS-2027 (personal copy: https://github.com/dnbl0/CCS-2027)
+
+> CCS 2027 is not connected to CCS 2026. The static prototype in `public/` is kept only because the Rails app's page styles were generated from it; see [docs/decoupling-from-2026.md](docs/decoupling-from-2026.md).
 
 The site is a prototype driven by an in-repo dataset (735 listed records), not a live catalogue. Accessibility work has been done and checked with axe-core scans (clean apart from the items listed under [Known issues](#known-issues--follow-ups)), but the site has **not** had a formal WCAG audit or certification.
 
@@ -242,14 +244,13 @@ Clean URLs (`/search/search-results`, `/collections/record`) only resolve on a h
 
 ### CI and merge workflow
 
-- `.github/workflows/ci.yml`: Node 20, `npm ci` (or `npm install` without a lockfile), installs Chromium for the browser test, then `npm test`, on every pull request and push to `main`.
+- `.github/workflows/ci.yml`: the checks for the static prototype in `public/` (Node 20, `npm ci` or `npm install`, Chromium for the browser tests, then `npm test`). It runs only when the prototype's own files change.
 - `.github/workflows/auto-merge.yml`: pushes to `feature/**`, `bugfix/**` or `enhance/**` that change html/css/js/md files and have 3+ commits or 2+ changed files open (or reuse) a PR against `main`, run basic documentation/structure checks, approve it, and squash-merge it. It does not run `npm test` itself. Auto-approval only works if the repository setting **Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests"** is enabled; otherwise the approve step logs a warning and the job continues to the merge step. See `github.md` and `.agents/rules/pr-workflow.md`.
-- `.github/workflows/rails-ci.yml`: Rails tests, system tests, rubocop and `npm run parity` (static pages against their Rails twins). `test`, `rails` and `system` must pass before a pull request is merged. On `dnbl0/CCS-Static-latest`, `parity` compares against this repository's copy of the Rails app, which can lag the organisation repository (where the Rails port is done); a `parity` failure is only acceptable when every failure is that known lag, and it should pass in the organisation repository after the sync.
-- `.github/workflows/pages.yml`: on push to `main` of the organisation repo, builds `public/` into `dist/` (`scripts/build-pages.js`) and publishes it with GitHub Pages. It does nothing on forks or personal copies.
+- `.github/workflows/rails-ci.yml`: Rails tests, system tests and rubocop. `rails` and `system` must pass before a pull request is merged.
 
 ### Hosting
 
-Published with GitHub Pages (static site) from the organisation repository (`Enterprise-Services-Group/CCS-2026-MVP`) by `pages.yml`; the site is public at https://enterprise-services-group.github.io/CCS-2026-MVP/. Vercel is no longer used. Changes reach it in two steps: a pull request into `main` of the personal repository (`dnbl0/CCS-Static-latest`), then a sync pull request into the organisation repository, which deploys when merged.
+The Rails app is deployed to Azure Container Apps (see `.github/workflows/acr-push.yml`, `azure-deploy.yml` and `infra/azure/`). The static prototype in `public/` is no longer published: the GitHub Pages workflow was removed (see `docs/decoupling-from-2026.md`). `scripts/build-pages.js` still builds it into `dist/` for local use.
 
 - `scripts/build-pages.js` prefixes links with the Pages base path, serves `/item/:code` through `404.html` and writes redirect pages for the legacy URLs.
 - `config/hosting.json`: `cleanUrls: true`, `trailingSlash: false`, and 301 redirects from the legacy `*.dc.html` names and from `/search` and `/search.html` to `/search/search-results`. It is the redirect configuration: `scripts/dev-server.js` and `scripts/build-pages.js` read it.
@@ -263,10 +264,9 @@ Some files are written by scripts; edit their source, then run the script (`npm 
 | Edit | Run | Writes |
 |---|---|---|
 | `src/partials/*.html` (header, search overlay, footer, browse-collections) | `npm run sync:partials` | the header, overlay and footer of every page in `public/`, and the Browse collections cards on the Collections page |
-| `public/styles/tokens`, `components`, `pages` and `public/images` | `npm run sync:rails` | the Rails copies in `ead-ccs-test/app/assets` |
+| `public/styles/tokens`, `components`, `pages` and `public/images` | `npm run sync:rails` | the Rails copies in `ead-ccs-test/app/assets` (no longer checked by `npm test` or CI; the Rails copies are now edited in the Rails app, see `docs/decoupling-from-2026.md`) |
 
-`npm run lint` runs ESLint and Stylelint. `npm run parity` (with this site on :3100 and the Rails app on :3200) compares the
-static pages with their Rails twins (content pages, header navigation and the search results page: card, toolbar, chips, filter rail, pagination, back-to-top and empty state, with the intentional differences listed in `scripts/parity.js`); it runs in `.github/workflows/rails-ci.yml`. The Rails app and the plan to keep both
+`npm run lint` runs ESLint and Stylelint. The Rails app and the plan to keep both
 codebases clean are described in `ead-ccs-test/README.md` and `docs/code-quality-plan.md`.
 
 ---

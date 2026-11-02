@@ -84,14 +84,8 @@ with the University's jump navigation beside them) and `/about`. The search resu
   `config/pages.yml`. The Browse collections cards on the home and collections pages are one partial,
   `pages/_browse_collections.html.erb` (the home page has its own listing); the Help text is all in `pages/help.html.erb`, and the
   jump navigation highlight is the `jump-nav` Stimulus controller. `HelpTopic` lists the sections for the header's Help menu.
-* The styles and images are generated from the static site, which is their source: `app/assets/stylesheets/pages`,
-  `tokens/static_site.css` and `app/assets/images/site/` are written by `node scripts/sync-rails-assets.js` (run
-  `npm run sync:rails` at the repository root) and checked by `npm test`. Never edit those files by hand: change
-  `public/styles` or `public/images` and re-run the script. The page copy is separate: the static pages and
-  `config/pages.yml` / the views here are edited together by hand. The header and footer are the existing
+* The styles and images were generated once from the 2026 static prototype (`node scripts/sync-rails-assets.js`, see `docs/decoupling-from-2026.md`): `app/assets/stylesheets/pages`, `tokens/static_site.css` and `app/assets/images/site/`. Nothing checks them against the prototype any more, so edit them here; their "Generated from ..." header comments are historical, and re-running the script would overwrite local changes. The page copy is `config/pages.yml` and the views. The header and footer are the existing
   `NexusCcs` components.
-* `npm run parity` (with both sites running) compares computed styles of the same elements on each static page and its
-  Rails twin at 1440px and 390px; it runs in the `Rails CI` workflow.
 
 ## UI
 

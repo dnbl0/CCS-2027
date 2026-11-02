@@ -4,5 +4,5 @@ packages: [docker.io, docker-compose-v2, git, python3, openssl]
 runcmd:
   # Swap, so the Rails image build does not run out of memory on a small VM
   - fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
-  - git clone --depth 1 -b __BRANCH__ https://github.com/dnbl0/CCS-Static-latest.git /opt/ccs
+  - git clone --depth 1 -b __BRANCH__ https://github.com/dnbl0/CCS-2027.git /opt/ccs
   - DOMAIN=__DOMAIN__ /opt/ccs/infra/azure/vm/bootstrap.sh > /var/log/ccs-bootstrap.log 2>&1
