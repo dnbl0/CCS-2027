@@ -244,6 +244,26 @@ en:
         body: "The image or file is not shown here. To see it, ask the collection team for access. Your request needs approval."
         link: "Request access to this item"
 
+    # Placeholder wording (CCS-163)
+    metadata_export:
+      link: "Download metadata (CSV)"
+      hint: "All the details above and the persistent link, as a spreadsheet file."
+
+    # Placeholder wording (CCS-227): the University must approve it.
+    sensitivity:
+      view: "View this item"
+      do_not_view: "Do not view"
+      hide: "Hide this item"
+      ask:
+        title: "This item may contain sensitive material"
+        body: "It is not shown unless you choose to see it. You can change your mind at any time."
+      declined:
+        title: "You chose not to view this item"
+        body: "The image or file is not shown. You can view it if you change your mind."
+      viewing:
+        title: "This item may contain sensitive material. You chose to view it."
+        body: "You can hide it again at any time."
+
   catalog:
     country_acknowledgement:
       title: "Acknowledgement of Country"

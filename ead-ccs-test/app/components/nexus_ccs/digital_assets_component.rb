@@ -6,7 +6,8 @@ module NexusCcs
   # band's right edge, and a toolbar with the licence and the buttons for that panel and for full screen.
   # Renders nothing for a record without assets. What it shows follows AccessPolicy: all of it for :open; for :view_only no
   # download (the media players' download button, the PDF link and the thumbnails' links to the files go) and a notice; for
-  # :request none of the assets, only the notice, the licence and the media metadata. Registered, through NexusCcs::RecordEmbedComponent, as the show
+  # :request none of the assets, only the notice, the licence and the media metadata. A sensitive record's assets are
+  # shown only after the visitor chooses to view them (SensitivityGateComponent). Registered, through NexusCcs::RecordEmbedComponent, as the show
   # page's document_embed_component. Behaviour: controllers/media_viewer_controller.js.
   class DigitalAssetsComponent < Blacklight::Component
     # The advisory every record carries (the demo's wording)
@@ -30,10 +31,28 @@ module NexusCcs
     def withheld? = tier == :request
     def downloadable? = tier == :open
 
+    # A sensitive record's assets wait for the visitor's choice (Sensitivity, CCS-227): :ask, :declined or :viewing; nil for
+    # any other record, and for one that is withheld anyway. Until the choice is "view", none of the assets is on the page.
+    def sensitivity_state
+      return @sensitivity_state if defined?(@sensitivity_state)
+
+      @sensitivity_state = if withheld? || !Sensitivity.sensitive?(@document) then nil
+      else
+        choices = Sensitivity::Choices.new(helpers.session)
+        if choices.viewing?(@document.id) then :viewing
+        elsif choices.declined?(@document.id) then :declined
+        else :ask
+        end
+      end
+    end
+
+    def gated? = %i[ask declined].include?(sensitivity_state)
+    def assets_shown? = !withheld? && !gated?
+
     # Audio, video and PDF files: [{ kind:, type:, url:, label: }]. A PDF can only be read by opening the file, so it is
     # left out when the file may not be downloaded.
     def media
-      return [] if withheld?
+      return [] unless assets_shown?
 
       items = Array(@document["digital_media_ssim"]).map { |entry| Collections::DigitalMedia.parse(entry) }
       downloadable? ? items : items.select { |item| %w[video audio].include?(item[:kind]) }
@@ -99,8 +118,8 @@ module NexusCcs
 
     private
 
-    # Nothing of a withheld asset reaches the page, not even as a path
-    def large_paths = withheld? ? [] : Array(@document["digital_asset_large_paths_ssim"])
-    def thumbnail_paths = withheld? ? [] : Array(@document["digital_asset_paths_ssim"])
+    # Nothing of a withheld asset (or one the visitor has not chosen to view) reaches the page, not even as a path
+    def large_paths = assets_shown? ? Array(@document["digital_asset_large_paths_ssim"]) : []
+    def thumbnail_paths = assets_shown? ? Array(@document["digital_asset_paths_ssim"]) : []
   end
 end
