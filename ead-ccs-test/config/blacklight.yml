@@ -1,19 +1,19 @@
 load_defaults: 9.0.0
 development:
   adapter: solr
-  # Fail rather than hang: the pages answer "search is unavailable" (see CatalogController#search_unavailable)
-  open_timeout: 5
-  timeout: 20
+  # Fail rather than hang: the pages answer "search is unavailable" (see CatalogController#search_unavailable). Seconds; SOLR_OPEN_TIMEOUT, SOLR_READ_TIMEOUT
+  open_timeout: <%= ENV.fetch("SOLR_OPEN_TIMEOUT", 2) %>
+  timeout: <%= ENV.fetch("SOLR_READ_TIMEOUT", 15) %>
   url: <%= ENV['SOLR_URL'] || "http://127.0.0.1:8983/solr/blacklight-core" %>
 test: &test
   adapter: solr
-  # Fail rather than hang: the pages answer "search is unavailable" (see CatalogController#search_unavailable)
-  open_timeout: 5
-  timeout: 20
+  # Fail rather than hang: the pages answer "search is unavailable" (see CatalogController#search_unavailable). Seconds; SOLR_OPEN_TIMEOUT, SOLR_READ_TIMEOUT
+  open_timeout: <%= ENV.fetch("SOLR_OPEN_TIMEOUT", 2) %>
+  timeout: <%= ENV.fetch("SOLR_READ_TIMEOUT", 15) %>
   url: <%= ENV['SOLR_URL'] || "http://127.0.0.1:8983/solr/blacklight-core" %>
 production:
   adapter: solr
-  # Fail rather than hang: the pages answer "search is unavailable" (see CatalogController#search_unavailable)
-  open_timeout: 5
-  timeout: 20
+  # Fail rather than hang: the pages answer "search is unavailable" (see CatalogController#search_unavailable). Seconds; SOLR_OPEN_TIMEOUT, SOLR_READ_TIMEOUT
+  open_timeout: <%= ENV.fetch("SOLR_OPEN_TIMEOUT", 2) %>
+  timeout: <%= ENV.fetch("SOLR_READ_TIMEOUT", 15) %>
   url: <%= ENV['SOLR_URL'] || "http://127.0.0.1:8983/solr/blacklight-core" %>
