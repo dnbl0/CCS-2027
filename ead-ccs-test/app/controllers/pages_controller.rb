@@ -12,4 +12,6 @@ class PagesController < ApplicationController
     redirect_to topic.path(helpers), status: :moved_permanently if topic
   end
   def about; end
+  def accessibility; end
+  def privacy; end
 end

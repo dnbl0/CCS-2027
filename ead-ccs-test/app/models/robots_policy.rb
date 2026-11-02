@@ -9,7 +9,7 @@
 #   noindex, follow         other results pages (a search, a filter, page 2 on: endless near-duplicates of the pages above, but
 #                           the records they link to are worth following), and the record pages withheld below
 #   noindex, nofollow       personal or action pages (history, saved items, lists, access requests, downloads, exports, the
-#                           sensitivity choice, citations, the comparison page, IIIF manifests), the facet and range endpoints, the stock comparison record pages
+#                           sensitivity choice, citations, Delete my data, the comparison page, IIIF manifests), the facet and range endpoints, the stock comparison record pages
 #                           (a copy of /catalog/:id), the error pages
 #   noindex                 the asset files under /digital-assets
 #
@@ -22,7 +22,7 @@ module RobotsPolicy
   NOINDEX_NOFOLLOW = "noindex, nofollow"
 
   # Paths of personal or action pages; also the Disallow lines of robots.txt (RobotsTxt), prefix match
-  PERSONAL_PREFIXES = %w[/bookmarks /saved_searches /search_history /lists /compare /access_requests /downloads /errors /400 /404 /406 /422 /500].freeze
+  PERSONAL_PREFIXES = %w[/bookmarks /saved_searches /search_history /lists /compare /my_data /access_requests /downloads /errors /400 /404 /406 /422 /500].freeze
   # /catalog/:id/<this>
   PERSONAL_RECORD_ACTIONS = %w[metadata sensitivity citation manifest manifest.json].freeze
   # Parts of /catalog that are not a results page or a record: the facet lists, the range chart data, suggestions, OpenSearch
