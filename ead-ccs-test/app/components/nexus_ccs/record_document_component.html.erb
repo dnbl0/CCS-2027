@@ -67,6 +67,7 @@
               </div>
             <% end %>
           </dl>
+          <%= render NexusCcs::MetadataExportComponent.new(document: document) %>
         </section>
 
         <% partials.each do |partial| %><%= partial %><% end %>

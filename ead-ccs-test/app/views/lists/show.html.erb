@@ -24,6 +24,7 @@
         <%= link_to t("nexus_ccs.saved_searches.start_searching"), root_path, class: "btn btn-primary" %>
       </div>
     <% else %>
+      <%= render NexusCcs::BulkSelectionComponent.new(documents: @documents, return_to: list_path(@list)) %>
       <h2 class="visually-hidden"><%= t("nexus_ccs.lists.menu.heading") %></h2>
       <% if @missing.positive? %><p class="saved-lists-note"><%= t("nexus_ccs.lists.missing_records") %></p><% end %>
       <%= render_document_index_with_view :list, @documents %>

@@ -16,6 +16,9 @@ Rails.application.routes.draw do
     resources :solr_documents, only: [ :show ], path: "/catalog", controller: "catalog" do
       member { get "citation" }
     end
+    # Sensitive records (CCS-227): the visitor's choice to view the assets or not. Export of a record's metadata (CCS-163).
+    post "catalog/:id/sensitivity", to: "sensitivity_choices#create", as: :sensitivity_choice
+    get "catalog/:id/metadata", to: "metadata_exports#show", as: :metadata_export
     # The saved list and its Save / Remove requests are a 404 while config.x.saved_records is off (config/application.rb)
     constraints(->(_request) { Rails.configuration.x.saved_records }) do
       resources :bookmarks, only: [ :index, :update, :create, :destroy ] do
@@ -26,6 +29,9 @@ Rails.application.routes.draw do
         end
       end
       resources :saved_searches, only: [ :index, :create, :destroy ]
+      # Bulk download of the selected records' digital assets (CCS-167): review what will be sent, then the zip
+      post "downloads/review", to: "bulk_downloads#review", as: :review_bulk_download
+      post "downloads", to: "bulk_downloads#create", as: :bulk_download
       # Named lists (CCS-389); a list's records are added and removed at /lists/:list_id/items
       resources :lists do
         member { get "citations" }

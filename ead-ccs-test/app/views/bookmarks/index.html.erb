@@ -21,6 +21,7 @@
           <%= render "bookmarks/clear_bookmarks_widget" %>
         </div>
       </div>
+      <%= render NexusCcs::BulkSelectionComponent.new(documents: @response.documents, return_to: bookmarks_path) %>
       <h2 class="visually-hidden"><%= t("blacklight.bookmarks.list_title") %></h2>
       <%= render_document_index_with_view :list, @response.documents %>
       <%= render "results_pagination" %>

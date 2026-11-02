@@ -1,4 +1,4 @@
-<section class="digital-assets" data-controller="media-viewer" aria-labelledby="digital-assets-heading">
+<section id="digital-assets" class="digital-assets" data-controller="media-viewer" aria-labelledby="digital-assets-heading">
   <h2 id="digital-assets-heading" class="visually-hidden">Digital <%= "asset".pluralize(count + media.size) %></h2>
 
   <div class="digital-assets__stage" data-media-viewer-target="stage">
@@ -8,6 +8,9 @@
     <div class="digital-assets__media-area">
       <% if withheld? %>
         <%= render NexusCcs::AccessNoticeComponent.new(document: @document) %>
+      <% end %>
+      <% if gated? %>
+        <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: sensitivity_state) %>
       <% end %>
       <% if main %>
         <figure class="digital-assets__main">
@@ -35,6 +38,10 @@
         </figure>
       <% end %>
     </div>
+
+    <% if sensitivity_state == :viewing %>
+      <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: :viewing) %>
+    <% end %>
 
     <% if tier == :view_only %>
       <%= render NexusCcs::AccessNoticeComponent.new(document: @document) %>
@@ -92,7 +99,7 @@
           <button type="button" class="digital-assets__button" aria-controls="media-metadata" aria-expanded="false" aria-label="Media metadata" title="Media metadata"
                   data-media-viewer-target="infoButton" data-action="media-viewer#togglePanel"><%= icon("media-info") %></button>
         <% end %>
-        <% unless withheld? %>
+        <% if assets_shown? %>
         <button type="button" class="digital-assets__button" aria-label="Full screen" title="Full screen" hidden
                 data-media-viewer-target="fullscreenButton" data-action="media-viewer#toggleFullscreen"><%= icon("media-fullscreen") %></button>
         <% end %>

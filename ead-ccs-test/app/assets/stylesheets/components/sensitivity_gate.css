@@ -1,0 +1,24 @@
+/*
+ * The notice that asks whether to view a sensitive record's digital assets (NexusCcs::SensitivityGateComponent, CCS-227):
+ * a light card on the dark media band, like the access notice, with its choices side by side (stacked on a phone).
+ */
+.digital-assets .sensitivity-gate {
+  max-width: 40rem;
+  width: 100%;
+}
+
+.sensitivity-gate__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-2);
+}
+
+/* button_to draws a form round each button; the forms sit in a row */
+.sensitivity-gate__form {
+  margin: 0;
+}
+
+.sensitivity-gate [tabindex="-1"]:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}

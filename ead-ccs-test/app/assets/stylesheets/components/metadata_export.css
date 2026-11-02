@@ -1,0 +1,12 @@
+/* "Download metadata (CSV)" under a record's details (NexusCcs::MetadataExportComponent, CCS-163) */
+.metadata-export {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ccs-space-2) var(--ccs-space-3);
+  margin: var(--ccs-space-4) 0 0;
+}
+
+.metadata-export__hint {
+  color: var(--ccs-text-secondary, var(--ccs-text-primary));
+}
