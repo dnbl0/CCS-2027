@@ -5,11 +5,18 @@
 # NameError. Remove this override when Blacklight ships the `action_name` fix.
 class BookmarksController < CatalogController
   include Blacklight::Bookmarks
+  include CitationsPage
 
   # The saved list is laid out like the content pages (page banner, container), not Blacklight's results layout
   layout "pages"
 
   before_action :remember_guest_user, only: %i[create update]
+
+  # The citations of the saved records (CCS-137)
+  def citations
+    render_citations(Array(action_documents), heading: t("nexus_ccs.saved.list_title"), back_path: bookmarks_path,
+                                              back_label: t("nexus_ccs.cite_page.back_to_saved"))
+  end
 
   private
 
