@@ -6,7 +6,7 @@ Measured on branch `nfr/maintainability-ccs-149`, November 2026. Re-run the meas
 
 **The Rails app is easy to change safely, and hard to learn without a guide; the guide now exists.** The code is small (5,600 lines
 of Ruby, 7,600 of CSS, 1,100 of JavaScript), split into small objects that each start with a comment saying what they decide, and
-99% of its lines are run by the unit suite (719 test cases, 12 seconds; 152 browser tests, 2 minutes). Almost no method is long
+99% of its lines are run by the unit suite (664 test runs, 12 seconds; 152 browser tests, 2 minutes). Almost no method is long
 or tangled. A new developer's real difficulties were elsewhere: no overview, no list of settings, no recipe for a common change,
 a CI that could not be run locally, a branch-name trap that merges without CI, and old documents that contradict the app.
 This work adds those, and pins the one untested area (the indexers and `SearchService`) with tests.
@@ -111,7 +111,7 @@ will not update unless asked: pin a commit or release when one allows Blacklight
 
 ### Speed of the suites
 
-Unit and integration: 12 seconds with Solr (641 runs, parallel on 10 cores), 3.5 seconds without (62 skip). Under `bin/coverage`
+Unit and integration: 12 seconds with Solr (664 runs, parallel on 10 cores), 7 seconds without (66 skip). Under `bin/coverage`
 (one process) 27 seconds. System: 123 seconds for 152 tests, one process. `bin/ci --quick` is 22 seconds; `bin/ci` adds the audits.
 
 ### Documentation
