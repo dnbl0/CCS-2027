@@ -64,6 +64,14 @@ module NexusCcs
     end
 
     def main = images.first
+
+
+    # The image's width and height attributes (nothing when its size cannot be read), so the page holds its space while it loads
+    def image_size(path)
+      width, height = ImageDimensions.for_path(path)
+      width ? { width: width, height: height } : {}
+    end
+
     def media_title(item) = item[:label].presence || title
     def others = images.drop(1)
 

@@ -46,6 +46,7 @@
   display: block;
   max-width: 100%;
   max-height: 38.5rem; /* 616px */
+  width: auto; /* the width and height attributes are for the aspect ratio only (they hold the space before the image loads) */
   height: auto;
   object-fit: contain;
 }

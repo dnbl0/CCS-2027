@@ -18,7 +18,7 @@ class ListsController < CatalogController
   before_action :find_list, only: %i[show edit update destroy citations]
 
   def index
-    @lists = visitor_lists.by_name.includes(:list_items)
+    @lists = visitor_lists.by_name.includes(:list_items).load # loaded once: the view's count and empty check then cost no queries
   end
 
   def show

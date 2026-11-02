@@ -1,0 +1,143 @@
+#!/usr/bin/env ruby
+# Reproduces the measurements in docs/performance.md. Not run in CI.
+#
+#   bin/perf counts            SQL statements, Solr requests, HTML size and server time for each page, in this process
+#                              (needs the Solr core at SOLR_URL; run it with RAILS_ENV=production for production behaviour)
+#   bin/perf browser [URL]     what a visitor's browser does: requests, bytes with and without compression, and the Core Web Vitals
+#                              proxies, in headless Chrome slowed to a mid-range phone on a good 4G connection. URL defaults to
+#                              http://localhost:3027, a server you have started yourself (see docs/performance.md).
+#
+# PERF_RUNS (default 5) is how many times each page is loaded; the median is reported. Add paths as arguments to measure others.
+require "json"
+require "net/http"
+require "zlib"
+require "stringio"
+
+PAGES = {
+  "home" => "/",
+  "help" => "/help",
+  "about" => "/about",
+  "results list (q=skull)" => "/catalog?q=skull&view=list",
+  "results mosaic (q=skull)" => "/catalog?q=skull&view=masonry",
+  "results with thumbnails (harp)" => "/catalog?q=harp&view=masonry",
+  "results with filters" => "/catalog?q=skull&f%5Bcollection_ssim%5D%5B%5D=Harry+Brookes+Allen+Museum+of+Anatomy+and+Pathology",
+  "record emu-406126" => "/catalog/emu-406126",
+  "record emu-20335" => "/catalog/emu-20335",
+  "advanced search" => "/catalog/advanced",
+  "search history" => "/search_history",
+  "lists" => "/lists",
+  "saved searches" => "/saved_searches",
+  "saved records" => "/bookmarks"
+}.freeze
+
+RUNS = Integer(ENV.fetch("PERF_RUNS", 5))
+
+def median(values) = values.empty? ? nil : values.sort[values.size / 2]
+
+def pages_for(args)
+  args.empty? ? PAGES : args.to_h { |path| [ path, path ] }
+end
+
+# Follows redirects (the results page adds its default filter), so the page measured is the one a visitor sees
+def visit(session, path)
+  session.get(path)
+  session.get(session.response.location) while session.response.redirect?
+end
+
+# A guest with some lists, saved records, saved searches and history, so the DB-backed pages have something to show
+def seed(session)
+  %w[skull violin bone].each { |q| visit(session, "/catalog?q=#{q}") }
+  2.times { |n| session.post("/lists", params: { list: { name: "Perf list #{n} #{SecureRandom.hex(3)}" } }) }
+  List.order(:id).last(2).each { |list| %w[emu-406126 emu-20335 emu-1].each { |id| session.post("/lists/#{list.id}/items", params: { document_id: id }) } }
+  %w[emu-406126 emu-20335 emu-1 emu-2].each { |id| session.post("/bookmarks", params: { id: id }) }
+  Search.order(:id).last(2).each { |search| session.post("/saved_searches", params: { search_id: search.id }) }
+end
+
+def counts(args)
+  ENV["RAILS_ENV"] ||= "development"
+  require_relative "../config/environment"
+  require_relative "../test/support/request_counter"
+  include RequestCounter
+  host = "localhost"
+  session = ActionDispatch::Integration::Session.new(Rails.application)
+  session.host = host
+  ActionController::Base.allow_forgery_protection = false
+  seed(session) if Rails.configuration.x.saved_records
+  puts format("%-26s %6s %6s %5s %6s %9s %9s", "page", "status", "ms", "sql", "solr", "html", "gzip")
+  pages_for(args).each do |name, path|
+    visit(session, path) # warm up
+    timings = []
+    result = nil
+    RUNS.times do
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      result = count_requests { visit(session, path) }
+      timings << ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).round
+    end
+    if ENV["PERF_SQL"]
+      result.statements.each { |sql| puts "    sql  #{sql.squish[0, 150]}" }
+      result.solr_requests.each { |uri| puts "    solr #{uri[0, 150]}" }
+    end
+    body = session.response.body
+    gz = Zlib.gzip(body).bytesize
+    puts format("%-26s %6s %6d %5d %6d %9d %9d", name, session.response.status, median(timings), result.sql, result.solr, body.bytesize, gz)
+  end
+end
+
+def browser(args)
+  require "ferrum"
+  base = URI(args.first&.start_with?("http") ? args.shift : "http://localhost:3027")
+  browser = Ferrum::Browser.new(headless: true, window_size: [ 412, 915 ], browser_options: { "no-sandbox" => nil }, timeout: 30, process_timeout: 30)
+  puts format("%-26s %6s %7s %7s %7s %6s %7s %5s %9s %9s %5s %7s %7s %7s", "page", "status", "TTFB", "FCP", "LCP", "CLS", "TBT", "reqs", "wire kB", "plain kB", "css", "css kB", "js kB", "img kB")
+  pages_for(args).each do |name, path|
+    samples = Array.new(RUNS) { browser_sample(browser, base, path) }
+    pick = ->(key) { median(samples.filter_map { |s| s[key] }) }
+    puts format("%-26s %6s %7.0f %7.0f %7.0f %6.3f %7.0f %5.0f %9.1f %9.1f %5.0f %7.1f %7.1f %7.1f", name, samples.last[:status], pick[:ttfb], pick[:fcp], pick[:lcp], pick[:cls], pick[:tbt], pick[:requests], pick[:wire] / 1024.0, pick[:plain] / 1024.0, pick[:css_requests], pick[:css] / 1024.0, pick[:js] / 1024.0, pick[:img] / 1024.0)
+  end
+ensure
+  browser&.quit
+end
+
+OBSERVERS = <<~JS
+  window.__perf = { lcp: 0, cls: 0, tbt: 0 };
+  new PerformanceObserver(l => { for (const e of l.getEntries()) window.__perf.lcp = e.startTime }).observe({ type: "largest-contentful-paint", buffered: true });
+  new PerformanceObserver(l => { for (const e of l.getEntries()) if (!e.hadRecentInput) window.__perf.cls += e.value }).observe({ type: "layout-shift", buffered: true });
+  new PerformanceObserver(l => { for (const e of l.getEntries()) if (e.startTime > 0) window.__perf.tbt += Math.max(0, e.duration - 50) }).observe({ type: "longtask", buffered: true });
+JS
+
+def browser_sample(browser, base, path)
+  context = browser.contexts.create
+  page = context.create_page
+  # A mid-range phone: 4x CPU slowdown; "Fast 4G" is 9 Mbit/s down, 170 ms round trip (Lighthouse's mobile defaults are slower: 1.6 Mbit/s, 150 ms).
+  page.command("Emulation.setCPUThrottlingRate", rate: 4)
+  page.command("Network.emulateNetworkConditions", offline: false, latency: Integer(ENV.fetch("PERF_LATENCY", 170)),
+                downloadThroughput: Integer(ENV.fetch("PERF_DOWN_KBPS", 1125)) * 1024, uploadThroughput: 750 * 1024 / 8 * 8)
+  page.command("Page.addScriptToEvaluateOnNewDocument", source: OBSERVERS)
+  status = nil
+  page.on(:response) { |r| status ||= r.response&.status if r.url.end_with?(path.sub(/#.*/, "")) }
+  page.go_to(URI.join(base.to_s, path).to_s)
+  sleep 2.5 # settle: late images, fonts and long tasks
+  data = page.evaluate(<<~JS)
+    (() => {
+      const nav = performance.getEntriesByType("navigation")[0];
+      const paint = performance.getEntriesByName("first-contentful-paint")[0];
+      const res = performance.getEntriesByType("resource").concat([nav]);
+      const kind = r => /\\.css(\\?|$)/.test(r.name) || r.initiatorType === "css" && /\\.css/.test(r.name) ? "css"
+        : /\\.js(\\?|$)/.test(r.name) ? "js" : /\\.(woff2?|ttf)(\\?|$)/.test(r.name) ? "font"
+        : /\\.(jpe?g|png|webp|gif|svg|avif|ico)(\\?|$)/.test(r.name) || r.initiatorType === "img" ? "img" : "other";
+      const sum = (k, f) => res.filter(r => k === "all" || kind(r) === k).reduce((n, r) => n + (r[f] || 0), 0);
+      return { ttfb: nav.responseStart, fcp: paint ? paint.startTime : null, lcp: window.__perf.lcp, cls: window.__perf.cls, tbt: window.__perf.tbt,
+               requests: res.length, wire: sum("all", "transferSize"), plain: sum("all", "decodedBodySize"),
+               css_requests: res.filter(r => kind(r) === "css").length, css: sum("css", "transferSize"), js: sum("js", "transferSize"), img: sum("img", "transferSize"),
+               font: sum("font", "transferSize") };
+    })()
+  JS
+  context.dispose
+  data.transform_keys(&:to_sym).merge(status: status || 200)
+end
+
+mode = ARGV.shift
+case mode
+when "counts" then counts(ARGV)
+when "browser" then browser(ARGV)
+else abort "usage: bin/perf counts|browser [URL] [paths...]"
+end

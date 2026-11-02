@@ -14,7 +14,9 @@
       <% end %>
       <% if main %>
         <figure class="digital-assets__main">
-          <%= image_tag main.first, alt: alt(1), class: "digital-assets__image", data: { media_viewer_target: "image" } %>
+          <%# The first thing on the page to paint: fetched first, and sized so the space is held before it arrives %>
+          <%= image_tag main.first, alt: alt(1), class: "digital-assets__image", data: { media_viewer_target: "image" },
+                fetchpriority: "high", decoding: "async", **image_size(main.first) %>
         </figure>
       <% end %>
 
@@ -74,12 +76,12 @@
           <% if downloadable? %>
             <%= link_to large, class: "digital-assets__other", target: "_blank", rel: "noopener",
                   data: { action: "media-viewer#show", media_viewer_large: large, media_viewer_alt: alt(index + 2) } do %>
-              <%= image_tag thumbnail, alt: "#{alt(index + 2)} (opens full size in a new tab)", loading: "lazy" %>
+              <%= image_tag thumbnail, alt: "#{alt(index + 2)} (opens full size in a new tab)", loading: "lazy", decoding: "async" %>
             <% end %>
           <% else %>
             <%# No link to the file: the thumbnail only changes the image on show %>
             <button type="button" class="digital-assets__other" data-action="media-viewer#show" data-media-viewer-large="<%= large %>" data-media-viewer-alt="<%= alt(index + 2) %>">
-              <%= image_tag thumbnail, alt: alt(index + 2), loading: "lazy" %>
+              <%= image_tag thumbnail, alt: alt(index + 2), loading: "lazy", decoding: "async" %>
             </button>
           <% end %>
         </li>
