@@ -234,6 +234,15 @@ en:
       close: "Close"
     facets:
       pending: "No records have this information yet."
+      # Said politely (a status) after a filter changes the results
+      status:
+        results:
+          one: "%{count} result"
+          other: "%{count} results"
+        filters:
+          zero: "no filters applied"
+          one: "%{count} filter applied"
+          other: "%{count} filters applied"
     access_notice:
       view_only:
         title: "You can view this item, but not download it"
