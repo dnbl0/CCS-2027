@@ -8,7 +8,7 @@ class PersonalPagesRobotsTest < ActionDispatch::IntegrationTest
   GET_PATHS = %w[
     /bookmarks /bookmarks/citations /saved_searches /search_history /lists /lists/1 /lists/1/citations /access_requests/new
     /access_requests/1 /my_data /catalog/emu-9044/metadata /catalog/emu-9044/citation /catalog/facet/collection_ssim /catalog/range_limit
-    /downloads /404
+    /downloads /404 /compare
   ].freeze
 
   test "every personal page, whatever its status, says noindex, nofollow in X-Robots-Tag, with indexing on" do

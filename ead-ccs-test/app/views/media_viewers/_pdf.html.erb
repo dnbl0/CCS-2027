@@ -1,0 +1,3 @@
+<%# locals: item, title, downloadable. A PDF is read by opening the file in the browser's own reader (a new tab), which the caller
+    offers only when the file may be downloaded; an in-page reader would be a new dependency. %>
+<%= link_to "Open #{title} (PDF, opens in a new tab)", item[:url], target: "_blank", rel: "noopener", class: "digital-assets__pdf" %>
