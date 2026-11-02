@@ -73,12 +73,17 @@
         <% partials.each do |partial| %><%= partial %><% end %>
       </div>
 
-      <% if copyright_card? %>
+      <%= render NexusCcs::CulturalProtocolsNoticeComponent.new(document: document) %>
+
         <aside class="record-card record-copyright" aria-labelledby="record-copyright-title">
           <div class="record-copyright__head">
             <h2 class="record-copyright__title" id="record-copyright-title">Copyright</h2>
             <%= render NexusCcs::HelpTipComponent.new(topic: :copyright) %>
           </div>
+          <% unless rights_recorded? %>
+            <p class="record-copyright__none"><%= t("nexus_ccs.rights.none_recorded") %></p>
+          <% end %>
+          <% if rights_recorded? || caption.present? || responsible_collection %>
           <dl class="record-copyright__list">
             <% { "Caption" => caption, "Credit line" => credit_line, "Copyright" => copyright, "Licence" => licence }.each do |label, value| %>
               <% next if value.blank? %>
@@ -91,9 +96,9 @@
               </div>
             <% end %>
           </dl>
+          <% end %>
           <p class="record-copyright__terms"><%= link_to "About copyright and terms of use", terms_path %></p>
         </aside>
-      <% end %>
     </div>
   </div>
 

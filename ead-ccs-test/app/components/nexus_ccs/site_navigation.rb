@@ -56,7 +56,10 @@ module NexusCcs
       Link.new("Emergency", "https://safety.unimelb.edu.au/emergency"),
       Link.new("Terms and privacy", "https://www.unimelb.edu.au/legal"),
       Link.new("Accessibility", "https://www.unimelb.edu.au/accessibility"),
-      Link.new("Privacy", "https://about.unimelb.edu.au/strategy/governance/compliance-obligations/privacy")
+      Link.new("Privacy", "https://about.unimelb.edu.au/strategy/governance/compliance-obligations/privacy"),
+      # This site's own statements (CCS-148): what the University's pages above cannot say about this site's data and checks
+      Link.new("Accessibility of this site", "/accessibility"),
+      Link.new("Privacy and data on this site", "/privacy")
     ].freeze
 
     # Label, value.

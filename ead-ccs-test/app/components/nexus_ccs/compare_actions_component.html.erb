@@ -1,0 +1,18 @@
+<div class="compare-actions">
+  <h3 class="visually-hidden">Compare</h3>
+  <% if several_images? %>
+    <%= link_to "Compare images", compare_path(record: id), class: "compare-actions__link", rel: "nofollow" %>
+  <% end %>
+  <% if in_comparison? %>
+    <%= button_to "Remove from compare", compare_item_path(id), method: :delete, class: "compare-actions__button", form: { class: "compare-actions__form" },
+                  params: { return_to: "record" }, aria: { label: "Remove from compare: #{title}" } %>
+  <% elsif full? %>
+    <p class="compare-actions__note">The comparison holds <%= CompareList::MAX %> records. Remove one to add this record.</p>
+  <% else %>
+    <%= button_to "Add to compare", compare_items_path, params: { id: id }, class: "compare-actions__button", form: { class: "compare-actions__form" },
+                  aria: { label: "Add to compare: #{title}" } %>
+  <% end %>
+  <% if comparison_size.positive? %>
+    <%= link_to "Open comparison (#{comparison_size})", compare_path, class: "compare-actions__link", rel: "nofollow" %>
+  <% end %>
+</div>

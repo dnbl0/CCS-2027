@@ -1,0 +1,8 @@
+<%# locals: item (Collections::DigitalMedia.parse), title, downloadable. The browser's own player: keyboard and screen reader
+    support come with it. Captions (item[:captions], a WebVTT file) are offered when the record has them; the transcript link too. %>
+<video controls <%= "controlsList=nodownload" unless downloadable %> preload="metadata" class="digital-assets__video" aria-label="<%= title %>">
+  <source src="<%= item[:url] %>" type="<%= item[:type] %>">
+  <% if item[:captions].present? %><track kind="captions" src="<%= item[:captions] %>" srclang="en" label="English captions"><% end %>
+  <% if downloadable %><a href="<%= item[:url] %>">Download <%= title %></a><% end %>
+</video>
+<%= render "media_viewers/transcript", item: item, title: title %>

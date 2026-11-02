@@ -1,5 +1,10 @@
 # Handover: Rails/Blacklight app (`ead-ccs-test`)
 
+> **Historical (October 2026).** Kept for the Europeana and British Museum evidence below. It is not kept up to date: for how the
+> app works now read [../../docs/architecture.md](../../docs/architecture.md), for what to run [running-the-app.md](running-the-app.md),
+> and for changes [../../CONTRIBUTING.md](../../CONTRIBUTING.md). The facts below that have since changed: Rails is 8.1.4 and
+> Blacklight 9.2.1, the test suite has about 640 tests, and the app deploys to Azure Container Apps.
+
 Written 2026-10-06 so a fresh session can continue. Current branch with the work:
 `feat/blacklight-oob` (local, not pushed), on top of `feat/rails-ccs-theme`. Both were committed with
 git plumbing off `origin/main`, because the parent repo's checked-out branch belongs to other work.

@@ -1,0 +1,18 @@
+en:
+  nexus_ccs:
+    compare:
+      title: "Compare"
+      description: "Look at images side by side. Zoom and pan one and the others can follow."
+      added: "Added to compare: %{title}."
+      removed: "Removed from compare."
+      cleared: "The comparison is empty."
+      full:
+        one: "The comparison holds %{count} record. Remove one to add another."
+        other: "The comparison holds %{count} records. Remove one to add another."
+      not_available: "This record cannot be compared: its images are not available to view."
+      unavailable:
+        one: "%{count} record you added is no longer available to view, so it is not shown."
+        other: "%{count} records you added are no longer available to view, so they are not shown."
+      empty: "Nothing to compare yet. Open a record with an image and choose Add to compare."
+      one_pane: "Add one more record to compare. Open another record with an image and choose Add to compare."
+      record_heading: "Images of %{title}"

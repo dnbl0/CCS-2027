@@ -14,14 +14,15 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   # axe-core comes from the static site's dependencies (npm install at the repository root)
   AXE = Rails.root.join("../node_modules/axe-core/axe.min.js")
   AXE_TAGS = %w[wcag2a wcag2aa wcag21a wcag21aa].freeze
+  WCAG22_TAGS = %w[wcag22aa best-practice].freeze
 
   # Fails with each violation (rule, impact, elements) when axe finds any on the current page. `except` lists rule ids
-  # that are known and tracked elsewhere.
-  def assert_accessible(except: [])
+  # that are known and tracked elsewhere; `tags` are the axe rule sets (AXE_TAGS + WCAG22_TAGS also checks WCAG 2.2 AA).
+  def assert_accessible(except: [], tags: AXE_TAGS)
     flunk "axe-core is not installed: run npm install at the repository root" unless AXE.exist?
 
     page.execute_script(AXE.read) unless page.evaluate_script("typeof axe") == "object"
-    violations = page.evaluate_async_script(<<~JS, AXE_TAGS)
+    violations = page.evaluate_async_script(<<~JS, tags)
       var tags = arguments[0], done = arguments[arguments.length - 1];
       axe.run(document, { runOnly: { type: "tag", values: tags } }).then(function (results) {
         done(results.violations.map(function (v) {

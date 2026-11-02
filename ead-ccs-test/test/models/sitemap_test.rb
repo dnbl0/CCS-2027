@@ -11,6 +11,8 @@ class SitemapTest < ActiveSupport::TestCase
     assert_equal "#{BASE}/", urls.first
     assert_includes urls, "#{BASE}/help"
     assert_includes urls, "#{BASE}/about"
+    assert_includes urls, "#{BASE}/accessibility"
+    assert_includes urls, "#{BASE}/privacy"
     assert_includes urls, "#{BASE}/catalog/advanced"
     assert_equal "#{BASE}/catalog/emu-1", urls.last
   end
@@ -23,7 +25,7 @@ class SitemapTest < ActiveSupport::TestCase
   end
 
   test "pages hold at most the page size, and the index lists every page" do
-    records = (1..25).map { |n| [ "r#{n}", nil ] } # 5 public pages and 25 records: 30 URLs
+    records = (1..23).map { |n| [ "r#{n}", nil ] } # 7 public pages and 23 records: 30 URLs
     map = sitemap(records, page_size: 10)
 
     assert_equal 3, map.page_count

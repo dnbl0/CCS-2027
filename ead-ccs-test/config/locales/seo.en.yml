@@ -5,6 +5,8 @@ en:
       home: "Search and explore the University of Melbourne's cultural collections in one place: art, museum objects, archives and more, with images and details for each record."
       help: "Help for Collections Navigator: how to search, filter and save records, how digital assets can be used, and how to contact the collection teams."
       about: "Collections Navigator brings together the University of Melbourne's rich and diverse cultural collections into a single discovery experience."
+      accessibility: "How accessible Collections Navigator is, how it is checked, and how to report a problem. Placeholder wording until the University approves it."
+      privacy: "What Collections Navigator stores about visitors, why, and how to remove it. Placeholder wording until the University approves it."
       advanced: "Advanced search for Collections Navigator: combine fields, words and dates to find records in the University of Melbourne's cultural collections."
       results: "Search results from the University of Melbourne's cultural collections."
       results_query: "Search results for “%{query}” in the University of Melbourne's cultural collections."

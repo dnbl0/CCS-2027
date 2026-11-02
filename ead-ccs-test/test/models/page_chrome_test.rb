@@ -89,7 +89,7 @@ class PageChromeTest < ActiveSupport::TestCase
   end
 
   test "the search history and saved searches pages: a trail with their own name and no banner, as the page brings one" do
-    { "search_history" => "Search history", "saved_searches" => "Saved searches", "lists" => "Your lists" }.each do |controller, name|
+    { "search_history" => "Search history", "saved_searches" => "Saved searches", "lists" => "Your lists", "my_data" => "Delete my data" }.each do |controller, name|
       page = chrome(controller, "index")
 
       assert_equal [ [ name, nil ] ], page.breadcrumbs
@@ -104,5 +104,13 @@ class PageChromeTest < ActiveSupport::TestCase
     assert_equal [ [ "Search results", "/catalog?q=grainger" ], [ "Request access", nil ] ], form.breadcrumbs
     assert_nil form.banner
     assert_equal :breadcrumb, form.saved_bar
+  end
+
+  test "the comparison page: a one-step trail, no banner, the saved bar in the breadcrumb strip" do
+    compare = chrome("compare", "show")
+
+    assert_equal [ [ I18n.t("nexus_ccs.compare.title"), nil ] ], compare.breadcrumbs
+    assert_nil compare.banner
+    assert_equal :breadcrumb, compare.saved_bar
   end
 end

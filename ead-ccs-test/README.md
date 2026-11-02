@@ -4,13 +4,19 @@
 (Ruby, PostgreSQL, Solr), check it works and fix common problems. How it runs on Azure is in
 [../infra/azure/README.md](../infra/azure/README.md).
 
+**Compliance** (copyright, rights-based access, Indigenous data governance, privacy, accessibility, security headers; what the app does and what only people can decide): [docs/compliance-register.md](docs/compliance-register.md).
+
 # System dependencies
 
-Ruby version 
+Ruby 4.0.6 (`.ruby-version`), PostgreSQL 17 and Solr 10; see [docs/running-the-app.md](docs/running-the-app.md).
 
 # Configuration
 
 ## Secrets
+
+On Azure Container Apps (where the app runs now) the secrets are Container Apps secrets: see
+[../infra/azure/README.md](../infra/azure/README.md). Every environment variable is listed in
+[../docs/configuration.md](../docs/configuration.md). The rest of this section describes the earlier AWS and Kubernetes deployment.
 
 Application secrets (`SECRET_KEY_BASE`, the database URL/password, and the Solr
 credentials) are stored in AWS Secrets Manager and synced into the cluster by the
@@ -34,10 +40,6 @@ See [docs/secrets.md](docs/secrets.md#solr-authentication) for how to rotate it 
 ### Facets
 Defined in app/controllers/catalog_controller.rb
 
-* Database creation
-
-* Database initialization
-
 # Deployment
 
 ## If changes are made to Solr schema
@@ -58,15 +60,13 @@ curl -s "$SOLR_URL/schema"
 # Testing
 
 This application uses Rails' default Minitest (rather than Rspec).
-Tests can be run using the standard (Rails Test Commands)[https://guides.rubyonrails.org/testing.html]
+Tests can be run using the standard [Rails test commands](https://guides.rubyonrails.org/testing.html). `bin/ci` runs everything GitHub CI runs (see [../CONTRIBUTING.md](../CONTRIBUTING.md)).
 
 Eg:
 
 ```bin/rails test -p``` — Run all tests
 ```bin/rails test test/models/boolean_syntax_test.rb``` - Run a specific test file
 ```bin/rails test test/models/user_test.rb:8``` - Run a single test on line 8
-
-* Services (job queues, cache servers, search engines, etc.)
 
 # Modifications from base Blacklight Project
 
