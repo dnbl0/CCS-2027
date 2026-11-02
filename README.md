@@ -1,6 +1,14 @@
-# Cultural Collections Search - University of Melbourne
+# Collections Navigator (Cultural Collections Search) - University of Melbourne
 
-A static front-end prototype for searching and browsing the University of Melbourne's cultural collections (Grainger Museum, Medical History Museum, University Art Collection, Harry Brookes Allen Museum, Henry Forman Atkinson Dental Museum, and a few smaller collections).
+The product is the Rails/Blacklight app in `ead-ccs-test/`, searching the University of Melbourne's cultural collections. **New here? Read in this order:**
+
+1. [ead-ccs-test/docs/running-the-app.md](ead-ccs-test/docs/running-the-app.md): run it on your computer (Ruby, PostgreSQL, Solr).
+2. [docs/architecture.md](docs/architecture.md): how it fits together, and [CONTEXT.md](CONTEXT.md) for the words it uses.
+3. [docs/how-to-change.md](docs/how-to-change.md): the usual changes, step by step.
+4. [CONTRIBUTING.md](CONTRIBUTING.md): branches, tests, `bin/ci`, and the auto-merge trap.
+5. [docs/configuration.md](docs/configuration.md) (every environment variable), [docs/adr](docs/adr/) (decisions) and [docs/maintainability.md](docs/maintainability.md) (the state of the code, and the backlog).
+
+The rest of this file describes the static front-end prototype kept in `public/`, a static prototype for searching and browsing the University of Melbourne's cultural collections (Grainger Museum, Medical History Museum, University Art Collection, Harry Brookes Allen Museum, Henry Forman Atkinson Dental Museum, and a few smaller collections).
 
 **Design system**: UoM Gen 3 | **Bootstrap**: 5.3.3 (built locally) | **Hosting**: Azure Container Apps (the Rails app) | **Repository**: https://github.com/Enterprise-Services-Group/CCS-2027 (personal copy: https://github.com/dnbl0/CCS-2027)
 

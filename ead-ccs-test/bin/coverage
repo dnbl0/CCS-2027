@@ -1,0 +1,67 @@
+#!/usr/bin/env ruby
+# Line coverage of the unit suite (everything except test/system), by directory and by file, with no extra gem: it uses
+# Ruby's built-in Coverage module. Not run in CI. See docs/maintainability.md.
+#
+#   bin/coverage              run the suite and print coverage for app/ and lib/
+#   bin/coverage --files      also list every file, least covered first
+#   bin/coverage --json       print the numbers as JSON (for comparing before and after)
+#
+# It runs in one process (PARALLEL_WORKERS=1) so one Coverage run sees every test; that takes a minute rather than ten
+# seconds. Tests that need Solr skip themselves when SOLR_URL is unreachable, so start Solr first for the true figure.
+require "coverage"
+require "json"
+
+ROOT = File.expand_path("..", __dir__)
+Dir.chdir(ROOT)
+ENV["RAILS_ENV"] = "test"
+ENV["PARALLEL_WORKERS"] = "1"
+options = ARGV.dup
+ARGV.clear
+
+# Start measuring before the app loads, then print once Minitest (registered later, so it runs first) has finished.
+Coverage.start(lines: true)
+at_exit do
+  next unless defined?(Minitest) && $!.nil? || $!.is_a?(SystemExit)
+
+  result = Coverage.result
+  files = Dir["app/**/*.rb", "lib/**/*.rb"].map { |f| File.expand_path(f) }
+  rows = files.filter_map do |path|
+    lines = result.dig(path, :lines) || Coverage.line_stub(path) # a file no test loaded counts as all missed
+    relevant = lines.compact.size
+    next if relevant.zero?
+
+    hit = lines.count { |n| n&.positive? }
+    [ path.delete_prefix("#{ROOT}/"), relevant, hit ]
+  end
+
+  by_dir = rows.group_by { |path, _, _| path.split("/").first(path.start_with?("app/") ? 2 : 1).join("/") }
+  summary = by_dir.sort.map do |dir, list|
+    relevant = list.sum { |r| r[1] }
+    hit = list.sum { |r| r[2] }
+    [ dir, list.size, relevant, hit, (100.0 * hit / relevant).round(1) ]
+  end
+  total_relevant = rows.sum { |r| r[1] }
+  total_hit = rows.sum { |r| r[2] }
+
+  if options.include?("--json")
+    puts JSON.pretty_generate(total: (100.0 * total_hit / total_relevant).round(1),
+                              directories: summary.to_h { |d, n, rel, hit, pct| [ d, { files: n, lines: rel, covered: hit, percent: pct } ] },
+                              files: rows.to_h { |p, rel, hit| [ p, (100.0 * hit / rel).round(1) ] })
+  else
+    puts "\nLine coverage of the unit suite (test/system excluded)\n\n"
+    printf("%-34s %6s %7s %8s %7s\n", "Directory", "Files", "Lines", "Covered", "%")
+    summary.each { |d, n, rel, hit, pct| printf("%-34s %6d %7d %8d %6.1f%%\n", d, n, rel, hit, pct) }
+    printf("%-34s %6d %7d %8d %6.1f%%\n", "TOTAL", rows.size, total_relevant, total_hit, 100.0 * total_hit / total_relevant)
+    if options.include?("--files")
+      puts "\nFiles, least covered first (lines relevant, covered, %)\n\n"
+      rows.sort_by { |_, rel, hit| [ 1.0 * hit / rel, -rel ] }.each do |path, rel, hit|
+        printf("%-62s %5d %5d %6.1f%%\n", path, rel, hit, 100.0 * hit / rel)
+      end
+    end
+  end
+end
+
+$LOAD_PATH.unshift(File.join(ROOT, "test"))
+require_relative "../config/environment"
+require "rails/test_help"
+Dir[File.join(ROOT, "test/**/*_test.rb")].reject { |f| f.include?("/test/system/") }.sort.each { |f| require f }

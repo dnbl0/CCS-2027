@@ -197,8 +197,6 @@ en:
       empty: "You have not saved any searches yet. Save one from your search history."
       empty_link: "Go to your search history"
       start_searching: "Start searching"
-      save: "Save this search"
-      save_named: "Save this search: %{query}"
       saved: "Search saved."
       removed: "Search removed from your saved searches."
       not_found: "That search is no longer in your history, so it could not be saved."
@@ -206,7 +204,6 @@ en:
     lists:
       title: "Your lists"
       description: "Lists you have made on this device. Add records to a list from a search result or a record page."
-      list_heading: "Your lists"
       count:
         one: "%{count} list"
         other: "%{count} lists"
@@ -220,7 +217,6 @@ en:
       edit_title: "Rename list"
       name_label: "List name"
       name_hint: "Up to %{limit} characters. You can have up to %{max_lists} lists, with up to %{max_records} records each."
-      name_error_prefix: "List name"
       create: "Create list"
       save_name: "Save name"
       cancel: "Cancel"
@@ -250,11 +246,9 @@ en:
         delete_named: "Delete list: %{name}"
       menu:
         button: "Add to list"
-        button_named: "Add to list: %{title}"
         heading: "Your lists"
         add: "Add to %{name}"
         remove: "Remove from %{name}"
-        in_list: "In list"
         new_label: "New list name"
         new_submit: "Create and add"
         none: "You have no lists yet."
