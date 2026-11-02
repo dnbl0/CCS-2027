@@ -7,6 +7,7 @@
 
 <main class="saved-main" id="main-content">
   <div class="saved-main__inner">
+    <p class="saved-lists-link"><%= link_to t("nexus_ccs.lists.your_lists"), lists_path %></p>
     <% if current_or_guest_user.blank? || @response.documents.blank? %>
       <div class="saved-empty">
         <p class="saved-empty__text"><%= t("nexus_ccs.saved.empty") %></p>

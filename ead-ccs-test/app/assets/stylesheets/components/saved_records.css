@@ -162,3 +162,188 @@
 .search-history .applied-filter .constraint-value {
   pointer-events: none;
 }
+
+/*
+ * Named lists (CCS-389): the lists page and a list's page share the saved records layout; the table uses the search
+ * history's icon buttons (.history-action). NexusCcs::AddToListComponent draws the Add to list menu beside Save.
+ */
+.saved-lists-link {
+  margin: 0 0 var(--ccs-space-4);
+}
+
+.saved-toolbar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-2);
+}
+
+.saved-toolbar__actions form {
+  margin: 0;
+}
+
+.saved-lists-note {
+  color: var(--ccs-text-primary);
+}
+
+.lists .lists__name {
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+.list-table {
+  position: relative;
+}
+
+.saved-main__inner--form {
+  max-width: 40rem;
+}
+
+.list-form__error {
+  margin: 0 0 var(--ccs-space-2);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-error, #b3261e);
+}
+
+.list-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-2);
+}
+
+/* On a card the Save control and Add to list sit side by side, and wrap on a narrow card */
+.result-card__save,
+.record-summary__save {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--ccs-space-4);
+}
+
+/* Above the mosaic's stretched title link, like the Save control */
+.list-menu {
+  position: relative;
+  z-index: 2;
+}
+
+.list-menu__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ccs-space-1);
+  min-height: 44px;
+  padding: var(--ccs-space-1) 0;
+  border: 0;
+  background: none;
+  font-size: var(--ccs-font-size-md);
+  font-weight: var(--ccs-font-weight-bold);
+  line-height: var(--ccs-line-height-tight);
+  color: var(--ccs-text-brand);
+  cursor: pointer;
+}
+
+.list-menu__button:hover .list-menu__text {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.list-menu__button:focus-visible,
+.list-menu__item:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring, currentcolor);
+  outline-offset: 2px;
+}
+
+.list-menu__icon {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.list-menu__panel {
+  z-index: 5;
+  width: 18rem;
+  max-width: calc(100vw - 2 * var(--space-16));
+  padding: var(--ccs-space-3);
+  border: 1px solid var(--ccs-border-default, #c7ccd6);
+  border-radius: var(--ccs-radius-sm);
+  background: var(--ccs-white);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 15%);
+  color: var(--ccs-text-primary);
+  font-size: var(--ccs-font-size-md);
+}
+
+/* Only the JavaScript-enhanced menu floats; without JavaScript the panel is part of the page */
+.list-menu__button:not([hidden]) + .list-menu__panel {
+  position: absolute;
+  top: 100%;
+  inset-inline-start: 0;
+}
+
+.list-menu__panel[hidden] {
+  display: none;
+}
+
+.list-menu__heading {
+  margin: 0 0 var(--ccs-space-2);
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+.list-menu__none {
+  margin: 0 0 var(--ccs-space-2);
+}
+
+.list-menu__lists {
+  max-height: 12rem;
+  margin: 0 0 var(--ccs-space-2);
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.list-menu__form {
+  margin: 0;
+}
+
+.list-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--ccs-space-2);
+  width: 100%;
+  min-height: 2.5rem;
+  padding: var(--ccs-space-1) var(--ccs-space-2);
+  border: 0;
+  border-radius: var(--ccs-radius-sm);
+  background: none;
+  color: var(--ccs-text-brand);
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+
+.list-menu__item:hover {
+  background: var(--ccs-navy-100, #e8ecf3);
+}
+
+.list-menu__item--in {
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+.list-menu__new {
+  padding-top: var(--ccs-space-2);
+  border-top: 1px solid var(--ccs-border-default, #c7ccd6);
+}
+
+.list-menu__label {
+  display: block;
+  margin-bottom: var(--ccs-space-1);
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+.list-menu__input {
+  margin-bottom: var(--ccs-space-2);
+}
+
+/* An open menu floats over the next cards and past its own card's edge (the card clips its content) */
+.result-card:has(.list-menu__button[aria-expanded="true"]) {
+  overflow: visible;
+}
+
+.list-menu:has(.list-menu__button[aria-expanded="true"]) {
+  z-index: 10;
+}

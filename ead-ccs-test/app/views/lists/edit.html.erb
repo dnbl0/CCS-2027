@@ -1,0 +1,10 @@
+<%# edit list (CCS-389): one field, the name. %>
+<% content_for :title, "#{t('nexus_ccs.lists.edit_title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-saved page-lists" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.lists.edit_title")) %>
+
+<main class="saved-main" id="main-content">
+  <div class="saved-main__inner saved-main__inner--form">
+    <%= render "form", list: @list %>
+  </div>
+</main>

@@ -17,7 +17,10 @@
       </ul>
     <% end %>
     <% if Rails.configuration.x.saved_records %>
-      <div class="result-card__save"><%= render NexusCcs::SaveControlComponent.new(document: document) %></div>
+      <div class="result-card__save">
+        <%= render NexusCcs::SaveControlComponent.new(document: document) %>
+        <%= render NexusCcs::AddToListComponent.new(document: document) %>
+      </div>
     <% end %>
   </div>
 <% end %>
