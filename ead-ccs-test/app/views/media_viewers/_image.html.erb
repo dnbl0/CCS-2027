@@ -1,0 +1,3 @@
+<%# locals: item (a RecordMedia::Image), alt. Plain image: the record page draws its large image itself (DigitalAssetsComponent,
+    with DeepZoomComponent over it); this is the viewer for an image among the other media. %>
+<%= image_tag item.url, alt: alt, loading: "lazy", decoding: "async", class: "digital-assets__image" %>

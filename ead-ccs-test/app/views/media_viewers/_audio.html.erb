@@ -1,0 +1,6 @@
+<%# locals: item, title, downloadable. As the video partial: the browser's own player, with a transcript link when there is one. %>
+<audio controls <%= "controlsList=nodownload" unless downloadable %> preload="metadata" class="digital-assets__audio" aria-label="<%= title %>">
+  <source src="<%= item[:url] %>" type="<%= item[:type] %>">
+  <% if downloadable %><a href="<%= item[:url] %>">Download <%= title %></a><% end %>
+</audio>
+<%= render "media_viewers/transcript", item: item, title: title %>

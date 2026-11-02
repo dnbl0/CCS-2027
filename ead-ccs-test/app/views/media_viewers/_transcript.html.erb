@@ -1,0 +1,4 @@
+<%# locals: item, title. The transcript of an audio or video file, when the record has one (a text or HTML file; see docs/media-viewer.md). %>
+<% if item[:transcript].present? %>
+  <p class="digital-assets__transcript"><%= link_to "Transcript of #{title} (opens in a new tab)", item[:transcript], target: "_blank", rel: "noopener" %></p>
+<% end %>
