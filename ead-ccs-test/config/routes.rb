@@ -6,6 +6,11 @@ Rails.application.routes.draw do
   concern :searchable, Blacklight::Routes::Searchable.new
   concern :exportable, Blacklight::Routes::Exportable.new
 
+  # The records ticked on the results pages (CCS-40): kept in the session cookie, so not behind the saved records setting below
+  resource :selection, only: [ :show, :create ] do
+    get "citations"
+  end
+
   # scope constraint to address Rails default :id segment stopping at dots in ids
   scope constraints: { id: %r{[^/]+} } do
     resource :catalog, only: [], as: "catalog", path: "/catalog", controller: "catalog" do

@@ -8,6 +8,7 @@ class ListItemsController < ApplicationController
   def create
     list = visitor_lists.find_by(id: params[:list_id])
     return back_or_to_lists(alert: t("nexus_ccs.lists.not_found")) unless list
+    return add_several(list, Array(params[:document_ids])) if params[:document_ids].present?
 
     item = list.list_items.build(document_id: params[:document_id].to_s)
     if item.save
@@ -26,5 +27,21 @@ class ListItemsController < ApplicationController
 
     item.destroy
     back_or_to_lists(notice: t("nexus_ccs.lists.removed", name: list.name))
+  end
+
+  private
+
+  # The selected records (CCS-40), added in one go: each once, those already in the list left as they are, stopping if the list fills
+  def add_several(list, document_ids)
+    added = 0
+    document_ids.grep(String).first(Selection::MAX).each do |document_id|
+      item = list.list_items.build(document_id: document_id)
+      if item.save
+        added += 1
+      elsif !item.errors.of_kind?(:document_id, :taken)
+        return back_or_to_lists(alert: t("nexus_ccs.lists.failure", reason: item.errors.full_messages.to_sentence))
+      end
+    end
+    back_or_to_lists(notice: t("nexus_ccs.lists.added_several", count: added, name: list.name))
   end
 end

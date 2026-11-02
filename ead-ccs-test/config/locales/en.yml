@@ -208,6 +208,10 @@ en:
       deleted: "List %{name} deleted."
       delete_confirm: "Delete the list %{name}? Its records stay in the collection."
       added: "Added to %{name}."
+      added_several:
+        zero: "Those records were already in %{name}."
+        one: "1 record added to %{name}."
+        other: "%{count} records added to %{name}."
       removed: "Removed from %{name}."
       not_found: "That list no longer exists."
       already_in: "That record is already in %{name}."
@@ -293,6 +297,98 @@ en:
         link: "Request access to this item"
 
     # Placeholder wording (CCS-167): the University must approve it, and set the limits (BulkDownload::MAX_*).
+    # Why a result matched (CCS-39, NexusCcs::MatchRationaleComponent). Placeholder wording for the collections team to approve.
+    rationale:
+      matched_in: "Matched in: %{fields}"
+      other: "Matched on a related word or in other details of the record"
+      fields:
+        title: "Title"
+        alternative_title: "Alternative title"
+        creator: "Creator"
+        subject: "Subject"
+        description: "Description"
+        credit_line: "Credit line"
+        citation: "Citation"
+    # Choosing results to look at together (CCS-40, Selection, NexusCcs::SelectionBarComponent). Placeholder wording.
+    selection:
+      title: "Selected records"
+      description: "The records you have ticked on the search results, in the order you chose them. You can choose up to %{count}. They are kept for this visit on this device."
+      back: "Back to search results"
+      select: "Select"
+      select_all: "Select all on this page"
+      update: "Update selection"
+      remove_unticked: "Remove unticked records"
+      clear: "Clear selection"
+      bar_label: "Selected records"
+      records_heading: "Selected records"
+      status:
+        zero: "No records selected"
+        one: "1 record selected"
+        other: "%{count} records selected"
+      view_count: "View selected (%{count})"
+      full: "You can select up to %{count} records. Clear some to choose more."
+      error: "Your selection could not be saved. Try again, or use Update selection."
+      count:
+        one: "1 selected record"
+        other: "%{count} selected records"
+      order: "Records are listed in the order you selected them. Untick a record to take it out of the selection."
+      missing:
+        one: "1 selected record is no longer in the collection and has been left out."
+        other: "%{count} selected records are no longer in the collection and have been left out."
+      empty: "You have not selected any records yet. Tick Select on a search result to choose it."
+      cite_named: "Cite selected records"
+      add_to_list: "Add selected records to a list"
+      add_to_named: "Add to %{name}"
+      step:
+        label: "Selected records"
+        position: "Selected record %{position} of %{count}"
+        previous: "Previous selected record"
+        next: "Next selected record"
+        all: "All selected records"
+    # Why am I seeing these results? (CCS-43, NexusCcs::SearchDiagnosticsComponent). Placeholder wording.
+    diagnostics:
+      summary: "Why am I seeing these results?"
+      read: "How your search was read"
+      limits: "What may be limiting the results"
+      try: "Things to try"
+      searched_for: "You searched for"
+      in_field: "Looking only in: %{field}"
+      phrases:
+        one: "Exact phrase, found only with the words together in this order:"
+        other: "Exact phrases, found only with the words together in this order:"
+      operators: "Your search uses AND, OR, NOT, + or -, or a field name, so a record matches the way those say."
+      one_word: "A record must contain your word."
+      words_needed:
+        zero: "A record must contain all %{count} of your words and phrases."
+        one: "A record must contain all %{count} of your words and phrases."
+        other: "A record must contain all %{count} of your words and phrases, except that up to %{missing} may be missing when a search is this long."
+      similar_words: "Other forms of a word and some similar words are matched too."
+      spelling: "Nothing matched “%{original}”, so the results are for “%{corrected}”."
+      filter_on: "Filter on: %{label}."
+      default_note: "This filter is on until you take it off."
+      no_search: "No search words were given."
+      clause:
+        must: "%{field} must contain %{query}."
+        should: "%{field} may contain %{query}."
+        must_not: "%{field} must not contain %{query}."
+      from_year: "from %{year}"
+      to_year: "up to %{year}"
+      reasons:
+        default_filter: "Records without a digital asset are hidden while the ‘With a digital asset’ filter is on. Many records have no image."
+        filters: "Each filter narrows the results. Several filters together may leave few or no records."
+        operators: "AND, OR, NOT, + and - change which records match. Check that each one is what you meant."
+        phrase: "A phrase in quotation marks matches only those words, together, in that order."
+        many_words: "A long search needs most of its words to be in the same record."
+        search_field: "You searched in one field only, so records that mention the words elsewhere are not included."
+        clauses: "Every row of an Advanced search may need to match. Check the ‘match all’ or ‘match any’ choice."
+        nothing_obvious: "Nothing in the search itself stands out. The collections may not hold records with these words, or may use different words."
+      remove: "Take off “%{label}”"
+      more:
+        one: "1 more result"
+        other: "%{number} more results"
+      no_filter_helps: "Taking off any one filter does not add results."
+      fewer_words: "Try fewer or more general words."
+      tips: "Read the search tips"
     bulk_download:
       title: "Download digital assets"
       description: "Check what the zip file will hold before you download it."

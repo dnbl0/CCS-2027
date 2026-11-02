@@ -1,0 +1,259 @@
+/*
+ * Why a result matched (CCS-39), choosing results (CCS-40) and "Why am I seeing these results?" (CCS-43):
+ * NexusCcs::MatchRationaleComponent, SelectBoxComponent, SelectionBarComponent, SelectionStepperComponent,
+ * SelectionListsComponent and SearchDiagnosticsComponent. One file for the three stories.
+ */
+
+/* Matched words. The pale amber is a second cue: "Matched in" names the fields, the words stay readable text, and the
+   underline survives a colour change (forced colours use the system highlight). Dark text on #fff5cb is above 7:1. */
+.result-card mark,
+.result-card__snippet mark {
+  padding: 0 0.1em;
+  border-radius: 0.125rem;
+  background: var(--ccs-amber-100);
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+@media (forced-colors: active) {
+  .result-card mark {
+    background: Mark;
+    color: MarkText;
+  }
+}
+
+.result-card__content > .result-card__why {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-1);
+  padding-top: var(--ccs-space-3);
+  font-size: var(--ccs-font-size-sm);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-secondary);
+}
+
+.result-card__why p {
+  margin: 0;
+}
+
+.result-card__snippet {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+/* The checkbox: a 24px target (WCAG 2.5.8) whose label is a 24px-high row, above the title link that the mosaic stretches
+   over the whole card */
+.result-card__content > .result-card__select {
+  padding-top: var(--ccs-space-2);
+}
+
+.result-card__select {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--ccs-space-2);
+}
+
+.result-card__select-input {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  cursor: pointer;
+}
+
+.result-card__select-label {
+  min-height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--ccs-font-size-md);
+  color: var(--ccs-text-brand);
+  cursor: pointer;
+}
+
+/* The strip above the results */
+.selection-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ccs-space-2) var(--ccs-space-4);
+  margin: 0 0 var(--ccs-space-4);
+  padding: var(--ccs-space-2) var(--ccs-space-3);
+  border: 1px solid var(--ccs-border-panel);
+  border-radius: 0.25rem;
+  background: var(--ccs-white);
+}
+
+.selection-bar__count {
+  margin: 0;
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-brand);
+}
+
+.selection-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-2);
+}
+
+.selection-bar__button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: var(--ccs-space-1) var(--ccs-space-3);
+  border: 1px solid var(--ccs-text-link);
+  border-radius: 0.25rem;
+  background: var(--ccs-white);
+  font: inherit;
+  color: var(--ccs-text-link);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.selection-bar__button:hover {
+  background: var(--ccs-neutral-100);
+}
+
+.selection-bar__view {
+  background: var(--ccs-text-link);
+  color: var(--ccs-white);
+}
+
+.selection-bar__view:hover {
+  background: var(--ccs-text-link-hover);
+}
+
+.selection-bar__button[hidden] {
+  display: none;
+}
+
+/* Previous and next selected record, above the record page */
+.selection-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ccs-space-2) var(--ccs-space-4);
+  max-width: 80rem;
+  margin: var(--ccs-space-3) auto 0;
+  padding: var(--ccs-space-2) var(--ccs-space-4);
+  border: 1px solid var(--ccs-border-panel);
+  background: var(--ccs-white);
+}
+
+.selection-stepper__position {
+  margin: 0;
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+.selection-stepper__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-2) var(--ccs-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.selection-stepper__links a {
+  display: inline-block;
+  min-height: 1.5rem;
+}
+
+/* Add selected to a list (the selection page) */
+.selection-lists {
+  margin-bottom: var(--ccs-space-5);
+  padding: var(--ccs-space-3) var(--ccs-space-4);
+  border: 1px solid var(--ccs-border-panel);
+  border-radius: 0.25rem;
+  background: var(--ccs-white);
+}
+
+.selection-lists__heading {
+  margin: 0 0 var(--ccs-space-2);
+  font-size: var(--ccs-font-size-lg);
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+.selection-lists__lists {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.selection-lists__button {
+  min-height: 2rem;
+  padding: var(--ccs-space-1) var(--ccs-space-3);
+  border: 1px solid var(--ccs-text-link);
+  border-radius: 0.25rem;
+  background: var(--ccs-white);
+  font: inherit;
+  color: var(--ccs-text-link);
+  cursor: pointer;
+}
+
+.selection-lists__none {
+  margin: 0;
+}
+
+/* Why am I seeing these results? */
+.why-results {
+  margin: var(--ccs-space-5) 0;
+  border: 1px solid var(--ccs-border-panel);
+  border-radius: 0.25rem;
+  background: var(--ccs-white);
+}
+
+.why-results__summary {
+  display: list-item; /* keeps the disclosure triangle */
+  list-style-position: inside;
+  min-height: 2.75rem;
+  padding: var(--ccs-space-3) var(--ccs-space-4);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-brand);
+  cursor: pointer;
+}
+
+.why-results__body {
+  padding: 0 var(--ccs-space-4) var(--ccs-space-4);
+}
+
+.why-results__heading {
+  margin: var(--ccs-space-4) 0 var(--ccs-space-2);
+  font-size: var(--ccs-font-size-lg);
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+.why-results__list {
+  margin: 0;
+  padding-inline-start: var(--ccs-space-5);
+}
+
+.why-results__list li + li {
+  margin-top: var(--ccs-space-1);
+}
+
+.why-results__count {
+  color: var(--ccs-text-secondary);
+}
+
+@media (max-width: 575.98px) {
+  .selection-bar__actions {
+    width: 100%;
+  }
+
+  .selection-bar__button {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}

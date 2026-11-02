@@ -45,6 +45,8 @@ class BulkDownloadsController < ApplicationController
 
   # Where "back" goes: only the pages that select records. A list's path is built from its number, never from the text asked for.
   def return_path
+    return selection_path if params[:return_to].to_s == "/selection" # the records ticked on the results pages (CCS-40)
+
     list_id = params[:return_to].to_s[%r{\A/lists/(\d+)\z}, 1]
     list_id ? list_path(list_id.to_i) : bookmarks_path
   end

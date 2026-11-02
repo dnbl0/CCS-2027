@@ -1,0 +1,47 @@
+<details class="why-results" id="why-results">
+  <summary class="why-results__summary"><%= t("nexus_ccs.diagnostics.summary") %></summary>
+  <div class="why-results__body">
+    <section aria-labelledby="why-read">
+      <h3 class="why-results__heading" id="why-read"><%= t("nexus_ccs.diagnostics.read") %></h3>
+      <ul class="why-results__list">
+        <% if query.present? && clauses.empty? %>
+          <li><%= t("nexus_ccs.diagnostics.searched_for") %> <q><%= query %></q></li>
+          <% if search_field_label %><li><%= t("nexus_ccs.diagnostics.in_field", field: search_field_label) %></li><% end %>
+          <% if phrases.any? %><li><%= t("nexus_ccs.diagnostics.phrases", count: phrases.size) %> <%= safe_join(phrases.map { |phrase| tag.q(phrase) }, ", ") %></li><% end %>
+          <% if operators? %>
+            <li><%= t("nexus_ccs.diagnostics.operators") %></li>
+          <% elsif words.any? || phrases.any? %>
+            <% count, missing = lack %>
+            <li><%= count == 1 ? t("nexus_ccs.diagnostics.one_word") : t("nexus_ccs.diagnostics.words_needed", count: count, missing: missing) %></li>
+            <li><%= t("nexus_ccs.diagnostics.similar_words") %></li>
+          <% end %>
+        <% end %>
+        <% clauses.each do |clause| %><li><%= clause_text(clause) %></li><% end %>
+        <% if spelling %><li><%= t("nexus_ccs.diagnostics.spelling", original: spelling.original, corrected: spelling.corrected) %></li><% end %>
+        <% removals.each do |removal| %>
+          <li><%= t("nexus_ccs.diagnostics.filter_on", label: removal.label) %><%= " " + t("nexus_ccs.diagnostics.default_note") if removal.field == SearchDefaults::DIGITAL_ASSET_FIELD && default_filter_on? %></li>
+        <% end %>
+        <% if removals.empty? && query.blank? && clauses.empty? %><li><%= t("nexus_ccs.diagnostics.no_search") %></li><% end %>
+      </ul>
+    </section>
+
+    <section aria-labelledby="why-limits">
+      <h3 class="why-results__heading" id="why-limits"><%= t("nexus_ccs.diagnostics.limits") %></h3>
+      <ul class="why-results__list">
+        <% reasons.each do |reason| %><li><%= t("nexus_ccs.diagnostics.reasons.#{reason}") %></li><% end %>
+      </ul>
+    </section>
+
+    <section aria-labelledby="why-try">
+      <h3 class="why-results__heading" id="why-try"><%= t("nexus_ccs.diagnostics.try") %></h3>
+      <ul class="why-results__list">
+        <% helpful.each do |removal| %>
+          <li><%= link_to t("nexus_ccs.diagnostics.remove", label: removal.label), remove_path(removal) %> <span class="why-results__count">(<%= count_text(removal) %>)</span></li>
+        <% end %>
+        <% if removals.any? && counted? && helpful.empty? %><li><%= t("nexus_ccs.diagnostics.no_filter_helps") %></li><% end %>
+        <li><%= t("nexus_ccs.diagnostics.fewer_words") %></li>
+        <li><%= link_to t("nexus_ccs.diagnostics.tips"), tips_path %></li>
+      </ul>
+    </section>
+  </div>
+</details>

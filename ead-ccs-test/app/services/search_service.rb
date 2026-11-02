@@ -6,6 +6,8 @@
 #   Solr does the heavy lifting. See spellcheck.maxCollationTries in solrconfig.xml
 # - when a search with filters still returns nothing, count the results without its filters (ZeroResults), so the empty
 #   page can offer them. Facet counts cannot give this: they are counted inside the filtered (empty) results.
+# - when a search with filters finds none or few records, count what each filter on its own is hiding (ResultsDiagnostics), for
+#   the "Why am I seeing these results?" panel (CCS-43). One more request per filter, only on those pages.
 #
 # Wired up as CatalogController.search_service_class, which is a class_attribute
 # from Blacklight::Searchable rather than a blacklight_config property.
@@ -14,7 +16,7 @@ class SearchService < Blacklight::SearchService
     response = super
     correction = SpellingCorrection.from(search_state.query_param, response)
     response = retry_with(correction) || response if correction
-    count_without_filters(response)
+    count_filter_removals(count_without_filters(response))
   end
 
   private
@@ -30,6 +32,26 @@ class SearchService < Blacklight::SearchService
     response.extend(ZeroResults::Response)
     response.unfiltered_total = repository.search(params: builder).total
     response
+  end
+
+  # One rows=0 request per filter (at most MAX_REMOVALS), each for the search without that filter. A search with a single filter
+  # that found nothing has its answer already (unfiltered_total).
+  def count_filter_removals(response)
+    params = search_state.to_hash
+    return response unless ResultsDiagnostics.applies?(total: response.total, params: params) && ZeroResults.filtered?(params)
+
+    removals = ResultsDiagnostics.removals(params, blacklight_config.facet_fields).first(ResultsDiagnostics::MAX_REMOVALS)
+    only_one_and_known = removals.one? && response.respond_to?(:unfiltered_total)
+    response.extend(ResultsDiagnostics::Response)
+    response.filter_removals = removals.map do |removal|
+      removal.with_total(only_one_and_known ? response.unfiltered_total : count_for(removal.params))
+    end
+    response
+  end
+
+  def count_for(params)
+    builder = search_builder.with(search_state.reset(params)).merge(rows: 0, facet: false, stats: false, spellcheck: false)
+    repository.search(params: builder).total
   end
 
   # This mirrors Blacklight::SearchService#search_results rather than calling

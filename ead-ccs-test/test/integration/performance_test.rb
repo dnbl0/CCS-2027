@@ -238,4 +238,18 @@ class PerformanceTest < ActionDispatch::IntegrationTest
     assert_select "img.digital-assets__image[fetchpriority=high][decoding=async][width][height]", count: 1
     assert_select "img[loading=lazy]", minimum: 1
   end
+
+  test "highlighting and the selection form add no Solr request to a results page, and the selection page makes one" do
+    needs_solr
+    get "/catalog", params: { q: "skull", any_assets: "1" }
+    result = count_requests { get "/catalog", params: { q: "skull", any_assets: "1" } }
+
+    assert_equal 1, result.solr, result.solr_requests.join("\n")
+    assert_includes result.solr_requests.first, "hl=true"
+    assert_select "form#selection-form"
+
+    post "/selection", params: { intent: "all", page_ids: [ "emu-406126" ] }
+    result = count_requests { get "/selection" }
+    assert_equal 1, result.solr, result.solr_requests.join("\n")
+  end
 end

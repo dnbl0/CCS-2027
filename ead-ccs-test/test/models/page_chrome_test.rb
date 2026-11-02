@@ -105,4 +105,12 @@ class PageChromeTest < ActiveSupport::TestCase
     assert_nil form.banner
     assert_equal :breadcrumb, form.saved_bar
   end
+
+  test "the selection page: a trail of its own, no banner, the saved bar in the breadcrumb strip" do
+    selection = chrome("selections", "show")
+
+    assert_equal [ [ "Selected records", nil ] ], selection.breadcrumbs
+    assert_nil selection.banner
+    assert_equal :breadcrumb, selection.saved_bar
+  end
 end
