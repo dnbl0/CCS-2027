@@ -244,6 +244,53 @@ en:
         body: "The image or file is not shown here. To see it, ask the collection team for access. Your request needs approval."
         link: "Request access to this item"
 
+    # Placeholder wording (CCS-167): the University must approve it, and set the limits (BulkDownload::MAX_*).
+    bulk_download:
+      title: "Download digital assets"
+      description: "Check what the zip file will hold before you download it."
+      open: "Download digital assets"
+      legend: "Choose the records to download"
+      limits: "Only files that can be downloaded are included. One zip file can hold up to %{records} records, %{files} files and %{size}."
+      review: "Review download"
+      none_chosen: "Choose at least one record to download."
+      too_many_records:
+        one: "Choose at most %{count} record at a time."
+        other: "Choose at most %{count} records at a time."
+      too_many_files: "That is more than %{files} files, the most one zip file can hold. Go back and choose fewer records."
+      too_large: "That is more than %{size}, the most one zip file can hold. Go back and choose fewer records."
+      included:
+        one: "%{count} record will be downloaded"
+        other: "%{count} records will be downloaded"
+      summary: "One zip file of %{files} files (%{size}), with a manifest.csv listing each file's record, licence, rights and persistent link."
+      file_count:
+        one: "%{count} file"
+        other: "%{count} files"
+      nothing_heading: "Nothing to download"
+      nothing: "None of the chosen records has a file that can be downloaded."
+      skipped_heading:
+        one: "%{count} item left out"
+        other: "%{count} items left out"
+      unknown_record: "A record"
+      download: "Download zip file (%{files} files, %{size})"
+      back: "Back"
+      skipped:
+        not_downloadable: "left out because its files can be viewed but not downloaded. You can ask the collection team for a copy."
+        withheld: "left out because its files are not available to view or download. You can ask the collection team for access."
+        sensitive: "left out because it is marked sensitive and you have not chosen to view it. Open the record and choose View this item."
+        no_assets: "left out because it has no digital assets."
+        file_missing: "the file %{name} was left out because it is not available from this site."
+        not_found: "left out because it is no longer in the collection."
+      status:
+        downloadable:
+          one: "Can be downloaded: %{count} file"
+          other: "Can be downloaded: %{count} files"
+        not_downloadable: "Cannot be downloaded: view only"
+        withheld: "Cannot be downloaded: not available to view"
+        sensitive: "Cannot be downloaded until you choose to view it"
+        no_assets: "No files to download"
+        file_missing: "No file to download here"
+        not_found: "No longer in the collection"
+
     # Placeholder wording (CCS-163)
     metadata_export:
       link: "Download metadata (CSV)"

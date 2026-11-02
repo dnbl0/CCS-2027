@@ -18,6 +18,7 @@
         <p class="saved-toolbar__count"><%= t("nexus_ccs.saved_noun", count: @response.total).then { |noun| "#{@response.total} #{noun}" } %></p>
         <%= render "bookmarks/clear_bookmarks_widget" %>
       </div>
+      <%= render NexusCcs::BulkSelectionComponent.new(documents: @response.documents, return_to: bookmarks_path) %>
       <h2 class="visually-hidden"><%= t("blacklight.bookmarks.list_title") %></h2>
       <%= render_document_index_with_view :list, @response.documents %>
       <%= render "results_pagination" %>
