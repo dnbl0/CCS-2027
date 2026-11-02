@@ -44,8 +44,10 @@ Configuration-only use of Blacklight 9.2.1 and its official plugins, in `Catalog
   shows the first image large under the title and the rest as thumbnails that open the large image.
   The "Digital Asset Format Type" filter lists records with assets. More assets: add
   accession numbers and file names to the YAML, make thumbnails, reindex.
-- **Date quality.** `date_start_isi` has no value for about 12,700 of 41,000 records, and about
-  1,700 values are 0 or below, which stretches the range histogram.
+- **Date quality.** `date_start_isi` has no value for about 12,700 of 41,000 records; the range facet
+  leaves those out. Negative years are real BC dates (the EMu export has about 1,400, written "BC -1000"
+  and parsed by `Collections::DateRange`), and no year is 0, so the histogram is wide but correct.
+  Do not filter years of 0 or below.
 - **JS.** chart.js and `@kurkle/color` (range-limit's dependencies) are vendored in
   `vendor/javascript`; the plugin's generator pins them to a CDN instead.
 - **Facets only render when they have values.** The facets, sections and record fields now come from the
