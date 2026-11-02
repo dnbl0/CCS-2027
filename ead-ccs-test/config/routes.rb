@@ -22,11 +22,13 @@ Rails.application.routes.draw do
         concerns :exportable
         collection do
           delete "clear"
+          get "citations"
         end
       end
       resources :saved_searches, only: [ :index, :create, :destroy ]
       # Named lists (CCS-389); a list's records are added and removed at /lists/:list_id/items
       resources :lists do
+        member { get "citations" }
         resources :items, controller: "list_items", only: [ :create, :destroy ]
       end
     end

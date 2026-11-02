@@ -16,7 +16,10 @@
     <% else %>
       <div class="saved-toolbar">
         <p class="saved-toolbar__count"><%= t("nexus_ccs.saved_noun", count: @response.total).then { |noun| "#{@response.total} #{noun}" } %></p>
-        <%= render "bookmarks/clear_bookmarks_widget" %>
+        <div class="saved-toolbar__actions">
+          <%= link_to t("nexus_ccs.cite_page.link"), citations_bookmarks_path, class: "btn btn-outline-primary" %>
+          <%= render "bookmarks/clear_bookmarks_widget" %>
+        </div>
       </div>
       <h2 class="visually-hidden"><%= t("blacklight.bookmarks.list_title") %></h2>
       <%= render_document_index_with_view :list, @response.documents %>
