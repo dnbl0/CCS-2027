@@ -1,0 +1,3 @@
+<%# locals: item, title, downloadable. A kind of file with no viewer yet (3D models, other files; MediaTypes): say so, plainly. %>
+<p class="digital-assets__unsupported">This <%= MediaTypes.for(mime: item[:type], filename: item[:url]).label.downcase %> cannot be previewed here.
+  <% if downloadable %><%= link_to "Download #{title}", item[:url] %><% else %>The file is described in the media metadata.<% end %></p>

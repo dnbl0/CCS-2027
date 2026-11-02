@@ -1,0 +1,262 @@
+/*
+ * The record media viewer's zoom and pan (CCS-57), the compare actions under the media and the comparison page (CCS-58).
+ * Used by NexusCcs::DeepZoomComponent, NexusCcs::CompareActionsComponent and views/compare. Buttons are solid dark with a
+ * light edge so they read on the dark band, on a pale page and over an image alike (WCAG 1.4.11), and are 44px high.
+ */
+
+.deep-zoom__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid #fff;
+  background: #1b1f2a;
+  font: inherit;
+  font-size: var(--ccs-font-size-sm);
+  line-height: 1.2;
+  color: #fff;
+  cursor: pointer;
+}
+
+.deep-zoom__button:hover {
+  background: #000;
+}
+
+.deep-zoom__button:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.deep-zoom__button[aria-pressed="true"] {
+  background: #fff;
+  color: #1b1f2a;
+  border-color: #1b1f2a;
+}
+
+.deep-zoom__button[hidden] {
+  display: none;
+}
+
+.deep-zoom__button--plain {
+  border-color: #1b1f2a;
+}
+
+/* On the record page: the toggle sits over the image's corner; switched on, the viewer fills the figure */
+.digital-assets__main {
+  position: relative;
+}
+
+.deep-zoom__toggle {
+  position: absolute;
+  left: var(--ccs-space-2);
+  bottom: var(--ccs-space-2);
+}
+
+.deep-zoom__controls {
+  position: absolute;
+  top: var(--ccs-space-2);
+  right: var(--ccs-space-2);
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-1);
+}
+
+.deep-zoom__controls[hidden] {
+  display: none;
+}
+
+.deep-zoom__stage {
+  width: 100%;
+  height: min(38.5rem, 70vh);
+  background: #000;
+}
+
+.deep-zoom__stage[hidden] {
+  display: none;
+}
+
+.digital-assets__main:has(.deep-zoom.is-active) {
+  width: 100%;
+}
+
+.digital-assets__main:has(.deep-zoom.is-active) .digital-assets__image {
+  display: none;
+}
+
+.deep-zoom .openseadragon-canvas:focus-visible,
+.compare-pane .openseadragon-canvas:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: -3px;
+}
+
+.digital-assets__unsupported,
+.digital-assets__transcript {
+  margin: var(--ccs-space-2) 0 0;
+  color: inherit;
+  font-size: var(--ccs-font-size-sm);
+}
+
+/* Compare actions, under the thumbnails */
+.compare-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ccs-space-2) var(--ccs-space-3);
+  padding: var(--ccs-space-2) var(--ccs-space-3);
+  max-width: 75rem;
+  margin: 0 auto;
+}
+
+.compare-actions__form {
+  margin: 0;
+}
+
+.compare-actions__link,
+.compare-actions__button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--ccs-navy-1100);
+  background: #fff;
+  font: inherit;
+  font-size: var(--ccs-font-size-sm);
+  color: var(--ccs-navy-1100);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.compare-actions__link:hover,
+.compare-actions__button:hover {
+  background: var(--ccs-navy-100);
+}
+
+.compare-actions__link:focus-visible,
+.compare-actions__button:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.compare-actions__note {
+  margin: 0;
+  font-size: var(--ccs-font-size-sm);
+}
+
+/* The comparison page. Panes stack on a narrow screen and sit two across from 48rem; four make two rows of two. */
+.compare__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ccs-space-2) var(--ccs-space-3);
+  margin-bottom: var(--ccs-space-3);
+  min-height: 2.75rem;
+}
+
+.compare__note,
+.compare__heading {
+  margin: 0 0 var(--ccs-space-3);
+}
+
+.compare__panes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ccs-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 48rem) {
+  .compare__panes:not(.compare__panes--1) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.compare-pane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-2);
+  height: 100%;
+  padding: var(--ccs-space-2);
+  border: 1px solid var(--ccs-border-panel);
+  background: #fff;
+}
+
+.compare-pane__title {
+  margin: 0;
+  font-size: var(--ccs-font-size-lg, 1.125rem);
+  overflow-wrap: anywhere;
+}
+
+.compare-pane__details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-1) var(--ccs-space-3);
+  margin: var(--ccs-space-1) 0 0;
+  font-size: var(--ccs-font-size-sm);
+}
+
+.compare-pane__details dt {
+  font-weight: 600;
+}
+
+.compare-pane__details dd {
+  margin: 0;
+}
+
+/* The stage holds a fixed shape before and after the viewer starts, so nothing moves when it does */
+.compare-pane__stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #000;
+}
+
+.compare-pane__image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.compare-pane__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ccs-space-2);
+  min-height: 2.75rem;
+}
+
+.compare-pane__choose {
+  display: flex;
+  align-items: center;
+  gap: var(--ccs-space-2);
+}
+
+.compare-pane__choose .form-select {
+  min-height: 2.75rem;
+}
+
+.compare-pane__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-1);
+}
+
+.compare:not(.is-ready) [data-js-only] {
+  visibility: hidden;
+}
+
+.compare-pane.is-fullscreen {
+  padding: var(--ccs-space-2);
+}
+
+.compare-pane.is-fullscreen .compare-pane__stage {
+  flex: 1 1 auto;
+  aspect-ratio: auto;
+}
