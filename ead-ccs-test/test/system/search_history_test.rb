@@ -66,8 +66,10 @@ class SearchHistoryTest < ApplicationSystemTestCase
   test "a tooltip shows on keyboard focus and goes with Escape, leaving focus where it was" do
     make_searches
 
-    first_row_button("Share").send_keys(:tab) # focus the button before it, then move on to Share
-    page.execute_script("document.querySelector('tbody tr button[data-action-tooltip-text=Share]').focus()")
+    # Focus Save, then press Tab to reach Share, as a keyboard user would (Share's own tooltip, so no show-during-hide on one tooltip)
+    page.execute_script("document.querySelector('tbody tr button[data-action-tooltip-text=Save]').focus()")
+    assert_selector "[role=tooltip]", text: "Save"
+    page.driver.browser.keyboard.type(:tab)
     assert_selector "[role=tooltip]", text: "Share"
 
     page.driver.browser.keyboard.type(:escape)
