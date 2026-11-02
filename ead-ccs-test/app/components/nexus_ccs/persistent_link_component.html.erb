@@ -4,7 +4,10 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5" /><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5" /></svg>
     </span>
     <div class="persistent-link__text">
-      <h2 id="persistent-link-heading" class="persistent-link__heading">Persistent link</h2>
+      <div class="persistent-link__title">
+        <h2 id="persistent-link-heading" class="persistent-link__heading">Persistent link</h2>
+        <%= render NexusCcs::HelpTipComponent.new(topic: :persistent_link) %>
+      </div>
       <input type="text" class="persistent-link__url" value="<%= url %>" readonly autocomplete="off" aria-label="Persistent link" data-clipboard-target="source">
     </div>
     <button type="button" class="persistent-link__copy" data-action="clipboard#copy" data-clipboard-target="button">

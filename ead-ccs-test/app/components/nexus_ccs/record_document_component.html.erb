@@ -73,7 +73,10 @@
 
       <% if copyright_card? %>
         <aside class="record-card record-copyright" aria-labelledby="record-copyright-title">
-          <h2 class="record-copyright__title" id="record-copyright-title">Copyright</h2>
+          <div class="record-copyright__head">
+            <h2 class="record-copyright__title" id="record-copyright-title">Copyright</h2>
+            <%= render NexusCcs::HelpTipComponent.new(topic: :copyright) %>
+          </div>
           <dl class="record-copyright__list">
             <% { "Caption" => caption, "Credit line" => credit_line, "Copyright" => copyright, "Licence" => licence }.each do |label, value| %>
               <% next if value.blank? %>

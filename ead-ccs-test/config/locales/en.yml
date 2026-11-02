@@ -79,6 +79,22 @@ en:
               list_full: "A list can hold at most %{count} records. Remove one to add another."
 
   nexus_ccs:
+    # Help text beside the heading or field it explains (CCS-101, NexusCcs::HelpTipComponent). Placeholder wording: the
+    # collections team must approve it. anchor is the section of the Help page to read more.
+    help_tips:
+      read_more: "Read more in Help."
+      persistent_link:
+        label: "About persistent links"
+        anchor: "faq"
+        text: "A persistent link always leads back to this record, even if the collection's website changes. Copy it to cite the record, or to say which record you mean when you contact the team."
+      copyright:
+        label: "About copyright and licences"
+        anchor: "copyright"
+        text: "The credit line, copyright and licence say who holds the rights to this record and how its images may be used. Ask the collection team before you reuse an image."
+      contact:
+        label: "About contacting the team"
+        anchor: "contact-us"
+        text: "Contact the team to ask a question, suggest a correction or arrange to see the object. Say which record you mean by quoting its ID or accession number; the email we start for you already does."
     access_requests:
       title: "Request access"
       # Placeholder wording throughout this block: the University must approve the privacy, retention and next-steps text.
