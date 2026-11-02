@@ -21,7 +21,7 @@ class CatalogController < ApplicationController
   # Solr down, slow or refusing a request: say so, instead of a stack trace. The pages that do not search (home, help...)
   # keep working. Timeouts come from config/blacklight.yml.
   rescue_from BlacklightRangeLimit::InvalidRange, with: :invalid_date_range
-  rescue_from Blacklight::Exceptions::ECONNREFUSED, Blacklight::Exceptions::InvalidRequest, Faraday::TimeoutError, Faraday::ConnectionFailed, with: :search_unavailable
+  rescue_from Blacklight::Exceptions::ECONNREFUSED, Blacklight::Exceptions::RepositoryTimeout, Blacklight::Exceptions::InvalidRequest, Faraday::TimeoutError, Faraday::ConnectionFailed, with: :search_unavailable
 
   # Retries a zero-result search using Solr's spelling collation
   self.search_service_class = ::SearchService
@@ -177,6 +177,7 @@ class CatalogController < ApplicationController
 
   def search_unavailable(error)
     Rails.logger.error("Search unavailable: #{error.class}: #{error.message}")
+    response.headers["Retry-After"] = ErrorsController::RETRY_AFTER.fetch("503").to_s
     respond_to do |format|
       format.html { render "catalog/unavailable", status: :service_unavailable }
       format.json { render json: { error: "Search is unavailable. Please try again shortly." }, status: :service_unavailable }

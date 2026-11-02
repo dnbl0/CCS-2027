@@ -98,11 +98,14 @@ Rails.application.routes.draw do
   get "llms.txt", to: "seo#llms", format: false
 
   # What the visitor sees for an error: Rails sends the failed request to /<status> (config.exceptions_app)
-  %w[400 404 406 422 500].each { |code| match code, to: "errors#show", via: :all, defaults: { code: code }, as: "error_#{code}" }
+  %w[400 404 406 422 429 500 503].each { |code| match code, to: "errors#show", via: :all, defaults: { code: code }, as: "error_#{code}" }
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
+  # Liveness and readiness probes with a JSON answer (CCS-146): /healthz is the process only; /readyz also needs the database, Solr and the migrations.
+  get "healthz" => "health#live", as: :liveness_check, format: false
+  get "readyz" => "health#ready", as: :readiness_check, format: false
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

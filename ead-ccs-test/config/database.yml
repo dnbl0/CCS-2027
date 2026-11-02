@@ -17,7 +17,16 @@ default: &default
   encoding: unicode
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
+  # Connections per Puma worker: at least RAILS_MAX_THREADS (config/puma.rb), which defaults to 3. Per instance: workers x this.
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  # Seconds to wait for a database that does not answer, and for a free connection in the pool, before failing with a 503 page
+  # rather than holding the thread (DB_CONNECT_TIMEOUT, DB_CHECKOUT_TIMEOUT). DB_STATEMENT_TIMEOUT (milliseconds, optional) ends a slow query.
+  connect_timeout: <%= ENV.fetch("DB_CONNECT_TIMEOUT", 3) %>
+  checkout_timeout: <%= ENV.fetch("DB_CHECKOUT_TIMEOUT", 5) %>
+  <% if ENV["DB_STATEMENT_TIMEOUT"] %>
+  variables:
+    statement_timeout: <%= ENV["DB_STATEMENT_TIMEOUT"].to_i %>
+  <% end %>
 
 
 development:
