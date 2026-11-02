@@ -2,6 +2,10 @@
 
 Recent changes to the static site, newest first. Earlier history is in `git log`. (Moved out of the README on 2026-10-07.)
 
+### 2026-11-02
+
+- **CCS 2027 decoupled from CCS 2026**: removed the `parity` CI job and `scripts/parity.js` (and `npm run parity`), the GitHub Pages workflow (`pages.yml`), the `npm test` check that the Rails style copies match `public/`, and the Rails test that compared collection slugs with the static site's folders; the repository, clone URLs, package name and deploy comments now name `CCS-2027`; `infra/azure/containerapps.sh` now requires `MEDIA_BASE_URL` (it defaulted to the 2026 Pages site). What is still shared is listed in `docs/decoupling-from-2026.md`.
+
 ### 2026-10-16
 
 - **Rails app** (org #49-#63, live): facets are stock Blacklight; Advanced Search is the stock form (title "Advanced Search"); the reviewed copy on home, About and Help; Help is one page with FAQ, Indigenous data, Copyright and Access and the University jump navigation (with a scroll highlight); Contact, Search tips and Indigenous data pages removed (old addresses redirect to the Help sections); collection landing pages removed on both sites, a collection's links go to the results filtered by it (old `/collections/<slug>` addresses redirect); header dropdowns are the University mega menu panel (static and Rails); mobile filter drawer spacing and a 24/18/18px sidebar type scale; record page tags wrap and the asset stage has equal padding; licence hover text from the copy; one light design whatever the browser's colour setting.

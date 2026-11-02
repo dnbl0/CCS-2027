@@ -1,7 +1,7 @@
 name: CI
 
-# The static site's checks. The Rails app has its own workflow (rails-ci.yml). `npm test` also checks that the Rails
-# copies of the shared styles and images (ead-ccs-test/app/assets) match public/, so it runs for either side's assets.
+# The checks for the 2026 static prototype that still sits in public/ (see docs/decoupling-from-2026.md). It runs only
+# when the prototype's own files change. The Rails app has its own workflow (rails-ci.yml).
 on:
   pull_request:
     paths:
@@ -14,7 +14,6 @@ on:
       - 'package.json'
       - 'eslint.config.js'
       - '.stylelintrc.json'
-      - 'ead-ccs-test/app/assets/**'
       - '.github/workflows/ci.yml'
   push:
     branches:

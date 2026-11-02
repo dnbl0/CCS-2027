@@ -10,7 +10,6 @@
 ## Checks
 
 - [ ] `npm test` passes (static) and/or `bin/rails test`, `bin/rubocop` and `bin/brakeman` pass (Rails)
-- [ ] A change to shared styles or images was made in `public/` and `npm run sync:rails` was run
 - [ ] A change to the header, search overlay or footer was made in `src/partials/` and `npm run sync:partials` was run
 - [ ] A change to a collection page was made in `src/collection-landing.template.html` and `npm run build:collections` was run
 

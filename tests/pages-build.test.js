@@ -3,7 +3,7 @@
 const { fail, ok, walk, finish, fs, path } = require('./lib');
 const { execFileSync } = require('child_process');
 
-const BASE = '/CCS-2026-MVP';
+const BASE = '/example-base';
 const root = path.join(__dirname, '..');
 const dist = path.join(root, 'dist-test');
 execFileSync('node', [path.join(root, 'scripts', 'build-pages.js')], { env: { ...process.env, BASE_PATH: BASE, DIST_DIR: 'dist-test' }, stdio: 'pipe' });
@@ -18,7 +18,7 @@ for (const f of files) {
     if (m[1].startsWith('//') || m[1].includes('{{')) continue;
     if (!m[1].startsWith(BASE + '/')) { fail(`${rel}: root-absolute URL without the base path: ${m[1]}`); unprefixed++; }
   }
-  for (const m of text.matchAll(/(?:(?:href|src|action)="|url\(['"]?)(\/CCS-2026-MVP[^"')?#]*)/g)) {
+  for (const m of text.matchAll(/(?:(?:href|src|action)="|url\(['"]?)(\/example-base[^"')?#]*)/g)) {
     const u = decodeURIComponent(m[1].slice(BASE.length)) || '/';
     if (u.includes('{{')) continue;
     checked++;

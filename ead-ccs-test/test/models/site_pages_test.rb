@@ -17,12 +17,6 @@ class SitePagesTest < ActiveSupport::TestCase
     assert_nil SitePages.collection("unknown")
   end
 
-  test "the collections match the static site's collection folders" do
-    static = Dir[Rails.root.join("../public/collections/*/index.html")].map { |path| File.basename(File.dirname(path)) }
-
-    assert_equal static.sort, SitePages.slugs.sort if static.any?
-  end
-
   test "the header menu has each collection's label, facet value and slug" do
     assert_equal 5, NexusCcs::SiteNavigation.collections.size
     assert_equal "Harry Brookes Allen Museum of Anatomy and Pathology", NexusCcs::SiteNavigation.facet_value("harry-brookes-allen-museum")

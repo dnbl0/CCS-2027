@@ -28,8 +28,8 @@ The app has three moving parts, and all three must be running:
 2. **Get the code and install Ruby 4.0.6** (the version in `.ruby-version`):
 
    ```sh
-   git clone https://github.com/dnbl0/CCS-Static-latest.git
-   cd CCS-Static-latest/ead-ccs-test
+   git clone https://github.com/dnbl0/CCS-2027.git
+   cd CCS-2027/ead-ccs-test
    rbenv install 4.0.6        # about 5 minutes the first time
    gem install bundler
    bundle install
@@ -50,7 +50,7 @@ The app has three moving parts, and all three must be running:
    In a **second** Terminal window:
 
    ```sh
-   cd CCS-Static-latest/ead-ccs-test
+   cd CCS-2027/ead-ccs-test
    export SOLR_URL=http://127.0.0.1:8984/solr/blacklight-core
    bin/rails collections:index             # about 20 seconds for ~41,000 records
    ```

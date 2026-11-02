@@ -7,7 +7,7 @@ and its Azure deployment at the same time. Every agent follows these rules so wo
    read what they are doing. Do not start work another agent already has in flight; message that agent instead.
 2. **Say what you are working on.** When you start a task, and again if its scope changes, send a short message to the
    agents that could be affected: the task, the branch or PR, and the files or systems you will touch (for example
-   `scripts/parity.js`, `src/partials/*`, `public/nav.js`, `ead-ccs-test/Dockerfile`, or the Azure apps).
+   `scripts/sync-rails-assets.js`, `src/partials/*`, `public/nav.js`, `ead-ccs-test/Dockerfile`, or the Azure apps).
 3. **Announce hand-offs.** When a PR merges or a deploy changes, tell the agents that depend on it, so they can
    rebase, redeploy or retest.
 4. **Ask before touching another agent's area.** If a file or system is claimed by another agent, ask first. Never

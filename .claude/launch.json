@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "ccs-static-site",
+      "name": "ccs-prototype-site",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8933", "--directory", "public"],
       "port": 8933
