@@ -29,7 +29,7 @@
                 <tr>
                   <th scope="col"><%= t("nexus_ccs.search_history.column_search") %></th>
                   <th scope="col"><%= t("nexus_ccs.search_history.column_filters") %></th>
-                  <th scope="col" class="text-end"><%= t("nexus_ccs.search_history.column_actions") %></th>
+                  <th scope="col" class="history-actions-heading"><%= t("nexus_ccs.search_history.column_actions") %></th>
                 </tr>
               </thead>
               <tbody>
@@ -39,7 +39,7 @@
                   <tr>
                     <td class="query"><%= term %></td>
                     <td class="filters"><%= filters %></td>
-                    <td class="history-actions text-end">
+                    <td class="history-actions">
                       <div class="history-actions__group" data-controller="action-tooltip">
                         <% if Rails.configuration.x.saved_records %>
                           <%= button_to saved_searches_path(search_id: search.id), method: :post, class: "history-action",

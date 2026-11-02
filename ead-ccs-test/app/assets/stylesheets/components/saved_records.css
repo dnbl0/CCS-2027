@@ -99,7 +99,14 @@
   width: 25%;
 }
 
-.search-history td.save-search,
+/* The Actions column is as wide as its icons, and its heading starts where they do */
+.search-history .history-actions-heading,
+.search-history td.history-actions {
+  width: 1%;
+  white-space: nowrap;
+  text-align: start;
+}
+
 .saved-searches td.saved-searches__remove {
   width: 1%;
   white-space: nowrap;
@@ -116,7 +123,6 @@
 .history-actions__group {
   display: inline-flex;
   gap: var(--ccs-space-1);
-  justify-content: flex-end;
 }
 
 .history-actions__form {

@@ -27,7 +27,10 @@ class SearchHistoryTest < ApplicationSystemTestCase
     assert_equal 1, page.all("td.history-actions").map { |cell| cell.evaluate_script("this.getBoundingClientRect().right").round }.uniq.size
     assert_selector "th[scope=col]", text: "Search"
     assert_selector "th[scope=col]", text: "Filters"
-    assert_selector "th[scope=col].text-end", text: "Actions" # a visible heading
+    assert_selector "th[scope=col]", text: "Actions" # a visible heading
+    heading = find("th.history-actions-heading").evaluate_script("this.getBoundingClientRect().left + parseFloat(getComputedStyle(this).paddingLeft)").round
+    group = first(".history-actions__group").evaluate_script("this.getBoundingClientRect().left").round
+    assert_in_delta heading, group, 1, "the Actions heading starts at #{heading}px, its icons at #{group}px"
     assert_selector "td.filters .applied-filter .filter-value", text: /with a digital asset/i, count: 3 # drawn in capitals
   end
 

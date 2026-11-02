@@ -22,7 +22,7 @@ class SavedSearchesTest < ActionDispatch::IntegrationTest
 
     get "/search_history"
 
-    assert_select "th.text-end", text: "Actions"
+    assert_select "th.history-actions-heading", text: "Actions"
     assert_select "td.history-actions form[action='/saved_searches?search_id=#{Search.last.id}'] button.history-action" do
       assert_select "svg[aria-hidden=true]"
       assert_select ".visually-hidden", text: "Save search: skull"
