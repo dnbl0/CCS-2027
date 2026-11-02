@@ -93,6 +93,12 @@
   margin-inline-end: var(--ccs-space-3);
 }
 
+/* Each day's table has the same three columns, so a row's filters start at the same place in every row */
+.search-history th:first-child,
+.search-history td.query {
+  width: 25%;
+}
+
 .search-history td.save-search,
 .saved-searches td.saved-searches__remove {
   width: 1%;

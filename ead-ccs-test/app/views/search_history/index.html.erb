@@ -22,21 +22,35 @@
       <% SearchHistoryDays.group(searches).each_with_index do |(day, day_searches), day_index| %>
         <section class="search-history-day" aria-labelledby="search-history-day-<%= day_index %>">
           <h3 id="search-history-day-<%= day_index %>" class="search-history-day__heading"><%= day %></h3>
-          <table class="table search-history">
-            <% day_searches.each do |search| %>
-              <% previous = link_to_previous_search(search_state.reset(search.query_params).to_hash) %>
-              <tr>
-                <td class="query"><%= previous %></td>
-                <% if Rails.configuration.x.saved_records %>
-                  <td class="save-search">
-                    <%= button_to t("nexus_ccs.saved_searches.save"), saved_searches_path(search_id: search.id), method: :post,
-                                  class: "btn btn-link", form: { class: "d-inline" },
-                                  aria: { label: t("nexus_ccs.saved_searches.save_named", query: strip_tags(previous)) } %>
-                  </td>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle search-history">
+              <thead>
+                <tr>
+                  <th scope="col"><%= t("nexus_ccs.search_history.column_search") %></th>
+                  <th scope="col"><%= t("nexus_ccs.search_history.column_filters") %></th>
+                  <% if Rails.configuration.x.saved_records %>
+                    <th scope="col" class="text-end"><span class="visually-hidden"><%= t("nexus_ccs.search_history.column_actions") %></span></th>
+                  <% end %>
+                </tr>
+              </thead>
+              <tbody>
+                <% day_searches.each do |search| %>
+                  <% term, filters = search_history_links(search.query_params) %>
+                  <tr>
+                    <td class="query"><%= term %></td>
+                    <td class="filters"><%= filters %></td>
+                    <% if Rails.configuration.x.saved_records %>
+                      <td class="save-search text-end">
+                        <%= button_to t("nexus_ccs.saved_searches.save"), saved_searches_path(search_id: search.id), method: :post,
+                                      class: "btn btn-link", form: { class: "d-inline" },
+                                      aria: { label: t("nexus_ccs.saved_searches.save_named", query: strip_tags(term)) } %>
+                      </td>
+                    <% end %>
+                  </tr>
                 <% end %>
-              </tr>
-            <% end %>
-          </table>
+              </tbody>
+            </table>
+          </div>
         </section>
       <% end %>
     <% end %>
