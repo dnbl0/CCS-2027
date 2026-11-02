@@ -13,12 +13,12 @@ name: Deploy to Azure Container Apps
 #   2. az ad sp create --id <appId>
 #   3. az ad app federated-credential create --id <appId> --parameters '{
 #        "name": "ccs-2026-mvp-main", "issuer": "https://token.actions.githubusercontent.com",
-#        "subject": "repo:Enterprise-Services-Group/CCS-2026-MVP:ref:refs/heads/main",
+#        "subject": "repo:Enterprise-Services-Group/CCS-2027:ref:refs/heads/main",
 #        "audiences": ["api://AzureADTokenExchange"] }'
 #      (lets this repo's main-branch runs sign in as the app, with no stored secret)
 #   4. az role assignment create --assignee <appId> --role Contributor \
 #        --resource-group ccs-service-experience-app
-#   5. gh variable set AZURE_CLIENT_ID --repo Enterprise-Services-Group/CCS-2026-MVP --body <appId>
+#   5. gh variable set AZURE_CLIENT_ID --repo Enterprise-Services-Group/CCS-2027 --body <appId>
 # After that this workflow (or a copy of it triggered on push, if full automation is wanted) deploys without
 # anyone running az by hand.
 on:

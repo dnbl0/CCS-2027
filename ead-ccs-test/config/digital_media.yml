@@ -1,5 +1,5 @@
 # Audio, video and PDF files by accession number (CCS-65). The files are not copied into this app: they are
-# served from CCS_MEDIA_BASE_URL (default /digital-assets/media), e.g. the static site's /assets/data folder.
+# served from CCS_MEDIA_BASE_URL (default /digital-assets/media), e.g. a storage account or CDN folder you own.
 # kind is audio, video or pdf.
 "MHM2014.137":
   - { kind: video, file: "MHM2014.137.2_2.mp4", type: "video/mp4", label: "McCoy Society expedition film" }
