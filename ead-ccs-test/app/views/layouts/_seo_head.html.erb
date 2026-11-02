@@ -1,0 +1,21 @@
+<%# Search engine, social card and structured-data tags (CCS-128, CCS-127); what they say is decided in PageMeta. Rendered by every layout. %>
+<% meta = page_meta %>
+<%= tag.meta name: "robots", content: meta.robots if meta.robots %>
+<% if meta.canonical_url %>
+  <%= tag.link rel: "canonical", href: meta.canonical_url %>
+  <%= tag.meta name: "description", content: meta.description %>
+  <%= tag.meta property: "og:site_name", content: StructuredData::SITE_NAME %>
+  <%= tag.meta property: "og:locale", content: "en_AU" %>
+  <%= tag.meta property: "og:type", content: meta.og_type %>
+  <%= tag.meta property: "og:title", content: meta.title %>
+  <%= tag.meta property: "og:description", content: meta.description %>
+  <%= tag.meta property: "og:url", content: meta.canonical_url %>
+  <%= tag.meta property: "og:image", content: meta.og_image if meta.og_image %>
+  <%= tag.meta name: "twitter:card", content: meta.twitter_card %>
+  <%= tag.meta name: "twitter:title", content: meta.title %>
+  <%= tag.meta name: "twitter:description", content: meta.description %>
+  <%= tag.meta name: "twitter:image", content: meta.og_image if meta.og_image %>
+<% end %>
+<% meta.json_ld.each do |data| %>
+  <%= json_ld_tag(data) %>
+<% end %>
