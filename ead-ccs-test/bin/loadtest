@@ -1,0 +1,113 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# A small load test for a running instance (CCS-144). Plain Ruby, Net::HTTP, no gems. Not run in CI. Ramps the number of
+# concurrent clients through the levels you give, holds each for a time, and prints latency percentiles, throughput and the
+# error rate for each scenario and level. Be gentle: it talks to the instance's Solr, which others may share.
+#
+#   bin/loadtest                                   home, results, record and health at 1, 2, 4 and 8 clients, 10 s each
+#   bin/loadtest --url http://127.0.0.1:3031 --levels 1,4,16 --seconds 20 --scenarios home,results
+#   bin/loadtest --record emu-9044 --scenarios record
+#
+# Options: --url (default http://127.0.0.1:3031)  --levels  --seconds  --scenarios (home, results, record, health, ready)
+#          --record (a record id; by default the first result)  --query (default "skull")  --max-errors-percent (exit 1 above; default 1)
+#
+# Start the instance with RATE_LIMIT=off, or the rate limit (BotGuard) answers 429 to the test; production behaviour needs
+# RAILS_ENV=production and the settings you will run with. The numbers depend on the machine, the data and the settings:
+# compare runs on the same machine (docs/availability-reliability-scalability.md has a baseline).
+
+require "net/http"
+require "optparse"
+require "json"
+require "uri"
+
+options = { url: "http://127.0.0.1:3031", levels: [ 1, 2, 4, 8 ], seconds: 10, scenarios: %w[home results record health], query: "skull", record: nil, max_errors: 1.0 }
+OptionParser.new do |o|
+  o.banner = "Usage: bin/loadtest [options]"
+  o.on("--url URL") { |v| options[:url] = v }
+  o.on("--levels LIST", "concurrent clients, e.g. 1,2,4,8") { |v| options[:levels] = v.split(",").map(&:to_i).select(&:positive?) }
+  o.on("--seconds N", Integer, "how long to hold each level") { |v| options[:seconds] = v }
+  o.on("--scenarios LIST") { |v| options[:scenarios] = v.split(",") }
+  o.on("--query TEXT") { |v| options[:query] = v }
+  o.on("--record ID") { |v| options[:record] = v }
+  o.on("--max-errors-percent N", Float) { |v| options[:max_errors] = v }
+end.parse!
+
+base = URI(options[:url])
+
+def percentile(sorted, fraction)
+  return 0.0 if sorted.empty?
+
+  sorted[[ (sorted.size * fraction).ceil - 1, 0 ].max]
+end
+
+def fetch(http, path)
+  started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  response = http.request(Net::HTTP::Get.new(path, { "Accept" => "text/html", "User-Agent" => "ccs-loadtest" }))
+  response.body # read it all, as a browser would
+  [ response.code.to_i, Process.clock_gettime(Process::CLOCK_MONOTONIC) - started ]
+rescue StandardError => e
+  [ e.class.name, Process.clock_gettime(Process::CLOCK_MONOTONIC) - started ]
+end
+
+def connect(base)
+  http = Net::HTTP.new(base.host, base.port)
+  http.use_ssl = base.scheme == "https"
+  http.open_timeout = 5
+  http.read_timeout = 30
+  http.keep_alive_timeout = 30
+  http.start
+end
+
+record = options[:record]
+if options[:scenarios].include?("record") && record.nil?
+  http = connect(base)
+  body = http.get("/catalog.json?#{URI.encode_www_form(q: options[:query], any_assets: "1", per_page: 12)}", { "Accept" => "application/json" }).body
+  record = JSON.parse(body).dig("data", 0, "id")
+  http.finish
+  abort "Could not find a record to ask for: give one with --record ID" unless record
+end
+
+paths = {
+  "home" => "/",
+  "results" => "/catalog?#{URI.encode_www_form(q: options[:query], any_assets: "1")}",
+  "record" => "/catalog/#{record}",
+  "health" => "/healthz",
+  "ready" => "/readyz"
+}
+
+puts "Target #{options[:url]}  |  #{options[:seconds]} s per level  |  ruby #{RUBY_VERSION}"
+puts format("%-8s %7s %8s %8s %8s %8s %8s %8s %8s  %s", "scenario", "clients", "reqs", "req/s", "p50 ms", "p90 ms", "p95 ms", "p99 ms", "max ms", "errors")
+worst = 0.0
+
+options[:scenarios].each do |name|
+  path = paths.fetch(name) { abort "Unknown scenario #{name}" }
+  options[:levels].each do |clients|
+    results = Queue.new
+    stop_at = Process.clock_gettime(Process::CLOCK_MONOTONIC) + options[:seconds]
+    threads = Array.new(clients) do
+      Thread.new do
+        http = connect(base)
+        while Process.clock_gettime(Process::CLOCK_MONOTONIC) < stop_at
+          status, seconds = fetch(http, path)
+          results << [ status, seconds ]
+          http = connect(base) unless status.is_a?(Integer) # reconnect after a failure
+        end
+        http.finish if http.started?
+      end
+    end
+    threads.each(&:join)
+
+    rows = Array.new(results.size) { results.pop }
+    times = rows.map(&:last).sort
+    failures = rows.reject { |status, _| status.is_a?(Integer) && status < 400 }
+    by_status = failures.map(&:first).tally.map { |status, count| "#{status}x#{count}" }.join(" ")
+    percent = rows.empty? ? 100.0 : failures.size * 100.0 / rows.size
+    worst = [ worst, percent ].max
+    puts format("%-8s %7d %8d %8.1f %8.1f %8.1f %8.1f %8.1f %8.1f  %.2f%% %s", name, clients, rows.size, rows.size.fdiv(options[:seconds]),
+                percentile(times, 0.50) * 1000, percentile(times, 0.90) * 1000, percentile(times, 0.95) * 1000, percentile(times, 0.99) * 1000,
+                (times.last || 0) * 1000, percent, by_status)
+  end
+end
+
+exit(worst > options[:max_errors] ? 1 : 0)
