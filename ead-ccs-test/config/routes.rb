@@ -83,7 +83,7 @@ Rails.application.routes.draw do
   get "help", to: "pages#help", as: :help
   # Search tips, Indigenous cultural data and Contact are no longer pages of their own: Indigenous data and Contact
   # are sections of Help, and the old addresses go there.
-  get "help/search-tips", to: redirect("/help", status: 301)
+  get "help/search-tips", to: redirect("/catalog/advanced#advanced-search-tips-title", status: 301)
   get "help/indigenous-data", to: redirect("/help#indigenous", status: 301)
   get "contact", to: redirect("/help#contact-us", status: 301)
   get "about", to: "pages#about", as: :about
