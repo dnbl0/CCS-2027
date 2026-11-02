@@ -69,6 +69,14 @@ en:
             purpose:
               blank: "Enter how you plan to use the record"
               too_long: "How you plan to use the record must be %{count} characters or fewer"
+        list:
+          attributes:
+            base:
+              too_many_lists: "You can have at most %{count} lists. Delete one to make a new one."
+        list_item:
+          attributes:
+            base:
+              list_full: "A list can hold at most %{count} records. Remove one to add another."
 
   nexus_ccs:
     access_requests:
@@ -236,17 +244,6 @@ en:
         body: "The image or file is not shown here. To see it, ask the collection team for access. Your request needs approval."
         link: "Request access to this item"
 
-  activerecord:
-    errors:
-      models:
-        list:
-          attributes:
-            base:
-              too_many_lists: "You can have at most %{count} lists. Delete one to make a new one."
-        list_item:
-          attributes:
-            base:
-              list_full: "A list can hold at most %{count} records. Remove one to add another."
   catalog:
     country_acknowledgement:
       title: "Acknowledgement of Country"
