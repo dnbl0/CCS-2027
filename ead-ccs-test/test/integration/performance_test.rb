@@ -129,7 +129,9 @@ class PerformanceTest < ActionDispatch::IntegrationTest
 
     assert_empty site.grep(/openseadragon|stock_/), "the site's pages preload the record viewer"
     assert_not_empty stock.grep(/openseadragon/), "the stock record page needs the viewer"
-    assert_operator site.size, :<=, 52, "the site's pages preload more scripts than the budget allows"
+    # Each Stimulus controller is one small file, so this count grows with features (53 after the selection and media viewer
+    # controllers, 3 Nov 2026). The size that matters is the script bytes budget; this only stops a library sneaking in.
+    assert_operator site.size, :<=, 56, "the site's pages preload more scripts than the budget allows"
   end
 
   test "a page does not preload the record viewer" do
@@ -237,5 +239,19 @@ class PerformanceTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "img.digital-assets__image[fetchpriority=high][decoding=async][width][height]", count: 1
     assert_select "img[loading=lazy]", minimum: 1
+  end
+
+  test "highlighting and the selection form add no Solr request to a results page, and the selection page makes one" do
+    needs_solr
+    get "/catalog", params: { q: "skull", any_assets: "1" }
+    result = count_requests { get "/catalog", params: { q: "skull", any_assets: "1" } }
+
+    assert_equal 1, result.solr, result.solr_requests.join("\n")
+    assert_includes result.solr_requests.first, "hl=true"
+    assert_select "form#selection-form"
+
+    post "/selection", params: { intent: "all", page_ids: [ "emu-406126" ] }
+    result = count_requests { get "/selection" }
+    assert_equal 1, result.solr, result.solr_requests.join("\n")
   end
 end

@@ -1,0 +1,37 @@
+<%# The records ticked on the results pages (CCS-40), as the site's result cards, in the order they were chosen. Personal to
+    the visitor: it lives in their session cookie (Selection), is not indexed (RobotsPolicy), and works without JavaScript.
+    Cite and the lists/download tools reuse the pages that already do those jobs. %>
+<% content_for :title, "#{t('nexus_ccs.selection.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-saved page-selection" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.selection.title"), description: t("nexus_ccs.selection.description", count: Selection::MAX)) %>
+
+<main class="saved-main" id="main-content">
+  <div class="saved-main__inner">
+    <p class="saved-lists-link"><%= link_to t("nexus_ccs.selection.back"), search_catalog_path %></p>
+    <% if @documents.empty? %>
+      <div class="saved-empty">
+        <p class="saved-empty__text"><%= t("nexus_ccs.selection.empty") %></p>
+        <%= link_to t("nexus_ccs.saved.empty_link"), search_catalog_path, class: "btn btn-primary" %>
+      </div>
+    <% else %>
+      <% focus = flash[:notice].present? || flash[:alert].present? ? { controller: "focus-on-load" } : {} %>
+      <div class="saved-toolbar">
+        <h2 class="saved-toolbar__count" tabindex="-1" data-controller="<%= focus[:controller] %>"><%= t("nexus_ccs.selection.count", count: @documents.size) %></h2>
+        <div class="saved-toolbar__actions">
+          <%= link_to t("nexus_ccs.selection.cite_named"), citations_selection_path, class: "btn btn-outline-primary" %>
+          <%= button_to t("nexus_ccs.selection.clear"), selection_path, params: { intent: "clear", return_to: selection_path },
+                        class: "btn btn-outline-primary", form: { class: "d-inline" } %>
+        </div>
+      </div>
+      <% if @missing.positive? %><p class="saved-lists-note"><%= t("nexus_ccs.selection.missing", count: @missing) %></p><% end %>
+      <p class="saved-lists-note"><%= t("nexus_ccs.selection.order") %></p>
+      <% if Rails.configuration.x.saved_records %>
+        <%= render NexusCcs::SelectionListsComponent.new(documents: @documents) %>
+        <%= render NexusCcs::BulkSelectionComponent.new(documents: @documents, return_to: selection_path) %>
+      <% end %>
+      <h2 class="visually-hidden"><%= t("nexus_ccs.selection.records_heading") %></h2>
+      <%= render NexusCcs::SelectionBarComponent.new(page_ids: @documents.map { |document| document.id.to_s }, return_to: selection_path, on_selection_page: true) %>
+      <%= render_document_index_with_view :list, @documents %>
+    <% end %>
+  </div>
+</main>

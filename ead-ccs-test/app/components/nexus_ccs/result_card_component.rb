@@ -13,10 +13,43 @@ module NexusCcs
       super(**args, title_component: TITLE_TAG)
     end
 
-    # The card places the Save control itself (below the lines), so the title does not also draw Blacklight's tools
+    # The card places the Save control itself (below the lines), so the title does not also draw Blacklight's tools. When the
+    # search words are in the title they are marked (CCS-39).
     def before_render
-      with_title(actions: false) unless title?
+      unless title?
+        marked = marked_title
+        marked ? with_title(actions: false) { marked } : with_title(actions: false)
+      end
       super
+    end
+
+    # What Solr's highlighter found in this record for this search (SearchHighlighting::Match), or nil
+    def match
+      return @match if defined?(@match)
+
+      @match = SearchHighlighting.for(document)
+    end
+
+    # The title with the matched words in <mark>; nil when the title holds none of them
+    def marked_title
+      return unless match&.matched_in?("title_tsim")
+
+      marked = match.mark(title_text)
+      marked if marked.include?(SearchHighlighting::OPEN)
+    end
+
+    # The snippet is a piece of the description and the like, so it is not shown for a record whose description is withheld
+    def show_snippet?
+      !RobotsPolicy.withheld?(document)
+    end
+
+    # The "Select" checkbox is for the results page and the selection page only (CCS-40)
+    def selectable?
+      helpers.controller_name.in?(%w[catalog selections]) && helpers.action_name == (helpers.controller_name == "catalog" ? "index" : "show")
+    end
+
+    def title_text
+      CGI.unescapeHTML(presenter.heading.to_s)
     end
 
     # Not for a record whose asset is withheld (AccessPolicy :request), nor a sensitive one (Sensitivity: the visitor
@@ -47,9 +80,20 @@ module NexusCcs
       helpers.search_state.url_for_document(document)
     end
 
-    # creator, object type and collection: the first of each, whichever the record has
+    # creator, object type and collection: the first of each, whichever the record has, with the Solr field the creator is
+    # searched in (the others are filters, not searched)
+    def line_fields
+      [ [ "creator_tsim", document["creator_ssim"] ], [ nil, document["object_type_ssim"] ], [ nil, document["collection_ssim"] ] ]
+        .filter_map { |field, value| [ field, Array(value).first.presence ] if Array(value).first.present? }
+    end
+
     def lines
-      [ document["creator_ssim"], document["object_type_ssim"], document["collection_ssim"] ].filter_map { |value| Array(value).first.presence }
+      line_fields.map(&:last)
+    end
+
+    # A line as it is drawn: the creator's has the searched words marked when that is where they matched (CCS-39)
+    def line_html(field, value)
+      field && match&.matched_in?(field) ? match.mark(value) : value
     end
   end
 end

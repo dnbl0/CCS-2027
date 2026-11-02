@@ -1,0 +1,8 @@
+<nav class="selection-stepper" aria-label="<%= t("nexus_ccs.selection.step.label") %>">
+  <p class="selection-stepper__position"><%= t("nexus_ccs.selection.step.position", position: position, count: selection.count) %></p>
+  <ul class="selection-stepper__links">
+    <% if previous_path %><li><%= link_to t("nexus_ccs.selection.step.previous"), previous_path, rel: "prev" %></li><% end %>
+    <% if next_path %><li><%= link_to t("nexus_ccs.selection.step.next"), next_path, rel: "next" %></li><% end %>
+    <li><%= link_to t("nexus_ccs.selection.step.all"), helpers.selection_path %></li>
+  </ul>
+</nav>

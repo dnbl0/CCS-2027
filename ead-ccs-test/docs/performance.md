@@ -57,7 +57,7 @@ adds network time to Solr and the database, and the figures must be re-measured 
 | Cumulative Layout Shift | 0.1 or less | 0.00-0.05 on most pages; 0.094 record page with two images; 0.14 mosaic with thumbnails (test machine) | Core Web Vitals "good" | system test (list view 0.1; mosaic held at 0.25 while it is above target) |
 | Interaction to Next Paint | 200 ms or less | not measurable by script; total blocking time 0 ms on most pages, 20 ms on Advanced search | Core Web Vitals "good"; blocking time is a stand-in | `bin/perf browser` (by hand) |
 | Server response, home / help / about | p95 50 ms | p50 7-9 ms, p95 14-16 ms | about 3x the measured value, since a hosted machine is slower than this laptop | by hand |
-| Server response, results page | p95 150 ms | p50 27 ms, p95 49 ms | as above; it makes two Solr requests | by hand |
+| Server response, results page | p95 150 ms | p50 27 ms, p95 49 ms before CCS-39; highlighting adds about 20 ms to the Solr request for a common word on 40 results (skull: 4.6 to 23 ms), so expect p95 near 70 ms | as above; it makes two Solr requests (highlighting rides on the first, no extra request). A search that finds nothing or few records makes one more per filter, at most 8 (CCS-43) | by hand |
 | Server response, record page | p95 100 ms | p50 18 ms, p95 31 ms | one Solr request | by hand |
 | Server response, Advanced search | p95 300 ms | p50 77 ms, p95 115 ms | one Solr request that asks for up to 100 values of each filter | by hand |
 | Solr requests per page | results 2, record 1, every other page 0 | the same | the header's collection counts are cached for a day (`BrowseMenu`) | `PerformanceTest` (needs Solr) |

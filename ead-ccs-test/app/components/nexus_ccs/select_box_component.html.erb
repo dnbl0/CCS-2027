@@ -1,0 +1,5 @@
+<div class="result-card__select">
+  <input type="checkbox" class="form-check-input result-card__select-input" id="<%= input_id %>" name="ids[]" value="<%= document_id %>"
+         form="<%= NexusCcs::SelectionBarComponent::FORM_ID %>" <%= "checked" if selected? %>>
+  <label class="result-card__select-label" for="<%= input_id %>"><%= t("nexus_ccs.selection.select") %><span class="visually-hidden">: <%= title %></span></label>
+</div>
