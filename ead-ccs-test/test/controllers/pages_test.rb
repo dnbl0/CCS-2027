@@ -96,14 +96,21 @@ class PagesTest < ActionDispatch::IntegrationTest
       assert_redirected_to location
     end
 
-    [ "nope", "privacy", "search-tips" ].each do |topic|
+    [ "nope", "privacy" ].each do |topic|
       get "/help", params: { topic: topic }
       assert_response :success
     end
   end
 
+  test "the old search tips topic link goes to the tips on the Advanced Search page" do
+    get "/help", params: { topic: "search-tips" }
+
+    assert_redirected_to "/catalog/advanced#advanced-search-tips-title"
+    assert_response :moved_permanently
+  end
+
   test "the pages folded into Help redirect permanently to their section" do
-    { "/contact" => "/help#contact-us", "/help/indigenous-data" => "/help#indigenous", "/help/search-tips" => "/help" }.each do |path, location|
+    { "/contact" => "/help#contact-us", "/help/indigenous-data" => "/help#indigenous", "/help/search-tips" => "/catalog/advanced#advanced-search-tips-title" }.each do |path, location|
       get path
 
       assert_redirected_to location
