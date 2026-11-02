@@ -51,7 +51,7 @@ class SiteChromeTest < ActiveSupport::TestCase
   test "search results show the breadcrumb and a banner with the search form" do
     render_header
 
-    assert_selector "nav.breadcrumb-bar[aria-label=Breadcrumb] li[aria-current=page]", text: "Search results"
+    assert_selector "nav.breadcrumb-bar[aria-label=Breadcrumb] li span[aria-current=page]", text: "Search results"
     assert_selector "section.search-banner .search-banner__title", text: "Search the Collection"
     assert_selector "section.search-banner form.search-banner__form"
     assert_no_selector "h1" # the banner title is not a heading: pages render their own h1
@@ -88,8 +88,10 @@ class SiteChromeTest < ActiveSupport::TestCase
     render_inline(NexusCcs::BreadcrumbComponent.new(items: [ [ "Search results", "/catalog" ], [ "A skull", nil ] ]))
 
     assert_selector "a[href='/catalog']", text: "Search results"
-    assert_selector "li[aria-current=page]", text: "A skull"
-    assert_no_selector "li[aria-current=page] a"
+    assert_selector "li > span[aria-current=page]", text: "A skull"
+    assert_no_selector "li[aria-current]"
+    assert_no_selector "a[aria-current]"
+    assert_no_selector ".breadcrumb-bar a[title]"
   end
 
   test "the saved-records bar is the last child of the breadcrumb strip, and nowhere else on a page with a breadcrumb" do
