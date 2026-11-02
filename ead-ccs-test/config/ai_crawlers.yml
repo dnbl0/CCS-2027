@@ -1,0 +1,58 @@
+# The user agents the site turns away (CCS-127). This is the ONE place the lists live: BotControls reads it, and the
+# robots.txt, the 403 on the asset files and the zip/CSV endpoints, and the tests all follow it.
+#
+# To update: add the crawler's user-agent token (the name its operator publishes for robots.txt, which is also a
+# substring of the User-Agent header it sends) under the right heading, keep the list tidy (one per line), and run
+# `bin/rails test test/models/bot_controls_test.rb`. Operators' published lists to check against:
+#   https://platform.openai.com/docs/bots   https://support.anthropic.com (ClaudeBot)   https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers
+#   https://darkvisitors.com (a community-maintained catalogue)
+# Matching is case-insensitive, on a substring of the User-Agent header. Nothing here stops a crawler that lies about who it is.
+
+# AI training crawlers and bulk scrapers: Disallow: / in robots.txt, and a 403 on the asset files and the zip/CSV endpoints.
+training_and_scraping:
+  - GPTBot
+  - ClaudeBot
+  - Claude-Web
+  - anthropic-ai
+  - CCBot
+  - Google-Extended      # a robots.txt token only (Googlebot fetches the pages); listed so the opt-out is made
+  - Applebot-Extended    # as above, for Apple
+  - PerplexityBot
+  - Bytespider
+  - Amazonbot
+  - cohere-ai
+  - cohere-training-data-crawler
+  - Diffbot
+  - ImagesiftBot
+  - FacebookBot
+  - meta-externalagent
+  - omgili
+  - omgilibot
+  - Timpibot
+  - AI2Bot
+  - Ai2Bot-Dolma
+  - PanguBot
+  - Kangaroo Bot
+  - Webzio-Extended
+
+# AI search and answer agents: they fetch a page to answer a person's question (and cite it), which is what the GEO half of
+# BR-18.04 wants. Allowed unless BOT_BLOCK_AI_RETRIEVAL=on adds them to the list above.
+ai_retrieval:
+  - OAI-SearchBot
+  - ChatGPT-User
+  - Claude-SearchBot
+  - Claude-User
+  - Perplexity-User
+  - DuckAssistBot
+  - MistralAI-User
+
+# Site copiers and scraping toolkits: a 403 on the asset files and the zip/CSV endpoints only (they are not named in robots.txt,
+# as they do not read it). Deliberately short: general HTTP libraries (curl, python-requests) are not here, as researchers use them.
+scrapers:
+  - Scrapy
+  - HTTrack
+  - WebCopier
+  - SiteSucker
+  - Offline Explorer
+  - Teleport Pro
+  - WebZIP

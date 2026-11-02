@@ -75,6 +75,12 @@ Rails.application.routes.draw do
   get "contact", to: redirect("/help#contact-us", status: 301)
   get "about", to: "pages#about", as: :about
 
+  # For crawlers (CCS-128, CCS-127): generated, so the environment's settings apply. The sitemap is an index of pages of up to 10,000 URLs.
+  get "robots.txt", to: "seo#robots", format: false
+  get "sitemap.xml", to: "seo#sitemap_index", format: false
+  get "sitemaps/:page.xml", to: "seo#sitemap_page", as: :sitemap_page, constraints: { page: /\d+/ }, format: false
+  get "llms.txt", to: "seo#llms", format: false
+
   # What the visitor sees for an error: Rails sends the failed request to /<status> (config.exceptions_app)
   %w[400 404 406 422 500].each { |code| match code, to: "errors#show", via: :all, defaults: { code: code }, as: "error_#{code}" }
 
