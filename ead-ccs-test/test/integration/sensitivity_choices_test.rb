@@ -19,6 +19,7 @@ class SensitivityChoicesTest < ActionDispatch::IntegrationTest
   def sensitive(&) = replacing(Sensitivity, :sensitive?, ->(document) { document.id == OPEN }, &)
 
   test "by default the page asks, and the image path is nowhere in the page" do
+    needs_solr
     sensitive { get "/catalog/#{OPEN}" }
 
     assert_response :success
@@ -28,6 +29,7 @@ class SensitivityChoicesTest < ActionDispatch::IntegrationTest
   end
 
   test "View this item shows the image from then on, in this session, with a way to hide it again" do
+    needs_solr
     sensitive do
       post "/catalog/#{OPEN}/sensitivity", params: { choice: "view" }
       assert_redirected_to "/catalog/#{OPEN}#digital-assets"
@@ -44,6 +46,7 @@ class SensitivityChoicesTest < ActionDispatch::IntegrationTest
   end
 
   test "Do not view keeps the image hidden, and offers View this item" do
+    needs_solr
     sensitive do
       post "/catalog/#{OPEN}/sensitivity", params: { choice: "hide" }
       follow_redirect!
@@ -55,6 +58,7 @@ class SensitivityChoicesTest < ActionDispatch::IntegrationTest
   end
 
   test "Hide this item takes back a choice to view" do
+    needs_solr
     sensitive do
       post "/catalog/#{OPEN}/sensitivity", params: { choice: "view" }
       post "/catalog/#{OPEN}/sensitivity", params: { choice: "hide" }
@@ -66,6 +70,7 @@ class SensitivityChoicesTest < ActionDispatch::IntegrationTest
   end
 
   test "a record that is not sensitive has nothing to choose, and an unknown record is a 404" do
+    needs_solr
     post "/catalog/#{OPEN}/sensitivity", params: { choice: "view" }
     assert_response :not_found
 
@@ -74,6 +79,7 @@ class SensitivityChoicesTest < ActionDispatch::IntegrationTest
   end
 
   test "a sensitive record that is withheld stays withheld, and cannot be chosen into view" do
+    needs_solr
     sensitive do
       replacing(AccessPolicy, :tier, ->(_document) { :request }) do
         post "/catalog/#{OPEN}/sensitivity", params: { choice: "view" }
@@ -86,6 +92,7 @@ class SensitivityChoicesTest < ActionDispatch::IntegrationTest
   end
 
   test "a value other than view or hide changes nothing" do
+    needs_solr
     sensitive do
       post "/catalog/#{OPEN}/sensitivity", params: { choice: "<script>" }
       follow_redirect!
@@ -94,6 +101,7 @@ class SensitivityChoicesTest < ActionDispatch::IntegrationTest
   end
 
   test "the result card hides the thumbnail of a sensitive record, and shows it for any other" do
+    needs_solr
     get "/catalog", params: { q: "Grainger", f: { has_digital_asset: [ "with" ] }, view: "list" }
     assert_select ".result-card__media"
 

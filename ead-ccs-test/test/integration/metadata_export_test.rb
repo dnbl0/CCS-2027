@@ -7,6 +7,7 @@ class MetadataExportTest < ActionDispatch::IntegrationTest
   VIEW_ONLY = "emu-20335"      # Copyright - Current
 
   test "an open record's page offers Download metadata (CSV), and the link gives the file" do
+    needs_solr
     get "/catalog/#{OPEN}"
     assert_select "a[href='/catalog/#{OPEN}/metadata']", text: "Download metadata (CSV)"
 
@@ -23,6 +24,7 @@ class MetadataExportTest < ActionDispatch::IntegrationTest
   end
 
   test "a view-only record is not offered the export, and its address is a 404" do
+    needs_solr
     get "/catalog/#{VIEW_ONLY}"
     assert_select "a[href$='/metadata']", count: 0
 
@@ -31,6 +33,7 @@ class MetadataExportTest < ActionDispatch::IntegrationTest
   end
 
   test "an unknown record is a 404" do
+    needs_solr
     get "/catalog/no-such-record/metadata"
     assert_response :not_found
   end

@@ -21,6 +21,7 @@ class BulkDownloadsTest < ActionDispatch::IntegrationTest
   end
 
   test "the saved records page offers the records that have assets as a group of checkboxes, saying which can be downloaded" do
+    needs_solr
     save(OPEN, VIEW_ONLY)
     get "/bookmarks"
 
@@ -34,6 +35,7 @@ class BulkDownloadsTest < ActionDispatch::IntegrationTest
   end
 
   test "a list page offers the same choice" do
+    needs_solr
     save(OPEN)
     list = List.create!(name: "Mine", user: User.last)
     list.list_items.create!(document_id: OPEN)
@@ -44,6 +46,7 @@ class BulkDownloadsTest < ActionDispatch::IntegrationTest
   end
 
   test "review says what goes in and what is left out, and why" do
+    needs_solr
     post "/downloads/review", params: { ids: [ OPEN, VIEW_ONLY, NO_ASSETS_NEEDED ], return_to: "/bookmarks" }
 
     assert_response :success
@@ -56,6 +59,7 @@ class BulkDownloadsTest < ActionDispatch::IntegrationTest
   end
 
   test "the zip holds only the open record's files and a manifest" do
+    needs_solr
     post "/downloads", params: { ids: [ OPEN, OPEN_TWO, VIEW_ONLY ] }
 
     assert_response :success
@@ -69,6 +73,7 @@ class BulkDownloadsTest < ActionDispatch::IntegrationTest
   end
 
   test "with nothing downloadable there is no zip: back to the page with a message" do
+    needs_solr
     post "/downloads", params: { ids: [ VIEW_ONLY ], return_to: "/bookmarks" }
 
     assert_redirected_to "/bookmarks"
@@ -88,6 +93,7 @@ class BulkDownloadsTest < ActionDispatch::IntegrationTest
   end
 
   test "a selection over the file limit is refused with the limit stated, and offers no download" do
+    needs_solr
     original = BulkDownload::MAX_FILES
     BulkDownload.send(:remove_const, :MAX_FILES)
     BulkDownload.const_set(:MAX_FILES, 1)
@@ -103,6 +109,7 @@ class BulkDownloadsTest < ActionDispatch::IntegrationTest
   end
 
   test "return_to is only ever one of the selecting pages" do
+    needs_solr
     post "/downloads/review", params: { ids: [ OPEN ], return_to: "https://evil.example/" }
     assert_select "a.btn[href='/bookmarks']", text: "Back"
 

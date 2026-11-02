@@ -26,6 +26,7 @@ class DynamicFiltersTest < ActionDispatch::IntegrationTest
   end
 
   test "choosing a value re-counts the other filters for the narrowed results and drops the values that no longer apply" do
+    needs_solr
     before = facet_counts(sidebar(BASE))
     after = facet_counts(sidebar(BASE.merge(MUSEUM)))
 
@@ -37,6 +38,7 @@ class DynamicFiltersTest < ActionDispatch::IntegrationTest
   end
 
   test "a filter left with no values is not offered" do
+    needs_solr
     before = facet_counts(sidebar(BASE))
     after = facet_counts(sidebar(BASE.merge(MUSEUM)))
 
@@ -46,6 +48,7 @@ class DynamicFiltersTest < ActionDispatch::IntegrationTest
   end
 
   test "no filter value is offered with a count of 0" do
+    needs_solr
     [ BASE, BASE.merge(MUSEUM), { q: "skull", any_assets: "1" } ].each do |params|
       counts = facet_counts(sidebar(params))
       counts.each { |name, values| assert values.values.all?(&:positive?), "#{name} offers a value with no records" }
@@ -53,6 +56,7 @@ class DynamicFiltersTest < ActionDispatch::IntegrationTest
   end
 
   test "the sidebar has a polite status that says how many results and filters apply" do
+    needs_solr
     sidebar = sidebar(BASE.merge(MUSEUM))
     status = sidebar.at_css("[data-filter-state-target=status]")
 
@@ -64,6 +68,7 @@ class DynamicFiltersTest < ActionDispatch::IntegrationTest
   end
 
   test "the status counts several filters and a single result" do
+    needs_solr
     two = sidebar(BASE.merge(f: { collection_ssim: [ "Medical History Museum" ], object_type_ssim: [ "photograph" ] }))
     assert_match(/results, 2 filters applied\z/, two["data-filter-state-message-value"])
 
