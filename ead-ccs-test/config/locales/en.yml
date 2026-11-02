@@ -52,7 +52,69 @@ en:
         failure: "Sorry, there was a problem removing the record."
         success: "Record removed from your saved list."
 
+  activerecord:
+    errors:
+      models:
+        access_request:
+          attributes:
+            name:
+              blank: "Enter your name"
+              too_long: "Your name must be %{count} characters or fewer"
+            email:
+              blank: "Enter your email address"
+              invalid: "Enter your email address in the format name@example.com"
+              too_long: "Your email address must be %{count} characters or fewer"
+            organisation:
+              too_long: "Your organisation must be %{count} characters or fewer"
+            purpose:
+              blank: "Enter how you plan to use the record"
+              too_long: "How you plan to use the record must be %{count} characters or fewer"
+
   nexus_ccs:
+    access_requests:
+      title: "Request access"
+      # Placeholder wording throughout this block: the University must approve the privacy, retention and next-steps text.
+      description_view: "This record is not available to view online. You can ask for access, and the collection's staff will decide."
+      description_download: "This record can be viewed online but not downloaded. You can ask for a copy, and the collection's staff will decide."
+      record_label: "Record"
+      type_label: "What you are asking for"
+      type_view: "Permission to view this record"
+      type_download: "A copy of this record to download"
+      back_to_record: "Back to the record"
+      required_note: "Fields marked * are required."
+      too_many: "Too many requests were sent from your connection. Wait an hour, then try again."
+      error_summary_title: "There is a problem"
+      error_summary_intro: "Fix these to send your request:"
+      hint_empty: "Leave this field empty"
+      fields:
+        name: "Your name"
+        name_hint: "As you would like the staff to address you."
+        email: "Email address"
+        email_hint: "The staff reply here. For example, name@example.com."
+        organisation: "Organisation (optional)"
+        organisation_hint: "For example, your university, museum or community group."
+        purpose: "How you plan to use this record"
+        purpose_hint: "Tell the staff what the record is for, such as research, teaching, an exhibition or a publication."
+        honeypot: "Website"
+      privacy_title: "How we use your details"
+      privacy: "We keep your name, email address, organisation and answers so that staff can decide on your request and reply to you. Only the University staff who manage this collection can see them. We do not use them for anything else. [Placeholder wording: the University must approve how long the details are kept.]"
+      submit: "Send request"
+      confirmation:
+        title: "Request sent"
+        description: "Your request has been recorded."
+        heading: "What you asked for"
+        record: "Record"
+        type: "Request"
+        name: "Name"
+        email: "Email address"
+        organisation: "Organisation"
+        purpose: "How you plan to use it"
+        next_title: "What happens next"
+        # Placeholder wording: the University must approve the next steps and any time frame.
+        next: "Staff who manage this collection will read your request and reply to the email address above. You do not need to send it again. [Placeholder wording: the University must confirm the process and how long it takes.]"
+        no_email: "This site does not send a confirmation email."
+        back_to_record: "Back to the record"
+        keep_searching: "Keep searching"
     search_history:
       title: "Search history"
       description: "The searches you have made in this browser, newest first. Open one to run it again, or save the ones you want to keep."

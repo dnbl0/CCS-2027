@@ -1,0 +1,40 @@
+<%# What was requested, and what happens next (AccessRequestsController#show). Shown only to the browser that made the request. %>
+<% t_key = "nexus_ccs.access_requests.confirmation" %>
+<% content_for :title, "#{t("#{t_key}.title")} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-saved page-access-request" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("#{t_key}.title"), description: t("#{t_key}.description")) %>
+
+<main class="saved-main" id="main-content">
+  <div class="saved-main__inner access-form">
+    <section aria-labelledby="request-summary-title">
+      <h2 id="request-summary-title" class="access-form__summary-title"><%= t("#{t_key}.heading") %></h2>
+      <dl class="access-form__record">
+        <dt><%= t("#{t_key}.record") %></dt>
+        <dd><%= link_to @access_request.document_title, solr_document_path(@access_request.document_id) %></dd>
+        <dt><%= t("#{t_key}.type") %></dt>
+        <dd><%= t("nexus_ccs.access_requests.type_#{@access_request.request_type}") %></dd>
+        <dt><%= t("#{t_key}.name") %></dt>
+        <dd><%= @access_request.name %></dd>
+        <dt><%= t("#{t_key}.email") %></dt>
+        <dd><%= @access_request.email %></dd>
+        <% if @access_request.organisation.present? %>
+          <dt><%= t("#{t_key}.organisation") %></dt>
+          <dd><%= @access_request.organisation %></dd>
+        <% end %>
+        <dt><%= t("#{t_key}.purpose") %></dt>
+        <dd class="access-form__purpose"><%= @access_request.purpose %></dd>
+      </dl>
+    </section>
+
+    <section aria-labelledby="next-title">
+      <h2 id="next-title" class="access-form__summary-title"><%= t("#{t_key}.next_title") %></h2>
+      <p><%= t("#{t_key}.next") %></p>
+      <p><%= t("#{t_key}.no_email") %></p>
+    </section>
+
+    <div class="access-form__actions">
+      <%= link_to t("#{t_key}.back_to_record"), solr_document_path(@access_request.document_id), class: "btn btn-primary" %>
+      <%= link_to t("#{t_key}.keep_searching"), root_path, class: "btn btn-outline-primary" %>
+    </div>
+  </div>
+</main>
