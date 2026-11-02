@@ -12,6 +12,20 @@ module SearchHistoryDays
             .map { |day, entries| [ label(day, today), entries ] }
   end
 
+  # A search with no Digital asset choice is saved as asked, then redirected to the same search with "With a digital asset"
+  # applied (SearchDefaults), which is saved too. The visitor made one search, so the one they were not shown is hidden.
+  # searches: anything with query_params (Blacklight's Search rows).
+  def self.without_redirected(searches)
+    all = searches.map { |search| normalise(search.query_params) }
+
+    searches.reject do |search|
+      decision = SearchDefaults.decide(normalise(search.query_params), html: true, get: true, catalog: true)
+      decision&.first == :search && all.include?(normalise(decision.last))
+    end
+  end
+
+  def self.normalise(params) = params.to_h.deep_stringify_keys
+
   def self.label(day, today)
     case day
     when today then "Today"

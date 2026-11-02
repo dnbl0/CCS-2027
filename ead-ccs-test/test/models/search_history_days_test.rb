@@ -30,6 +30,22 @@ class SearchHistoryDaysTest < ActiveSupport::TestCase
     assert_equal [ "Today" ], SearchHistoryDays.group([ just_after_midnight ], now: now).map(&:first)
   end
 
+  Query = Struct.new(:query_params, :created_at)
+
+  test "the search a default-filter redirect made is hidden once the redirected search is in the history" do
+    redirected = Query.new({ "q" => "skull" }, now)
+    filtered = Query.new({ "q" => "skull", "f" => { "has_digital_asset" => [ "with" ] } }, now)
+    other = Query.new({ "q" => "violin", "any_assets" => "1" }, now)
+
+    assert_equal [ filtered, other ], SearchHistoryDays.without_redirected([ filtered, redirected, other ])
+  end
+
+  test "a search is kept when nothing in the history is its redirected form" do
+    bare = Query.new({ "q" => "skull" }, now)
+
+    assert_equal [ bare ], SearchHistoryDays.without_redirected([ bare ])
+  end
+
   test "no searches, no groups" do
     assert_empty SearchHistoryDays.group([], now: now)
   end

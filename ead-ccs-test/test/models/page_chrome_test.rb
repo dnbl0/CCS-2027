@@ -62,7 +62,7 @@ class PageChromeTest < ActiveSupport::TestCase
 
   test "any other catalog page keeps the search banner; any other page has no banner; neither has a trail" do
     assert_equal [ [], :search, :header ], chrome("catalog", "facet").deconstruct
-    assert_equal [ [], nil, :header ], chrome("search_history", "index").deconstruct
+    assert_equal [ [], nil, :header ], chrome("errors", "not_found").deconstruct
   end
 
   test "saved records: the saved list's trail and no banner" do
@@ -86,5 +86,15 @@ class PageChromeTest < ActiveSupport::TestCase
     assert_equal [ [ "Search results", "/catalog" ], [ "Test record", nil ] ], stock.breadcrumbs
     assert_nil stock.banner
     assert_equal :breadcrumb, stock.saved_bar
+  end
+
+  test "the search history and saved searches pages: a trail with their own name and no banner, as the page brings one" do
+    { "search_history" => "Search history", "saved_searches" => "Saved searches" }.each do |controller, name|
+      page = chrome(controller, "index")
+
+      assert_equal [ [ name, nil ] ], page.breadcrumbs
+      assert_nil page.banner
+      assert_equal :breadcrumb, page.saved_bar
+    end
   end
 end

@@ -1,37 +1,44 @@
-<%# Blacklight's search history page, with the searches grouped by the day they were made (CCS-206) %>
-<% @page_title = t('blacklight.search_history.page_title', :application_name => application_name) %>
+<%# Blacklight's search history page, in the site's page layout (SearchHistoryController): the page banner, then the
+    searches grouped by the day they were made (CCS-206), each with a Save this search button when saving is on (CCS-130). %>
+<% content_for :title, "#{t('nexus_ccs.search_history.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-saved page-search-history" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.search_history.title"), description: t("nexus_ccs.search_history.description")) %>
 
-<div id="content" class="col-md-12">
-<h1 class='page-heading'><%= t('blacklight.search_history.title') %></h1>
-<% if @searches.blank? %>
-  <h2 class='section-heading'><%= t('blacklight.search_history.no_history') %></h2>
-<% else %>
-  <%= link_to t('blacklight.search_history.clear.action_title'),
-              blacklight.clear_search_history_path,
-              data: {
-                turbo_confirm: t('blacklight.search_history.clear.action_confirm'),
-                turbo_method: :delete
-              },
-              class: 'btn btn-danger float-md-right float-md-end' %>
-  <h2 class='section-heading'><%= t('blacklight.search_history.recent') %></h2>
-  <% SearchHistoryDays.group(@searches).each_with_index do |(day, searches), day_index| %>
-    <section class="search-history-day" aria-labelledby="search-history-day-<%= day_index %>">
-      <h3 id="search-history-day-<%= day_index %>" class="h5"><%= day %></h3>
-      <table class="table table-striped search-history">
-        <% searches.each do |search| %>
-          <tr>
-            <td class="query"><%= link_to_previous_search(search_state.reset(search.query_params).to_hash) %></td>
-            <% if Rails.configuration.x.saved_records %>
-              <td class="save-search">
-                <%= button_to t("nexus_ccs.saved_searches.save"), saved_searches_path(search_id: search.id), method: :post,
-                              class: "btn btn-link", form: { class: "d-inline" },
-                              aria: { label: t("nexus_ccs.saved_searches.save_named", query: link_to_previous_search(search_state.reset(search.query_params).to_hash).then { |l| strip_tags(l) }) } %>
-              </td>
+<main class="saved-main" id="main-content">
+  <div class="saved-main__inner">
+    <% searches = SearchHistoryDays.without_redirected(@searches.to_a) %>
+    <% if searches.empty? %>
+      <div class="saved-empty">
+        <p class="saved-empty__text"><%= t("blacklight.search_history.no_history") %></p>
+        <%= link_to t("nexus_ccs.saved_searches.start_searching"), root_path, class: "btn btn-primary" %>
+      </div>
+    <% else %>
+      <div class="saved-toolbar">
+        <h2 class="saved-toolbar__count"><%= t("nexus_ccs.search_history.recent") %></h2>
+        <%= link_to t("blacklight.search_history.clear.action_title"), blacklight.clear_search_history_path,
+                    data: { turbo_confirm: t("blacklight.search_history.clear.action_confirm"), turbo_method: :delete },
+                    class: "btn btn-outline-primary" %>
+      </div>
+      <% SearchHistoryDays.group(searches).each_with_index do |(day, day_searches), day_index| %>
+        <section class="search-history-day" aria-labelledby="search-history-day-<%= day_index %>">
+          <h3 id="search-history-day-<%= day_index %>" class="search-history-day__heading"><%= day %></h3>
+          <table class="table search-history">
+            <% day_searches.each do |search| %>
+              <% previous = link_to_previous_search(search_state.reset(search.query_params).to_hash) %>
+              <tr>
+                <td class="query"><%= previous %></td>
+                <% if Rails.configuration.x.saved_records %>
+                  <td class="save-search">
+                    <%= button_to t("nexus_ccs.saved_searches.save"), saved_searches_path(search_id: search.id), method: :post,
+                                  class: "btn btn-link", form: { class: "d-inline" },
+                                  aria: { label: t("nexus_ccs.saved_searches.save_named", query: strip_tags(previous)) } %>
+                  </td>
+                <% end %>
+              </tr>
             <% end %>
-          </tr>
-        <% end %>
-      </table>
-    </section>
-  <% end %>
-<% end %>
-</div>
+          </table>
+        </section>
+      <% end %>
+    <% end %>
+  </div>
+</main>

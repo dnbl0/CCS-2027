@@ -10,10 +10,11 @@ class SearchHistoryTest < ActionDispatch::IntegrationTest
     get "/search_history"
 
     assert_response :success
-    assert_select "h1.page-heading", "Search History"
+    assert_select ".page-banner h1, h1", text: "Search history"
     assert_select "table.search-history td.query a", count: 2
     assert_select "table.search-history tr:first-child td.query", text: /violin/
     assert_select "a[data-turbo-method=delete]", text: "Clear Search History"
+    assert_select ".breadcrumb-strip", text: /Search history/
     assert_select ".search-history-day h3", count: 1, text: "Today"
   end
 
@@ -33,7 +34,7 @@ class SearchHistoryTest < ActionDispatch::IntegrationTest
   test "a visitor with no searches is told so" do
     get "/search_history"
 
-    assert_select "h2.section-heading", text: /no search history/i
+    assert_select ".saved-empty__text", text: /no search history/i
     assert_select ".search-history-day", count: 0
   end
 end

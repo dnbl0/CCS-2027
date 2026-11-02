@@ -53,3 +53,49 @@
     padding-inline: var(--space-16);
   }
 }
+
+/*
+ * The search history page (/search_history) and the saved searches page (/saved_searches) share this page layout: each
+ * day's searches are a table, one search to a row, in the same container.
+ */
+.page-search-history .saved-toolbar__count {
+  font-size: var(--ccs-font-size-xl);
+}
+
+.search-history-day {
+  margin-bottom: var(--ccs-space-6);
+}
+
+.search-history-day__heading {
+  margin: 0 0 var(--ccs-space-2);
+  font-size: var(--ccs-font-size-lg);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-brand);
+}
+
+.search-history td.query a,
+.saved-searches td.saved-searches__name a {
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+/* A row reads "grainger  With a digital asset": each filter's value alone, as on the results page's pills (its name,
+   "Digital asset:", stays for screen readers), with a gap between the search's parts */
+.search-history .constraint .filter-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.search-history .constraint {
+  margin-inline-end: var(--ccs-space-3);
+}
+
+.search-history td.save-search,
+.saved-searches td.saved-searches__remove {
+  width: 1%;
+  white-space: nowrap;
+  text-align: end;
+}

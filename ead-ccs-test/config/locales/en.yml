@@ -53,12 +53,17 @@ en:
         success: "Record removed from your saved list."
 
   nexus_ccs:
+    search_history:
+      title: "Search history"
+      description: "The searches you have made in this browser, newest first. Open one to run it again, or save the ones you want to keep."
+      recent: "Your recent searches"
     saved_searches:
       title: "Saved searches"
       description: "The searches you chose to keep. Open one to run it again."
       list_heading: "Your saved searches"
       empty: "You have not saved any searches yet. Save one from your search history."
       empty_link: "Go to your search history"
+      start_searching: "Start searching"
       save: "Save this search"
       save_named: "Save the search %{query}"
       saved: "Search saved."
