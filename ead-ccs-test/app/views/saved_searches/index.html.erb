@@ -1,0 +1,33 @@
+<%# The searches a visitor kept from their search history (CCS-130), laid out like the saved records page. %>
+<% content_for :title, "#{t('nexus_ccs.saved_searches.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-saved" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.saved_searches.title"), description: t("nexus_ccs.saved_searches.description")) %>
+
+<main class="saved-main" id="main-content">
+  <div class="saved-main__inner">
+    <% if flash[:notice] || flash[:alert] %>
+      <p class="saved-searches__flash" role="status"><%= flash[:notice] || flash[:alert] %></p>
+    <% end %>
+    <% if @saved_searches.empty? %>
+      <div class="saved-empty">
+        <p class="saved-empty__text"><%= t("nexus_ccs.saved_searches.empty") %></p>
+        <%= link_to t("nexus_ccs.saved_searches.empty_link"), blacklight.search_history_path, class: "btn btn-primary" %>
+      </div>
+    <% else %>
+      <h2 class="visually-hidden"><%= t("nexus_ccs.saved_searches.list_heading") %></h2>
+      <table class="table table-striped saved-searches">
+        <% @saved_searches.each do |saved| %>
+          <tr>
+            <td class="saved-searches__name"><%= link_to saved.name, search_action_path(saved.search_params) %></td>
+            <td class="saved-searches__date"><%= l(saved.created_at.in_time_zone, format: :long) %></td>
+            <td class="saved-searches__remove">
+              <%= button_to t("nexus_ccs.saved_searches.remove"), saved_search_path(saved), method: :delete,
+                            class: "btn btn-link", form: { class: "d-inline" },
+                            aria: { label: t("nexus_ccs.saved_searches.remove_named", name: saved.name) } %>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+    <% end %>
+  </div>
+</main>

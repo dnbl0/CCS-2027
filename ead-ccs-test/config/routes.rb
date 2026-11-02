@@ -24,6 +24,7 @@ Rails.application.routes.draw do
           delete "clear"
         end
       end
+      resources :saved_searches, only: [ :index, :create, :destroy ]
     end
   end
 

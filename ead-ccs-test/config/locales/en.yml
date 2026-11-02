@@ -53,6 +53,20 @@ en:
         success: "Record removed from your saved list."
 
   nexus_ccs:
+    saved_searches:
+      title: "Saved searches"
+      description: "The searches you chose to keep. Open one to run it again."
+      list_heading: "Your saved searches"
+      empty: "You have not saved any searches yet. Save one from your search history."
+      empty_link: "Go to your search history"
+      save: "Save this search"
+      save_named: "Save the search %{query}"
+      saved: "Search saved."
+      removed: "Search removed from your saved searches."
+      remove: "Remove"
+      remove_named: "Remove the saved search %{name}"
+      not_found: "That search is no longer in your history, so it could not be saved."
+      failure: "Sorry, there was a problem saving the search."
     save:
       absent: "Save"
       present: "Saved"
