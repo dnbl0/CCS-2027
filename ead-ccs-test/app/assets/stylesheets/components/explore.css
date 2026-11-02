@@ -30,6 +30,15 @@
 
 .explore__link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
+.explore__all {
+  display: inline-flex; align-items: center; min-height: 44px; align-self: flex-start;
+  font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-link);
+}
+
+.explore__all:hover { color: var(--ccs-text-link-hover); }
+
+.explore__all:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
 .explore__label { font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); overflow-wrap: anywhere; }
 
 .explore__count { flex: none; font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
