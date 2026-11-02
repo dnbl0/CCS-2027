@@ -61,6 +61,16 @@ en:
       column_filters: "Filters"
       column_actions: "Actions"
       no_term: "All records"
+      caption: "Searches from %{day}"
+      removed: "Search removed from your history."
+      not_found: "That search is no longer in your history."
+      actions:
+        save: "Save"
+        share: "Share"
+        delete: "Delete"
+        save_named: "Save search: %{query}"
+        share_named: "Share search: %{query}"
+        delete_named: "Delete search: %{query}"
     saved_searches:
       title: "Saved searches"
       description: "The searches you chose to keep. Open one to run it again."

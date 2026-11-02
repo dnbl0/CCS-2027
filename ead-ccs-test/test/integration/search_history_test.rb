@@ -31,6 +31,18 @@ class SearchHistoryTest < ActionDispatch::IntegrationTest
     assert_select ".search-history-day:last-of-type td.query", text: /skull/
   end
 
+  test "the filters are applied-filter pills in their own column, with the filter's name for screen readers" do
+    get "/catalog", params: { q: "skull" }
+    follow_redirect! # the default "With a digital asset" filter (SearchDefaults)
+
+    get "/search_history"
+
+    assert_select "td.filters .applied-filter .filter-value", text: "With a digital asset"
+    assert_select "td.filters .applied-filter .filter-name", text: /Digital asset/
+    assert_select "td.filters .applied-filter .remove", count: 0
+    assert_select "table.search-history caption.visually-hidden", text: /Searches from Today/
+  end
+
   test "a visitor with no searches is told so" do
     get "/search_history"
 

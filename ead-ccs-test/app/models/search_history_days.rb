@@ -24,6 +24,17 @@ module SearchHistoryDays
     end
   end
 
+  # The history entries without_redirected hides for this search: the ones a default-filter redirect turned into it.
+  # Deleting a search takes them out too, or they would show up in its place.
+  def self.redirect_origins(searches, search)
+    target = normalise(search.query_params)
+
+    searches.select do |other|
+      decision = SearchDefaults.decide(normalise(other.query_params), html: true, get: true, catalog: true)
+      decision&.first == :search && normalise(decision.last) == target
+    end
+  end
+
   def self.normalise(params) = params.to_h.deep_stringify_keys
 
   def self.label(day, today)

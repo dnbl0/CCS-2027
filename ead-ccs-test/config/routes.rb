@@ -45,6 +45,9 @@ Rails.application.routes.draw do
 
   # Browse collections is gone (the sitemap keeps Blacklight's own pages): its address goes to the collection cards on the home
   # page, and each old collection landing page goes to the results filtered to that collection.
+  # Take one search out of the history (Blacklight draws /search_history and /search_history/clear)
+  delete "search_history/:id", to: "search_history#destroy", as: :search_history_entry, constraints: { id: /\d+/ }
+
   get "collections", to: redirect("/#browse-collections", status: 301)
   get "collections/:slug", to: redirect(status: 301) { |params, _request|
     "/catalog?#{NexusCcs::SiteNavigation.whole_collection_query(params[:slug]).to_query}"

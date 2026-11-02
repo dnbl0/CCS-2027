@@ -46,6 +46,15 @@ class SearchHistoryDaysTest < ActiveSupport::TestCase
     assert_equal [ bare ], SearchHistoryDays.without_redirected([ bare ])
   end
 
+  test "redirect_origins finds the search a default-filter redirect turned into a given one" do
+    redirected = Query.new({ "q" => "skull" }, now)
+    filtered = Query.new({ "q" => "skull", "f" => { "has_digital_asset" => [ "with" ] } }, now)
+    other = Query.new({ "q" => "violin" }, now)
+
+    assert_equal [ redirected ], SearchHistoryDays.redirect_origins([ filtered, redirected, other ], filtered)
+    assert_empty SearchHistoryDays.redirect_origins([ filtered, redirected, other ], other)
+  end
+
   test "no searches, no groups" do
     assert_empty SearchHistoryDays.group([], now: now)
   end

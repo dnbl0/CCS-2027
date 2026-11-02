@@ -17,13 +17,54 @@ class SavedSearchesTest < ActionDispatch::IntegrationTest
     assert_select ".saved-empty__text", text: /not saved any searches/
   end
 
-  test "each search in the history has a Save button naming the search" do
+  test "each search in the history has Save, Share and Delete icon buttons, named for their search" do
     search_id_for("skull")
 
     get "/search_history"
 
-    assert_select "td.save-search form[action='/saved_searches?search_id=#{Search.last.id}'] button", text: "Save this search"
-    assert_select "td.save-search button[aria-label*='skull']"
+    assert_select "th.text-end", text: "Actions"
+    assert_select "td.history-actions form[action='/saved_searches?search_id=#{Search.last.id}'] button.history-action" do
+      assert_select "svg[aria-hidden=true]"
+      assert_select ".visually-hidden", text: "Save search: skull"
+      assert_select "[data-action-tooltip-text=Save]"
+    end
+    assert_select "td.history-actions button[data-clipboard-target=button] .visually-hidden", text: "Share search: skull"
+    assert_select "td.history-actions button[data-action-tooltip-text=Share]"
+    assert_select "td.history-actions form[action='/search_history/#{Search.last.id}'] button .visually-hidden", text: "Delete search: skull"
+    assert_select "td.history-actions button[data-action-tooltip-text=Delete]"
+  end
+
+  test "Delete takes one search out of the history and leaves the others" do
+    keep = search_id_for("violin")
+    drop = search_id_for("skull")
+
+    delete "/search_history/#{drop}"
+    follow_redirect!
+
+    assert_select "td.query", text: /violin/
+    assert_select "td.query", text: /skull/, count: 0
+    assert Search.exists?(keep)
+  end
+
+  test "Delete also takes out the unfiltered search the default-filter redirect left behind" do
+    get "/catalog", params: { q: "skull" }
+    follow_redirect!
+    assert_equal 2, Search.count
+
+    delete "/search_history/#{session[:history].first}"
+    follow_redirect!
+
+    assert_equal [], session[:history]
+    assert_select "td.query", count: 0
+  end
+
+  test "Delete does nothing to a search that is not in the visitor's own history" do
+    other = Search.create!(query_params: { "q" => "violin" })
+
+    delete "/search_history/#{other.id}"
+
+    assert_redirected_to "/search_history"
+    assert Search.exists?(other.id)
   end
 
   test "saving a search from the history lists it, and opening it repeats the search" do

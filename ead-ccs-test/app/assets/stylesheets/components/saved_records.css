@@ -105,3 +105,54 @@
   white-space: nowrap;
   text-align: end;
 }
+
+/* The table scrolls inside its own box on a narrow screen. Visually hidden text is absolutely positioned: without a
+   positioned scroll box its containing block is the page, so it escapes the box and makes the whole page scroll sideways. */
+.search-history-day .table-responsive {
+  position: relative;
+}
+
+/* The row's actions (Save, Share, Delete): icon buttons, each 40px square (WCAG 2.5.8 asks 24px) */
+.history-actions__group {
+  display: inline-flex;
+  gap: var(--ccs-space-1);
+  justify-content: flex-end;
+}
+
+.history-actions__form {
+  display: inline-flex;
+  margin: 0;
+}
+
+.history-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--ccs-radius-sm);
+  background: transparent;
+  color: var(--ccs-text-brand);
+}
+
+.history-action:hover {
+  background: var(--ccs-navy-100, #e8ecf3);
+  border-color: currentcolor;
+}
+
+.history-action:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring, currentcolor);
+  outline-offset: 2px;
+}
+
+.history-action__icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Filter pills in a row carry no remove button, so they are not buttons to press */
+.search-history .applied-filter .constraint-value {
+  pointer-events: none;
+}
