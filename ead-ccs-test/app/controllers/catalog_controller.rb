@@ -154,7 +154,15 @@ class CatalogController < ApplicationController
   # Home page, the Advanced search form again, or the default Digital asset filter: the rules are SearchDefaults'
   before_action :apply_search_defaults, only: :index
 
+  # The record page lists the records the visitor opened before (RecentlyViewed); this one is added once the page is drawn,
+  # so it is not listed beside itself
+  after_action :remember_viewed_record, only: :show
+
   private
+
+  def remember_viewed_record
+    RecentlyViewed.new(session).record(@document.id) if @document && response.successful?
+  end
 
   def apply_search_defaults
     outcome, detail = SearchDefaults.decide(request.query_parameters, html: request.format.html?, get: request.get?,
