@@ -17,6 +17,8 @@ class ListItemsController < ApplicationController
     else
       back_or_to_lists(alert: t("nexus_ccs.lists.failure", reason: item.errors.full_messages.to_sentence))
     end
+  rescue ActiveRecord::RecordNotUnique # two requests at once: the unique index let one in
+    back_or_to_lists(notice: t("nexus_ccs.lists.already_in", name: list.name))
   end
 
   def destroy
