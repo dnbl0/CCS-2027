@@ -2,7 +2,7 @@
     controls (Add to list also takes the record out of this list). %>
 <% content_for :title, "#{@list.name} — #{t('nexus_ccs.lists.title')} — Collections Navigator — University of Melbourne" %>
 <% content_for :body_class, "page-saved page-lists" %>
-<%= render NexusCcs::PageBannerComponent.new(title: @list.name, description: t("nexus_ccs.lists.records", count: @items.size)) %>
+<%= render NexusCcs::PageBannerComponent.new(title: @list.name) %>
 
 <main class="saved-main" id="main-content">
   <div class="saved-main__inner">
