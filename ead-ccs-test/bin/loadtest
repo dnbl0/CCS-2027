@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-# frozen_string_literal: true
 
 # A small load test for a running instance (CCS-144). Plain Ruby, Net::HTTP, no gems. Not run in CI. Ramps the number of
 # concurrent clients through the levels you give, holds each for a time, and prints latency percentiles, throughput and the
@@ -33,6 +32,7 @@ OptionParser.new do |o|
   o.on("--max-errors-percent N", Float) { |v| options[:max_errors] = v }
 end.parse!
 
+$stdout.sync = true
 base = URI(options[:url])
 
 def percentile(sorted, fraction)
@@ -43,16 +43,17 @@ end
 
 def fetch(http, path)
   started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-  response = http.request(Net::HTTP::Get.new(path, { "Accept" => "text/html", "User-Agent" => "ccs-loadtest" }))
+  response = http.request(Net::HTTP::Get.new(+path, { +"Accept" => +"text/html", +"User-Agent" => +"ccs-loadtest" }))
   response.body # read it all, as a browser would
   [ response.code.to_i, Process.clock_gettime(Process::CLOCK_MONOTONIC) - started ]
 rescue StandardError => e
+  warn "#{e.class}: #{e.message[0, 100]}" if ENV["LOADTEST_DEBUG"]
   [ e.class.name, Process.clock_gettime(Process::CLOCK_MONOTONIC) - started ]
 end
 
 def connect(base)
-  http = Net::HTTP.new(base.host, base.port)
-  http.use_ssl = base.scheme == "https"
+  http = Net::HTTP.new(base.host.dup, base.port)
+  http.use_ssl = true if base.scheme == "https"
   http.open_timeout = 5
   http.read_timeout = 30
   http.keep_alive_timeout = 30
@@ -61,10 +62,10 @@ end
 
 record = options[:record]
 if options[:scenarios].include?("record") && record.nil?
-  http = connect(base)
-  body = http.get("/catalog.json?#{URI.encode_www_form(q: options[:query], any_assets: "1", per_page: 12)}", { "Accept" => "application/json" }).body
+  probe = connect(base)
+  body = probe.get("/catalog.json?#{URI.encode_www_form(q: options[:query], any_assets: "1", per_page: 12)}", { "Accept" => "application/json" }).body
   record = JSON.parse(body).dig("data", 0, "id")
-  http.finish
+  probe.finish
   abort "Could not find a record to ask for: give one with --record ID" unless record
 end
 
@@ -87,13 +88,13 @@ options[:scenarios].each do |name|
     stop_at = Process.clock_gettime(Process::CLOCK_MONOTONIC) + options[:seconds]
     threads = Array.new(clients) do
       Thread.new do
-        http = connect(base)
+        connection = connect(base) # its own: Net::HTTP connections are not shared between threads
         while Process.clock_gettime(Process::CLOCK_MONOTONIC) < stop_at
-          status, seconds = fetch(http, path)
+          status, seconds = fetch(connection, path)
           results << [ status, seconds ]
-          http = connect(base) unless status.is_a?(Integer) # reconnect after a failure
+          connection = connect(base) unless status.is_a?(Integer) # reconnect after a failure
         end
-        http.finish if http.started?
+        connection.finish if connection.started?
       end
     end
     threads.each(&:join)
