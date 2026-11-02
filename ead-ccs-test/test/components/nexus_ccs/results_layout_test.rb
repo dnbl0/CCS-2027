@@ -92,6 +92,19 @@ class ResultsLayoutTest < ActiveSupport::TestCase
     assert_equal "no-media", without.variant
   end
 
+  test "a card keeps its thumbnail for an open or view-only record, and drops it (and its path) for a request record" do
+    thumb = "/digital-assets/thumbs/a.jpg"
+    fields = { "thumbnail_path_ssi" => thumb, "title_tsim" => [ "Untitled" ] }
+
+    assert card(fields.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ])).media?
+    assert card(fields.merge("licence_type_ssim" => [ "Copyright - Current" ])).media?
+    assert card(fields).media?, "no licence is view-only"
+    withheld = card(fields.merge("licence_type_ssim" => [ "ICIP Rights" ]))
+    assert_not withheld.media?
+    assert_equal "no-media", withheld.variant
+    assert_nil withheld.media_path
+  end
+
   test "the card heading is an h5" do
     assert_equal :h5, NexusCcs::ResultCardComponent::TITLE_TAG
     assert_equal :h5, card("title_tsim" => [ "Untitled" ]).instance_variable_get(:@title_component)

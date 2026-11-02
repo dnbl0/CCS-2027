@@ -171,6 +171,15 @@ en:
       close: "Close"
     facets:
       pending: "No records have this information yet."
+    access_notice:
+      view_only:
+        title: "You can view this item, but not download it"
+        body: "To download it, ask the collection team for access. Your request needs approval."
+        link: "Request access to download this item"
+      request:
+        title: "This item is available on request"
+        body: "The image or file is not shown here. To see it, ask the collection team for access. Your request needs approval."
+        link: "Request access to this item"
 
   catalog:
     country_acknowledgement:

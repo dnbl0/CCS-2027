@@ -63,7 +63,15 @@
 
 .digital-assets__other {
   display: block;
+  padding: 0; /* a button when the file may not be opened (AccessPolicy) */
+  background: none;
   border: 2px solid transparent;
+}
+
+/* Why an asset can't be downloaded or isn't shown (NexusCcs::AccessNoticeComponent): a light card on the band */
+.digital-assets .access-notice {
+  max-width: 40rem;
+  width: 100%;
 }
 
 .digital-assets__other:hover,
