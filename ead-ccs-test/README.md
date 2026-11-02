@@ -4,6 +4,8 @@
 (Ruby, PostgreSQL, Solr), check it works and fix common problems. How it runs on Azure is in
 [../infra/azure/README.md](../infra/azure/README.md).
 
+**Compliance** (copyright, rights-based access, Indigenous data governance, privacy, accessibility, security headers; what the app does and what only people can decide): [docs/compliance-register.md](docs/compliance-register.md).
+
 # System dependencies
 
 Ruby version 

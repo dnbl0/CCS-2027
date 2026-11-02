@@ -2,7 +2,7 @@
     browser's own controls and scrollbars light; the script pins Bootstrap's colour mode, which Blacklight's script would otherwise
     switch to dark when the device changes mode while a page is open. %>
 <meta name="color-scheme" content="light">
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   (() => {
     const root = document.documentElement
     const pin = () => { if (root.getAttribute("data-bs-theme") !== "light") root.setAttribute("data-bs-theme", "light") }
