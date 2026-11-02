@@ -5,24 +5,21 @@
 #
 # PLACEHOLDER RULE. The DAM's advisory is not in the index yet (the ingest keeps it in assets_json, as
 # metadata.dAAdvisory1, with dAUseStatus beside it; real values not yet known). Until it is, the index carries two
-# signals the collection staff wrote for the same purpose:
+# signal the collection staff wrote for the same purpose:
 #   restrictions_tsi     "Not for publishing Sensitive|Culturally sensitive images. Only select images to be published online"
 #                        (36 records: any restriction note that says "sensitive")
-#   access_condition_ssi "Community Restricted" (1 record)
-# To switch to the DAM: change SENSITIVE_NOTE / SENSITIVE_ACCESS_CONDITIONS and .sensitive? (read dAAdvisory1);
+# (access_condition_ssi "Community Restricted", 1 record, is not here: AccessPolicy withholds it, as :request.)
+# To switch to the DAM: change SENSITIVE_NOTE and .sensitive? (read dAAdvisory1);
 # AccessPolicy, the record page and the bulk download only ask .sensitive?.
 #
 # What a visitor chose is kept in the session cookie only (Choices): "view" or "hide" per record, the latest MAX_CHOICES.
 # It is not an access decision: AccessPolicy still decides what may be shown (a :request record stays withheld).
 module Sensitivity
   SENSITIVE_NOTE = /\bsensitive\b/i
-  SENSITIVE_ACCESS_CONDITIONS = [ "community restricted" ].freeze
 
   # document: a SolrDocument (or anything answering #[])
   def self.sensitive?(document)
-    return true if Array(document["restrictions_tsi"]).any? { |note| note.to_s.match?(SENSITIVE_NOTE) }
-
-    Array(document["access_condition_ssi"]).any? { |value| SENSITIVE_ACCESS_CONDITIONS.include?(value.to_s.strip.downcase) }
+    Array(document["restrictions_tsi"]).any? { |note| note.to_s.match?(SENSITIVE_NOTE) }
   end
 
   # The visitor's choices for this session. Wraps the session hash; a value that is not "view" or "hide" is ignored.

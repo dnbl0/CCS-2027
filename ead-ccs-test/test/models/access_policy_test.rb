@@ -63,4 +63,13 @@ class AccessPolicyTest < ActiveSupport::TestCase
   test "request_path is the access request form for the record" do
     assert_equal "/access_requests/new?document_id=emu-1%2F2", AccessPolicy.request_path(SolrDocument.new("id" => "emu-1/2"))
   end
+
+  test "Community Restricted access withholds the asset whatever the licence and the case" do
+    [ [], [ "Public domain - Copyright expired" ], [ "Copyright" ] ].each do |licences|
+      doc = SolrDocument.new("id" => "c", "licence_type_ssim" => licences, "access_condition_ssi" => " community restricted ")
+
+      assert_equal :request, AccessPolicy.tier(doc), licences.inspect
+    end
+    assert_equal :open, AccessPolicy.tier(SolrDocument.new("id" => "o", "licence_type_ssim" => [ "Public domain - Copyright expired" ], "access_condition_ssi" => "Consult"))
+  end
 end

@@ -8,8 +8,8 @@ class SensitivityTest < ActiveSupport::TestCase
     assert Sensitivity.sensitive?(doc("restrictions_tsi" => [ "Contains SENSITIVE images" ]))
   end
 
-  test "Community Restricted access is sensitive, whatever the case" do
-    assert Sensitivity.sensitive?(doc("access_condition_ssi" => " community restricted "))
+  test "Community Restricted access is not a sensitive choice: AccessPolicy withholds it" do
+    assert_not Sensitivity.sensitive?(doc("access_condition_ssi" => "Community Restricted"))
   end
 
   test "other notes, other access conditions and no fields are not sensitive" do
