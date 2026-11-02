@@ -13,9 +13,6 @@ class BulkDownloadsController < ApplicationController
 
   layout "pages"
 
-  # Where "back" goes: only the pages that select records
-  RETURN_TO = %r{\A/(bookmarks|lists/\d+)\z}
-
   before_action :load_selection
 
   def review
@@ -37,13 +34,19 @@ class BulkDownloadsController < ApplicationController
   private
 
   def load_selection
-    @return_to = params[:return_to].to_s.match?(RETURN_TO) ? params[:return_to].to_s : bookmarks_path
+    @return_to = return_path
     @ids = Array(params[:ids]).map(&:to_s).compact_blank.uniq
     if @ids.empty?
       redirect_to @return_to, alert: t("nexus_ccs.bulk_download.none_chosen"), status: :see_other
     elsif @ids.size > BulkDownload::MAX_RECORDS
       redirect_to @return_to, alert: t("nexus_ccs.bulk_download.too_many_records", count: BulkDownload::MAX_RECORDS), status: :see_other
     end
+  end
+
+  # Where "back" goes: only the pages that select records. A list's path is built from its number, never from the text asked for.
+  def return_path
+    list_id = params[:return_to].to_s[%r{\A/lists/(\d+)\z}, 1]
+    list_id ? list_path(list_id.to_i) : bookmarks_path
   end
 
   # A record no longer in the index is reported (as not found), not hidden
