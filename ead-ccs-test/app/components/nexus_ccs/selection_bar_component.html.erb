@@ -1,0 +1,17 @@
+<%= form_with url: helpers.selection_path, method: :post, id: FORM_ID, class: "selection-bar#{' selection-bar--page' if on_selection_page?}",
+              data: { turbo: false }.merge(data), "aria-label": t("nexus_ccs.selection.bar_label") do %>
+  <%= hidden_field_tag :return_to, return_to, id: nil %>
+  <% page_ids.each do |id| %><%= hidden_field_tag "page_ids[]", id, id: nil %><% end %>
+  <p class="selection-bar__count" role="status" aria-live="polite" aria-atomic="true" data-selection-target="status"><%= count_text %></p>
+  <div class="selection-bar__actions">
+    <% unless on_selection_page? %>
+      <button type="submit" name="intent" value="all" class="selection-bar__button" data-action="selection#all"><%= t("nexus_ccs.selection.select_all") %></button>
+    <% end %>
+    <button type="submit" name="intent" value="update" class="selection-bar__button" data-selection-target="update"><%= t(on_selection_page? ? "nexus_ccs.selection.remove_unticked" : "nexus_ccs.selection.update") %></button>
+    <% unless on_selection_page? %>
+      <button type="submit" name="intent" value="clear" class="selection-bar__button" data-action="selection#clear" data-selection-target="clear"><%= t("nexus_ccs.selection.clear") %></button>
+      <%= link_to t("nexus_ccs.selection.view_count", count: selection.count), helpers.selection_path, class: "selection-bar__button selection-bar__view",
+                  data: { "selection-target": "view" } %>
+    <% end %>
+  </div>
+<% end %>

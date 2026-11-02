@@ -5,3 +5,5 @@
   <%= render NexusCcs::ConstraintsComponent.new(search_state: search_state, inline: true) %>
   <%= render_results_collection_tools wrapping_class: "search-widgets" %>
 </div>
+<%# Choosing results (CCS-40): the form the cards' Select checkboxes belong to %>
+<%= render NexusCcs::SelectionBarComponent.new(page_ids: @response.documents.map { |document| document.id.to_s }, return_to: request.fullpath) if @response && controller_name == "catalog" %>

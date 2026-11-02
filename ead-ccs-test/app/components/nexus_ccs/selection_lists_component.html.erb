@@ -1,0 +1,15 @@
+<section class="selection-lists" aria-labelledby="selection-lists-heading">
+  <h2 class="selection-lists__heading" id="selection-lists-heading"><%= t("nexus_ccs.selection.add_to_list") %></h2>
+  <% if lists.any? %>
+    <%= form_with url: "#", method: :post, class: "selection-lists__form", data: { turbo: false } do %>
+      <% documents.each do |document| %><%= hidden_field_tag "document_ids[]", document.id, id: nil %><% end %>
+      <ul class="selection-lists__lists">
+        <% lists.each do |list| %>
+          <li><button type="submit" class="selection-lists__button" formaction="<%= helpers.list_items_path(list) %>"><%= t("nexus_ccs.selection.add_to_named", name: list.name) %></button></li>
+        <% end %>
+      </ul>
+    <% end %>
+  <% else %>
+    <p class="selection-lists__none"><%= t("nexus_ccs.lists.menu.none") %> <%= link_to t("nexus_ccs.lists.new_list"), helpers.new_list_path %></p>
+  <% end %>
+</section>

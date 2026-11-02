@@ -1,3 +1,5 @@
+<%# Under a search that found nothing or only a few records: "Why am I seeing these results?" (CCS-43) %>
+<%= render NexusCcs::SearchDiagnosticsComponent.new(response: @response, params: search_state.to_hash, config: blacklight_config) if @response %>
 <%# Blacklight's, with a window of two pages either side of the current one and one at each end (1 … 4 5 6 7 8 … 74) %>
 <% if show_pagination? and @response.total_pages > 1 %>
   <%= render Blacklight::Response::PaginationComponent.new(response: @response,
