@@ -75,6 +75,8 @@ en:
       title: "Saved searches"
       description: "The searches you chose to keep. Open one to run it again."
       list_heading: "Your saved searches"
+      column_name: "Search"
+      column_saved: "Saved"
       empty: "You have not saved any searches yet. Save one from your search history."
       empty_link: "Go to your search history"
       start_searching: "Start searching"
@@ -82,8 +84,6 @@ en:
       save_named: "Save this search: %{query}"
       saved: "Search saved."
       removed: "Search removed from your saved searches."
-      remove: "Remove"
-      remove_named: "Remove the saved search %{name}"
       not_found: "That search is no longer in your history, so it could not be saved."
       failure: "Sorry, there was a problem saving the search."
     save:

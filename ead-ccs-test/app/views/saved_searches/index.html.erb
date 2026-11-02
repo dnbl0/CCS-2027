@@ -11,20 +11,42 @@
         <%= link_to t("nexus_ccs.saved_searches.empty_link"), blacklight.search_history_path, class: "btn btn-primary" %>
       </div>
     <% else %>
-      <h2 class="visually-hidden"><%= t("nexus_ccs.saved_searches.list_heading") %></h2>
-      <table class="table table-striped saved-searches">
-        <% @saved_searches.each do |saved| %>
-          <tr>
-            <td class="saved-searches__name"><%= link_to saved.name, search_action_path(saved.search_params) %></td>
-            <td class="saved-searches__date"><%= l(saved.created_at.in_time_zone, format: :long) %></td>
-            <td class="saved-searches__remove">
-              <%= button_to t("nexus_ccs.saved_searches.remove"), saved_search_path(saved), method: :delete,
-                            class: "btn btn-link", form: { class: "d-inline" },
-                            aria: { label: t("nexus_ccs.saved_searches.remove_named", name: saved.name) } %>
-            </td>
-          </tr>
-        <% end %>
-      </table>
+      <div class="table-responsive saved-searches-scroll">
+        <table class="table table-hover align-middle saved-searches">
+          <caption class="visually-hidden"><%= t("nexus_ccs.saved_searches.list_heading") %></caption>
+          <thead>
+            <tr>
+              <th scope="col"><%= t("nexus_ccs.saved_searches.column_name") %></th>
+              <th scope="col"><%= t("nexus_ccs.saved_searches.column_saved") %></th>
+              <th scope="col" class="history-actions-heading"><%= t("nexus_ccs.search_history.column_actions") %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @saved_searches.each do |saved| %>
+              <tr>
+                <td class="saved-searches__name"><%= link_to saved.name, search_action_path(saved.search_params) %></td>
+                <td class="saved-searches__date"><%= l(saved.created_at.in_time_zone, format: :long) %></td>
+                <td class="history-actions">
+                  <div class="history-actions__group" data-controller="action-tooltip">
+                    <div class="history-actions__form" data-controller="clipboard">
+                      <span hidden data-clipboard-target="source" data-copy="<%= search_action_url(saved.search_params) %>"></span>
+                      <button type="button" class="history-action" data-action="clipboard#copy" data-clipboard-target="button"
+                              data-action-tooltip-text="<%= t("nexus_ccs.search_history.actions.share") %>">
+                        <%= history_action_content(:share, saved.name) %>
+                      </button>
+                      <span class="visually-hidden" role="status" data-clipboard-target="status"></span>
+                    </div>
+                    <%= button_to saved_search_path(saved), method: :delete, class: "history-action",
+                                  form: { class: "history-actions__form" }, data: { action_tooltip_text: t("nexus_ccs.search_history.actions.delete") } do %>
+                      <%= history_action_content(:delete, saved.name) %>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     <% end %>
   </div>
 </main>

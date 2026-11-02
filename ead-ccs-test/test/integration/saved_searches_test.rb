@@ -81,6 +81,20 @@ class SavedSearchesTest < ActionDispatch::IntegrationTest
     assert_equal 1, response.body.scan("Search saved.").size, "the notice is shown once"
   end
 
+  test "each saved search has Share and Delete icon buttons under an Actions heading" do
+    post "/saved_searches", params: { search_id: search_id_for("skull") }
+
+    get "/saved_searches"
+
+    assert_select "table.saved-searches caption.visually-hidden"
+    assert_select "th[scope=col]", text: "Search"
+    assert_select "th[scope=col]", text: "Saved"
+    assert_select "th.history-actions-heading", text: "Actions"
+    assert_select "td.history-actions button[data-action-tooltip-text=Share] .visually-hidden", text: "Share search: skull"
+    assert_select "td.history-actions button[data-action-tooltip-text=Delete] .visually-hidden", text: "Delete search: skull"
+    assert_select "td.history-actions button", text: "Save", count: 0
+  end
+
   test "a search that is not in the visitor's own history cannot be saved" do
     other = Search.create!(query_params: { "q" => "violin" })
 

@@ -100,22 +100,18 @@
 }
 
 /* The Actions column is as wide as its icons, and its heading starts where they do */
-.search-history .history-actions-heading,
-.search-history td.history-actions {
+:is(.search-history, .saved-searches) .history-actions-heading,
+:is(.search-history, .saved-searches) td.history-actions {
   width: 1%;
   white-space: nowrap;
   text-align: start;
 }
 
-.saved-searches td.saved-searches__remove {
-  width: 1%;
-  white-space: nowrap;
-  text-align: end;
-}
 
 /* The table scrolls inside its own box on a narrow screen. Visually hidden text is absolutely positioned: without a
    positioned scroll box its containing block is the page, so it escapes the box and makes the whole page scroll sideways. */
-.search-history-day .table-responsive {
+.search-history-day .table-responsive,
+.saved-searches-scroll {
   position: relative;
 }
 
