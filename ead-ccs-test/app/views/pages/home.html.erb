@@ -17,7 +17,7 @@
             </div>
           </div>
         </div>
-        <div class="ccs-hero__media"><img class="ccs-hero__image" src="<%= asset_path("site/hero-banner-gallery.jpg") %>" alt="A woman walks past framed drawings in a gallery"><%= render NexusCcs::SavedBarComponent.new(placement: :hero) %></div>
+        <div class="ccs-hero__media"><img class="ccs-hero__image" src="<%= asset_path("site/hero-banner-gallery.jpg") %>" width="1200" height="799" fetchpriority="high" decoding="async" alt="A woman walks past framed drawings in a gallery"><%= render NexusCcs::SavedBarComponent.new(placement: :hero) %></div>
       </div>
     </section>
 
@@ -37,7 +37,7 @@
         </header>
         <ul class="home-collections__list">
         <li class="home-card">
-          <div class="home-card__media"><img class="home-card__image" src="<%= asset_path("site/banners/grainger-museum-card.jpg") %>" alt=""></div>
+          <div class="home-card__media"><img class="home-card__image" src="<%= asset_path("site/banners/grainger-museum-card.jpg") %>" width="1100" height="499" loading="lazy" decoding="async" alt=""></div>
           <div class="home-card__body">
             <h3 class="home-card__title"><a class="home-card__link" href="<%= collection_results_path("grainger-museum") %>">Grainger Museum Collection</a></h3>
             <p class="home-card__text">Australian musician and composer Percy Grainger established the Grainger Museum and Collection in 1938, motivated by the desire to interpret and contextualise his creative achievements and cultural environment. The Collection is an internationally significant archive of over 100,000 items, spanning a range of disciplines, from experimental sound technology and musical instruments, to costumes, ethnography, art and design. The collection is brought to life through collaboration with students, academic partners and artists and their creative work and production.</p>
@@ -45,7 +45,7 @@
           </div>
         </li>
         <li class="home-card">
-          <div class="home-card__media"><img class="home-card__image" src="<%= asset_path("site/banners/harry-brookes-allen-museum.jpg") %>" alt=""></div>
+          <div class="home-card__media"><img class="home-card__image" src="<%= asset_path("site/banners/harry-brookes-allen-museum.jpg") %>" width="1100" height="550" loading="lazy" decoding="async" alt=""></div>
           <div class="home-card__body">
             <h3 class="home-card__title"><a class="home-card__link" href="<%= collection_results_path("harry-brookes-allen-museum") %>">Harry Brookes Allen Museum of Anatomy and Pathology</a></h3>
             <p class="home-card__text">The Harry Brookes Allen Museum of Anatomy and Pathology is one of Australia's largest collections of human tissue specimens, animal anatomy specimens, and historical anatomical models, offering students and researchers a unique insight into the human body.</p>
@@ -53,7 +53,7 @@
           </div>
         </li>
         <li class="home-card">
-          <div class="home-card__media"><img class="home-card__image" src="<%= asset_path("site/banners/henry-forman-atkinson-dental-museum.jpg") %>" alt=""></div>
+          <div class="home-card__media"><img class="home-card__image" src="<%= asset_path("site/banners/henry-forman-atkinson-dental-museum.jpg") %>" width="1100" height="550" loading="lazy" decoding="async" alt=""></div>
           <div class="home-card__body">
             <h3 class="home-card__title"><a class="home-card__link" href="<%= collection_results_path("henry-forman-atkinson-dental-museum") %>">Henry Forman Atkinson Dental Museum</a></h3>
             <p class="home-card__text">Showcases the intriguing history of dental health and development of the dental professions and dental education. The Henry Forman Atkinson Dental Museum collection is the oldest and most significant dental collection in Australia, tracing its origins back to 1884.</p>
@@ -61,7 +61,7 @@
           </div>
         </li>
         <li class="home-card">
-          <div class="home-card__media"><img class="home-card__image" src="<%= asset_path("site/banners/medical-history-museum.jpg") %>" alt=""></div>
+          <div class="home-card__media"><img class="home-card__image" src="<%= asset_path("site/banners/medical-history-museum.jpg") %>" width="1100" height="550" loading="lazy" decoding="async" alt=""></div>
           <div class="home-card__body">
             <h3 class="home-card__title"><a class="home-card__link" href="<%= collection_results_path("medical-history-museum") %>">Medical History Museum</a></h3>
             <p class="home-card__text">Since its inception in 1967, the Medical History Museum has developed a diverse and varied collection of over 13,000 items encompassing documents, photographs, artefacts, artworks, medical and scientific equipment and associated research material, encompassing the history of medicine in Victoria, Australia and internationally.</p>
@@ -69,7 +69,7 @@
           </div>
         </li>
         <li class="home-card">
-          <div class="home-card__media"><img class="home-card__image" src="<%= asset_path("site/banners/university-art-collection.jpg") %>" alt=""></div>
+          <div class="home-card__media"><img class="home-card__image" src="<%= asset_path("site/banners/university-art-collection.jpg") %>" width="1100" height="550" loading="lazy" decoding="async" alt=""></div>
           <div class="home-card__body">
             <h3 class="home-card__title"><a class="home-card__link" href="<%= collection_results_path("university-art-collection") %>">University Art Collection</a></h3>
             <p class="home-card__text">The University of Melbourne Art Collection is the largest University-based art collection in Australia, comprising over 18,000 artworks. The collection includes major holdings of paintings, prints and drawings, ceramics, and sculpture, including contemporary Australian art and contemporary Aboriginal and Torres Strait Islander Art.</p>
@@ -77,7 +77,7 @@
           </div>
         </li>
         <li class="home-card">
-          <div class="home-card__media"><img class="home-card__image" src="<%= asset_path("site/collections-breakout.jpg") %>" alt=""></div>
+          <div class="home-card__media"><img class="home-card__image" src="<%= asset_path("site/collections-breakout.jpg") %>" width="800" height="547" loading="lazy" decoding="async" alt=""></div>
           <div class="home-card__body">
             <h3 class="home-card__title"><a class="home-card__link" href="<%= search_action_path(search_field: "all_fields") %>">Collections Navigator</a></h3>
             <p class="home-card__text">Collections Navigator will make accessible the University of Melbourne’s 30+ cultural collections via a single discovery experience. You can search all five collections now, and more will be available over time; for more information about other cultural collections at the University of Melbourne, visit <a href="https://museumsandcollections.unimelb.edu.au/collections">museumsandcollections.unimelb.edu.au/collections</a>.</p>

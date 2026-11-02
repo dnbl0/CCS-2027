@@ -29,6 +29,12 @@ module NexusCcs
       media_path.present?
     end
 
+    # The thumbnail's width and height attributes, so the card holds the image's shape while it loads (CCS-71); none if the file cannot be read
+    def media_size
+      width, height = ImageDimensions.for_path(media_path)
+      width ? { width: width, height: height } : {}
+    end
+
     def variant
       media? ? "media" : "no-media"
     end
