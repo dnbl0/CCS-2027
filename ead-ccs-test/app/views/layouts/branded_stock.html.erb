@@ -27,7 +27,7 @@
     <title><%= render_page_title %></title>
 
     <% if dark_mode_support? %>
-    <script>
+    <script nonce="<%= content_security_policy_nonce %>">
       (() => {
         const theme = localStorage.getItem('theme') || 'auto';
         if (theme === 'auto') {

@@ -93,8 +93,10 @@ module NexusCcs
       parts.compact_blank.map { |part| part.to_s.sub(/[.\s]+\z/, "") }.join(". ").then { |text| text.present? ? "#{text}." : nil }
     end
 
-    def copyright_card?
-      [ credit_line, copyright, licence, responsible_collection ].any?(&:present?)
+    # Whether the record says anything about its rights. The card is on every record page (CCS-148); when this is false it says so,
+    # rather than saying nothing, so a visitor is never left to think "no card" means "no restriction".
+    def rights_recorded?
+      [ credit_line, copyright, licence ].any?(&:present?)
     end
 
     def terms_path = "/help#copyright"

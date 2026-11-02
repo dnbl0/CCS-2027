@@ -1,5 +1,11 @@
 # Secrets Management
 
+> **This describes the earlier AWS and Kubernetes deployment.** The live app runs on Azure Container Apps, where the database
+> password, `SECRET_KEY_BASE` and `SOLR_URL` are Container Apps secrets (`pgpass`, `secretkey`, `solrurl`) set by
+> `infra/azure/containerapps.sh` or the portal; see [../../infra/azure/README.md](../../infra/azure/README.md). The rules still
+> hold: no secret in git, a file, a message or a pull request. The Solr password hash in `solr/security.json` and the secret
+> must be changed together. The AWS and Kubernetes steps below apply only if that deployment is used again.
+
 How application secrets are stored, delivered to the running app, and rotated.
 
 ## Overview

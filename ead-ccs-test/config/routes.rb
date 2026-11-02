@@ -40,6 +40,8 @@ Rails.application.routes.draw do
         end
       end
       resources :saved_searches, only: [ :index, :create, :destroy ]
+      # Delete my data (CCS-148): what the site holds against the visitor's cookie, shown, then removed
+      resource :my_data, only: [ :show, :destroy ], controller: "my_data", path: "my_data"
       # Bulk download of the selected records' digital assets (CCS-167): review what will be sent, then the zip
       post "downloads/review", to: "bulk_downloads#review", as: :review_bulk_download
       post "downloads", to: "bulk_downloads#create", as: :bulk_download
@@ -85,6 +87,9 @@ Rails.application.routes.draw do
   get "help/indigenous-data", to: redirect("/help#indigenous", status: 301)
   get "contact", to: redirect("/help#contact-us", status: 301)
   get "about", to: "pages#about", as: :about
+  # Accessibility statement and privacy notice (CCS-148); placeholder wording until the University approves it
+  get "accessibility", to: "pages#accessibility", as: :accessibility
+  get "privacy", to: "pages#privacy", as: :privacy
 
   # For crawlers (CCS-128, CCS-127): generated, so the environment's settings apply. The sitemap is an index of pages of up to 10,000 URLs.
   get "robots.txt", to: "seo#robots", format: false

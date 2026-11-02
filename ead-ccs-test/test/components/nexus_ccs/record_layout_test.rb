@@ -54,14 +54,15 @@ class RecordLayoutTest < ActiveSupport::TestCase
 
     assert_not_includes fields, "rights_ssim"
     assert_not_includes fields, "credit_line_tsim"
-    assert c.copyright_card?
+    assert c.rights_recorded?
     assert_equal "Kangaroo-pouch tone-tool. 1952. Grainger, Percy Aldridge. Paper. © Grainger, Percy Aldridge. Grainger Museum Collection.", c.caption
   end
 
-  test "a record with no rights fields has no Copyright card" do
+  test "a record with no rights fields has no rights recorded, and the Copyright card says so" do
     c = component("title_tsim" => [ "Untitled" ])
 
-    assert_not c.copyright_card?
+    assert_not c.rights_recorded?
+    # (the card's markup is checked on real record pages: test/integration/rights_display_test.rb)
     assert_nil c.byline
     assert_empty c.tags
   end

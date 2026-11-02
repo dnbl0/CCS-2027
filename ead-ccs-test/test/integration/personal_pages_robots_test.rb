@@ -7,7 +7,7 @@ class PersonalPagesRobotsTest < ActionDispatch::IntegrationTest
 
   GET_PATHS = %w[
     /bookmarks /bookmarks/citations /saved_searches /search_history /lists /lists/1 /lists/1/citations /access_requests/new
-    /access_requests/1 /catalog/emu-9044/metadata /catalog/emu-9044/citation /catalog/facet/collection_ssim /catalog/range_limit
+    /access_requests/1 /my_data /catalog/emu-9044/metadata /catalog/emu-9044/citation /catalog/facet/collection_ssim /catalog/range_limit
     /downloads /404 /selection /selection/citations /compare
   ].freeze
 

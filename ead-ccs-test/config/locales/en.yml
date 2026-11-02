@@ -121,6 +121,7 @@ en:
         purpose_hint: "Tell the staff what the record is for, such as research, teaching, an exhibition or a publication."
         honeypot: "Website"
       privacy_title: "How we use your details"
+      privacy_link: "What this site stores about you, and your choices"
       privacy: "We keep your name, email address, organisation and answers so that staff can decide on your request and reply to you. Only the University staff who manage this collection can see them. We do not use them for anything else. [Placeholder wording: the University must approve how long the details are kept.]"
       submit: "Send request"
       confirmation:
@@ -157,6 +158,36 @@ en:
         save_named: "Save search: %{query}"
         share_named: "Share search: %{query}"
         delete_named: "Delete search: %{query}"
+    # Delete my data (CCS-148). PLACEHOLDER WORDING: the University's privacy office must approve it.
+    my_data:
+      title: "Delete my data"
+      description: "See what this site holds about your browser, and remove it."
+      held_heading: "What the site holds about your browser"
+      held_intro: "You do not sign in, so the site knows you only by a cookie. Everything below is linked to that cookie."
+      held:
+        saved_records:
+          one: "%{count} saved record"
+          other: "%{count} saved records"
+        lists:
+          one: "%{count} list"
+          other: "%{count} lists"
+        saved_searches:
+          one: "%{count} saved search"
+          other: "%{count} saved searches"
+        searches:
+          one: "%{count} search in your search history"
+          other: "%{count} searches in your search history"
+        sensitivity_choices:
+          one: "%{count} choice about viewing a sensitive record"
+          other: "%{count} choices about viewing sensitive records"
+      kept_heading: "What is not removed"
+      kept_requests_html: "Requests for access to a record are not removed here. They hold your name and email address, and the University must be able to act on them and keep them. To have a request corrected or removed, <a href=\"%{contact}\">contact the collection team</a>."
+      delete_heading: "Delete"
+      delete_warning: "This removes everything listed above. It cannot be undone."
+      button: "Delete my data"
+      deleted: "Your data has been deleted from this site."
+      nothing: "There is nothing to delete."
+      privacy_link: "Read what this site stores and why"
     saved_searches:
       title: "Saved searches"
       description: "The searches you chose to keep. Open one to run it again."
@@ -166,8 +197,6 @@ en:
       empty: "You have not saved any searches yet. Save one from your search history."
       empty_link: "Go to your search history"
       start_searching: "Start searching"
-      save: "Save this search"
-      save_named: "Save this search: %{query}"
       saved: "Search saved."
       removed: "Search removed from your saved searches."
       not_found: "That search is no longer in your history, so it could not be saved."
@@ -175,7 +204,6 @@ en:
     lists:
       title: "Your lists"
       description: "Lists you have made on this device. Add records to a list from a search result or a record page."
-      list_heading: "Your lists"
       count:
         one: "%{count} list"
         other: "%{count} lists"
@@ -189,7 +217,6 @@ en:
       edit_title: "Rename list"
       name_label: "List name"
       name_hint: "Up to %{limit} characters. You can have up to %{max_lists} lists, with up to %{max_records} records each."
-      name_error_prefix: "List name"
       create: "Create list"
       save_name: "Save name"
       cancel: "Cancel"
@@ -223,11 +250,9 @@ en:
         delete_named: "Delete list: %{name}"
       menu:
         button: "Add to list"
-        button_named: "Add to list: %{title}"
         heading: "Your lists"
         add: "Add to %{name}"
         remove: "Remove from %{name}"
-        in_list: "In list"
         new_label: "New list name"
         new_submit: "Create and add"
         none: "You have no lists yet."
@@ -295,6 +320,19 @@ en:
         title: "This item is available on request"
         body: "The image or file is not shown here. To see it, ask the collection team for access. Your request needs approval."
         link: "Request access to this item"
+
+    # The Copyright card of a record with no licence, rights note or credit line (CCS-148). PLACEHOLDER WORDING, NOT YET APPROVED.
+    rights:
+      none_recorded: "No licence or rights statement is recorded for this record. Ask the collection team before you reuse it."
+
+    # Cultural protocols notice on a record page (CCS-148). PLACEHOLDER WORDING, NOT YET APPROVED: the University, with Indigenous
+    # advisers, must write and approve it. The reasons are in NexusCcs::CulturalProtocolsNoticeComponent.
+    cultural_protocols:
+      title: "Cultural protocols apply to this record"
+      icip: "This record is marked as Indigenous Cultural and Intellectual Property (ICIP). The community it comes from may decide who can see it, and how it can be used."
+      community: "Access to this record is limited to a community. The community may decide who can see it, and how it can be used."
+      cultural_note: "The collection team has noted that this record needs cultural care. It may be held back or shown only on request."
+      read_html: "Read <a href=\"%{help}\">Indigenous Cultural Data and Access</a>, or <a href=\"%{contact}\">contact the collection team</a> before you use this record."
 
     # Placeholder wording (CCS-167): the University must approve it, and set the limits (BulkDownload::MAX_*).
     # Why a result matched (CCS-39, NexusCcs::MatchRationaleComponent). Placeholder wording for the collections team to approve.

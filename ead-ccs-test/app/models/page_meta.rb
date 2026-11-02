@@ -56,7 +56,7 @@ class PageMeta
   def description_for(params)
     case @type
     when :home, :advanced then I18n.t("seo.description.#{@type}")
-    when :page then I18n.t(@path.start_with?("/help") ? "seo.description.help" : "seo.description.about")
+    when :page then I18n.t("seo.description.#{@path.delete_prefix('/').split('/').first.presence_in(%w[accessibility privacy help]) || 'about'}")
     when :results then results_description(params)
     when :record, :stock then @document && !RobotsPolicy.withheld?(@document) ? StructuredData::Description.of(@document) : I18n.t("seo.description.record_withheld")
     end
