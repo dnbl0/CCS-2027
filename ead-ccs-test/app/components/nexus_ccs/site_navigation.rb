@@ -59,7 +59,8 @@ module NexusCcs
       Link.new("Privacy", "https://about.unimelb.edu.au/strategy/governance/compliance-obligations/privacy"),
       # This site's own statements (CCS-148): what the University's pages above cannot say about this site's data and checks
       Link.new("Accessibility of this site", "/accessibility"),
-      Link.new("Privacy and data on this site", "/privacy")
+      Link.new("Privacy and data on this site", "/privacy"),
+      Link.new("Language in our records", "/language-in-our-records")
     ].freeze
 
     # Label, value.

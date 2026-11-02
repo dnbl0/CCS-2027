@@ -1,0 +1,65 @@
+/* De-bias notices (DebiasTerms): the notice on a record page and the mark on a flagged term in a field value.
+   The term is marked three ways, none of them colour alone: a hidden "flagged term:" for screen readers, a thick underline, and
+   a tint. Nothing changes size or position when it appears (it is in the server's HTML, with no script). */
+
+.record-debias {
+  border-inline-start: 6px solid var(--ccs-amber-600);
+}
+
+.record-debias__body {
+  padding: 0 var(--ccs-space-5) var(--ccs-space-5);
+}
+
+.record-debias__list {
+  margin: var(--ccs-space-4) 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--ccs-space-4);
+}
+
+.record-debias__item {
+  padding: var(--ccs-space-3) var(--ccs-space-4);
+  border: 1px solid var(--ccs-border-default);
+  background: var(--ccs-surface-subtle);
+}
+
+.record-debias__item--caution {
+  border-inline-start: 4px solid var(--ccs-red-600);
+}
+
+.record-debias__item p {
+  margin: 0 0 var(--ccs-space-2);
+}
+
+.record-debias__item p:last-child {
+  margin-bottom: 0;
+}
+
+.record-debias__term {
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+.record-debias__severity {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.8125rem;
+}
+
+/* The flagged term, in the notice's quote and in the details list */
+.record-debias mark,
+.debias-flag {
+  padding: 0 0.15em;
+  color: var(--ccs-text-primary);
+  background: var(--ccs-amber-100);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--ccs-amber-600);
+}
+
+@media (max-width: 575.98px) {
+  .record-debias__body {
+    padding-inline: var(--ccs-space-4);
+  }
+}
