@@ -12,7 +12,16 @@ class DigitalMediaTest < ActiveSupport::TestCase
   end
 
   test "entries parse back" do
-    assert_equal({ kind: "video", type: "video/mp4", url: "/u", label: "Film" }, Collections::DigitalMedia.parse("video|video/mp4|/u|Film"))
+    assert_equal({ kind: "video", type: "video/mp4", url: "/u", label: "Film", captions: nil, transcript: nil }, Collections::DigitalMedia.parse("video|video/mp4|/u|Film"))
+  end
+
+  test "captions and a transcript, when the entry has them, are stored after the label and parse back" do
+    media = Collections::DigitalMedia.new("X.1" => [ { "kind" => "audio", "file" => "a.mp3", "type" => "audio/mpeg", "label" => "Talk", "captions" => "a.vtt", "transcript" => "a.html" } ])
+    entry = media.attach("accession_number_ssim" => [ "X.1" ])["digital_media_ssim"].first
+
+    assert_equal "audio|audio/mpeg|/digital-assets/media/a.mp3|Talk|/digital-assets/media/a.vtt|/digital-assets/media/a.html", entry
+    assert_equal({ kind: "audio", type: "audio/mpeg", url: "/digital-assets/media/a.mp3", label: "Talk",
+                   captions: "/digital-assets/media/a.vtt", transcript: "/digital-assets/media/a.html" }, Collections::DigitalMedia.parse(entry))
   end
 
   test "a record without media is unchanged" do

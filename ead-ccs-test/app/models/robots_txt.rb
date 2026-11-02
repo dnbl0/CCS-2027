@@ -5,9 +5,9 @@
 module RobotsTxt
   # Paths no crawler should fetch: personal or action pages, endpoints that are not pages, copies of the record page, the asset files
   DISALLOWED = (RobotsPolicy::PERSONAL_PREFIXES.map { |prefix| "#{prefix}/" } + %w[
-    /bookmarks /saved_searches /search_history /lists /access_requests /downloads
+    /bookmarks /saved_searches /search_history /lists /compare /access_requests /downloads
     /catalog/facet/ /catalog/range_limit /catalog/suggest /catalog/opensearch
-    /catalog/*/metadata /catalog/*/sensitivity /catalog/*/citation
+    /catalog/*/metadata /catalog/*/sensitivity /catalog/*/citation /catalog/*/manifest.json
     /stock/ /branded-stock/ /digital-assets/
   ]).uniq.freeze
 

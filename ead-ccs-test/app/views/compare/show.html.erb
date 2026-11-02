@@ -1,0 +1,82 @@
+<%# Compare images side by side (CCS-58, CompareController): two to four panes, each a viewer of one image with the record's title,
+    accession number and licence. Without JavaScript each pane is the plain image. Panes stack on a narrow screen. %>
+<% content_for :title, "#{t('nexus_ccs.compare.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-saved page-compare" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.compare.title"), description: t("nexus_ccs.compare.description")) %>
+
+<main class="saved-main" id="main-content">
+  <div class="saved-main__inner compare" data-controller="compare">
+    <% if @unavailable.to_i.positive? %>
+      <p class="compare__note" role="status"><%= t("nexus_ccs.compare.unavailable", count: @unavailable) %></p>
+    <% end %>
+
+    <% if @panes.empty? %>
+      <div class="saved-empty">
+        <p class="saved-empty__text"><%= t("nexus_ccs.compare.empty") %></p>
+        <%= link_to t("nexus_ccs.saved_searches.start_searching"), root_path, class: "btn btn-primary" %>
+      </div>
+    <% else %>
+      <% if @record_mode %><h2 class="compare__heading"><%= t("nexus_ccs.compare.record_heading", title: @record_title) %></h2><% end %>
+      <% if @panes.size == 1 && !@record_mode %><p class="compare__note"><%= t("nexus_ccs.compare.one_pane") %></p><% end %>
+
+      <div class="compare__toolbar">
+        <div class="compare__link form-check">
+          <input type="checkbox" id="compare-link" class="form-check-input" checked data-compare-target="link" data-js-only>
+          <label for="compare-link" class="form-check-label" data-js-only>Link zoom and pan</label>
+        </div>
+        <% if @record_mode %>
+          <% if @panes.size < [ CompareList::MAX, @panes.first.images.size ].min %>
+            <%= link_to "Add a pane", compare_path(record: params[:record], panes: @panes.size + 1), class: "btn btn-outline-primary" %>
+          <% end %>
+          <% if @panes.size > CompareController::MIN_PANES %>
+            <%= link_to "Remove a pane", compare_path(record: params[:record], panes: @panes.size - 1), class: "btn btn-outline-primary" %>
+          <% end %>
+        <% else %>
+          <%= button_to "Clear comparison", clear_compare_path, method: :delete, class: "btn btn-outline-danger", form: { class: "d-inline" } %>
+        <% end %>
+      </div>
+
+      <ul class="compare__panes compare__panes--<%= @panes.size %>">
+        <% @panes.each_with_index do |pane, number| %>
+          <% sources = pane.images.each_with_index.map { |image, index| { url: image.url, info: image.info_url, alt: image.alt } } %>
+          <% current = pane.images[pane.index] %>
+          <li class="compare__item"><div class="compare-pane" data-compare-target="pane" data-sources="<%= sources.to_json %>" role="group" aria-labelledby="compare-pane-<%= number %>-title">
+            <header class="compare-pane__header">
+              <h2 id="compare-pane-<%= number %>-title" class="compare-pane__title"><%= link_to pane.title, solr_document_path(pane.record_id) %></h2>
+              <dl class="compare-pane__details">
+                <% if pane.accession_number %><div><dt>Accession number</dt><dd><%= pane.accession_number %></dd></div><% end %>
+                <div><dt>Licence</dt><dd><%= pane.licence || "Not stated" %></dd></div>
+              </dl>
+              <p class="visually-hidden">Showing <span data-pane-image-name><%= current.alt %></span></p>
+            </header>
+            <div class="compare-pane__stage" data-stage>
+              <img src="<%= current.url %>" alt="<%= current.alt %>" class="compare-pane__image" decoding="async" <%= tag.attributes(ImageDimensions.for_path(current.url)&.then { |w, h| { width: w, height: h } } || {}) %>>
+            </div>
+            <div class="compare-pane__controls">
+              <% if pane.images.size > 1 %>
+                <div class="compare-pane__choose" data-js-only>
+                  <label for="compare-pane-<%= number %>-image">Image</label>
+                  <select id="compare-pane-<%= number %>-image" class="form-select" data-action="compare#choose">
+                    <% pane.images.each_with_index do |image, index| %>
+                      <option value="<%= index %>" <%= "selected" if index == pane.index %>>Image <%= index + 1 %> of <%= pane.images.size %></option>
+                    <% end %>
+                  </select>
+                </div>
+              <% end %>
+              <div class="compare-pane__buttons" data-js-only role="group" aria-label="Zoom controls for <%= pane.title %>">
+                <button type="button" class="deep-zoom__button" data-action="compare#zoomIn">Zoom in</button>
+                <button type="button" class="deep-zoom__button" data-action="compare#zoomOut">Zoom out</button>
+                <button type="button" class="deep-zoom__button" data-action="compare#reset">Reset view</button>
+                <button type="button" class="deep-zoom__button" data-fullscreen data-action="compare#fullscreen">Full screen</button>
+              </div>
+              <% unless @record_mode %>
+                <%= button_to "Remove", compare_item_path(pane.record_id), method: :delete, class: "deep-zoom__button deep-zoom__button--plain",
+                              form: { class: "d-inline" }, aria: { label: "Remove from compare: #{pane.title}" } %>
+              <% end %>
+            </div>
+          </div></li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+</main>

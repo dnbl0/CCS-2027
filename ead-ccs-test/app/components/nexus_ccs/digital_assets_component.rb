@@ -65,6 +65,13 @@ module NexusCcs
 
     def main = images.first
 
+    # What the zoom viewer may open: the images being shown (none when they are withheld or waiting for a choice), with the
+    # IIIF info.json of each when the record has one (MediaTypes::IIIF_INFO_FIELD, parallel to the large images)
+    def zoom_sources
+      infos = Array(@document[MediaTypes::IIIF_INFO_FIELD])
+      images.each_with_index.map { |(large, _thumbnail), index| { url: large, info: infos[index].presence, alt: alt(index + 1) } }
+    end
+
 
     # The image's width and height attributes (nothing when its size cannot be read), so the page holds its space while it loads
     def image_size(path)
