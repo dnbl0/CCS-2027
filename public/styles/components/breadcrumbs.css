@@ -76,6 +76,12 @@
   text-decoration: underline;
 }
 
+/* White on #00354c is 13:1, well over the 3:1 non-text minimum */
+.page-breadcrumbs .page-local-history a:focus-visible {
+  outline: 2px solid var(--uom-ds-color-text-link-inverse);
+  outline-offset: 2px;
+}
+
 .page-breadcrumbs .page-local-history li:last-child {
   font-weight: var(--uom-ds-typography-font-weight-body-semibold);
 }

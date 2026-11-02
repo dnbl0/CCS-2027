@@ -105,7 +105,7 @@ class SearchJourneysTest < ApplicationSystemTestCase
 
     assert_current_path(%r{\A/catalog/.+})
     assert_selector "h1", text: title.split.first
-    assert_selector "nav.breadcrumb-bar li[aria-current=page]"
+    assert_selector "nav.breadcrumb-bar li > span[aria-current=page]"
 
     click_link "Search results"
     assert_current_path(%r{\A/catalog\?})
