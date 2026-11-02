@@ -112,6 +112,18 @@ class SearchJourneysTest < ApplicationSystemTestCase
     assert_selector ".result-card", minimum: 1
   end
 
+  test "result card media is never cropped, in the mosaic or the list" do
+    %w[mosaic list].each do |view|
+      visit search_catalog_path(q: "harp", view: view)
+      assert_selector ".result-card__media img", minimum: 1
+
+      fits = page.evaluate_script(<<~JS)
+        Array.from(document.querySelectorAll(".result-card__media img"), (img) => getComputedStyle(img).objectFit)
+      JS
+      assert_equal [ "contain" ], fits.uniq, "#{view} view crops card media"
+    end
+  end
+
   test "the advanced search link is a standalone page, Blacklight's own form, not a modal" do
     visit search_catalog_path(any_assets: "1", q: "skull")
     click_link "Advanced Search"

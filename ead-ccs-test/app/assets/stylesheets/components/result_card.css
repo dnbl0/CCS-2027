@@ -39,7 +39,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 /* No padding or gap on the content block, so nothing is added under the last line; the title and the lines
@@ -198,7 +198,7 @@
     aspect-ratio: auto;
   }
 
-  /* The image fills the box (at least 182px tall, as tall as the row if the text is taller) without sizing it */
+  /* The image sits whole inside the box (at least 182px tall, as tall as the row if the text is taller) without sizing it; it is letterboxed, never cropped */
   .documents-list .result-card__media {
     position: relative;
   }
