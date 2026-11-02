@@ -84,4 +84,34 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
   test "the show page's embed component wraps it with the record summary" do
     assert_equal NexusCcs::RecordEmbedComponent, CatalogController.blacklight_config.view_config(:show).document_embed_component
   end
+
+  # CCS-227: a sensitive record's assets wait for the visitor's choice
+  SENSITIVE = { "id" => "emu-9", "restrictions_tsi" => "Not for publishing Sensitive|Culturally sensitive images" }.freeze
+
+  test "a sensitive record shows the notice and none of the asset until the visitor chooses to view it" do
+    render_for(assets(3).merge(SENSITIVE).merge("digital_media_ssim" => [ "video|video/mp4|/v.mp4|Film" ]))
+
+    assert_selector ".sensitivity-gate--ask button", text: "View this item"
+    assert_selector ".sensitivity-gate--ask button", text: "Do not view"
+    assert_no_selector "img"
+    assert_no_selector "video"
+    assert_no_selector "button[aria-label='Full screen']", visible: :all
+    assert_not_includes rendered_content, "/digital-assets/"
+    assert_not_includes rendered_content, "/v.mp4"
+  end
+
+  test "a sensitive record that is withheld stays withheld: the request notice, no choice to view" do
+    render_for(assets(1).merge(SENSITIVE).merge("licence_type_ssim" => [ "ICIP Rights" ]))
+
+    assert_selector ".access-notice--request"
+    assert_no_selector ".sensitivity-gate"
+    assert_no_selector "img"
+  end
+
+  test "a record that is not sensitive is shown as before, with no notice" do
+    render_for(assets(1))
+
+    assert_no_selector ".sensitivity-gate"
+    assert_selector "img.digital-assets__image"
+  end
 end

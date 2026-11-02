@@ -1,0 +1,73 @@
+<%# Cite records (CCS-137): the style, the records, then the citations with Copy and Download. A plain GET form, so it works
+    without JavaScript; Copy is controllers/clipboard_controller.js. Rendered in the "pages" layout. %>
+<% content_for :title, "#{t('nexus_ccs.cite_page.title')}: #{@cite_heading} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-saved page-cite" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.cite_page.title"), description: t("nexus_ccs.cite_page.description", name: @cite_heading)) %>
+
+<main class="saved-main" id="main-content">
+  <div class="saved-main__inner">
+    <p class="saved-lists-link"><%= link_to @cite_back_label, @cite_back_path %></p>
+    <% if @cite_documents.empty? %>
+      <div class="saved-empty">
+        <p class="saved-empty__text"><%= t("nexus_ccs.cite_page.empty") %></p>
+        <%= link_to t("nexus_ccs.saved.empty_link"), search_catalog_path, class: "btn btn-primary" %>
+      </div>
+    <% else %>
+      <%= form_with url: request.path, method: :get, class: "cite-page__form", data: { turbo: false } do %>
+        <%= hidden_field_tag :submitted, "1", id: nil %>
+        <fieldset class="cite-page__group">
+          <legend class="cite-page__legend"><%= t("nexus_ccs.cite_page.style") %></legend>
+          <ul class="cite-page__choices">
+            <% Citation::STYLES.each do |style| %>
+              <li>
+                <label class="cite-page__choice">
+                  <%= radio_button_tag :style, style, @cite_style == style, id: "cite-style-#{style}" %>
+                  <span><%= Citation.label(style) %></span>
+                </label>
+              </li>
+            <% end %>
+          </ul>
+        </fieldset>
+        <fieldset class="cite-page__group">
+          <legend class="cite-page__legend"><%= t("nexus_ccs.cite_page.records") %></legend>
+          <ul class="cite-page__records">
+            <% @cite_documents.each do |document| %>
+              <li>
+                <label class="cite-page__choice">
+                  <%= check_box_tag "ids[]", document.id, @cite_selected.include?(document), id: "cite-record-#{document.id.to_s.parameterize}" %>
+                  <span><%= Array(document["title_tsim"]).first.presence || "Untitled" %></span>
+                </label>
+              </li>
+            <% end %>
+          </ul>
+        </fieldset>
+        <div class="cite-page__actions">
+          <%= submit_tag t("nexus_ccs.cite_page.submit"), name: nil, class: "btn btn-primary" %>
+        </div>
+      <% end %>
+
+      <section class="cite-page__results" aria-labelledby="cite-results-heading" data-controller="clipboard">
+        <h2 class="cite-page__results-heading" id="cite-results-heading" tabindex="-1"
+            <%= tag.attributes(data: { controller: ("focus-on-load" if @cite_submitted) }.compact) %>>
+          <%= t("nexus_ccs.cite_page.results", count: @cite_texts.size, style: Citation.label(@cite_style)) %>
+        </h2>
+        <% if @cite_texts.empty? %>
+          <p role="alert"><%= t("nexus_ccs.cite_page.none_selected") %></p>
+        <% else %>
+          <div class="cite-page__actions">
+            <button type="button" class="cite__copy" data-action="clipboard#copy" data-clipboard-target="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="1" /><path d="M5 15V5a1 1 0 0 1 1-1h10" /></svg>
+              <span data-clipboard-target="label"><%= t("nexus_ccs.cite_page.copy") %></span>
+            </button>
+            <%= link_to t("nexus_ccs.cite_page.download"), url_for(style: @cite_style, ids: @cite_selected.map(&:id), format: :txt, only_path: true),
+                        class: "btn btn-outline-primary cite-page__download", download: "citations-#{@cite_style}.txt" %>
+            <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
+          </div>
+          <ol class="cite-page__list cite__list" data-clipboard-target="source" data-copy="<%= @cite_texts.join("\n\n") %>">
+            <% @cite_texts.each do |text| %><li class="cite-page__reference"><%= text %></li><% end %>
+          </ol>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+</main>

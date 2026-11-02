@@ -6,6 +6,7 @@
 # It is a CatalogController so that a list's records are fetched and drawn like the saved records page's.
 class ListsController < CatalogController
   include GuestLists
+  include CitationsPage
 
   layout "pages"
 
@@ -14,7 +15,7 @@ class ListsController < CatalogController
   blacklight_config.track_search_session.storage = false
 
   skip_before_action :apply_search_defaults, raise: false
-  before_action :find_list, only: %i[show edit update destroy]
+  before_action :find_list, only: %i[show edit update destroy citations]
 
   def index
     @lists = visitor_lists.by_name.includes(:list_items)
@@ -25,6 +26,13 @@ class ListsController < CatalogController
     @items = items
     @documents = items.empty? ? [] : documents_in_order(items.map(&:document_id))
     @missing = items.size - @documents.size
+  end
+
+  # The citations of the list's records (CCS-137)
+  def citations
+    ids = @list.list_items.recent.pluck(:document_id)
+    render_citations(ids.empty? ? [] : documents_in_order(ids), heading: @list.name, back_path: list_path(@list),
+                                                                  back_label: t("nexus_ccs.cite_page.back_to_list", name: @list.name))
   end
 
   def new

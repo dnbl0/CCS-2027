@@ -1,0 +1,98 @@
+/*
+ * Bulk download of digital assets (CCS-167): the record chooser on the saved records page and a list
+ * (NexusCcs::BulkSelectionComponent), and the review page (views/bulk_downloads/review.html.erb).
+ */
+.bulk-select {
+  margin-bottom: var(--ccs-space-5);
+  border: 1px solid var(--ccs-border-panel);
+  border-radius: 0.25rem;
+  background: var(--ccs-white);
+}
+
+.bulk-select__summary {
+  display: list-item; /* keeps the disclosure triangle */
+  list-style-position: inside;
+  min-height: 2.75rem;
+  padding: var(--ccs-space-3) var(--ccs-space-4);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-brand);
+  cursor: pointer;
+}
+
+.bulk-select__form {
+  padding: 0 var(--ccs-space-4) var(--ccs-space-4);
+}
+
+.bulk-select__group {
+  margin: 0 0 var(--ccs-space-4);
+  padding: 0;
+  border: 0;
+}
+
+.bulk-select__legend {
+  font-size: var(--ccs-font-size-lg);
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+.bulk-select__hint {
+  margin: 0 0 var(--ccs-space-3);
+}
+
+.bulk-select__list {
+  max-height: 24rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+/* A row is a checkbox, its label (the record's title) and, beneath, whether its files can be downloaded */
+.bulk-select__item {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr;
+  column-gap: var(--ccs-space-3);
+  align-items: start;
+  padding-block: var(--ccs-space-2);
+}
+
+.bulk-select__input {
+  grid-row: 1 / span 2;
+  width: 1.5rem; /* the 24px minimum target (WCAG 2.5.8) */
+  height: 1.5rem;
+  margin: 0;
+}
+
+.bulk-select__label {
+  min-height: 1.5rem;
+}
+
+.bulk-select__status {
+  grid-column: 2;
+  color: var(--ccs-text-secondary);
+}
+
+.bulk-review__heading {
+  margin: var(--ccs-space-5) 0 var(--ccs-space-3);
+  font-size: var(--ccs-font-size-lg);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-brand);
+}
+
+.bulk-review__heading:first-child {
+  margin-top: 0;
+}
+
+.bulk-review__list {
+  padding-left: 1.25rem;
+}
+
+.bulk-review__detail {
+  color: var(--ccs-text-secondary);
+}
+
+.bulk-review__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-3);
+  margin-top: var(--ccs-space-5);
+}

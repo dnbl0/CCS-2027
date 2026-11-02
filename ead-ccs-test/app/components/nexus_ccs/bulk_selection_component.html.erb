@@ -1,0 +1,21 @@
+<details class="bulk-select">
+  <summary class="bulk-select__summary"><%= t("nexus_ccs.bulk_download.open") %></summary>
+  <%= form_with url: helpers.review_bulk_download_path, method: :post, local: true, class: "bulk-select__form", data: { turbo: false } do |form| %>
+    <%= hidden_field_tag :return_to, return_to, id: nil %>
+    <fieldset class="bulk-select__group">
+      <legend class="bulk-select__legend"><%= t("nexus_ccs.bulk_download.legend") %></legend>
+      <p class="bulk-select__hint" id="bulk-select-hint"><%= limits_hint %></p>
+      <ul class="bulk-select__list" aria-describedby="bulk-select-hint">
+        <% rows.each_with_index do |row, index| %>
+          <li class="bulk-select__item">
+            <input type="checkbox" name="ids[]" value="<%= row.document.id %>" id="bulk-select-<%= index %>" class="bulk-select__input form-check-input"
+                   aria-describedby="bulk-select-status-<%= index %>">
+            <label for="bulk-select-<%= index %>" class="bulk-select__label"><%= row.title %></label>
+            <span class="bulk-select__status" id="bulk-select-status-<%= index %>"><%= row.status %></span>
+          </li>
+        <% end %>
+      </ul>
+    </fieldset>
+    <%= form.submit t("nexus_ccs.bulk_download.review"), class: "btn btn-primary" %>
+  <% end %>
+</details>

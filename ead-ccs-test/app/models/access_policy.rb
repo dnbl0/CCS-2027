@@ -24,6 +24,10 @@
 #                                                        images of most of the collection for a gap in the data
 #   any value not listed above                :view_only as for blank, unless it says "restricted" or "ICIP" (:request)
 #
+# A record whose access condition (access_condition_ssi) is "Community Restricted" (1 record) is :request whatever its
+# licence: access is limited to a community, so a visitor is not offered a "view anyway" choice (Sensitivity is for
+# material that may be shown if the visitor chooses).
+#
 # A record with several licences gets the most restrictive tier.
 #
 # Swapping in the DAM: the ingest keeps each asset's full DAM metadata in the Solr field assets_json. The fields likely to
@@ -49,8 +53,13 @@ module AccessPolicy
   # A wording not in the table that still says the asset is restricted is withheld, not shown
   WITHHELD = /restricted|icip/
 
+  # Access conditions (access_condition_ssi, compared in lower case) that withhold the asset whatever the licence
+  WITHHELD_ACCESS_CONDITIONS = [ "community restricted" ].freeze
+
   # document: a SolrDocument. Returns one of TIERS.
   def self.tier(document)
+    return :request if withheld_by_access_condition?(document)
+
     licences = Array(document["licence_type_ssim"]).map { |value| value.to_s.strip.downcase }.compact_blank
     return :view_only if licences.empty?
 
@@ -61,6 +70,11 @@ module AccessPolicy
     TIER_BY_LICENCE.fetch(licence) { licence.match?(WITHHELD) ? :request : :view_only }
   end
   private_class_method :tier_of
+
+  def self.withheld_by_access_condition?(document)
+    Array(document["access_condition_ssi"]).any? { |value| WITHHELD_ACCESS_CONDITIONS.include?(value.to_s.strip.downcase) }
+  end
+  private_class_method :withheld_by_access_condition?
 
   # The asset may be shown (:open, :view_only)
   def self.view?(document) = tier(document) != :request

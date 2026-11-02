@@ -9,6 +9,13 @@ module NexusCcs
       helpers.applied_filter_count
     end
 
+    # What a screen reader is told once a filter has changed the results: "7,719 results, 1 filter applied".
+    def status_message
+      total = response.total
+      [ t("nexus_ccs.facets.status.results", count: total).sub(total.to_s, helpers.number_with_delimiter(total)),
+        t("nexus_ccs.facets.status.filters", count: applied_count) ].join(", ")
+    end
+
     # The same search (words, search field, sort, view) with every filter taken off.
     def clear_filters_path
       helpers.search_action_path(helpers.search_state.params_for_search.except(:f, :f_inclusive, :range, :page))

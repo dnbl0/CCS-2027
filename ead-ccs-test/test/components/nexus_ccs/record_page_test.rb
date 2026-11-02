@@ -86,7 +86,7 @@ class RecordPageTest < ActiveSupport::TestCase
     assert_selector ".persistent-link__note", text: "Quote this link when contacting the collection team."
   end
 
-  test "the persistent link is a show partial" do
-    assert_equal [ :persistent_link ], CatalogController.blacklight_config.view_config(:show).partials
+  test "the persistent link and the contact card are show partials" do
+    assert_equal [ :persistent_link, :contact_collection ], CatalogController.blacklight_config.view_config(:show).partials
   end
 end

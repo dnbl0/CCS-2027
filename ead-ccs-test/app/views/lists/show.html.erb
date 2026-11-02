@@ -10,6 +10,7 @@
       <h2 class="saved-toolbar__count" tabindex="-1" <%= tag.attributes(data: { controller: ("focus-on-load" if flash[:notice].present?) }.compact) %>><%= t("nexus_ccs.lists.records", count: @items.size) %></h2>
       <div class="saved-toolbar__actions">
         <%= link_to t("nexus_ccs.lists.back_to_lists"), lists_path, class: "btn btn-outline-primary" %>
+        <%= link_to t("nexus_ccs.cite_page.link"), citations_list_path(@list), class: "btn btn-outline-primary" if @items.any? %>
         <%= link_to t("nexus_ccs.lists.actions.rename"), edit_list_path(@list), class: "btn btn-outline-primary",
                     aria: { label: t("nexus_ccs.lists.actions.rename_named", name: @list.name) } %>
         <%= button_to t("nexus_ccs.lists.actions.delete"), list_path(@list), method: :delete, class: "btn btn-outline-danger",
@@ -23,6 +24,7 @@
         <%= link_to t("nexus_ccs.saved_searches.start_searching"), root_path, class: "btn btn-primary" %>
       </div>
     <% else %>
+      <%= render NexusCcs::BulkSelectionComponent.new(documents: @documents, return_to: list_path(@list)) %>
       <h2 class="visually-hidden"><%= t("nexus_ccs.lists.menu.heading") %></h2>
       <% if @missing.positive? %><p class="saved-lists-note"><%= t("nexus_ccs.lists.missing_records") %></p><% end %>
       <%= render_document_index_with_view :list, @documents %>

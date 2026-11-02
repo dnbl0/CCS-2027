@@ -1,5 +1,9 @@
-<search class="filter-sidebar" data-controller="filter-drawer"
-        data-action="filter-drawer:open@window->filter-drawer#open keydown.esc@window->filter-drawer#escape">
+<search class="filter-sidebar" data-controller="filter-drawer filter-state"
+        data-action="filter-drawer:open@window->filter-drawer#open keydown.esc@window->filter-drawer#escape click->filter-state#remember"
+        data-filter-state-message-value="<%= status_message %>">
+  <%# Empty when the page arrives: filter-state puts the message in once the page shows, which is what makes it announced %>
+  <p class="visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-filter-state-target="status"></p>
+
   <div class="filter-drawer__header d-lg-none">
     <h2 id="filter-drawer-title" class="filter-drawer__title">Filters</h2>
     <button type="button" class="filter-drawer__close" data-filter-drawer-target="close" data-action="filter-drawer#close">
