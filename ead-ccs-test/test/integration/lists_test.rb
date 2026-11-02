@@ -163,6 +163,7 @@ class ListsTest < ActionDispatch::IntegrationTest
   end
 
   test "the saved records page links to Your lists" do
+    needs_solr
     get "/bookmarks"
 
     assert_select "a[href='/lists']", text: "Your lists"

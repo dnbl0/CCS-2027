@@ -1,0 +1,161 @@
+/*
+ * Citation tools (CCS-131, CCS-137): the "Cite this record" button and dialog on the record page (NexusCcs::CiteComponent)
+ * and the "Cite records" page of a list or the saved records (views/citations/show.html.erb). Each citation sits in its own
+ * block with a Copy button; the dialog reuses the site's modal look (components/modal.css).
+ */
+.record-summary__cite {
+  margin: var(--ccs-space-3) 0 0;
+}
+
+.cite__button,
+.cite__copy {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ccs-space-2);
+  min-height: 2.5rem;
+  min-width: 2.5rem;
+  padding-inline: 0.875rem;
+  border: 1px solid var(--ccs-navy-1100);
+  background: var(--ccs-white);
+  font-size: 0.9375rem;
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-navy-1100);
+  cursor: pointer;
+}
+
+.cite__button:hover,
+.cite__copy:hover {
+  background: var(--ccs-cyan-100);
+}
+
+.cite__button:focus-visible,
+.cite__copy:focus-visible,
+.cite-page__download:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.cite__dialog {
+  --bs-modal-width: 720px;
+}
+
+.cite__intro {
+  margin-bottom: var(--ccs-space-4);
+  color: var(--ccs-text-secondary);
+}
+
+.cite__list {
+  display: grid;
+  gap: var(--ccs-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cite__item {
+  display: grid;
+  justify-items: start;
+  gap: var(--ccs-space-2);
+  padding-bottom: var(--ccs-space-4);
+  border-bottom: 1px solid var(--ccs-border-default);
+}
+
+.cite__item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.cite__style {
+  margin: 0;
+  font-size: var(--ccs-font-size-md);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-brand);
+}
+
+.cite__text {
+  margin: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  color: var(--ccs-text-primary);
+}
+
+/* The citations page of a list or the saved records */
+.cite-page__form {
+  display: grid;
+  gap: var(--ccs-space-5);
+  margin-bottom: var(--ccs-space-6);
+}
+
+.cite-page__group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.cite-page__legend {
+  float: none;
+  width: auto;
+  margin-bottom: var(--ccs-space-2);
+  padding: 0;
+  font-size: var(--ccs-font-size-md);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-brand);
+}
+
+.cite-page__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-2) var(--ccs-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cite-page__records {
+  display: grid;
+  gap: var(--ccs-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cite-page__choice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ccs-space-2);
+  min-height: 1.5rem;
+  padding-block: var(--ccs-space-1);
+}
+
+.cite-page__choice input {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+}
+
+.cite-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ccs-space-3);
+}
+
+.cite-page__results {
+  display: grid;
+  gap: var(--ccs-space-4);
+}
+
+.cite-page__results-heading {
+  margin: 0;
+  font-size: var(--ccs-font-size-lg);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-brand);
+}
+
+.cite-page__reference {
+  margin: 0;
+  padding: var(--ccs-space-4);
+  border: 1px solid var(--ccs-border-default);
+  overflow-wrap: anywhere;
+}

@@ -100,8 +100,8 @@ class CatalogController < ApplicationController
     # Between a record's title and its details: the digital assets and a summary line.
     config.show.document_embed_component = NexusCcs::RecordEmbedComponent
 
-    # After the details: the persistent link.
-    config.show.partials = [ :persistent_link ]
+    # After the details: the persistent link, then how to contact the collection team (CCS-47).
+    config.show.partials = [ :persistent_link, :contact_collection ]
 
     CatalogConfig::Facets.apply(config)
 

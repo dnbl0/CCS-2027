@@ -1,0 +1,45 @@
+<%# What a bulk download will hold (CCS-167): the records that go in, the records left out and why, and the button for the zip.
+    Planned again when the button is pressed (BulkDownloadsController#create). %>
+<% content_for :title, "#{t('nexus_ccs.bulk_download.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-saved page-bulk-download" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.bulk_download.title"), description: t("nexus_ccs.bulk_download.description")) %>
+
+<main class="saved-main" id="main-content">
+  <div class="saved-main__inner bulk-review">
+    <% if @download.items.any? %>
+      <h2 class="bulk-review__heading" tabindex="-1"><%= t("nexus_ccs.bulk_download.included", count: @download.records.size) %></h2>
+      <p><%= t("nexus_ccs.bulk_download.summary", files: @download.files, size: number_to_human_size(@download.total_bytes)) %></p>
+      <ul class="bulk-review__list">
+        <% @download.items.group_by(&:document).each do |document, items| %>
+          <li><%= Array(document["title_tsim"]).first.presence || document.id %> <span class="bulk-review__detail">(<%= t("nexus_ccs.bulk_download.file_count", count: items.size) %>)</span></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <h2 class="bulk-review__heading"><%= t("nexus_ccs.bulk_download.nothing_heading") %></h2>
+      <p><%= t("nexus_ccs.bulk_download.nothing") %></p>
+    <% end %>
+
+    <% if @download.skipped.any? %>
+      <h2 class="bulk-review__heading"><%= t("nexus_ccs.bulk_download.skipped_heading", count: @download.skipped.size) %></h2>
+      <ul class="bulk-review__list">
+        <% @download.skipped.each do |skip| %>
+          <li>
+            <%= skip.document ? (Array(skip.document["title_tsim"]).first.presence || skip.document.id) : t("nexus_ccs.bulk_download.unknown_record") %>:
+            <%= t("nexus_ccs.bulk_download.skipped.#{skip.reason}", name: skip.name) %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <div class="bulk-review__actions">
+      <% if @download.downloadable? %>
+        <%= form_with url: bulk_download_path, method: :post, local: true, data: { turbo: false } do |form| %>
+          <% @download.records.each do |document| %><%= hidden_field_tag "ids[]", document.id, id: nil %><% end %>
+          <%= hidden_field_tag :return_to, @return_to, id: nil %>
+          <%= form.submit t("nexus_ccs.bulk_download.download", files: @download.files, size: number_to_human_size(@download.total_bytes)), class: "btn btn-primary" %>
+        <% end %>
+      <% end %>
+      <%= link_to t("nexus_ccs.bulk_download.back"), @return_to, class: "btn btn-outline-primary" %>
+    </div>
+  </div>
+</main>

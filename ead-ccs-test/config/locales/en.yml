@@ -79,6 +79,22 @@ en:
               list_full: "A list can hold at most %{count} records. Remove one to add another."
 
   nexus_ccs:
+    # Help text beside the heading or field it explains (CCS-101, NexusCcs::HelpTipComponent). Placeholder wording: the
+    # collections team must approve it. anchor is the section of the Help page to read more.
+    help_tips:
+      read_more: "Read more in Help."
+      persistent_link:
+        label: "About persistent links"
+        anchor: "faq"
+        text: "A persistent link always leads back to this record, even if the collection's website changes. Copy it to cite the record, or to say which record you mean when you contact the team."
+      copyright:
+        label: "About copyright and licences"
+        anchor: "copyright"
+        text: "The credit line, copyright and licence say who holds the rights to this record and how its images may be used. Ask the collection team before you reuse an image."
+      contact:
+        label: "About contacting the team"
+        anchor: "contact-us"
+        text: "Contact the team to ask a question, suggest a correction or arrange to see the object. Say which record you mean by quoting its ID or accession number; the email we start for you already does."
     access_requests:
       title: "Request access"
       # Placeholder wording throughout this block: the University must approve the privacy, retention and next-steps text.
@@ -224,6 +240,29 @@ en:
       list_description: "The records you have saved on this device. Open one to see it in full, or select Saved to remove it from the list."
       empty: "You have not saved any records yet."
       empty_link: "Search all records"
+    cite:
+      button: "Cite this record"
+      title: "Cite this record"
+      close: "Close"
+      intro: "Choose a style and copy the citation for %{title}. Citations are written as at %{date}; check them against your institution's guide before you submit."
+      copy: "Copy"
+      copy_named: "Copy %{style} citation"
+    cite_page:
+      title: "Cite records"
+      description: "Citations for the records in %{name}. Choose a style and the records to cite, then copy the citations or download them."
+      back_to_list: "Back to %{name}"
+      back_to_saved: "Back to your saved records"
+      link: "Cite records"
+      empty: "There are no records to cite yet."
+      style: "Citation style"
+      records: "Records to cite"
+      submit: "Show citations"
+      results:
+        one: "%{count} citation in %{style}"
+        other: "%{count} citations in %{style}"
+      none_selected: "Select at least one record to cite."
+      copy: "Copy citations"
+      download: "Download citations (.txt)"
     view_full_record:
       label: "View full record"
       title: "You're leaving this site"
@@ -234,6 +273,15 @@ en:
       close: "Close"
     facets:
       pending: "No records have this information yet."
+      # Said politely (a status) after a filter changes the results
+      status:
+        results:
+          one: "%{count} result"
+          other: "%{count} results"
+        filters:
+          zero: "no filters applied"
+          one: "%{count} filter applied"
+          other: "%{count} filters applied"
     access_notice:
       view_only:
         title: "You can view this item, but not download it"
@@ -243,6 +291,73 @@ en:
         title: "This item is available on request"
         body: "The image or file is not shown here. To see it, ask the collection team for access. Your request needs approval."
         link: "Request access to this item"
+
+    # Placeholder wording (CCS-167): the University must approve it, and set the limits (BulkDownload::MAX_*).
+    bulk_download:
+      title: "Download digital assets"
+      description: "Check what the zip file will hold before you download it."
+      open: "Download digital assets"
+      legend: "Choose the records to download"
+      limits: "Only files that can be downloaded are included. One zip file can hold up to %{records} records, %{files} files and %{size}."
+      review: "Review download"
+      none_chosen: "Choose at least one record to download."
+      too_many_records:
+        one: "Choose at most %{count} record at a time."
+        other: "Choose at most %{count} records at a time."
+      too_many_files: "That is more than %{files} files, the most one zip file can hold. Go back and choose fewer records."
+      too_large: "That is more than %{size}, the most one zip file can hold. Go back and choose fewer records."
+      included:
+        one: "%{count} record will be downloaded"
+        other: "%{count} records will be downloaded"
+      summary: "One zip file of %{files} files (%{size}), with a manifest.csv listing each file's record, licence, rights and persistent link."
+      file_count:
+        one: "%{count} file"
+        other: "%{count} files"
+      nothing_heading: "Nothing to download"
+      nothing: "None of the chosen records has a file that can be downloaded."
+      skipped_heading:
+        one: "%{count} item left out"
+        other: "%{count} items left out"
+      unknown_record: "A record"
+      download: "Download zip file (%{files} files, %{size})"
+      back: "Back"
+      skipped:
+        not_downloadable: "left out because its files can be viewed but not downloaded. You can ask the collection team for a copy."
+        withheld: "left out because its files are not available to view or download. You can ask the collection team for access."
+        sensitive: "left out because it is marked sensitive and you have not chosen to view it. Open the record and choose View this item."
+        no_assets: "left out because it has no digital assets."
+        file_missing: "the file %{name} was left out because it is not available from this site."
+        not_found: "left out because it is no longer in the collection."
+      status:
+        downloadable:
+          one: "Can be downloaded: %{count} file"
+          other: "Can be downloaded: %{count} files"
+        not_downloadable: "Cannot be downloaded: view only"
+        withheld: "Cannot be downloaded: not available to view"
+        sensitive: "Cannot be downloaded until you choose to view it"
+        no_assets: "No files to download"
+        file_missing: "No file to download here"
+        not_found: "No longer in the collection"
+
+    # Placeholder wording (CCS-163)
+    metadata_export:
+      link: "Download metadata (CSV)"
+      hint: "All the details above and the persistent link, as a spreadsheet file."
+
+    # Placeholder wording (CCS-227): the University must approve it.
+    sensitivity:
+      view: "View this item"
+      do_not_view: "Do not view"
+      hide: "Hide this item"
+      ask:
+        title: "This item may contain sensitive material"
+        body: "It is not shown unless you choose to see it. You can change your mind at any time."
+      declined:
+        title: "You chose not to view this item"
+        body: "The image or file is not shown. You can view it if you change your mind."
+      viewing:
+        title: "This item may contain sensitive material. You chose to view it."
+        body: "You can hide it again at any time."
 
   catalog:
     country_acknowledgement:

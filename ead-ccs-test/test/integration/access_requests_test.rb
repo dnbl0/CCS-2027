@@ -24,6 +24,7 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
   end
 
   test "the form names the record and what is requested, with labelled, described fields" do
+    needs_solr
     get AccessPolicy.request_path(SolrDocument.new(id: DOC))
 
     assert_response :success
@@ -40,6 +41,7 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
   end
 
   test "a view-only record is asked for as a download" do
+    needs_solr
     @tier = :view_only
     get "/access_requests/new", params: { document_id: DOC }
 
@@ -47,6 +49,7 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
   end
 
   test "an open record has nothing to request, so the visitor goes to it" do
+    needs_solr
     @tier = :open
     get "/access_requests/new", params: { document_id: DOC }
 
@@ -54,6 +57,7 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
   end
 
   test "an unknown or missing record is a 404" do
+    needs_solr
     get "/access_requests/new", params: { document_id: "no-such-record-xyz" }
     assert_response :not_found
     get "/access_requests/new"
@@ -64,6 +68,7 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
   end
 
   test "sending the form stores the request with the title read from the index, and shows a confirmation" do
+    needs_solr
     assert_difference "AccessRequest.count", 1 do
       submit({}, extra: { document_title: "Forged title", request_type: "download", status: "approved" })
     end
@@ -85,6 +90,7 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
   end
 
   test "an invalid form is shown again with a summary and a message beside each field, and keeps what was typed" do
+    needs_solr
     assert_no_difference "AccessRequest.count" do
       submit({ name: "", email: "nope", purpose: "" })
     end
@@ -100,6 +106,7 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
   end
 
   test "a confirmation can be opened only by the browser that made the request" do
+    needs_solr
     other = AccessRequest.create!(document_id: DOC, document_title: "T", request_type: "view", name: "Fake", email: "a@example.invalid", purpose: "p")
 
     get "/access_requests/#{other.id}"
@@ -111,6 +118,7 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
   end
 
   test "a filled-in trap field stores nothing" do
+    needs_solr
     assert_no_difference "AccessRequest.count" do
       submit({}, extra: { website: "http://spam.example.invalid" })
     end
@@ -118,6 +126,7 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
   end
 
   test "one address may send only a few requests an hour" do
+    needs_solr
     AccessRequestsController::RATE_LIMIT.times { submit }
     assert_equal AccessRequestsController::RATE_LIMIT, AccessRequest.count
 
@@ -131,6 +140,7 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
   end
 
   test "a request with no access_request parameters is a bad request, not an error" do
+    needs_solr
     post "/access_requests", params: { document_id: DOC }
     assert_response :bad_request
   end

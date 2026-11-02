@@ -1,0 +1,25 @@
+<section class="contact-collection record-card" aria-labelledby="contact-collection-heading">
+  <div class="contact-collection__head">
+    <h2 id="contact-collection-heading" class="contact-collection__heading">Contact the collection team</h2>
+    <%= render NexusCcs::HelpTipComponent.new(topic: :contact) %>
+  </div>
+  <% if contact %>
+    <p class="contact-collection__team"><%= contact.collection %></p>
+    <% if contact.email? %>
+      <p class="contact-collection__action">
+        Email <a href="<%= mailto %>"><%= contact.address %></a>. The message starts with this record's details.
+      </p>
+    <% else %>
+      <p class="contact-collection__action">
+        Send your question with the
+        <a href="<%= contact.url %>" target="_blank" rel="noopener">Access Request Form<span class="visually-hidden"> (opens in a new tab)</span></a>.
+        Include this record's ID, <strong><%= persistent_id %></strong>.
+      </p>
+    <% end %>
+  <% else %>
+    <p class="contact-collection__action">Find the right team on the <a href="/help#contact-us">Contact Us section of the Help page</a>. Include this record's ID, <strong><%= persistent_id %></strong>.</p>
+  <% end %>
+  <% if request_access? %>
+    <p class="contact-collection__access">To view or download this record's digital assets, <a href="<%= request_access_path %>">Request access</a>.</p>
+  <% end %>
+</section>

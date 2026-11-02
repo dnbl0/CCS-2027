@@ -1,0 +1,9 @@
+<span class="help-tip" data-controller="help-tip" data-action="keydown->help-tip#escape focusout->help-tip#focusout">
+  <button type="button" class="help-tip__button" aria-expanded="false" aria-controls="<%= text_id %>" data-help-tip-target="button" data-action="help-tip#toggle">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10" /><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4.5" /><path d="M12 17.5h.01" /></svg>
+    <span class="help-tip__label visually-hidden"><%= label %></span>
+  </button>
+  <span class="help-tip__text" id="<%= text_id %>" hidden data-help-tip-target="panel">
+    <%= text %> <a href="<%= help_path %>"><%= t("nexus_ccs.help_tips.read_more") %></a>
+  </span>
+</span>
