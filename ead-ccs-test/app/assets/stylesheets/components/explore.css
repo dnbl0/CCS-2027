@@ -1,0 +1,39 @@
+/* The home page's "Explore by" section (NexusCcs::ExploreComponent): groups of tiles that open records by object type,
+   place and time. Tiles are links; the whole tile is the target (at least 44px tall). */
+.explore { background: var(--ccs-surface-default); }
+
+.explore__inner { display: flex; flex-direction: column; gap: var(--ccs-space-6); max-width: var(--layout-content-wide); }
+
+.explore__header { display: flex; flex-direction: column; gap: var(--ccs-space-3); max-width: var(--layout-reading); }
+
+.explore__intro { margin: 0; font-size: var(--ccs-font-size-lg); color: var(--ccs-text-primary); }
+
+.explore__groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ccs-space-6); }
+
+.explore__group { display: flex; flex-direction: column; gap: var(--ccs-space-3); }
+
+.explore__heading { margin: 0; font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-primary); }
+
+.explore__list { display: flex; flex-direction: column; gap: var(--ccs-space-2); margin: 0; padding: 0; list-style: none; }
+
+.explore__link {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--ccs-space-3);
+  min-height: 44px; padding: var(--ccs-space-3) var(--ccs-space-4);
+  border: 1px solid var(--ccs-border-default); background: var(--ccs-surface-default);
+  color: var(--ccs-text-link); text-decoration: none;
+  transition: border-color var(--ccs-duration-base);
+}
+
+.explore__link:hover, .explore__link:focus-visible { border-color: var(--ccs-border-strong); color: var(--ccs-text-link-hover); }
+
+.explore__link:hover .explore__label { text-decoration: underline; }
+
+.explore__link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+.explore__label { font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); overflow-wrap: anywhere; }
+
+.explore__count { flex: none; font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
+
+@media (max-width: 1023px) {
+  .explore__groups { grid-template-columns: 1fr; }
+}
