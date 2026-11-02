@@ -112,15 +112,29 @@ class SearchJourneysTest < ApplicationSystemTestCase
     assert_selector ".result-card", minimum: 1
   end
 
-  test "result card media is never cropped, in the mosaic or the list" do
+  test "result card media takes the image's own shape: nothing is cropped or letterboxed, in the mosaic and the list" do
     %w[mosaic list].each do |view|
       visit search_catalog_path(q: "harp", view: view)
       assert_selector ".result-card__media img", minimum: 1
 
-      fits = page.evaluate_script(<<~JS)
-        Array.from(document.querySelectorAll(".result-card__media img"), (img) => getComputedStyle(img).objectFit)
+      shapes = page.evaluate_script(<<~JS)
+        Array.from(document.querySelectorAll(".result-card__media img"))
+          .filter((img) => img.complete && img.naturalWidth > 0)
+          .map((img) => {
+            const box = img.parentElement.getBoundingClientRect();
+            const shown = img.getBoundingClientRect();
+            return {
+              src: img.currentSrc,
+              ratioGap: Math.abs(shown.width / shown.height - img.naturalWidth / img.naturalHeight),
+              boxGap: Math.abs(box.height - shown.height)
+            };
+          })
       JS
-      assert_equal [ "contain" ], fits.uniq, "#{view} view crops card media"
+      assert_not_empty shapes, "#{view} view shows no loaded thumbnails"
+      shapes.each do |shape|
+        assert_operator shape["ratioGap"], :<, 0.02, "#{view} view distorts or crops #{shape['src']}"
+        assert_operator shape["boxGap"], :<, 1.5, "#{view} view letterboxes #{shape['src']}"
+      end
     end
   end
 

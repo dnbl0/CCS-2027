@@ -1,6 +1,6 @@
 /*
  * The record card in the list and mosaic views, after the CCS UI "Card image" and "Card no media" (Figma
- * 250:21910 and 250:22182): a white card with a 1px #dddfe7 border; a 16:9 image when the record has a digital
+ * 250:21910 and 250:22182): a white card with a 1px #dddfe7 border; an image, shown whole at its own aspect ratio, when the record has a digital
  * asset; then 16px of padding around a 24px semibold link-blue title and three 16px lines (creator, object,
  * collection). Hover underlines the title. Markup: NexusCcs::ResultCardComponent.
  */
@@ -30,16 +30,15 @@
 .result-card__media {
   display: block;
   flex: none;
-  aspect-ratio: 240 / 135;
   overflow: hidden;
   background: var(--ccs-neutral-200);
 }
 
+/* The card takes the image's own aspect ratio (from its width and height attributes): never cropped, never letterboxed */
 .result-card__media img {
   display: block;
   width: 100%;
-  height: 100%;
-  object-fit: contain;
+  height: auto;
 }
 
 /* No padding or gap on the content block, so nothing is added under the last line; the title and the lines
@@ -122,14 +121,6 @@
   box-shadow: none;
 }
 
-.documents-masonry .result-card__media {
-  aspect-ratio: auto;
-}
-
-.documents-masonry .result-card__media img {
-  height: auto;
-}
-
 /* blacklight-gallery greys the mosaic's titles for its dark captions; here the title is the card's own */
 .documents-masonry .result-card .index_title {
   font-size: var(--ccs-font-size-2xl);
@@ -172,14 +163,14 @@
 
 /*
  * List view, after the CCS UI "List views" (Figma 254:23780): below 768px (xs-sm) the card is the vertical
- * card, one column; from 768px (md-lg) it is the horizontal card, text on the left and the 324 x 182 image on
+ * card, one column; from 768px (md-lg) it is the horizontal card, text on the left and the 324px-wide image on
  * the right, one column; from 1800px (xl-wide) two columns of them. Without a digital asset the text takes the
  * whole width.
  */
 @media (min-width: 768px) {
   .documents-list .result-card {
     flex-direction: row;
-    align-items: stretch;
+    align-items: center;
   }
 
   .documents-list .result-card__content {
@@ -194,19 +185,6 @@
     order: 2;
     flex: none;
     width: 20.25rem;
-    min-height: 11.375rem;
-    aspect-ratio: auto;
-  }
-
-  /* The image sits whole inside the box (at least 182px tall, as tall as the row if the text is taller) without sizing it; it is letterboxed, never cropped */
-  .documents-list .result-card__media {
-    position: relative;
-  }
-
-  .documents-list .result-card__media img {
-    position: absolute;
-    inset: 0;
-    height: 100%;
   }
 }
 
