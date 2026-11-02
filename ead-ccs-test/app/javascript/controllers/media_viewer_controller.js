@@ -70,5 +70,6 @@ export default class extends Controller {
     const link = event.currentTarget
     this.imageTarget.src = link.dataset.mediaViewerLarge
     this.imageTarget.alt = link.dataset.mediaViewerAlt
+    this.dispatch("shown", { detail: { src: this.imageTarget.getAttribute("src"), alt: this.imageTarget.alt } }) // the zoom viewer follows
   }
 }

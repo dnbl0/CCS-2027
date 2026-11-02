@@ -27,6 +27,7 @@ PageChrome = Data.define(:breadcrumbs, :banner, :saved_bar) do
     in [ "access_requests", _ ] then with_trail([ [ "Search results", page.results_url ], [ I18n.t("nexus_ccs.access_requests.title"), nil ] ], banner: nil)
     in [ "selections", _ ] then with_trail([ [ I18n.t("nexus_ccs.selection.title"), nil ] ], banner: nil)
     in [ "saved_searches", _ ] then with_trail([ [ I18n.t("nexus_ccs.saved_searches.title"), nil ] ], banner: nil)
+    in [ "compare", _ ] then with_trail([ [ I18n.t("nexus_ccs.compare.title"), nil ] ], banner: nil)
     in [ "lists", _ ] then with_trail([ [ I18n.t("nexus_ccs.lists.title"), nil ] ], banner: nil)
     else new(breadcrumbs: [], banner: nil, saved_bar: :header)
     end

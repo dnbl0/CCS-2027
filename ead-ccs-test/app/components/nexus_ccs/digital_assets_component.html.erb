@@ -17,25 +17,14 @@
           <%# The first thing on the page to paint: fetched first, and sized so the space is held before it arrives %>
           <%= image_tag main.first, alt: alt(1), class: "digital-assets__image", data: { media_viewer_target: "image" },
                 fetchpriority: "high", decoding: "async", **image_size(main.first) %>
+          <%= render NexusCcs::DeepZoomComponent.new(sources: zoom_sources, label: alt(1)) %>
         </figure>
       <% end %>
 
       <% media.each do |item| %>
         <figure class="digital-assets__media">
-          <% case item[:kind] %>
-          <% when "video" %>
-            <video controls <%= "controlsList=nodownload" unless downloadable? %> preload="metadata" class="digital-assets__video" aria-label="<%= media_title(item) %>">
-              <source src="<%= item[:url] %>" type="<%= item[:type] %>">
-              <% if downloadable? %><a href="<%= item[:url] %>">Download <%= media_title(item) %></a><% end %>
-            </video>
-          <% when "audio" %>
-            <audio controls <%= "controlsList=nodownload" unless downloadable? %> preload="metadata" class="digital-assets__audio" aria-label="<%= media_title(item) %>">
-              <source src="<%= item[:url] %>" type="<%= item[:type] %>">
-              <% if downloadable? %><a href="<%= item[:url] %>">Download <%= media_title(item) %></a><% end %>
-            </audio>
-          <% else %>
-            <%= link_to "Open #{media_title(item)} (PDF, opens in a new tab)", item[:url], target: "_blank", rel: "noopener", class: "digital-assets__pdf" %>
-          <% end %>
+          <%# Each kind of file has its viewer (MediaTypes): one that cannot be previewed says so %>
+          <%= helpers.render partial: MediaTypes.viewer_for(item[:kind]), locals: { item: item, title: media_title(item), downloadable: downloadable? } %>
           <figcaption><%= media_title(item) %></figcaption>
         </figure>
       <% end %>
@@ -88,6 +77,8 @@
       <% end %>
     </ul>
   <% end %>
+
+  <%= render NexusCcs::CompareActionsComponent.new(document: @document, images: count) if assets_shown? %>
 
   <div class="digital-assets__toolbar">
     <div class="digital-assets__toolbar-inner">

@@ -23,6 +23,12 @@ Rails.application.routes.draw do
     end
     # Sensitive records (CCS-227): the visitor's choice to view the assets or not. Export of a record's metadata (CCS-163).
     post "catalog/:id/sensitivity", to: "sensitivity_choices#create", as: :sensitivity_choice
+    # The record's images as an IIIF Presentation manifest (CCS-57), and the comparison of records or images side by side (CCS-58)
+    get "catalog/:id/manifest.json", to: "manifests#show", as: :manifest, format: false
+    get "compare", to: "compare#show", as: :compare
+    post "compare/items", to: "compare#create", as: :compare_items
+    delete "compare/items/:id", to: "compare#destroy", as: :compare_item
+    delete "compare", to: "compare#clear", as: :clear_compare
     get "catalog/:id/metadata", to: "metadata_exports#show", as: :metadata_export
     # The saved list and its Save / Remove requests are a 404 while config.x.saved_records is off (config/application.rb)
     constraints(->(_request) { Rails.configuration.x.saved_records }) do

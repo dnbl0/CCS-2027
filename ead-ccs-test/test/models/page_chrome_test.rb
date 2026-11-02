@@ -113,4 +113,12 @@ class PageChromeTest < ActiveSupport::TestCase
     assert_nil selection.banner
     assert_equal :breadcrumb, selection.saved_bar
   end
+
+  test "the comparison page: a one-step trail, no banner, the saved bar in the breadcrumb strip" do
+    compare = chrome("compare", "show")
+
+    assert_equal [ [ I18n.t("nexus_ccs.compare.title"), nil ] ], compare.breadcrumbs
+    assert_nil compare.banner
+    assert_equal :breadcrumb, compare.saved_bar
+  end
 end
