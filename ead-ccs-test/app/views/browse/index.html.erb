@@ -1,0 +1,16 @@
+<% content_for :body_class, "page-browse" %>
+<% content_for :title, "Browse the collections — Collections Navigator — University of Melbourne" %>
+<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", nil ] ]) %>
+<%= render NexusCcs::PageBannerComponent.new(title: "Browse the collections", description: "No search term needed. Start from what the records are, where they come from, when they were made, who made them or what they are about.") %>
+<main class="browse" id="main-content">
+  <div class="browse__inner">
+    <ul class="browse__hubs">
+      <% @hubs.each do |hub| %>
+        <li class="browse__hub">
+          <h2 class="browse__hub-title"><%= link_to hub.title, browse_hub_path(hub.slug), class: "browse__hub-link" %></h2>
+          <p class="browse__hub-intro"><%= hub.intro %></p>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</main>

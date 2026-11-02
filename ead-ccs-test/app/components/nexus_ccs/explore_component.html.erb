@@ -18,6 +18,7 @@
               </li>
             <% end %>
           </ul>
+          <%= link_to helpers.browse_hub_path(hub_slug(group)), class: "explore__all" do %>See all <%= group.heading.downcase == "time" ? "periods" : "#{group.heading.downcase}s" %><% end %>
         </div>
       <% end %>
     </div>

@@ -87,6 +87,9 @@ Rails.application.routes.draw do
   get "help/indigenous-data", to: redirect("/help#indigenous", status: 301)
   get "contact", to: redirect("/help#contact-us", status: 301)
   get "about", to: "pages#about", as: :about
+  # The pages behind the home page's Explore tiles: every object type, place, period, maker and subject
+  get "browse", to: "browse#index", as: :browse
+  get "browse/:slug", to: "browse#show", as: :browse_hub
   # Accessibility statement and privacy notice (CCS-148); placeholder wording until the University approves it
   get "accessibility", to: "pages#accessibility", as: :accessibility
   get "privacy", to: "pages#privacy", as: :privacy

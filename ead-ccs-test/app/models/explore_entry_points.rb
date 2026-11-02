@@ -71,9 +71,7 @@ module ExploreEntryPoints
   def self.period_query(first, last) = "#{DATE_FIELD}:[#{first} TO #{last}]"
 
   def self.facet_group(id, heading, field, pairs)
-    items = pairs.to_a.map do |value, count|
-      Item.new(value, count, { any_assets: "1", f: { field => [ value ] }, search_field: "all_fields" })
-    end
+    items = pairs.to_a.map { |value, count| Item.new(value, count, BrowseHubs.query(field, value)) }
     Group.new(id, heading, items)
   end
 
@@ -82,10 +80,10 @@ module ExploreEntryPoints
       count = counts[period_key(first, last)].to_i
       next if count.zero?
 
-      Item.new(label, count, { any_assets: "1", range: { DATE_FIELD => { begin: first, end: last } }, search_field: "all_fields" })
+      Item.new(label, count, BrowseHubs.period_query(first, last))
     end
     Group.new("time", "Time", items)
   end
 
-  private_class_method :fetch_counts, :period_query, :facet_group, :period_group
+  private_class_method :fetch_counts, :facet_group, :period_group
 end

@@ -10,7 +10,11 @@ module NexusCcs
 
     attr_reader :groups
 
+    HUB_SLUGS = { "object-type" => "object-types", "place" => "places", "time" => "periods" }.freeze
+
     def render? = groups.any?
+
+    def hub_slug(group) = HUB_SLUGS.fetch(group.id)
 
     def count_label(count) = "#{helpers.number_with_delimiter(count)} #{'record'.pluralize(count)}"
   end
