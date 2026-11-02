@@ -89,7 +89,7 @@ class PageChromeTest < ActiveSupport::TestCase
   end
 
   test "the search history and saved searches pages: a trail with their own name and no banner, as the page brings one" do
-    { "search_history" => "Search history", "saved_searches" => "Saved searches" }.each do |controller, name|
+    { "search_history" => "Search history", "saved_searches" => "Saved searches", "lists" => "Your lists" }.each do |controller, name|
       page = chrome(controller, "index")
 
       assert_equal [ [ name, nil ] ], page.breadcrumbs

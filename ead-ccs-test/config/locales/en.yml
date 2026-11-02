@@ -148,6 +148,61 @@ en:
       removed: "Search removed from your saved searches."
       not_found: "That search is no longer in your history, so it could not be saved."
       failure: "Sorry, there was a problem saving the search."
+    lists:
+      title: "Your lists"
+      description: "Lists you have made on this device. Add records to a list from a search result or a record page."
+      list_heading: "Your lists"
+      count:
+        one: "%{count} list"
+        other: "%{count} lists"
+      records:
+        one: "%{count} record"
+        other: "%{count} records"
+      empty: "You have not made any lists yet."
+      empty_list: "This list has no records yet. Add one with Add to list on a search result or a record page."
+      new_list: "New list"
+      new_title: "New list"
+      edit_title: "Rename list"
+      name_label: "List name"
+      name_hint: "Up to %{limit} characters. You can have up to %{max_lists} lists, with up to %{max_records} records each."
+      name_error_prefix: "List name"
+      create: "Create list"
+      save_name: "Save name"
+      cancel: "Cancel"
+      back_to_lists: "Back to your lists"
+      saved_records: "Saved records"
+      your_lists: "Your lists"
+      error_summary: "There is a problem"
+      caption: "Your lists"
+      column_name: "List"
+      column_records: "Records"
+      column_actions: "Actions"
+      missing_records: "Some records in this list are no longer in the collection."
+      created: "List %{name} created."
+      created_with_record: "List %{name} created, and the record added to it."
+      renamed: "List renamed to %{name}."
+      deleted: "List %{name} deleted."
+      delete_confirm: "Delete the list %{name}? Its records stay in the collection."
+      added: "Added to %{name}."
+      removed: "Removed from %{name}."
+      not_found: "That list no longer exists."
+      already_in: "That record is already in %{name}."
+      failure: "Sorry, that did not work: %{reason}"
+      actions:
+        rename: "Rename"
+        delete: "Delete"
+        rename_named: "Rename list: %{name}"
+        delete_named: "Delete list: %{name}"
+      menu:
+        button: "Add to list"
+        button_named: "Add to list: %{title}"
+        heading: "Your lists"
+        add: "Add to %{name}"
+        remove: "Remove from %{name}"
+        in_list: "In list"
+        new_label: "New list name"
+        new_submit: "Create and add"
+        none: "You have no lists yet."
     save:
       absent: "Save"
       present: "Saved"
@@ -181,6 +236,17 @@ en:
         body: "The image or file is not shown here. To see it, ask the collection team for access. Your request needs approval."
         link: "Request access to this item"
 
+  activerecord:
+    errors:
+      models:
+        list:
+          attributes:
+            base:
+              too_many_lists: "You can have at most %{count} lists. Delete one to make a new one."
+        list_item:
+          attributes:
+            base:
+              list_full: "A list can hold at most %{count} records. Remove one to add another."
   catalog:
     country_acknowledgement:
       title: "Acknowledgement of Country"

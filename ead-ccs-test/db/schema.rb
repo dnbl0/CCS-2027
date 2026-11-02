@@ -41,6 +41,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_000001) do
     t.index ["user_id"], name: "index_bookmarks_on_user_id"
   end
 
+  create_table "list_items", force: :cascade do |t|
+    t.bigint "list_id", null: false
+    t.string "document_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["list_id", "document_id"], name: "index_list_items_on_list_id_and_document_id", unique: true
+    t.index ["list_id"], name: "index_list_items_on_list_id"
+  end
+
+  create_table "lists", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "user_id, lower((name)::text)", name: "index_lists_on_user_id_and_lower_name", unique: true
+    t.index ["user_id"], name: "index_lists_on_user_id"
+  end
+
   create_table "saved_searches", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "name", null: false

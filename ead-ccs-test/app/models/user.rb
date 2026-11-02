@@ -7,6 +7,7 @@ class User < ApplicationRecord
   include Blacklight::User
 
   has_many :saved_searches, dependent: :destroy
+  has_many :lists, dependent: :destroy
 
   def to_s = "Guest #{id}"
 end

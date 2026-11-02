@@ -1,0 +1,25 @@
+<%# The name of a list, to make one (new) or rename one (edit). A problem is summarised at the top, where focus goes, and
+    repeated at the field, which points to it with aria-describedby. %>
+<% errors = list.errors.full_messages_for(:name) + list.errors.full_messages_for(:base) %>
+<% describedby = [ "list-name-hint", ("list-name-error" if errors.any?) ].compact.join(" ") %>
+<% if errors.any? %>
+  <div class="alert alert-danger" role="group" aria-labelledby="list-error-title" tabindex="-1" data-controller="focus-on-load">
+    <h2 class="h5" id="list-error-title"><%= t("nexus_ccs.lists.error_summary") %></h2>
+    <ul class="mb-0">
+      <% errors.each do |message| %><li><a href="#list_name"><%= message %></a></li><% end %>
+    </ul>
+  </div>
+<% end %>
+<%= form_with model: list, class: "list-form", html: { novalidate: true } do |form| %>
+  <div class="mb-3">
+    <%= form.label :name, t("nexus_ccs.lists.name_label"), class: "form-label", for: "list_name" %>
+    <p class="form-text" id="list-name-hint"><%= t("nexus_ccs.lists.name_hint", limit: List::NAME_LIMIT, max_lists: List::MAX_PER_USER, max_records: ListItem::MAX_PER_LIST) %></p>
+    <% if errors.any? %><p class="list-form__error" id="list-name-error"><span class="visually-hidden"><%= t("nexus_ccs.lists.error_summary") %>: </span><%= errors.to_sentence %></p><% end %>
+    <%= form.text_field :name, id: "list_name", class: "form-control", maxlength: List::NAME_LIMIT, required: true, autocomplete: "off",
+                        aria: { required: true, invalid: (errors.any? || nil), describedby: describedby } %>
+  </div>
+  <div class="list-form__actions">
+    <%= form.submit t(list.persisted? ? "nexus_ccs.lists.save_name" : "nexus_ccs.lists.create"), class: "btn btn-primary" %>
+    <%= link_to t("nexus_ccs.lists.cancel"), (list.persisted? ? list_path(list) : lists_path), class: "btn btn-outline-primary" %>
+  </div>
+<% end %>
