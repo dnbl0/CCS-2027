@@ -1,0 +1,37 @@
+# De-bias notices: the list of terms that may be offensive or outdated (docs/debias-terms.md explains it in plain language).
+#
+# THIS FILE SHIPS WITH NO REAL TERMS. The collections team supplies the list, with Indigenous advisers' review, later. Until then
+# the one entry below is a made-up word, switched off, there only to show the format. Replace the file with
+#   bin/rails debias:import CSV=path/to/spreadsheet.csv
+# which checks the spreadsheet and writes this file, or edit it by hand and run `bin/rails debias:report` to see what it finds.
+# Nothing here changes a record: the app only adds a notice and marks the term where the record shows it.
+#
+# One entry per term or phrase:
+#   id           short unique label, lower case letters, digits and hyphens (made from the term if left out)
+#   term         the word or phrase as written in records: plain text, never a pattern (no * ? [ ] ( ) | \ ^ $ wildcards)
+#   match        word    the whole word only ("art" does not match "party")
+#                phrase  two or more words in this order, with any spacing between them
+#                prefix  any word that starts with it (three letters or more)
+#   case         insensitive (default) or sensitive (use for a term that is only a problem when capitalised)
+#   languages    language codes the term is in, e.g. [en]. Recorded for reviewers; records carry no language field yet, so it
+#                does not narrow the match today
+#   fields       where to look: all, or any of title, description, subject, place, names, material, notes, inscription
+#   explanation  plain-language reason it may be offensive or outdated (required; shown to the visitor)
+#   alternative  a suggested neutral wording (optional; shown to the visitor)
+#   severity     note (outdated or imprecise) or caution (may cause offence or distress)
+#   source       who proposed it and where the explanation comes from (required)
+#   reviewed_on  date a person last reviewed the entry, YYYY-MM-DD (required)
+#   enabled      true to use it. false entries are kept for review and ignored by the app
+terms:
+  - id: example-flibbertigibbet
+    term: flibbertigibbet
+    match: word
+    case: insensitive
+    languages: [en]
+    fields: [all]
+    explanation: "EXAMPLE ONLY, NOT A REAL TERM. This made-up word shows the format. A real entry says, in plain language, why the term may be offensive or outdated."
+    alternative: "example-neutral-word"
+    severity: note
+    source: "Schema example (developers)"
+    reviewed_on: "2026-11-03"
+    enabled: false

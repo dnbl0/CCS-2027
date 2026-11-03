@@ -54,6 +54,8 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `EMU_CSV` | `data/emu.csv` | `lib/tasks/collections.rake` | The EMu export to index |
 | `VERNON_CSV` | `data/vernon.csv` | same | The Vernon export to index |
 | `FORCE` | unset | same | `FORCE=1 bin/rails collections:index` reindexes a core that already has records |
+| `CSV` | none (required) | `lib/tasks/debias.rake` | `bin/rails debias:import CSV=terms.csv` checks the collections team's term spreadsheet and writes the de-bias term list |
+| `OUT` | `config/debias_terms.yml` | same | Where `debias:import` writes the list, to try an import without replacing the real list |
 | `SOURCE_DIR` | `../public/assets/images/collections` | `lib/tasks/digital_assets.rake` | Where `digital_assets:*` reads source images |
 | `CI` | unset | `config/environments/test.rb` | When set, tests eager-load the app, as GitHub CI does. `bin/ci` sets it |
 | `PARALLEL_WORKERS` | CPU count | Rails test runner | `1` runs tests in one process; always use it for system tests |

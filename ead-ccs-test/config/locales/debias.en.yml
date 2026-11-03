@@ -1,0 +1,21 @@
+en:
+  nexus_ccs:
+    # De-bias notices (DebiasTerms, NexusCcs::DebiasNoticeComponent). ALL of this wording is PLACEHOLDER wording for the collections
+    # team and the University's Indigenous advisers to write or approve; it is marked on the page it appears on.
+    debias:
+      title: "This record contains language that may be offensive or outdated"
+      intro: "These words appear in the record as the catalogue holds them. We show them unchanged, so you can see what the record says, and we explain why they may cause offence. They are not our views."
+      flagged_label: "flagged term:"
+      severity:
+        note: "Note"
+        caution: "Caution"
+      found_in: "In %{field}:"
+      alternative: "A more current term: %{alternative}"
+      more_html: "%{count} more flagged terms are in this record's details."
+      read_html: "Read <a href=\"%{about}\">about the language in our records</a>. To suggest a correction, use <a href=\"%{contact}\">Contact the collection team</a> on this page."
+      field_fallback: "this record"
+      page:
+        title: "About the language in our records"
+        description: "Why some records carry a notice about offensive or outdated language, how it works, and how to suggest a correction."
+        crumb: "Language in our records"
+        placeholder_html: "<strong>Placeholder wording, not yet approved.</strong> The collections team and the University's Indigenous advisers must write or approve this page before it is relied on. It describes what the site does today."
