@@ -1,0 +1,18 @@
+<%# /browse/time: the centuries, then the decades from the 1700s. Only records with a start year are placed in time. %>
+<% content_for :title, "#{t('browse.time.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-browse" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("browse.time.title"), description: t("browse.time.blurb")) %>
+
+<main class="browse-main" id="main-content">
+  <div class="browse-main__inner">
+    <p class="browse-note"><%= t("browse.time.note") %></p>
+    <section aria-labelledby="time-centuries">
+      <h2 id="time-centuries"><%= t("browse.time.centuries") %></h2>
+      <%= render "browse/period_list", pairs: @periods.centuries %>
+    </section>
+    <section aria-labelledby="time-decades">
+      <h2 id="time-decades"><%= t("browse.time.decades") %></h2>
+      <%= render "browse/period_list", pairs: @periods.decades %>
+    </section>
+  </div>
+</main>

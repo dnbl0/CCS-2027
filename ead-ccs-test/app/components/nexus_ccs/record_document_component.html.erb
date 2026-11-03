@@ -59,7 +59,7 @@
                   <% else %>
                     <% row.values.each do |value| %>
                       <span class="record-details__value">
-                        <% if link_to_value?(row) %><%= link_to value, value_path(row, value) %><% else %><%= value %><% end %>
+                        <% if link_to_value?(row) %><%= link_to value, value_path(row, value) %><% elsif (browse = browse_path(row, value)) %><%= link_to value, browse %><% else %><%= value %><% end %>
                       </span>
                     <% end %>
                   <% end %>

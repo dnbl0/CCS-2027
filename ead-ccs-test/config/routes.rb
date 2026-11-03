@@ -110,4 +110,13 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+
+  # Browse hubs and entity pages (BrowseController): public, built from Solr facets. Kept in one block.
+  scope "/browse", controller: "browse" do
+    get "/", action: :index, as: :browse_home
+    get "time", action: :time, as: :browse_time
+    get "time/:slug", action: :period, as: :browse_period, constraints: { slug: /[a-z0-9-]+/ }
+    get ":kind", action: :hub, as: :browse_kind, constraints: { kind: /creators|places|subjects/ }
+    get ":kind/:slug", action: :entity, as: :browse_entity, constraints: { kind: /creators|places|subjects/, slug: /[a-z0-9-]+/ }
+  end
 end

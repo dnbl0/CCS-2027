@@ -74,6 +74,16 @@ module NexusCcs
 
     def link_to_value?(row) = row.field.in?(LINK_FIELDS)
 
+    # A record's place, subject and creator values link to the browse page for the value (Browse), where one exists
+    BROWSE_KINDS = { "production_place_ssim" => "places", "subject_ssim" => "subjects", "creator_display_ssim" => "creators" }.freeze
+
+    def browse_path(row, value)
+      kind = BROWSE_KINDS[row.field] or return
+      # creator_display_ssim is "Name (born - died) Role": the page is for the name, which is the record's creator_ssim value it starts with
+      value = Array(document["creator_ssim"]).select { |name| value.start_with?(name) }.max_by(&:length) if kind == "creators"
+      Browse.path_for(kind, value) if value
+    end
+
     def value_path(row, value)
       helpers.search_action_path(filter_query(row.field, value))
     end

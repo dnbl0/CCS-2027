@@ -48,7 +48,7 @@ class SeoController < ActionController::Base
 
   private
 
-  def sitemap = Sitemap.new(base_url: BotControls.base_url(request), records: Sitemap::RecordSource.method(:cached))
+  def sitemap = Sitemap.new(base_url: BotControls.base_url(request), records: Sitemap::RecordSource.method(:cached), extra: Browse::SitemapPaths.method(:paths))
 
   def index_unavailable
     response.headers["Retry-After"] = "300"
