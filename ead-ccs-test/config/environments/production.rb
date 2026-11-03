@@ -33,8 +33,8 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = ENV["RAILS_FORCE_SSL"] == "true"
 
-  # Skip http-to-https redirect for the default health check endpoint.
-  config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
+  # Skip http-to-https redirect for the health checks: /up, and the liveness and readiness probes (CCS-146).
+  config.ssl_options = { redirect: { exclude: ->(request) { %w[/up /healthz /readyz].include?(request.path) } } }
 
   # Log to STDOUT with the current request id as a default log tag.
   config.log_tags = [ :request_id ]
@@ -43,14 +43,17 @@ Rails.application.configure do
   # Change to "debug" to log everything (including potentially personally-identifiable information!).
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 
-  # Prevent health checks from clogging up the logs.
+  # Prevent health checks from clogging up the logs (HealthController quietens /healthz and /readyz itself).
   config.silence_healthcheck_path = "/up"
 
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
 
-  # Replace the default in-process memory cache store with a durable alternative.
-  # config.cache_store = :mem_cache_store
+  # The cache holds the header's collection counts, the sitemap's record list and (RATE_LIMIT_STORE=cache) the rate limit's counts.
+  # CACHE_STORE: memory (default: each process has its own), file (CACHE_PATH, a shared volume), solid_cache (shared, in the database)
+  # or null. See lib/cache_store_config.rb and docs/availability-reliability-scalability.md.
+  require Rails.root.join("lib/cache_store_config")
+  config.cache_store = CacheStoreConfig.build(ENV)
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
   # config.active_job.queue_adapter = :resque
@@ -86,6 +89,6 @@ Rails.application.configure do
   # Allow extra hostnames to be configured without needing an image rebuild
   config.hosts.concat(ENV.fetch("RAILS_HOSTS", "").split(",").map(&:strip).reject(&:empty?))
 
-  # Skip DNS rebinding protection for the default health check endpoint.
-  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  # Skip DNS rebinding protection for the health checks: a probe calls the instance by its address, not the site's name.
+  config.host_authorization = { exclude: ->(request) { %w[/up /healthz /readyz].include?(request.path) } }
 end

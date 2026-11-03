@@ -28,6 +28,20 @@
 threads_count = ENV.fetch("RAILS_MAX_THREADS", 3)
 threads threads_count, threads_count
 
+# Several worker processes (WEB_CONCURRENCY=2 or more) share the app's memory at boot and each get RAILS_MAX_THREADS threads, so the database
+# connections an instance opens are workers x threads (config/database.yml; docs/availability-reliability-scalability.md).
+workers ENV.fetch("WEB_CONCURRENCY", 0).to_i
+preload_app! if ENV.fetch("WEB_CONCURRENCY", 0).to_i > 1
+
+# Graceful shutdown (CCS-146): on SIGTERM (what a container platform sends first) Puma stops accepting connections, lets requests
+# in flight finish for up to PUMA_SHUTDOWN_SECONDS, then stops them. Keep it under the platform's termination grace period.
+# Slow clients are cut off rather than holding a thread: PUMA_FIRST_DATA_TIMEOUT for a connection that sends nothing,
+# PUMA_PERSISTENT_TIMEOUT for an idle keep-alive connection.
+force_shutdown_after ENV.fetch("PUMA_SHUTDOWN_SECONDS", 25).to_i
+worker_shutdown_timeout ENV.fetch("PUMA_SHUTDOWN_SECONDS", 25).to_i
+first_data_timeout ENV.fetch("PUMA_FIRST_DATA_TIMEOUT", 30).to_i
+persistent_timeout ENV.fetch("PUMA_PERSISTENT_TIMEOUT", 20).to_i
+
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
 port ENV.fetch("PORT", 3000)
 

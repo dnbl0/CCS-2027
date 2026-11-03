@@ -11,6 +11,13 @@ class BookmarksController < CatalogController
   layout "pages"
 
   before_action :remember_guest_user, only: %i[create update]
+  # A double click on Save sends two requests: they take turns (a lock on the visitor's row), so the second finds the first's bookmark
+  # and no record is saved twice (there is no unique index on the Blacklight bookmarks table)
+  around_action :one_at_a_time, only: %i[create update]
+  before_action :limit_saved, only: %i[create update]
+
+  # A visitor may keep this many saved records (the saved records page fetches them all from Solr in one request)
+  MAX_SAVED = 500
 
   # The citations of the saved records (CCS-137)
   def citations
@@ -19,6 +26,18 @@ class BookmarksController < CatalogController
   end
 
   private
+
+  def limit_saved
+    incoming = params[:bookmarks].respond_to?(:size) ? params[:bookmarks].size : 1
+    return if current_or_guest_user.bookmarks.count + incoming <= MAX_SAVED
+
+    message = t("nexus_ccs.saved.too_many", count: MAX_SAVED)
+    return render(json: [ message ], status: :unprocessable_content) if request.xhr?
+
+    redirect_back_or_to bookmarks_path, alert: message
+  end
+
+  def one_at_a_time(&block) = current_or_guest_user.with_lock(&block)
 
   # Create the guest's row on the first save and remember it in the (30-day) session cookie.
   def remember_guest_user

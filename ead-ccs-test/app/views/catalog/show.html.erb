@@ -13,3 +13,6 @@
     <% end %>
   <% end %>
 <% end %>
+
+<%= render NexusCcs::RecordTilesComponent.new(id: "related-objects", heading: "Related objects", documents: RelatedObjects.for(@document)) %>
+<%= render NexusCcs::RecordTilesComponent.new(id: "recently-viewed", heading: "Recently viewed", documents: RecentlyViewed.new(session).documents(except: @document.id)) %>

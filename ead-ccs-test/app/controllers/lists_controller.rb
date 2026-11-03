@@ -26,6 +26,13 @@ class ListsController < CatalogController
     @items = items
     @documents = items.empty? ? [] : documents_in_order(items.map(&:document_id))
     @missing = items.size - @documents.size
+  rescue *SolrGuard::FAILURES => e
+    # Solr is down: the list still opens, with its records named by id until the cards can be drawn (CCS-147)
+    Rails.logger.warn("List shown without its records, search unavailable: #{e.class}")
+    @documents = []
+    @missing = 0
+    @unavailable = true
+    response.headers["Retry-After"] = ErrorsController::RETRY_AFTER.fetch("503").to_s
   end
 
   # The citations of the list's records (CCS-137)
@@ -44,11 +51,13 @@ class ListsController < CatalogController
   end
 
   def create
-    @list = guest_owner.lists.build(list_params(:name, :description))
+    owner = guest_owner
+    attrs = list_params(:name, :description)
+    @list = List.just_made(owner, attrs[:name]) || owner.lists.build(attrs) # a repeated request finds the list the first one made
     document_id = params[:document_id].presence
 
-    if @list.save
-      @list.list_items.create(document_id: document_id) if document_id
+    if @list.persisted? || save_once(@list, owner, name)
+      add_once(@list, document_id) if document_id
       notice = t(document_id ? "nexus_ccs.lists.created_with_record" : "nexus_ccs.lists.created", name: @list.name)
       document_id ? back_or_to_lists(notice: notice) : redirect_to(list_path(@list), notice: notice)
     elsif document_id
@@ -93,6 +102,25 @@ class ListsController < CatalogController
     documents_in_order(ids).map { |document| [ Array(document["title_tsim"]).first.presence || document.id.to_s, document.id.to_s ] }
   rescue Blacklight::Exceptions::ECONNREFUSED, Blacklight::Exceptions::InvalidRequest, Faraday::TimeoutError, Faraday::ConnectionFailed
     []
+  end
+
+  # Saves the new list. The unique index (name, ignoring case) settles two requests at once: the one that lost finds the winner's list.
+  def save_once(list, owner, name)
+    list.save
+  rescue ActiveRecord::RecordNotUnique
+    existing = List.just_made(owner, name)
+    if existing
+      @list = existing
+    else
+      list.errors.add(:name, :taken)
+    end
+    existing.present?
+  end
+
+  def add_once(list, document_id)
+    list.list_items.create(document_id: document_id)
+  rescue ActiveRecord::RecordNotUnique
+    nil # already in the list
   end
 
   def find_list

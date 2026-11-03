@@ -9,6 +9,8 @@ class List < ApplicationRecord
   TOKEN_BYTES = 24
   TOKEN_FORMAT = /\A[A-Za-z0-9_-]{32}\z/
   MAX_PER_USER = 25
+  # A name made again within this many seconds is the same request twice (a double click), not a clash
+  DOUBLE_SUBMIT_SECONDS = 10
 
   belongs_to :user
   has_many :list_items, dependent: :destroy
@@ -32,6 +34,13 @@ class List < ApplicationRecord
   def self.find_shared(token)
     token = token.to_s
     token.match?(TOKEN_FORMAT) ? where.not(share_token: nil).find_by(share_token: token) : nil
+  end
+
+  # The visitor's list of this name made a moment ago, if any: what a repeated "Create list" is answered with
+  def self.just_made(user, name)
+    return unless user.persisted?
+
+    user.lists.where("lower(lists.name) = ?", name.to_s.squish.downcase).where(created_at: DOUBLE_SUBMIT_SECONDS.seconds.ago..).first
   end
 
   def full? = list_items.count >= ListItem::MAX_PER_LIST

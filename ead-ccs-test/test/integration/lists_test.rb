@@ -49,7 +49,7 @@ class ListsTest < ActionDispatch::IntegrationTest
     make_list("Violins")
 
     assert_no_difference "List.count" do
-      post "/lists", params: { list: { name: "violins" } }
+      travel(List::DOUBLE_SUBMIT_SECONDS + 1) { post "/lists", params: { list: { name: "violins" } } } # later than a double click
     end
 
     assert_response :unprocessable_content
@@ -127,7 +127,7 @@ class ListsTest < ActionDispatch::IntegrationTest
     make_list("Violins")
 
     assert_no_difference "List.count" do
-      post "/lists", params: { list: { name: "Violins" }, document_id: "a1" }
+      travel(List::DOUBLE_SUBMIT_SECONDS + 1) { post "/lists", params: { list: { name: "Violins" }, document_id: "a1" } }
     end
 
     assert_redirected_to "/lists"

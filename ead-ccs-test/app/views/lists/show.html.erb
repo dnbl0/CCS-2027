@@ -29,6 +29,13 @@
         <p class="saved-empty__text"><%= t("nexus_ccs.lists.empty_list") %></p>
         <%= link_to t("nexus_ccs.saved_searches.start_searching"), root_path, class: "btn btn-primary" %>
       </div>
+    <% elsif @unavailable %>
+      <div class="saved-lists-note" role="status">
+        <p><%= t("nexus_ccs.lists.records_unavailable") %></p>
+        <ul>
+          <% @items.each do |item| %><li><%= link_to item.document_id, solr_document_path(item.document_id) %></li><% end %>
+        </ul>
+      </div>
     <% else %>
       <%= render NexusCcs::BulkSelectionComponent.new(documents: @documents, return_to: list_path(@list)) %>
       <h2 class="visually-hidden"><%= t("nexus_ccs.lists.menu.heading") %></h2>
