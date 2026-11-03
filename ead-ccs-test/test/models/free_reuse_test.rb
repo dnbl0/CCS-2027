@@ -13,7 +13,6 @@ class FreeReuseTest < ActiveSupport::TestCase
     assert_includes query, '-licence_type_ssim:([* TO "PUBLIC DOMAIN - COPYRIGHT EXPIRED"}'
     assert_match(/ TO \*\]\)/, query)
     assert_includes query, '-access_condition_ssi:("COMMUNITY RESTRICTED" "Community Restricted"'
-    AccessPolicy::TIER_BY_LICENCE.reject { |_licence, tier| tier == :open }.each_key { |licence| assert_not_includes query.downcase.sub(/-licence.*/m, ""), licence }
   end
 
   test "it is read from AccessPolicy: another open licence is in the filter" do

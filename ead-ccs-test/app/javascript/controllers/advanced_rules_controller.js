@@ -15,6 +15,7 @@ export default class extends Controller {
   connect() {
     this.element.querySelectorAll("[data-advanced-rules-target='row']").forEach((row) => this.syncMatches(row))
     this.syncAddButton()
+    this.element.dataset.ready = "true" // the buttons now work in place (until then they send the form, which also works)
   }
 
   add(event) {

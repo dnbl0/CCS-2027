@@ -5,6 +5,8 @@
      data-advanced-rules-removed-one-value="<%= t("nexus_ccs.advanced_rules.removed_status.one", count: 1) %>"
      data-advanced-rules-removed-other-value="<%= t("nexus_ccs.advanced_rules.removed_status.other", count: "%{count}") %>"
      data-advanced-rules-limit-value="<%= t("nexus_ccs.advanced_rules.add_limit", max: max_extra) %>">
+  <%# Enter in a box submits the form with its first submit button: this one, so it searches, and does not add or remove a rule. Never shown or focused. %>
+  <input type="submit" name="commit" value="<%= t("blacklight.advanced_search.form.search_btn_html", default: "Search") %>" hidden tabindex="-1">
   <% fixed_rows.each do |field, rule| %>
     <%= render NexusCcs::AdvancedRuleRowComponent.new(rule: rule, field_label: field_label(field), field_options: field_options,
           match_options: match_options(field, rule.match)) %>

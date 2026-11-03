@@ -117,13 +117,13 @@ module AdvancedRules
     return unless rule.active? && field_config
 
     op, query = case rule.match
-                when "all" then [ default_op, edismax(field_config, words(rule.query).map { |word| %(+"#{word}") }.join(" ")) ]
-                when "phrase" then [ default_op, edismax(field_config, (phrase = words(rule.query).join(" ")).empty? ? nil : %("#{phrase}")) ]
-                when "not" then [ :must_not, edismax(field_config, words(rule.query).map { |word| %("#{word}") }.join(" "), mm: "1") ]
-                when "begins" then [ default_op, begins_with(rule) ]
-                when "present" then [ default_op, lucene("#{PRESENCE_FIELD.fetch(rule.field)}:[* TO *]") ]
-                when "empty" then [ default_op, lucene("*:* -#{PRESENCE_FIELD.fetch(rule.field)}:[* TO *]") ]
-                end
+    when "all" then [ default_op, edismax(field_config, words(rule.query).map { |word| %(+"#{word}") }.join(" ")) ]
+    when "phrase" then [ default_op, edismax(field_config, (phrase = words(rule.query).join(" ")).empty? ? nil : %("#{phrase}")) ]
+    when "not" then [ :must_not, edismax(field_config, words(rule.query).map { |word| %("#{word}") }.join(" "), mm: "1") ]
+    when "begins" then [ default_op, begins_with(rule) ]
+    when "present" then [ default_op, lucene("#{PRESENCE_FIELD.fetch(rule.field)}:[* TO *]") ]
+    when "empty" then [ default_op, lucene("*:* -#{PRESENCE_FIELD.fetch(rule.field)}:[* TO *]") ]
+    end
     [ op, query ] if query
   end
 
