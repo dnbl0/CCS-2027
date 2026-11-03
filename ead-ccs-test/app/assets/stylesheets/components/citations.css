@@ -8,6 +8,7 @@
 }
 
 .cite__button,
+.share__button, /* the Share and embed button looks the same as Cite this record */
 .cite__copy {
   display: inline-flex;
   align-items: center;
@@ -24,11 +25,13 @@
 }
 
 .cite__button:hover,
+.share__button:hover,
 .cite__copy:hover {
   background: var(--ccs-cyan-100);
 }
 
 .cite__button:focus-visible,
+.share__button:focus-visible,
 .cite__copy:focus-visible,
 .cite-page__download:focus-visible {
   outline: 3px solid var(--ccs-focus-ring);
