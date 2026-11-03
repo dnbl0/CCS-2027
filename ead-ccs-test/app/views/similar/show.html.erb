@@ -4,7 +4,7 @@
     <div class="similar-records__inner">
       <h2 class="similar-records__heading" id="similar-records-heading"><%= t("nexus_ccs.similar.heading") %></h2>
       <p class="similar-records__description"><%= t("nexus_ccs.similar.description") %></p>
-      <%= render "discover/cards", entries: @entries %>
+      <%= render "discover/cards", entries: @entries, title_tag: :h3 %>
     </div>
   </section>
 </turbo-frame>

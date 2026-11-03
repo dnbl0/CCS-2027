@@ -3,5 +3,5 @@
 <section class="discover-section discover-section--<%= section.key %>" aria-labelledby="<%= heading_id %>">
   <%= content_tag heading_tag, t("nexus_ccs.discover.sections.#{section.key}.heading"), id: heading_id, class: "discover-section__heading" %>
   <p class="discover-section__description"><%= t("nexus_ccs.discover.sections.#{section.key}.description", days: RecordView.window_days) %></p>
-  <%= render "discover/cards", entries: section.entries %>
+  <%= render "discover/cards", entries: section.entries, title_tag: heading_tag == :h2 ? :h3 : :h4 %>
 </section>

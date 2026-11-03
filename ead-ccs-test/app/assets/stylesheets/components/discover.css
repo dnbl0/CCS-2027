@@ -147,14 +147,3 @@ body.page-home .home-discover .ccs-section__inner {
   outline: 3px solid var(--brand-1100);
   outline-offset: 2px;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .discover-frame[complete] {
-    animation: discover-in var(--ccs-duration-base, 150ms) ease-out;
-  }
-}
-
-@keyframes discover-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}

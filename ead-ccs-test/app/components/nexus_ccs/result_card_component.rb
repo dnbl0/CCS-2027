@@ -9,8 +9,9 @@ module NexusCcs
     TITLE_TAG = :h5
 
     # The card's heading is an h5 (Blacklight's default is h3)
-    def initialize(**args)
-      super(**args, title_component: TITLE_TAG)
+    # (title_tag: the discovery sections put cards under an h2 or h3, so their cards are an h3 or h4)
+    def initialize(title_tag: TITLE_TAG, **args)
+      super(**args, title_component: title_tag)
     end
 
     # The card places the Save control itself (below the lines), so the title does not also draw Blacklight's tools. When the

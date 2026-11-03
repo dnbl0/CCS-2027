@@ -14,7 +14,7 @@ class FeaturedRecords
 
   CONFIG_PATH = Rails.root.join("config/featured.yml")
   # Records with an image a visitor may download: the licence says public domain, and the record has a thumbnail
-  POOL_FILTERS = [ 'has_digital_asset_bsi:true', 'licence_type_ssim:"Public domain - Copyright expired"', "-restrictions_tsi:sensitive" ].freeze
+  POOL_FILTERS = [ "has_digital_asset_bsi:true", 'licence_type_ssim:"Public domain - Copyright expired"', "-restrictions_tsi:sensitive" ].freeze
   ATTEMPTS = 5
 
   class << self
