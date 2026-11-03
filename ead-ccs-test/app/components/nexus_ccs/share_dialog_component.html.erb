@@ -1,0 +1,61 @@
+<div class="share" data-controller="dialog" <%= tag.attributes(data: { dialog_open_on_connect_value: (true if open?) }.compact) %>>
+  <button type="button" class="cite__button share__button" aria-haspopup="dialog" data-action="dialog#open">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4" /></svg>
+    <span><%= button_label %></span>
+  </button>
+
+  <dialog class="modal uom-dialog uom-modal cite__dialog share__dialog" id="<%= dom_id %>" data-dialog-target="dialog"
+          data-action="click->dialog#closeOnBackdrop" aria-labelledby="<%= dom_id %>-title">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <button type="button" class="modal-close" data-action="dialog#close"><%= t("nexus_ccs.cite.close") %></button>
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="<%= dom_id %>-title"><%= title %></h2>
+        </div>
+        <div class="modal-body share__body">
+          <%= content %>
+
+          <% if share_url %>
+            <section class="share__section" aria-labelledby="<%= dom_id %>-link-heading">
+              <h3 class="share__heading" id="<%= dom_id %>-link-heading"><%= t("nexus_ccs.share.link_heading") %></h3>
+              <div class="share__field" data-controller="clipboard share" data-share-title-value="<%= subject %>" data-share-url-value="<%= share_url %>">
+                <label class="form-label" for="<%= dom_id %>-link"><%= link_label %></label>
+                <input type="text" class="form-control share__input" id="<%= dom_id %>-link" value="<%= share_url %>" readonly autocomplete="off" data-clipboard-target="source">
+                <div class="share__buttons">
+                  <button type="button" class="cite__copy" data-action="clipboard#copy" data-clipboard-target="button">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="1" /><path d="M5 15V5a1 1 0 0 1 1-1h10" /></svg>
+                    <span data-clipboard-target="label"><%= t("nexus_ccs.share.copy_link") %></span>
+                  </button>
+                  <button type="button" class="cite__copy" hidden data-share-target="button" data-action="share#share"><%= t("nexus_ccs.share.share_sheet") %></button>
+                </div>
+                <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
+              </div>
+            </section>
+          <% end %>
+
+          <% if embed %>
+            <section class="share__section" aria-labelledby="<%= dom_id %>-embed-heading">
+              <h3 class="share__heading" id="<%= dom_id %>-embed-heading"><%= t("nexus_ccs.share.embed_heading") %></h3>
+              <p class="share__note"><%= t("nexus_ccs.share.embed_intro") %></p>
+              <% { fixed: [ embed.fixed, t("nexus_ccs.share.fixed_label", width: embed.width, height: embed.height), t("nexus_ccs.share.copy_fixed") ],
+                   responsive: [ embed.responsive, t("nexus_ccs.share.responsive_label", width: embed.width), t("nexus_ccs.share.copy_responsive") ] }.each do |kind_of_code, (code, label, copy_label)| %>
+                <div class="share__field" data-controller="clipboard">
+                  <label class="form-label" for="<%= dom_id %>-code-<%= kind_of_code %>"><%= label %></label>
+                  <textarea class="form-control share__code" id="<%= dom_id %>-code-<%= kind_of_code %>" rows="4" readonly spellcheck="false" autocomplete="off" data-clipboard-target="source"><%= code %></textarea>
+                  <div class="share__buttons">
+                    <button type="button" class="cite__copy" data-action="clipboard#copy" data-clipboard-target="button">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="1" /><path d="M5 15V5a1 1 0 0 1 1-1h10" /></svg>
+                      <span data-clipboard-target="label"><%= copy_label %></span>
+                    </button>
+                  </div>
+                  <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
+                </div>
+              <% end %>
+              <p class="share__note"><%= link_to t("nexus_ccs.share.preview"), preview_path, target: "_blank", rel: "noopener" %></p>
+            </section>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</div>

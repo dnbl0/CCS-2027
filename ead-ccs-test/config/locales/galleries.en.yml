@@ -1,0 +1,89 @@
+en:
+  activerecord:
+    errors:
+      models:
+        list:
+          attributes:
+            cover_document_id:
+              not_in_list: "must be one of the records in the list"
+  nexus_ccs:
+    # Shared galleries, the share dialog and the embeds. PLACEHOLDER WORDING, NOT YET APPROVED: the University must approve every
+    # sentence about what sharing makes visible, as it is a privacy statement (see docs/compliance-register.md).
+    galleries:
+      page_title: "Shared gallery"
+      link_only: "This is a shared gallery. It is not listed on this site or in search engines: only people who have its link can see it, and it does not say who made it."
+      cover_caption: "Cover:"
+      add_to_mine: "Add to my list"
+      add_to_mine_hint: "Makes a copy of this gallery in your own lists, on this device. The original does not change."
+      empty: "This gallery has no records."
+      without_images:
+        one: "%{count} record is shown without an image: its image is not available to view or is marked sensitive. Open the record to find out more."
+        other: "%{count} records are shown without an image: their images are not available to view or are marked sensitive. Open a record to find out more."
+      missing_records:
+        one: "%{count} record in this gallery is no longer in the collection, so it is not shown."
+        other: "%{count} records in this gallery are no longer in the collection, so they are not shown."
+      back_to_gallery: "Back to %{name}"
+      copied: "Added to your lists as %{name}."
+      copy_failed: "The gallery could not be added to your lists. %{reason}"
+      description_label: "Description (optional)"
+      description_hint: "Shown to anyone you share the list with. Up to %{limit} characters."
+      cover_label: "Cover record (optional)"
+      cover_hint: "The image shown at the top of the shared gallery. Without one, the first record that has an image is used. Records whose images are not available to view are never used."
+      cover_none: "No cover chosen"
+      status_shared: "Shared."
+      status_shared_detail: "Anyone with the link can see this list. Open Share this list to copy the link, make a new one or stop sharing."
+      share:
+        created: "Share link created. Anyone with the link can see this list."
+        regenerated: "New share link made. The old link no longer works."
+        stopped: "Sharing stopped. The old link no longer works."
+        privacy_heading: "What sharing does"
+        anyone: "Anyone with the link can see this list."
+        what_is_shown: "They see its name, its description and its records, as you see them, but not who made it. They can copy it to their own lists."
+        not_listed: "The link is not listed on this site and is kept out of search engines. Anyone you give it to can pass it on."
+        revoking: "Deleting the list, stopping sharing, making a new link or using Delete my data ends the old link at once."
+        manage_heading: "Manage the link"
+        shared_on: "Shared since %{date}."
+        regenerate: "Make a new link"
+        regenerate_confirm: "Make a new link? The old link will stop working."
+        stop: "Stop sharing"
+        stop_confirm: "Stop sharing this list? The link will stop working."
+        create: "Create share link"
+    share:
+      button: "Share and embed"
+      button_list: "Share this list"
+      title: "Share and embed"
+      title_list: "Share this list"
+      link_heading: "Link"
+      link_label_record: "Link to this record"
+      link_label_gallery: "Link to this gallery"
+      copy_link: "Copy link"
+      share_sheet: "Share…"
+      embed_heading: "Embed on your website"
+      embed_intro: "Paste this code into the page. The frame shows the title, creator, date and licence, and the image only where the record allows it, with a link back to the full record."
+      fixed_label: "Fixed size, %{width} by %{height} pixels"
+      responsive_label: "Fills the width of its column, up to %{width} pixels"
+      copy_fixed: "Copy fixed size code"
+      copy_responsive: "Copy responsive code"
+      preview: "Preview the embed (opens in a new tab)"
+    embed:
+      site_name: "Collections Navigator"
+      attribution_html: "From %{site}, University of Melbourne."
+      new_tab: "(opens in a new tab)"
+      licence: "Licence: %{licence}"
+      licence_none: "No licence recorded"
+      notice_request: "The image is not shown here. Open the record to ask the collection team for access."
+      notice_sensitive: "The image is not shown here. Open the record to choose whether to view it."
+      view_record: "View the full record"
+      view_gallery:
+        one: "View the gallery (%{count} record)"
+        other: "View the gallery (%{count} records)"
+      no_image: "No image shown"
+      not_found_title: "Not available"
+      not_found_body: "This record or gallery is not available. It may have been removed, or its link may have changed."
+      unavailable_title: "Temporarily unavailable"
+      unavailable_body: "The collection could not be reached. Try again in a few minutes."
+    my_data:
+      held:
+        shared_lists:
+          one: "%{count} list shared by a link (deleting your data ends the link)"
+          other: "%{count} lists shared by a link (deleting your data ends the links)"
