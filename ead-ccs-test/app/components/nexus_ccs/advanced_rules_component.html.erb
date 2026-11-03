@@ -1,0 +1,35 @@
+<div class="advanced-rules" id="advanced-rules" data-controller="advanced-rules"
+     data-advanced-rules-max-value="<%= max_extra %>" data-advanced-rules-next-key-value="<%= next_key %>"
+     data-advanced-rules-added-value="<%= t("nexus_ccs.advanced_rules.added_status", number: "%{number}", left: "%{left}") %>"
+     data-advanced-rules-added-last-value="<%= t("nexus_ccs.advanced_rules.added_status_last", number: "%{number}") %>"
+     data-advanced-rules-removed-one-value="<%= t("nexus_ccs.advanced_rules.removed_status.one", count: 1) %>"
+     data-advanced-rules-removed-other-value="<%= t("nexus_ccs.advanced_rules.removed_status.other", count: "%{count}") %>"
+     data-advanced-rules-limit-value="<%= t("nexus_ccs.advanced_rules.add_limit", max: max_extra) %>">
+  <% fixed_rows.each do |field, rule| %>
+    <%= render NexusCcs::AdvancedRuleRowComponent.new(rule: rule, field_label: field_label(field), field_options: field_options,
+          match_options: match_options(field, rule.match)) %>
+  <% end %>
+
+  <div class="advanced-rules__extras" data-advanced-rules-target="list">
+    <% extra_rows.each do |rule, number| %>
+      <%= render NexusCcs::AdvancedRuleRowComponent.new(rule: rule, number: number, field_options: field_options,
+            match_options: match_options(rule.field, rule.match), focus: focus_new?(rule)) %>
+    <% end %>
+  </div>
+
+  <template data-advanced-rules-target="template">
+    <%= render NexusCcs::AdvancedRuleRowComponent.new(rule: AdvancedRules::Rule.new("__KEY__", @fields.keys.first, "contains", nil, ""), number: 0,
+          field_options: field_options, match_options: match_options(@fields.keys.first, "contains")) %>
+  </template>
+
+  <p class="visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-advanced-rules-target="status"></p>
+
+  <div class="advanced-rules__actions">
+    <button type="submit" name="add_rule" value="1" formaction="<%= add_path %>" formmethod="get" formnovalidate
+            id="advanced-rules-add" class="advanced-rules__add btn btn-outline-secondary" aria-describedby="advanced-rules-limit"
+            <%= "aria-disabled=true".html_safe if full? %> data-action="advanced-rules#add" data-advanced-rules-target="add">
+      <%= t("nexus_ccs.advanced_rules.add") %>
+    </button>
+    <span id="advanced-rules-limit" class="advanced-rules__limit"><%= t("nexus_ccs.advanced_rules.add_limit", max: max_extra) %></span>
+  </div>
+</div>

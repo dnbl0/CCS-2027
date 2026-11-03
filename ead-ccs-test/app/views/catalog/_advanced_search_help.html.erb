@@ -11,4 +11,10 @@
     <li>Use "OR", "AND", and "NOT" to create complex boolean logic. You can use parentheses in your complex expressions.</li>
     <li>Truncation and wildcards are not supported - word-stemming is done automatically.</li>
   </ul>
+  <h3 class="advanced-search-tips__subtitle"><%= t("nexus_ccs.advanced_rules.help.title") %></h3>
+  <ul class="advanced-help-rules">
+    <% %w[contains fixed not begins add].each do |topic| %>
+      <li><%= t("nexus_ccs.advanced_rules.help.#{topic}") %></li>
+    <% end %>
+  </ul>
 </section>

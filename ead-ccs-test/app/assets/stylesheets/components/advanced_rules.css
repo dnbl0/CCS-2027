@@ -1,0 +1,205 @@
+/*
+ * The rule builder on the Advanced search form (NexusCcs::AdvancedRulesComponent, AdvancedRuleRowComponent, controllers/advanced_rules_controller.js)
+ * and the "Open licence (public domain)" switch (FreeReuseSwitchComponent in the results sidebar, FreeReuseAdvancedComponent on the form).
+ * Fixed rows keep the form's own look (advanced_search.css: the field's name above its box); this file puts a "how to match" menu
+ * beside the words box, lays out the extra rules, and draws the switch.
+ */
+
+/* A rule: the match menu and the words box side by side, stacked when the form is narrow (320px) */
+.advanced-rule__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ccs-space-3);
+}
+
+.advanced-rule__part {
+  display: flex;
+  flex: 0 1 15rem;
+  flex-direction: column;
+  min-width: min(100%, 11rem);
+}
+
+.advanced-rule__part--term {
+  flex: 1 1 14rem;
+}
+
+form.advanced .advanced-rule select.form-select {
+  height: 3rem;
+  border: 1px solid var(--ccs-navy-1100);
+  border-radius: 0;
+  font-size: var(--ccs-font-size-md);
+  color: var(--ccs-text-primary);
+}
+
+/* The words box beside its menu is no taller than the menu */
+form.advanced .advanced-rule input[type="text"]:disabled {
+  background: #f8f9fa;
+  border-color: var(--ccs-border-default);
+}
+
+/* Extra rules: a bordered group with its own heading, so it reads as one rule */
+.advanced-rules__extras {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-4);
+}
+
+.advanced-rules__extras:not(:empty) {
+  margin-bottom: var(--ccs-space-4);
+}
+
+fieldset.advanced-rule--extra {
+  min-width: 0;
+  margin: 0;
+  padding: var(--ccs-space-4);
+  border: 1px solid var(--ccs-border-default);
+  background: #f8f9fa;
+}
+
+.advanced-rule__legend {
+  float: none;
+  width: auto;
+  margin: 0 0 var(--ccs-space-2);
+  padding: 0;
+  font-size: var(--ccs-font-size-lg);
+  font-weight: var(--ccs-font-weight-semibold);
+  line-height: 1.5;
+  color: var(--ccs-navy-1100);
+}
+
+.advanced-rule__label {
+  margin-bottom: var(--ccs-space-1);
+  font-size: var(--ccs-font-size-md);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-navy-1100);
+}
+
+fieldset.advanced-rule--extra input[type="text"] {
+  height: 3rem;
+  border: 1px solid var(--ccs-navy-1100);
+  border-radius: 0;
+  font-size: var(--ccs-font-size-md);
+}
+
+/* Remove and Add: at least 44px high (24px is the minimum), the same height as the boxes beside them */
+.advanced-rule__remove,
+.advanced-rules__add {
+  min-height: 2.75rem;
+  border-radius: 0;
+  font-size: var(--ccs-font-size-md);
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+.advanced-rules__add[aria-disabled="true"] {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.advanced-rules__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ccs-space-3);
+  margin-bottom: var(--ccs-space-4);
+}
+
+.advanced-rules__limit {
+  font-size: var(--ccs-font-size-md);
+  color: var(--ccs-text-primary);
+}
+
+.advanced-help-rules {
+  margin: var(--ccs-space-2) 0 0;
+  padding-left: var(--ccs-space-5);
+  font-size: var(--ccs-font-size-md);
+  line-height: 1.5;
+}
+
+.advanced-search-tips__subtitle {
+  margin: var(--ccs-space-4) 0 var(--ccs-space-2);
+  font-size: var(--ccs-font-size-lg);
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+/* The switch: a button that reads "on" or "off" by more than colour (the thumb moves, and the state is spoken) */
+.free-reuse {
+  padding: var(--ccs-space-3) 0;
+}
+
+.free-reuse__form {
+  margin: 0;
+}
+
+.free-reuse__switch {
+  display: flex;
+  align-items: center;
+  gap: var(--ccs-space-2);
+  min-height: 2.75rem;
+  padding: var(--ccs-space-1) 0;
+  border: 0;
+  background: transparent;
+  font-size: var(--ccs-font-size-md);
+  line-height: 1.4;
+  text-align: left;
+  color: var(--ccs-text-primary);
+  cursor: pointer;
+}
+
+.free-reuse__track {
+  position: relative;
+  flex: none;
+  width: 2.75rem;
+  height: 1.5rem;
+  border: 2px solid var(--ccs-navy-1100);
+  border-radius: 999px;
+  background: var(--ccs-white);
+}
+
+.free-reuse__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: var(--ccs-navy-1100);
+  transition: transform 120ms ease;
+}
+
+.free-reuse__switch[aria-checked="true"] .free-reuse__track {
+  background: var(--ccs-navy-1100);
+}
+
+.free-reuse__switch[aria-checked="true"] .free-reuse__thumb {
+  background: var(--ccs-white);
+  transform: translateX(1.25rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .free-reuse__thumb {
+    transition: none;
+  }
+}
+
+.free-reuse__switch:focus-visible {
+  outline: 3px solid var(--ccs-navy-1100);
+  outline-offset: 2px;
+}
+
+.free-reuse__count {
+  color: var(--ccs-text-primary);
+}
+
+.free-reuse__description {
+  margin: var(--ccs-space-1) 0 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--ccs-text-primary);
+}
+
+/* On the form it is a Bootstrap switch: keep the box 24px or more and let the label wrap */
+.free-reuse--advanced .form-check-input {
+  width: 2.75rem;
+  height: 1.5rem;
+}

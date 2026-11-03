@@ -1,0 +1,46 @@
+<%# Fixed rows keep Blacklight's classes and its label text (the field's name), so the label still names the words box %>
+<% if extra? %>
+  <fieldset class="advanced-rule advanced-rule--extra" id="<%= dom_id(:group) %>" data-advanced-rules-target="row" data-key="<%= key %>">
+    <legend class="advanced-rule__legend" data-advanced-rules-target="legend" data-template="<%= t("nexus_ccs.advanced_rules.extra_title", number: "%{number}") %>"><%= legend %></legend>
+    <div class="advanced-rule__controls">
+      <div class="advanced-rule__part">
+        <%= label_tag dom_id(:field), t("nexus_ccs.advanced_rules.field_label"), class: "advanced-rule__label" %>
+        <%= select_tag name(:field), options_for_select(@field_options, rule.field), id: dom_id(:field), class: "form-select",
+              autofocus: @focus, data: { action: "advanced-rules#fieldChanged", advanced_rules_target: "field" } %>
+      </div>
+      <div class="advanced-rule__part">
+        <%= label_tag dom_id(:match), t("nexus_ccs.advanced_rules.match_menu_label"), class: "advanced-rule__label" %>
+        <%= select_tag name(:match), options_for_select(@match_options, selected_match), id: dom_id(:match), class: "form-select",
+              data: { action: "advanced-rules#matchChanged", advanced_rules_target: "match" } %>
+      </div>
+      <div class="advanced-rule__part advanced-rule__part--term">
+        <%= label_tag dom_id(:query), t("nexus_ccs.advanced_rules.term_label"), class: "advanced-rule__label" %>
+        <%= text_field_tag name(:query), rule.query, id: dom_id(:query), class: "form-control", disabled: term_disabled?,
+              data: { advanced_rules_target: "term" } %>
+      </div>
+      <button type="submit" name="remove_rule" value="<%= key %>" formaction="<%= helpers.advanced_search_catalog_path(anchor: 'advanced-rules-add') %>"
+              formmethod="get" formnovalidate class="advanced-rule__remove btn btn-outline-secondary"
+              data-action="advanced-rules#remove" data-advanced-rules-target="removeButton">
+        <%= t("nexus_ccs.advanced_rules.removed_hint") %><span class="visually-hidden" data-advanced-rules-target="removeName"> <%= legend.to_s.downcase %></span>
+      </button>
+    </div>
+  </fieldset>
+<% else %>
+  <div class="advanced-search-field advanced-rule advanced-rule--fixed row mb-3">
+    <%= label_tag dom_id(:query), field_label, class: "col-sm-3 col-form-label text-md-right" %>
+    <div class="col-sm-9">
+      <%= hidden_field_tag name(:field), rule.field, id: nil %>
+      <div class="advanced-rule__controls">
+        <div class="advanced-rule__part">
+          <%= label_tag dom_id(:match), match_label, class: "visually-hidden" %>
+          <%= select_tag name(:match), options_for_select(@match_options, selected_match), id: dom_id(:match), class: "form-select",
+                data: { action: "advanced-rules#matchChanged", advanced_rules_target: "match" } %>
+        </div>
+        <div class="advanced-rule__part advanced-rule__part--term">
+          <%= text_field_tag name(:query), rule.query, id: dom_id(:query), class: "form-control", disabled: term_disabled?,
+                data: { advanced_rules_target: "term" } %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

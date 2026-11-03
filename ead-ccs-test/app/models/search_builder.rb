@@ -3,6 +3,7 @@
 class SearchBuilder < Blacklight::SearchBuilder
   include Blacklight::Solr::SearchBuilderBehavior
   include BlacklightRangeLimit::RangeLimitBuilder
+  include AdvancedRules::SearchBuilderClauses # Advanced search rules with a fixed reading ("begins with", "is empty"...); old rows go to Blacklight's code
 
 
   # How many of the user's terms a document has to match

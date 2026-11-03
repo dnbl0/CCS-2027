@@ -23,12 +23,19 @@ class SavedSearch < ApplicationRecord
     (name.presence || "All records").truncate(NAME_LIMIT)
   end
 
-  # The words searched for: the search box, or each Advanced search clause's words
+  # The words searched for: the search box, or each Advanced search rule. A row as it has always been is its words; a rule with a
+  # fixed reading says what it asks: 'Title does not contain “skull”', 'Description is empty'.
   def self.terms(params)
-    clauses = params["clause"].is_a?(Hash) ? params["clause"].values.filter_map { |clause| clause["query"] if clause.is_a?(Hash) } : []
+    rules = AdvancedRules.rules(params["clause"]).select(&:active?).map do |rule|
+      next rule.query.squish if rule.legacy?
 
-    [ params["q"], *clauses ].compact_blank.map { |term| term.to_s.squish }
+      "#{field_label(rule.field)} #{AdvancedRules.describe(rule.with(query: rule.query.squish))}"
+    end
+
+    [ params["q"], *rules ].compact_blank.map { |term| term.to_s.squish }
   end
+
+  def self.field_label(field) = CatalogController.blacklight_config.search_fields[field]&.label || field.humanize
 
   # What the search is narrowed to: each filter's values, and a year range as "1900–1950"
   def self.filters(params)
@@ -43,6 +50,7 @@ class SavedSearch < ApplicationRecord
   # The Digital asset filter stores "with"; the page says "With a digital asset"
   def self.filter_label(field, value)
     return "With a digital asset" if field == SearchDefaults::DIGITAL_ASSET_FIELD && value == "with"
+    return I18n.t("nexus_ccs.free_reuse.label") if field == FreeReuse::FIELD && value == FreeReuse::VALUE
 
     value.to_s.squish
   end
@@ -54,7 +62,7 @@ class SavedSearch < ApplicationRecord
     [ from, to ].compact.join("–") if from || to
   end
 
-  private_class_method :terms, :filters, :filter_label, :year_range
+  private_class_method :terms, :field_label, :filters, :filter_label, :year_range
 
   # What the results page needs to repeat the search
   def search_params = query_params.to_h.symbolize_keys

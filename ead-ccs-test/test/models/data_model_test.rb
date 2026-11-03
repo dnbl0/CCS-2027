@@ -28,7 +28,7 @@ class DataModelTest < ActiveSupport::TestCase
   end
 
   # CCS-41 asks for a with/without digital assets option, which is not in the workbook's filter list.
-  JIRA_ADDITIONS = %w[has_digital_asset].freeze
+  JIRA_ADDITIONS = %w[has_digital_asset free_reuse].freeze # free_reuse: the open-licence switch (FreeReuse), not a workbook filter either
 
   test "facets are every workbook filter, in the order of the sheet's # column, with its names, sections and types" do
     expected = DataModel.filters
@@ -67,7 +67,7 @@ class DataModelTest < ActiveSupport::TestCase
     assert_equal "media_type", extra.group
 
     order = config.facet_fields.keys
-    assert_equal "digital_asset_format_ssim", order[order.index("has_digital_asset") + 1]
+    assert_equal %w[free_reuse digital_asset_format_ssim], order[order.index("has_digital_asset") + 1, 2] # the open-licence switch sits under it
   end
 
   test "Creator role is a workbook filter, between Creator Name and the birth date" do
