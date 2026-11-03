@@ -59,7 +59,7 @@
                   <% else %>
                     <% row.values.each_with_index do |value, index| %>
                       <span class="record-details__value">
-                        <% if link_to_value?(row) %><%= link_to value, value_path(row, value) %><% else %><%= flagged(row, value, index) %><% end %>
+                        <% if link_to_value?(row) %><%= link_to value, value_path(row, value) %><% elsif (browse = browse_path(row, value)) %><%= link_to flagged(row, value, index), browse %><% else %><%= flagged(row, value, index) %><% end %>
                       </span>
                     <% end %>
                   <% end %>

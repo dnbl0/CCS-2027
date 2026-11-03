@@ -6,8 +6,10 @@
 #
 #   indexed                 home, Help, About, Advanced search, the results of the whole site or of one collection (page 1, no
 #                           search words or other filter), and a record page whose asset may be shown and is not sensitive
+#                           (and the browse hubs, and the browse pages of a creator, place, subject or period with 5 records or more)
 #   noindex, follow         other results pages (a search, a filter, page 2 on: endless near-duplicates of the pages above, but
-#                           the records they link to are worth following), and the record pages withheld below
+#                           the records they link to are worth following), the record pages withheld below, and the browse pages
+#                           that are thin (fewer than 5 records), filtered or past the first page
 #   noindex, nofollow       personal or action pages (history, saved items, lists, shared galleries (link-only), embeds, oEmbed, access requests, downloads, exports, the
 #                           sensitivity choice, citations, Delete my data, the comparison page, IIIF manifests), the facet and range endpoints, the stock comparison record pages
 #                           (a copy of /catalog/:id), the error pages
@@ -33,9 +35,10 @@ module RobotsPolicy
   # The facet filters a results page may carry and still be indexed: the default digital-asset choice, one collection
   INDEXABLE_FILTERS = %w[has_digital_asset collection_ssim].freeze
 
-  # path: request path; params: the query parameters. document: the record, on a record page. Returns a directive string, or
-  # nil for a path no header belongs on (the site's own scripts and styles).
-  def self.directive(path, params = {}, document: nil, indexing: BotControls.indexing?)
+  # path: request path; params: the query parameters. document: the record, on a record page. thin: a browse page too small, filtered
+  # or past the first page to be worth indexing (PageMeta decides). Returns a directive string, or nil for a path no header
+  # belongs on (the site's own scripts and styles).
+  def self.directive(path, params = {}, document: nil, indexing: BotControls.indexing?, thin: false)
     path = path.to_s
     return nil if UNTOUCHED_PREFIXES.any? { |prefix| path == prefix || path.start_with?("#{prefix}/") }
 
@@ -44,6 +47,7 @@ module RobotsPolicy
     return join(NOINDEX_NOFOLLOW, ai) if !indexing || personal?(path) || stock?(path)
     return join(NOINDEX_FOLLOW, ai) if results?(path) && !indexable_results?(params)
     return join(NOINDEX_FOLLOW, ai) if document && withheld?(document)
+    return join(NOINDEX_FOLLOW, ai) if thin
 
     join(nil, ai)
   end

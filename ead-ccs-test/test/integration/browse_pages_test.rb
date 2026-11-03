@@ -62,7 +62,7 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal [ "Before 1000 2 records", "1950–1959 12 records" ], css_select("a.browse__link").map { |a| a.text.squish }
-    assert_select "a.browse__link[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1950'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1959']"
+    assert_select "a.browse__link[href='/browse/periods/1950-1959']" # each period has a page of its own, which links to the search
   end
 
   test "an unknown way in is not found" do
@@ -93,5 +93,47 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
     assert_select "section.explore a.explore__all[href='/browse/object-types']"
     assert_select "section.explore a.explore__all[href='/browse/places']"
     assert_select "section.explore a.explore__all[href='/browse/periods']"
+  end
+
+  # --- Entity pages (BrowseEntitiesController) and the filter box ---
+
+  test "makers, places and subjects link to their entity pages, with spelling variants as one" do
+    seed("subjects", [ [ "Portraits", 190 ], [ "portraits", 3 ], [ "Archaeology", 20 ] ])
+
+    get "/browse/subjects"
+
+    assert_equal [ "Portraits 193 records", "Archaeology 20 records" ], css_select("a.browse__link").map { |a| a.text.squish }
+    assert_select "a.browse__link[href='#{Browse.path_for('subjects', 'Portraits')}']"
+  end
+
+  test "periods link to their pages" do
+    Rails.cache.write("browse_hubs/v1/periods", [ [ "Before 1000", 2, -10_000, 999 ], [ "1950–1959", 12, 1950, 1959 ] ], expires_in: 1.day)
+
+    get "/browse/periods"
+
+    assert_select "a.browse__link[href='/browse/periods/before-1000']"
+    assert_select "a.browse__link[href='/browse/periods/1950-1959']"
+  end
+
+  test "the type-to-filter box is a plain GET form, narrows the list and says when nothing matches" do
+    seed("places", [ [ "Australia", 20 ], [ "Austria", 5 ], [ "Japan", 9 ] ])
+
+    get "/browse/places", params: { filter: "austr" }
+
+    assert_select "form[method=get][action='/browse/places'] input[type=search][name=filter][value=austr]"
+    assert_select "form label[for=filter]"
+    assert_equal [ "Australia 20 records", "Austria 5 records" ], css_select("a.browse__link").map { |a| a.text.squish }
+    get "/browse/places", params: { filter: "zzz" }
+    assert_select ".browse-empty", /Nothing matches/
+  end
+
+  test "a long list under a letter is paged" do
+    seed("places", (1..130).map { |n| [ "Place #{format('%03d', n)}", n ] })
+
+    get "/browse/places", params: { letter: "P" }
+    assert_select "a.browse__link", count: BrowseList::PAGE_SIZE
+    assert_select "nav.browse-pager a[rel=next]"
+    get "/browse/places", params: { letter: "P", page: 2 }
+    assert_select "a.browse__link", count: 10
   end
 end

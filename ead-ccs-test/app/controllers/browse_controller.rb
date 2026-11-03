@@ -6,11 +6,13 @@ class BrowseController < ApplicationController
 
   def index
     @hubs = BrowseHubs.all
+    @browse_meta = Browse::Meta.index
   end
 
   def show
     @hub = BrowseHubs.find(params[:slug]) || raise(ActionController::RoutingError, "Not Found")
-    @list = BrowseList.new(@hub, letter: params[:letter])
+    @browse_meta = Browse::Meta.hub(@hub)
+    @list = BrowseList.new(@hub, letter: params[:letter], filter: params[:filter], page: params[:page])
     render status: :service_unavailable unless @list.available?
   end
 end

@@ -1,0 +1,12 @@
+<%# Previous / Next between pages of a list, as plain links (no JavaScript). page, pages, label: what the pages are of. %>
+<% if pages > 1 %>
+  <nav class="browse-pager" aria-label="<%= label %>">
+    <% if page > 1 %>
+      <%= link_to t("browse.previous"), url_for(request.query_parameters.merge(page: page - 1 > 1 ? page - 1 : nil)), rel: "prev", class: "browse-pager__link" %>
+    <% end %>
+    <span class="browse-pager__status"><%= t("browse.page_of", page: page, pages: pages) %></span>
+    <% if page < pages %>
+      <%= link_to t("browse.next"), url_for(request.query_parameters.merge(page: page + 1)), rel: "next", class: "browse-pager__link" %>
+    <% end %>
+  </nav>
+<% end %>

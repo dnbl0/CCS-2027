@@ -68,6 +68,8 @@
             </div>
           </li>
 
+          <li><%= link_to t("browse.title"), helpers.browse_path, aria: { current: (helpers.controller_name.start_with?("browse") ? "page" : nil) } %></li>
+
           <li><%= link_to about.label, about.href, aria: { current: (helpers.current_page?(about.href) ? "page" : nil) } %></li>
 
           <li>

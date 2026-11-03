@@ -20,6 +20,7 @@
   <div class="site-footer__main">
     <div class="site-footer__inner">
       <ul class="site-footer__links">
+        <li><%= link_to helpers.browse_path, class: "arrow-link arrow-link--inverse" do %><%= image_tag "site/icon-arrow-footer.svg", alt: "" %><%= t("browse.footer_link") %><% end %></li>
         <% about_links.each do |link| %>
           <li><%= link_to link.href, class: "arrow-link arrow-link--inverse" do %><%= image_tag "site/icon-arrow-footer.svg", alt: "" %><%= link.label %><% end %></li>
         <% end %>

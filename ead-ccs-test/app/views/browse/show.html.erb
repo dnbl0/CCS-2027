@@ -16,17 +16,31 @@
         </nav>
       <% end %>
 
+      <% unless @list.periods? %>
+        <%# Type to filter: a plain GET form, so it works without JavaScript %>
+        <%= form_with url: browse_hub_path(@hub.slug), method: :get, class: "browse-filter", html: { role: "search", "aria-label": t("browse.filter.label", kind: @hub.title.downcase) } do |form| %>
+          <%= form.label :filter, t("browse.filter.label", kind: @hub.title.downcase), class: "browse-filter__label" %>
+          <div class="browse-filter__row">
+            <%= form.search_field :filter, value: @list.filter, id: "filter", class: "browse-filter__input", autocomplete: "off", maxlength: 80 %>
+            <%= form.button t("browse.filter.submit"), type: "submit", class: "btn btn-primary" %>
+            <% if @list.filter %><%= link_to t("browse.filter.clear"), browse_hub_path(@hub.slug), class: "browse-filter__clear" %><% end %>
+          </div>
+        <% end %>
+      <% end %>
+
       <h2 class="browse__heading"><%= @list.heading %></h2>
+      <% if @list.filter && @list.chosen.empty? %><p class="browse-empty"><%= t("browse.filter.none", filter: @list.filter) %></p><% end %>
       <ul class="browse__list">
         <% @list.entries.each do |entry| %>
           <li class="browse__item">
-            <%= link_to search_action_path(entry.query), class: "browse__link" do %>
+            <%= link_to (entry.path || search_action_path(entry.query)), class: "browse__link" do %>
               <span class="browse__label"><%= entry.label.to_s.upcase_first %></span>
               <span class="browse__count"><%= number_with_delimiter(entry.count) %> <%= "record".pluralize(entry.count) %></span>
             <% end %>
           </li>
         <% end %>
       </ul>
+      <%= render "browse_entities/pager", page: @list.page, pages: @list.pages, label: t("browse.pagination", kind: @hub.title.downcase) if @list.paged? %>
     <% else %>
       <p class="browse__unavailable">The list of <%= @hub.title.downcase %> cannot be shown right now. Please try again in a few minutes, or <%= link_to "search all records", search_action_path(any_assets: "1", search_field: "all_fields") %>.</p>
     <% end %>

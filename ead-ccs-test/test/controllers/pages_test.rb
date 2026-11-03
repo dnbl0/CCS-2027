@@ -130,12 +130,12 @@ class PagesTest < ActionDispatch::IntegrationTest
     assert_select ".site-nav a[href='/about']", count: 1
   end
 
-  test "the header lists Search collections, About and Help in that order" do
+  test "the header lists Search collections, Browse, About and Help in that order" do
     get "/about"
 
-    labels = [ "Search collections", "About", "Help" ]
+    labels = [ "Search collections", "Browse", "About", "Help" ]
     items = css_select(".site-nav > ul > li").map { |item| item.text.squish }
-    assert_equal labels, items.first(3).map { |text| labels.find { |label| text.start_with?(label) } }
+    assert_equal labels, items.first(4).map { |text| labels.find { |label| text.start_with?(label) } }
     assert_select "#site-nav a[href='https://about.unimelb.edu.au']", count: 0
   end
 

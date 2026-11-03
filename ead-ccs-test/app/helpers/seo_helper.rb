@@ -6,7 +6,7 @@ module SeoHelper
   def page_meta
     @page_meta ||= PageMeta.new(
       controller: controller_path, action: action_name, path: request.path, params: request.query_parameters,
-      base_url: BotControls.base_url(request), title: plain_text(content_for(:title).presence || @page_title), document: @document
+      base_url: BotControls.base_url(request), title: plain_text(content_for(:title).presence || @page_title), document: @document, browse: @browse_meta
     ).tap { |meta| request.env["ccs.robots"] = meta.robots }
   end
 

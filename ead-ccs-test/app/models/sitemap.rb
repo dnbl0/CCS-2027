@@ -14,9 +14,11 @@ class Sitemap
   # The results page is the default search, as /catalog redirects to it (SearchDefaults), so the redirect is not what is listed
   STATIC_PATHS = %w[/ /catalog?f%5Bhas_digital_asset%5D%5B%5D=with&search_field=all_fields /catalog/advanced /help /about /accessibility /privacy /language-in-our-records /discover].freeze
 
-  def initialize(base_url:, records:, page_size: PAGE_SIZE)
+  # extra: answers #call with more public paths (the browse pages), listed after the static ones
+  def initialize(base_url:, records:, page_size: PAGE_SIZE, extra: -> { [] })
     @base_url = base_url.to_s.chomp("/")
     @records = records
+    @extra = extra
     @page_size = page_size
   end
 
@@ -39,7 +41,7 @@ class Sitemap
 
   # Every URL: [address, lastmod or nil]
   def urls
-    @urls ||= STATIC_PATHS.map { |path| [ path == "/" ? "#{@base_url}/" : "#{@base_url}#{path}", nil ] } +
+    @urls ||= (STATIC_PATHS + @extra.call).map { |path| [ path == "/" ? "#{@base_url}/" : "#{@base_url}#{path}", nil ] } +
               @records.call.map { |id, lastmod| [ "#{@base_url}/catalog/#{ERB::Util.url_encode(id)}", lastmod ] }
   end
 

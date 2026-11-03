@@ -1,0 +1,83 @@
+<%# The body of an entity or period page: facts, the records (images first) as the site's result cards, the link to all of them
+    in the search, and related entities. Records whose images or details need permission are left out of the grid
+    (Browse::Profile; the count and the search include them). %>
+<% result = @result %>
+<% span = Browse::Meta.span_of(result) %>
+<% life = entry && entry.kind.key == "makers" && result.documents.filter_map { |document| Browse::Meta.life_dates(document, entry.variants) }.tally.max_by(&:last)&.first %>
+<main class="browse-main" id="main-content">
+  <div class="browse-main__inner">
+    <% advisory = result.cultural.positive? || name.match?(/aborigin|indigenous|torres strait|first nations|koori|palawa/i) %>
+    <% if advisory %>
+      <aside class="browse-advisory" aria-labelledby="browse-advisory-title">
+        <h2 id="browse-advisory-title" class="browse-advisory__title"><%= t("browse.entity.advisory_title") %></h2>
+        <p><%= t("browse.entity.advisory") %> <%= link_to t("browse.entity.advisory_link"), "/help#indigenous" %></p>
+      </aside>
+    <% end %>
+
+    <section class="browse-facts" aria-labelledby="browse-facts-title">
+      <h2 id="browse-facts-title"><%= t("browse.entity.facts") %></h2>
+      <dl class="browse-facts__list">
+        <div><dt><%= t("browse.entity.records_count") %></dt><dd><%= number_with_delimiter(total) %></dd></div>
+        <% if span %><div><dt><%= t("browse.entity.date_span") %></dt><dd><%= span %></dd></div><% end %>
+        <% if life %><div><dt><%= t("browse.entity.life_dates") %></dt><dd><%= life %></dd></div><% end %>
+        <% if period&.parent %><div><dt><%= t("browse.period.parent") %></dt><dd><%= link_to period.parent.label, period.parent.path %></dd></div><% end %>
+        <% if result.facets["collection_ssim"].any? %>
+          <div><dt><%= t("browse.entity.collections") %></dt>
+            <dd><ul class="browse-facts__links">
+              <% result.facets["collection_ssim"].first(4).each do |value, count| %>
+                <li><%= link_to value, search_catalog_path(refine(@search_query, "collection_ssim", value)) %> <span class="browse-list__count">(<%= number_with_delimiter(count) %>)</span></li>
+              <% end %>
+            </ul></dd></div>
+        <% end %>
+        <% if result.facets["object_type_ssim"].any? %>
+          <div><dt><%= t("browse.entity.object_types") %></dt>
+            <dd><ul class="browse-facts__links">
+              <% result.facets["object_type_ssim"].first(5).each do |value, count| %>
+                <li><%= link_to value, search_catalog_path(refine(@search_query, "object_type_ssim", value)) %> <span class="browse-list__count">(<%= number_with_delimiter(count) %>)</span></li>
+              <% end %>
+            </ul></dd></div>
+        <% end %>
+      </dl>
+      <p><%= link_to t("browse.entity.see_all", count: number_with_delimiter(total)), search_catalog_path(@search_query), class: "btn btn-primary" %></p>
+    </section>
+
+    <section class="browse-records" aria-labelledby="browse-records-title">
+      <h2 id="browse-records-title"><%= t("browse.entity.records") %></h2>
+      <% if result.documents.empty? %>
+        <p class="browse-empty"><%= t("browse.entity.empty_page") %></p>
+      <% else %>
+        <%= render_document_index_with_view :list, result.documents %>
+      <% end %>
+      <% if result.held_back.positive? %><p class="browse-note"><%= t("browse.entity.held_back") %></p><% end %>
+      <%= render "browse_entities/pager", page: result.page, pages: result.pages, label: t("browse.entity.pagination") %>
+    </section>
+
+    <% related = [] %>
+    <% related << [ t("browse.entity.related_makers"), :makers, related_entities(Browse::Kind.find("makers"), result.facets["creator_ssim"], except: (entry if entry&.kind&.key == "makers")) ] %>
+    <% related << [ t("browse.entity.related_places"), :places, related_entities(Browse::Kind.find("places"), result.facets["production_place_ssim"], except: (entry if entry&.kind&.key == "places")) ] %>
+    <% related << [ t("browse.entity.related_subjects"), :subjects, related_entities(Browse::Kind.find("subjects"), result.facets["subject_ssim"], except: (entry if entry&.kind&.key == "subjects")) ] %>
+    <% related = related.reject { |_, _, pairs| pairs.empty? } %>
+    <% periods = result.periods.select { |_, count| count.positive? } %>
+    <% if related.any? || periods.any? %>
+      <section class="browse-related" aria-labelledby="browse-related-title">
+        <h2 id="browse-related-title"><%= t("browse.entity.related") %></h2>
+        <% related.each_with_index do |(heading, kind_key, pairs), i| %>
+          <h3 id="related-<%= kind_key %>"><%= heading %></h3>
+          <ul class="browse-list" aria-labelledby="related-<%= kind_key %>">
+            <% pairs.each do |related_entry, count| %>
+              <li><%= link_to related_entry.name, related_entry.path, class: "browse-list__link" %> <span class="browse-list__count"><%= t("browse.records", count: count) %></span></li>
+            <% end %>
+          </ul>
+        <% end %>
+        <% if periods.any? %>
+          <h3 id="related-periods"><%= period ? t("browse.period.within") : t("browse.entity.related_periods") %></h3>
+          <ul class="browse-list" aria-labelledby="related-periods">
+            <% periods.each do |related_period, count| %>
+              <li><%= link_to related_period.label, related_period.path, class: "browse-list__link" %> <span class="browse-list__count"><%= t("browse.records", count: count) %></span></li>
+            <% end %>
+          </ul>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+</main>

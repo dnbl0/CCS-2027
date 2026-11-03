@@ -1,0 +1,5 @@
+<%# One century or decade (Browse::Period): see _profile. %>
+<% content_for :title, t("browse.period.title", period: @period.label) %>
+<% content_for :body_class, "page-browse page-browse-entity" %>
+<%= render NexusCcs::PageBannerComponent.new(title: @period.label, description: t("browse.periods")) %>
+<%= render "browse_entities/profile", name: @period.label, total: @result.total, entry: nil, period: @period %>
