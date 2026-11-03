@@ -130,7 +130,8 @@ class SiteChromeTest < ActiveSupport::TestCase
     render_inline(NexusCcs::SiteFooterComponent.new)
 
     assert_selector "footer.site-footer h2", text: "Acknowledgement of Country"
-    assert_selector ".site-footer__links a", count: NexusCcs::SiteNavigation::FOOTER_ABOUT.size
+    assert_selector ".site-footer__links a", count: NexusCcs::SiteNavigation::FOOTER_ABOUT.size + 1 # and the Browse link
+    assert_selector ".site-footer__links a", text: "Browse the collections"
     assert_selector ".site-footer__social a[aria-label]", count: NexusCcs::SiteNavigation::FOOTER_SOCIAL.size
     assert_selector ".site-footer__identifiers", text: "CRICOS: 00116K"
   end
