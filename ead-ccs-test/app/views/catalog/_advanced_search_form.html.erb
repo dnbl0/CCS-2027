@@ -1,0 +1,7 @@
+<%# Blacklight's own partial, with the rule builder (NexusCcs::AdvancedSearchFormComponent) in place of its component %>
+<%= render(NexusCcs::AdvancedSearchFormComponent.new(
+      url: search_action_url,
+      classes: ['advanced'],
+      params: search_state.params_for_search.except(:qt),
+      response: @response
+    )) %>

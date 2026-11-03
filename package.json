@@ -13,6 +13,7 @@
     "build:css:dev": "sass --quiet-deps --silence-deprecation=import --load-path=node_modules src/scss/custom-bootstrap.scss:public/styles/vendor/bootstrap-uom.css",
     "watch:css": "sass --quiet-deps --silence-deprecation=import --load-path=node_modules --watch src/scss/custom-bootstrap.scss:public/styles/vendor/bootstrap-uom.css",
     "verify:bootstrap": "bash verify-bootstrap.sh",
+    "export:copy": "node scripts/export-copy.js",
     "build:pages": "node scripts/build-pages.js",
     "lint": "eslint . && stylelint \"public/styles/**/*.css\" && npm run lint:rails-css",
     "lint:rails-css": "stylelint --config ead-ccs-test/.stylelintrc.json --config-basedir . \"ead-ccs-test/app/assets/stylesheets/**/*.css\"",

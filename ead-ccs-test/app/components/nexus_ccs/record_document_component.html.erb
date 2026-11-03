@@ -25,6 +25,7 @@
         </div>
       <% end %>
       <div class="record-summary__cite"><%= render NexusCcs::CiteComponent.new(document: document) %></div>
+      <div class="record-summary__share"><%= render NexusCcs::ShareDialogComponent.new(kind: :record, document: document) %></div>
     </div>
   </section>
 

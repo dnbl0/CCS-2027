@@ -1,0 +1,45 @@
+<%# A shared list (a gallery): read-only, for anyone with the link. The records are the site's result cards in the owner's order.
+    It names no owner. Noindex and nofollow (RobotsPolicy). Placeholder wording until the University approves it. %>
+<% gallery_url = "#{BotControls.base_url(request)}#{gallery_path(@list.share_token)}" %>
+<% content_for :title, "#{@list.name} — #{t('nexus_ccs.galleries.page_title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-saved page-lists page-gallery" %>
+<% content_for(:head) { oembed_link_tag(gallery_url, @list.name) } %>
+<%= render NexusCcs::PageBannerComponent.new(title: @list.name, description: @list.description) %>
+
+<main class="saved-main" id="main-content">
+  <div class="saved-main__inner">
+    <p class="gallery-note" role="note"><%= t("nexus_ccs.galleries.link_only") %></p>
+
+    <% if @cover_path %>
+      <figure class="gallery-cover">
+        <%= image_tag @cover_path, alt: "", loading: "lazy", decoding: "async" %>
+        <figcaption><%= t("nexus_ccs.galleries.cover_caption") %> <%= link_to Array(@cover["title_tsim"]).first.presence || "Untitled", solr_document_path(@cover) %></figcaption>
+      </figure>
+    <% end %>
+
+    <div class="saved-toolbar">
+      <h2 class="saved-toolbar__count" tabindex="-1" <%= tag.attributes(data: { controller: ("focus-on-load" if flash.any?) }.compact) %>><%= t("nexus_ccs.lists.records", count: @items.size) %></h2>
+      <div class="saved-toolbar__actions">
+        <span class="d-inline-flex" data-controller="clipboard">
+          <span hidden data-clipboard-target="source" data-copy="<%= gallery_url %>"></span>
+          <button type="button" class="btn btn-outline-primary" data-action="clipboard#copy" data-clipboard-target="button"><span data-clipboard-target="label"><%= t("nexus_ccs.share.copy_link") %></span></button>
+          <span class="visually-hidden" role="status" data-clipboard-target="status"></span>
+        </span>
+        <%= link_to t("nexus_ccs.cite_page.link"), citations_gallery_path(@list.share_token), class: "btn btn-outline-primary" if @items.any? %>
+        <%= render NexusCcs::ShareDialogComponent.new(kind: :gallery, list: @list) %>
+        <%= button_to t("nexus_ccs.galleries.add_to_mine"), copy_gallery_path(@list.share_token), class: "btn btn-primary", form: { class: "d-inline" },
+                      aria: { describedby: "gallery-copy-hint" } %>
+      </div>
+    </div>
+    <p class="gallery-hint" id="gallery-copy-hint"><%= t("nexus_ccs.galleries.add_to_mine_hint") %></p>
+
+    <% if @items.empty? %>
+      <div class="saved-empty"><p class="saved-empty__text"><%= t("nexus_ccs.galleries.empty") %></p></div>
+    <% else %>
+      <h2 class="visually-hidden"><%= t("nexus_ccs.lists.menu.heading") %></h2>
+      <% if @without_image.positive? %><p class="saved-lists-note"><%= t("nexus_ccs.galleries.without_images", count: @without_image) %></p><% end %>
+      <% if @missing.positive? %><p class="saved-lists-note"><%= t("nexus_ccs.galleries.missing_records", count: @missing) %></p><% end %>
+      <%= render_document_index_with_view :list, @documents %>
+    <% end %>
+  </div>
+</main>

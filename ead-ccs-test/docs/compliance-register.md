@@ -92,6 +92,8 @@ What the site stores, today:
 | `country_acknowledged` cookie | Browser | No | 1 day | Browser |
 | `users` row (guest) | Database | Pseudonymous | Not limited | Delete my data |
 | `bookmarks`, `lists`, `list_items`, `saved_searches` | Database | Pseudonymous | Not limited | Delete my data |
+| `lists.share_token`, `description`, `cover_document_id` (galleries) | Database | Pseudonymous; a share link is a capability: anyone holding it can read the list, which names no owner | Until the owner stops sharing, makes a new link, deletes the list or uses Delete my data (all end the link at once) | Delete my data; the owner's Stop sharing. **Placeholder privacy wording on `/privacy`; the University must approve it** |
+| Embed pages (`/embed/*`) and oEmbed | Response only; no cookie, no storage | Public data only (SharedMedia: no image for a withheld or sensitive record) | n/a | The only framable pages (`EMBED_FRAME_ANCESTORS`); noindex. The University should confirm that any site may embed |
 | `searches` (words and filters) | Database | Words a visitor typed can be personal | Not limited (`blacklight:delete_old_searches` exists but is not scheduled) | Delete my data (own history); otherwise nothing |
 | `access_requests` (name, email, organisation, reason, record) | Database | Yes | Not limited | Not by Delete my data. By staff on request. |
 | Web server logs | Azure | Addresses and pages | Azure's setting | Not by the app |

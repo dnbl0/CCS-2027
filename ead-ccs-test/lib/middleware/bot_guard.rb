@@ -82,7 +82,7 @@ class BotGuard
     if path.start_with?("/digital-assets/") then "asset"
     elsif path.start_with?("/downloads") || path.match?(%r{\A/catalog/[^/]+/metadata\z}) then "download"
     elsif path.match?(%r{\A/catalog(\.\w+)?\z}) || path.start_with?("/catalog/facet/", "/catalog/range_limit", "/catalog/suggest") then "search"
-    elsif path.start_with?("/stock/", "/branded-stock/") || record_path?(path) then "record"
+    elsif path.start_with?("/stock/", "/branded-stock/", "/galleries/", "/embed/", "/oembed") || record_path?(path) then "record"
     end
   end
 

@@ -12,7 +12,10 @@ module CatalogConfig
       # config/data_model/solr_mapping.yml) says so in place of values, and is never asked of Solr.
       DataModel.filters.each do |filter|
         # CCS-41 (not in the workbook): the Digital asset option sits above Digital Asset Format Type.
-        add_digital_asset_option(config) if filter.name == DIGITAL_ASSET_FORMAT_FILTER
+        if filter.name == DIGITAL_ASSET_FORMAT_FILTER
+          add_digital_asset_option(config)
+          add_free_reuse_option(config)
+        end
 
         unless filter.available?
           config.add_facet_field filter.key, label: filter.name, group: filter.group, include_in_request: false,
@@ -30,6 +33,7 @@ module CatalogConfig
       end
 
       add_digital_asset_option(config) unless config.facet_fields.key?("has_digital_asset")
+      add_free_reuse_option(config) unless config.facet_fields.key?(FreeReuse::FIELD)
 
       config.add_facet_fields_to_solr_request!
     end
@@ -52,6 +56,13 @@ module CatalogConfig
         with: { label: "With a digital asset", fq: "has_digital_asset_bsi:true" },
         without: { label: "Without a digital asset", fq: "-has_digital_asset_bsi:true" }
       }
+    end
+
+    # The "Open licence (public domain)" switch (FreeReuse): not in the workbook either; it sits under Digital asset. A switch, not a
+    # list of values, on the results page (NexusCcs::FreeReuseSwitchComponent) and on Advanced search (FreeReuseAdvancedComponent).
+    def self.add_free_reuse_option(config)
+      config.add_facet_field FreeReuse::FIELD, label: I18n.t("nexus_ccs.free_reuse.facet"), group: "media_type", query: FreeReuse.query_config,
+        component: NexusCcs::FreeReuseSwitchComponent, advanced_search_component: NexusCcs::FreeReuseAdvancedComponent
     end
   end
 end
