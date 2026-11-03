@@ -77,7 +77,9 @@ module DebiasTerms
         next unless SCANNED_FIELDS.include?(field)
 
         Array(values).first(MAX_VALUES).each_with_index do |value, index|
-          text = normalise(value)
+          # Cut before normalising: Unicode normalisation is regex-based and Rails' global Regexp.timeout (1 s) would stop it on a
+          # multi-megabyte value. Twice the window leaves room for normalisation to shrink the text.
+          text = normalise(value.to_s[0, MAX_LENGTH * 2])
           next if text.empty?
 
           window = text[0, MAX_LENGTH]
