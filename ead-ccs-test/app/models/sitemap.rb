@@ -12,7 +12,7 @@ class Sitemap
   PAGE_SIZE = 10_000
   XMLNS = "http://www.sitemaps.org/schemas/sitemap/0.9"
   # The results page is the default search, as /catalog redirects to it (SearchDefaults), so the redirect is not what is listed
-  STATIC_PATHS = %w[/ /catalog?f%5Bhas_digital_asset%5D%5B%5D=with&search_field=all_fields /catalog/advanced /help /about /accessibility /privacy].freeze
+  STATIC_PATHS = %w[/ /catalog?f%5Bhas_digital_asset%5D%5B%5D=with&search_field=all_fields /catalog/advanced /help /about /accessibility /privacy /language-in-our-records].freeze
 
   def initialize(base_url:, records:, page_size: PAGE_SIZE)
     @base_url = base_url.to_s.chomp("/")

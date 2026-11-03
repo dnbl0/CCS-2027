@@ -1,0 +1,20 @@
+<aside class="record-card record-debias" aria-labelledby="record-debias-title" data-placeholder-wording>
+  <h2 class="record-copyright__title" id="record-debias-title"><%= t("nexus_ccs.debias.title") %></h2>
+  <div class="record-debias__body">
+    <p><%= t("nexus_ccs.debias.intro") %></p>
+    <ul class="record-debias__list">
+      <% items.each do |item| %>
+        <li class="record-debias__item record-debias__item--<%= item.entry.severity %>">
+          <p class="record-debias__term"><span class="record-debias__severity"><%= severity(item.entry) %>:</span> <%= item.contexts.first.found %></p>
+          <% item.contexts.each do |context| %>
+            <p class="record-debias__context"><%= t("nexus_ccs.debias.found_in", field: context.field_label) %> <q><%= context.before %><mark><%= context.found %></mark><%= context.after %></q></p>
+          <% end %>
+          <p class="record-debias__explanation"><%= item.entry.explanation %></p>
+          <% if item.entry.alternative %><p class="record-debias__alternative"><%= t("nexus_ccs.debias.alternative", alternative: item.entry.alternative) %></p><% end %>
+        </li>
+      <% end %>
+    </ul>
+    <% if more.positive? %><p><%= t("nexus_ccs.debias.more_html", count: more) %></p><% end %>
+    <p class="mb-0"><%= t("nexus_ccs.debias.read_html", about: helpers.language_in_records_path, contact: "#contact-collection-heading") %></p>
+  </div>
+</aside>

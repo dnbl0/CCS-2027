@@ -116,4 +116,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+
+  # De-bias notices: the page the record page's notice links to (DebiasTerms)
+  get "language-in-our-records", to: "pages#language_in_records", as: :language_in_records
 end
