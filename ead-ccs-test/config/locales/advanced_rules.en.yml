@@ -1,0 +1,55 @@
+en:
+  nexus_ccs:
+    # The Advanced search rules and the open-licence switch. PLACEHOLDER WORDING, NOT YET APPROVED by the University.
+    free_reuse:
+      facet: "Reuse"
+      label: "Open licence (public domain)"
+      description: "Records whose licence lets you view and download the files. This is not legal advice: a record can have other limits, so check its Copyright card before you reuse it. Placeholder wording."
+      carried: "This is already on for the search (see the filters above the form). Take it off there."
+    advanced_rules:
+      # How a rule reads on a filter pill, in search history, in a saved search's name and in "Why am I seeing these results?"
+      reading:
+        contains: "%{term}"
+        all: "contains all of “%{term}”"
+        phrase: "contains the phrase “%{term}”"
+        begins: "begins with “%{term}”"
+        not: "does not contain “%{term}”"
+        present: "has a value"
+        empty: "is empty"
+      # The menu on each rule, in this order
+      matches:
+        contains: "contains"
+        all: "contains all of these words"
+        phrase: "contains this exact phrase"
+        begins: "begins with"
+        not: "does not contain these words"
+        present: "has a value"
+        empty: "is empty"
+      match_label: "%{field}: how to match"
+      extra_title: "Additional rule %{number}"
+      field_label: "Field"
+      match_menu_label: "How to match"
+      term_label: "Search words"
+      add: "Add another rule"
+      add_limit: "You can add up to %{max} more rules."
+      removed_hint: "Remove"
+      # Said politely (a status) when JavaScript adds or removes a rule
+      added_status: "Rule %{number} added. %{left} more can be added."
+      added_status_last: "Rule %{number} added. That is the most you can add."
+      removed_status:
+        one: "Rule removed. %{count} added rule left."
+        other: "Rule removed. %{count} added rules left."
+      help:
+        title: "Rules"
+        contains: "“contains” reads your words as the search tips describe (AND, OR, quotation marks, + and -)."
+        fixed: "The other choices read your words as they are typed: no search syntax is needed."
+        not: "A “does not contain” rule always leaves records out, whether the rows are matched all or any."
+        begins: "“Begins with” looks at the start of the whole title, creator or subject."
+        add: "Use “Add another rule” to give a field more than one rule, for example a title that contains one word but not another."
+    diagnostics:
+      clause:
+        all: "%{field} must contain all of the words %{query}."
+        phrase: "%{field} must contain the phrase %{query}."
+        begins: "%{field} must begin with %{query}."
+        present: "%{field} must have a value."
+        empty: "%{field} must be empty."

@@ -36,6 +36,7 @@
 @import url("components/facet_list.css");
 @import url("components/skeleton.css");
 @import url("components/advanced_search.css");
+@import url("components/advanced_rules.css");
 @import url("components/record_page.css");
 @import url("components/record_tiles.css");
 @import url("components/contact_help.css");
@@ -43,6 +44,7 @@
 @import url("components/saved_bar.css");
 @import url("components/saved_records.css");
 @import url("components/citations.css");
+@import url("components/sharing.css");
 @import url("components/sensitivity_gate.css");
 @import url("components/bulk_download.css");
 @import url("components/selection.css");
@@ -55,4 +57,5 @@
 @import url("pages/contact.css");
 @import url("pages/help.css");
 @import url("pages/indigenous_data.css");
+@import url("components/debias.css");
 @import url("components/responsive.css");

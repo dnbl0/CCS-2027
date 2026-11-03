@@ -14,6 +14,9 @@
 #
 # No image, and a general description, for a record the policy withholds or that is sensitive.
 class PageMeta
+  # The path's first segment => the key in seo.description; any other page is described as About
+  PAGE_DESCRIPTIONS = { "accessibility" => "accessibility", "privacy" => "privacy", "help" => "help", "language-in-our-records" => "language", "discover" => "discover" }.freeze
+
   attr_reader :canonical_url, :robots, :description, :title, :og_image, :json_ld
 
   # controller/action: from the request; path/params: the request path and query parameters; document: on a record page
@@ -56,7 +59,7 @@ class PageMeta
   def description_for(params)
     case @type
     when :home, :advanced then I18n.t("seo.description.#{@type}")
-    when :page then I18n.t("seo.description.#{@path.delete_prefix('/').split('/').first.presence_in(%w[accessibility privacy help discover]) || 'about'}")
+    when :page then I18n.t("seo.description.#{PAGE_DESCRIPTIONS.fetch(@path.delete_prefix('/').split('/').first, 'about')}")
     when :results then results_description(params)
     when :record, :stock then @document && !RobotsPolicy.withheld?(@document) ? StructuredData::Description.of(@document) : I18n.t("seo.description.record_withheld")
     end

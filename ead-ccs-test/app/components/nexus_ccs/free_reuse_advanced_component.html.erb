@@ -1,0 +1,11 @@
+<div class="free-reuse free-reuse--advanced">
+  <div class="form-check form-switch free-reuse__check">
+    <%= check_box_tag input_name, FreeReuse::VALUE, checked?, id: input_id, role: "switch", class: "form-check-input",
+          disabled: carried?, aria: { describedby: "#{input_id}-description" } %>
+    <%= label_tag input_id, label, class: "form-check-label" %>
+  </div>
+  <p class="free-reuse__description" id="<%= input_id %>-description">
+    <%= t("nexus_ccs.free_reuse.description") %>
+    <% if carried? %><%= t("nexus_ccs.free_reuse.carried") %><% end %>
+  </p>
+</div>

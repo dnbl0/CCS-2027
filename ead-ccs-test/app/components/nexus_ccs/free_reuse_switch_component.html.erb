@@ -1,0 +1,11 @@
+<div class="free-reuse" id="facet-<%= FreeReuse::FIELD %>">
+  <%= form_with url: helpers.search_action_path, method: :get, class: "free-reuse__form", data: { turbo: false } do %>
+    <%= render Blacklight::HiddenSearchStateComponent.new(params: toggled_params) %>
+    <button type="submit" class="free-reuse__switch" role="switch" aria-checked="<%= on? %>" aria-describedby="<%= description_id %>">
+      <span class="free-reuse__track" aria-hidden="true"><span class="free-reuse__thumb"></span></span>
+      <span class="free-reuse__label"><%= label %></span>
+      <% if count_text %><span class="free-reuse__count">(<%= count_text %>)</span><% end %>
+    </button>
+  <% end %>
+  <p class="free-reuse__description" id="<%= description_id %>"><%= t("nexus_ccs.free_reuse.description") %></p>
+</div>

@@ -76,6 +76,13 @@ module AccessPolicy
   end
   private_class_method :withheld_by_access_condition?
 
+  # The licences (lower case, as in TIER_BY_LICENCE) that give a record this tier. FreeReuse reads :open from here, so the
+  # "free reuse" filter follows the same rules as the download button. Replace with the DAM classification when .tier is.
+  def self.licences_with_tier(tier) = TIER_BY_LICENCE.select { |_licence, licence_tier| licence_tier == tier }.keys
+
+  # The access conditions (lower case) that withhold a record's asset whatever its licence
+  def self.withheld_access_conditions = WITHHELD_ACCESS_CONDITIONS
+
   # The asset may be shown (:open, :view_only)
   def self.view?(document) = tier(document) != :request
 

@@ -31,6 +31,7 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `POSTGRES_USER` | `ead_ccs` | same | Database user |
 | `POSTGRES_PASSWORD` | none | same | Database password (a secret) |
 | `DB_SUFFIX` | empty | `config/database.yml` (development, test) | Appended to the database names, so a second checkout or worktree has databases of its own: `DB_SUFFIX=_2` |
+| `EMBED_FRAME_ANCESTORS` | unset (any site) | `app/models/embed_policy.rb` | Which sites may frame the embed pages (`/embed/*`, the only framable pages). Unset or `*`: any site, because embeds show only what any visitor may see. Otherwise origins separated by spaces or commas, e.g. `https://museum.example.org https://*.example.edu`; the site itself is always allowed and anything that is not a plain origin is ignored |
 | `RAILS_ASSUME_SSL` | false | `config/environments/production.rb` | `true` when a proxy ends HTTPS in front of the app |
 | `RAILS_FORCE_SSL` | false | same | `true` redirects HTTP to HTTPS and sets HSTS |
 | `RAILS_HOSTS` | none | same | Comma-separated host names the app answers to (Rails host authorisation) |
@@ -58,6 +59,8 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `EMU_CSV` | `data/emu.csv` | `lib/tasks/collections.rake` | The EMu export to index |
 | `VERNON_CSV` | `data/vernon.csv` | same | The Vernon export to index |
 | `FORCE` | unset | same | `FORCE=1 bin/rails collections:index` reindexes a core that already has records |
+| `CSV` | none (required) | `lib/tasks/debias.rake` | `bin/rails debias:import CSV=terms.csv` checks the collections team's term spreadsheet and writes the de-bias term list |
+| `OUT` | `config/debias_terms.yml` | same | Where `debias:import` writes the list, to try an import without replacing the real list |
 | `SOURCE_DIR` | `../public/assets/images/collections` | `lib/tasks/digital_assets.rake` | Where `digital_assets:*` reads source images |
 | `CI` | unset | `config/environments/test.rb` | When set, tests eager-load the app, as GitHub CI does. `bin/ci` sets it |
 | `PARALLEL_WORKERS` | CPU count | Rails test runner | `1` runs tests in one process; always use it for system tests |
