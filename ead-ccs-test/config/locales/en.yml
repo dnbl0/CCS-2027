@@ -73,6 +73,10 @@ en:
           attributes:
             base:
               too_many_lists: "You can have at most %{count} lists. Delete one to make a new one."
+        saved_search:
+          attributes:
+            base:
+              too_many_saved_searches: "You can keep at most %{count} saved searches. Remove one to save another."
         list_item:
           attributes:
             base:
@@ -180,6 +184,9 @@ en:
         sensitivity_choices:
           one: "%{count} choice about viewing a sensitive record"
           other: "%{count} choices about viewing sensitive records"
+        recently_viewed:
+          one: "%{count} record in your recently viewed list"
+          other: "%{count} records in your recently viewed list"
       kept_heading: "What is not removed"
       kept_requests_html: "Requests for access to a record are not removed here. They hold your name and email address, and the University must be able to act on them and keep them. To have a request corrected or removed, <a href=\"%{contact}\">contact the collection team</a>."
       delete_heading: "Delete"
@@ -201,6 +208,7 @@ en:
       removed: "Search removed from your saved searches."
       not_found: "That search is no longer in your history, so it could not be saved."
       failure: "Sorry, there was a problem saving the search."
+      too_many: "You can keep at most %{count} saved searches. Remove one to save another."
     lists:
       title: "Your lists"
       description: "Lists you have made on this device. Add records to a list from a search result or a record page."
@@ -229,6 +237,7 @@ en:
       column_records: "Records"
       column_actions: "Actions"
       missing_records: "Some records in this list are no longer in the collection."
+      records_unavailable: "We can't show the records' details just now because search is unavailable. Their identifiers are listed below; please try again in a few minutes."
       created: "List %{name} created."
       created_with_record: "List %{name} created, and the record added to it."
       renamed: "List renamed to %{name}."
@@ -269,6 +278,7 @@ en:
       list_description: "The records you have saved on this device. Open one to see it in full, or select Saved to remove it from the list."
       empty: "You have not saved any records yet."
       empty_link: "Search all records"
+      too_many: "You can save at most %{count} records. Remove some to save more."
     cite:
       button: "Cite this record"
       title: "Cite this record"

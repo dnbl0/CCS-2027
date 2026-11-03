@@ -30,10 +30,13 @@ export default class extends Controller {
     this.closeSections(trigger)
     trigger.setAttribute("aria-expanded", wasOpen ? "false" : "true")
     this.syncTitle()
+    // The phone trigger is hidden while its section is open, so focus moves into the panel.
+    if (!wasOpen && this.phone.matches) document.getElementById(trigger.getAttribute("aria-controls"))?.querySelector(".site-nav__back, a")?.focus()
   }
 
   back(event) {
-    const trigger = event.currentTarget.closest(".site-nav__panel")?.previousElementSibling
+    const panel = event.currentTarget.closest(".site-nav__panel")
+    const trigger = this.triggerTargets.find((t) => t.getAttribute("aria-controls") === panel?.id)
     if (!trigger) return
     trigger.setAttribute("aria-expanded", "false")
     this.syncTitle()

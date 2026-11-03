@@ -12,6 +12,22 @@ class SearchBuilderTest < ActiveSupport::TestCase
     assert_equal SearchBuilder::KEYWORD_MM, mm_for("Basket (coiled)")
   end
 
+  test "a page deeper than MAX_START is answered with the last page inside it; a normal page is untouched" do
+    deep = SearchBuilder.new(CatalogController.new).with(q: "skull", page: "99999", per_page: "40").to_h
+    normal = SearchBuilder.new(CatalogController.new).with(q: "skull", page: "3", per_page: "40").to_h
+
+    assert_equal SearchBuilder::MAX_START, deep[:start]
+    assert_equal 80, normal[:start]
+  end
+
+  test "the deepest start can be set by RESULTS_MAX_START" do
+    ENV["RESULTS_MAX_START"] = "200"
+
+    assert_equal 200, SearchBuilder.new(CatalogController.new).with(q: "skull", page: "50", per_page: "40").to_h[:start]
+  ensure
+    ENV.delete("RESULTS_MAX_START")
+  end
+
   test "boolean syntax relaxes minimum-should-match" do
     assert_equal SearchBuilder::BOOLEAN_MM, mm_for("anatomy OR botany")
     assert_equal SearchBuilder::BOOLEAN_MM, mm_for("anatomy AND botany OR zoology")
