@@ -56,7 +56,7 @@ class ListsController < CatalogController
     @list = List.just_made(owner, attrs[:name]) || owner.lists.build(attrs) # a repeated request finds the list the first one made
     document_id = params[:document_id].presence
 
-    if @list.persisted? || save_once(@list, owner, name)
+    if @list.persisted? || save_once(@list, owner, attrs[:name])
       add_once(@list, document_id) if document_id
       notice = t(document_id ? "nexus_ccs.lists.created_with_record" : "nexus_ccs.lists.created", name: @list.name)
       document_id ? back_or_to_lists(notice: notice) : redirect_to(list_path(@list), notice: notice)
