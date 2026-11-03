@@ -74,8 +74,8 @@ class ModalScrollLockTest < ApplicationSystemTestCase
     assert_no_selector "#country-acknowledgement[open]"
   end
 
-  # The record page has other dialog buttons (Cite this record); this one opens the leaving-site dialog
-  LEAVING_SITE_OPENER = "button[data-action='dialog#open']:not(.cite__button)".freeze
+  # The record page has other dialog buttons (Cite this record, Share and embed); this one opens the leaving-site dialog
+  LEAVING_SITE_OPENER = "button[data-action='dialog#open']:not(.cite__button):not(.share__button)".freeze
 
   test "the leaving-site dialog locks the page, and Escape, the Close button and the backdrop each release it where it was" do
     visit search_catalog_path(any_assets: "1", q: "skull")
