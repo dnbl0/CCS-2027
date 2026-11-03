@@ -1,0 +1,30 @@
+<%# A shared gallery's card for another site's page: its title, description and the first records, with a link to the whole
+    gallery. No owner is named. Images follow SharedMedia, as the record embed. %>
+<% content_for :title, "#{@list.name} — #{t('nexus_ccs.embed.site_name')}" %>
+<main class="embed-card embed-card--gallery" id="main-content">
+  <div class="embed-card__body">
+    <h1 class="embed-card__title"><%= link_to @gallery_url, target: "_blank", rel: "noopener" do %><%= @list.name %><span class="visually-hidden"> <%= t("nexus_ccs.embed.new_tab") %></span><% end %></h1>
+    <% if @list.description.present? %><p class="embed-card__line"><%= @list.description %></p><% end %>
+    <p class="embed-card__line"><%= t("nexus_ccs.lists.records", count: @total) %></p>
+    <% if @documents.any? %>
+      <ul class="embed-gallery">
+        <% @documents.each do |document| %>
+          <% image = SharedMedia.thumbnail_path(document) %>
+          <% creators = Array(document["creator_display_ssim"]).first %>
+          <li class="embed-gallery__item">
+            <% if image %>
+              <%= image_tag image, alt: "", loading: "lazy", decoding: "async", class: "embed-gallery__image" %>
+            <% else %>
+              <span class="embed-gallery__image embed-gallery__image--none"><%= t("nexus_ccs.embed.no_image") %></span>
+            <% end %>
+            <span class="embed-gallery__text">
+              <%= link_to solr_document_url(document), target: "_blank", rel: "noopener" do %><%= Array(document["title_tsim"]).first.presence || "Untitled" %><span class="visually-hidden"> <%= t("nexus_ccs.embed.new_tab") %></span><% end %>
+              <% if creators %><br><span class="embed-gallery__creator"><%= creators %></span><% end %>
+            </span>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+    <p class="embed-card__link"><%= link_to @gallery_url, target: "_blank", rel: "noopener" do %><%= t("nexus_ccs.embed.view_gallery", count: @total) %><span class="visually-hidden"> <%= t("nexus_ccs.embed.new_tab") %></span><% end %></p>
+  </div>
+</main>

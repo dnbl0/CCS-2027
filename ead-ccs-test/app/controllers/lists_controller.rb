@@ -39,10 +39,12 @@ class ListsController < CatalogController
     @list = List.new
   end
 
-  def edit; end
+  def edit
+    @cover_options = cover_options
+  end
 
   def create
-    @list = guest_owner.lists.build(name: params.dig(:list, :name))
+    @list = guest_owner.lists.build(list_params(:name, :description))
     document_id = params[:document_id].presence
 
     if @list.save
@@ -57,9 +59,10 @@ class ListsController < CatalogController
   end
 
   def update
-    if @list.update(name: params.dig(:list, :name))
+    if @list.update(list_params(:name, :description, :cover_document_id))
       redirect_to list_path(@list), notice: t("nexus_ccs.lists.renamed", name: @list.name)
     else
+      @cover_options = cover_options
       render :edit, status: :unprocessable_content
     end
   end
@@ -75,6 +78,22 @@ class ListsController < CatalogController
   end
 
   private
+
+  def list_params(*fields)
+    given = params[:list]
+    given.respond_to?(:permit) ? given.permit(*fields) : {}
+  end
+
+  # [title, id] of the list's records, for choosing its cover (a gallery's picture); none if the index cannot be reached, so
+  # renaming a list never depends on it
+  def cover_options
+    ids = @list.list_items.recent.pluck(:document_id)
+    return [] if ids.empty?
+
+    documents_in_order(ids).map { |document| [ Array(document["title_tsim"]).first.presence || document.id.to_s, document.id.to_s ] }
+  rescue Blacklight::Exceptions::ECONNREFUSED, Blacklight::Exceptions::InvalidRequest, Faraday::TimeoutError, Faraday::ConnectionFailed
+    []
+  end
 
   def find_list
     @list = visitor_lists.find_by(id: params[:id])

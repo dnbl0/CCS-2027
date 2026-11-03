@@ -1,6 +1,7 @@
 <% presenter = document_presenter(@document) %>
 <% @page_title = t('blacklight.search.show.title', document_title: presenter.html_title, application_name: application_name).html_safe %> <%# erblint:disable ErbSafety %>
 <% content_for(:head) { render_link_rel_alternates } %>
+<% content_for(:head) { oembed_link_tag(solr_document_url(@document), Array(@document["title_tsim"]).first.to_s) } %> <%# for CMS and chat tools: the embed code of this record (tier-safe) %>
 
 <%# The page body, after the CCS UI "Record-detail"; first, where this record is in the visitor's selection (CCS-40) %>
 <%= render NexusCcs::SelectionStepperComponent.new(document_id: @document.id) %>
