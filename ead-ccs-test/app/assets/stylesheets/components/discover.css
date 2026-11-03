@@ -1,0 +1,160 @@
+/*
+ * Similar records (record page), and Featured and trending (home page frame, /discover): the site's result cards in a grid.
+ * Markup: views/discover/_cards, _section, pages/_featured_and_trending, NexusCcs::SimilarRecordsComponent. docs/similar-and-trending.md.
+ * The lazy frames reserve their height while they load, and only while JavaScript runs (no-js is removed by the layout), so
+ * a late-arriving section does not move what is below it, and a visitor without JavaScript is not left with an empty gap.
+ */
+.discover-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ccs-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .discover-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .discover-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.discover-cards__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-2);
+  min-width: 0;
+}
+
+.discover-cards__item .result-card {
+  flex: 1 1 auto;
+}
+
+.discover-cards__blurb {
+  margin: 0;
+  font-size: var(--ccs-font-size-sm, 0.875rem);
+  color: var(--ccs-text-secondary);
+}
+
+.discover-section + .discover-section {
+  margin-top: var(--ccs-space-8);
+}
+
+.discover-section__heading {
+  margin: 0 0 var(--ccs-space-2);
+  font-family: var(--ccs-font-heading);
+  font-weight: var(--ccs-font-weight-regular, 400);
+  color: var(--ccs-text-brand);
+}
+
+h2.discover-section__heading {
+  font-size: var(--ccs-font-size-3xl, 1.875rem);
+}
+
+h3.discover-section__heading {
+  font-size: var(--ccs-font-size-2xl, 1.5rem);
+}
+
+.discover-section__description {
+  margin: 0 0 var(--ccs-space-5);
+  max-width: 48rem;
+  color: var(--ccs-text-secondary);
+}
+
+/* Record page */
+.similar-records {
+  background: var(--ccs-surface-subtle);
+}
+
+.similar-records__inner {
+  max-width: calc(75rem + 2 * var(--record-gutter, 1rem));
+  margin-inline: auto;
+  padding: var(--ccs-space-7) var(--record-gutter, 1rem) 3.5rem;
+}
+
+.similar-records__heading {
+  margin: 0 0 var(--ccs-space-2);
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-3xl, 1.875rem);
+  font-weight: var(--ccs-font-weight-regular, 400);
+  color: var(--ccs-text-brand);
+}
+
+.similar-records__description {
+  margin: 0 0 var(--ccs-space-5);
+  color: var(--ccs-text-secondary);
+}
+
+/* Home page: the frame holds the room its cards will need (the first section is a row of cards under a heading) */
+.discover-frame {
+  display: block;
+}
+
+html:not(.no-js) .discover-frame:not([complete]) {
+  min-height: 34rem;
+}
+
+@media (min-width: 640px) {
+  html:not(.no-js) .discover-frame:not([complete]) {
+    min-height: 28rem;
+  }
+}
+
+.discover-frame__note {
+  margin: 0;
+  color: var(--ccs-text-secondary);
+}
+
+.home-discover__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-2);
+  margin-bottom: var(--ccs-space-5);
+}
+
+body.page-home .home-discover {
+  padding-block: var(--space-48, 3rem);
+}
+
+body.page-home .home-discover .ccs-section__inner {
+  max-width: var(--layout-content-wide);
+}
+
+.home-discover__intro {
+  margin: 0;
+  font-size: var(--font-size-body-lg, 1.125rem);
+}
+
+.home-discover__link {
+  display: inline-block;
+  min-height: 24px;
+  color: var(--interactive-800);
+  font-weight: var(--font-weight-bold, 700);
+  text-decoration: underline;
+}
+
+.home-discover__link:hover {
+  color: var(--interactive-700);
+}
+
+.home-discover__link:focus-visible {
+  outline: 3px solid var(--brand-1100);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .discover-frame[complete] {
+    animation: discover-in var(--ccs-duration-base, 150ms) ease-out;
+  }
+}
+
+@keyframes discover-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

@@ -7,6 +7,7 @@ class CatalogController < ApplicationController
   include Blacklight::Catalog
   include BlacklightRangeLimit::ControllerOverride
   include QueryRules
+  include CountsRecordViews
 
   # The results open in the default view (mosaic) every time. Blacklight would remember the last view the
   # visitor chose in the session and open every later search that way; here only ?view= in the URL changes it.

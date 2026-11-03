@@ -25,7 +25,7 @@ class SitemapTest < ActiveSupport::TestCase
   end
 
   test "pages hold at most the page size, and the index lists every page" do
-    records = (1..23).map { |n| [ "r#{n}", nil ] } # 7 public pages and 23 records: 30 URLs
+    records = (1..22).map { |n| [ "r#{n}", nil ] } # 8 public pages and 22 records: 30 URLs
     map = sitemap(records, page_size: 10)
 
     assert_equal 3, map.page_count

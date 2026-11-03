@@ -38,7 +38,7 @@ class PageMeta
   def type_of(controller, action)
     case [ controller, action ]
     in [ "pages", "home" ] then :home
-    in [ "pages", _ ] then :page
+    in [ "pages", _ ] | [ "discover", _ ] then :page
     in [ "catalog", "index" ] then :results
     in [ "catalog", "show" ] then :record
     in [ "catalog", "advanced_search" ] then :advanced
@@ -56,7 +56,7 @@ class PageMeta
   def description_for(params)
     case @type
     when :home, :advanced then I18n.t("seo.description.#{@type}")
-    when :page then I18n.t("seo.description.#{@path.delete_prefix('/').split('/').first.presence_in(%w[accessibility privacy help]) || 'about'}")
+    when :page then I18n.t("seo.description.#{@path.delete_prefix('/').split('/').first.presence_in(%w[accessibility privacy help discover]) || 'about'}")
     when :results then results_description(params)
     when :record, :stock then @document && !RobotsPolicy.withheld?(@document) ? StructuredData::Description.of(@document) : I18n.t("seo.description.record_withheld")
     end
