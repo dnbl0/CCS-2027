@@ -1,0 +1,28 @@
+# Featured records (docs/similar-and-trending.md): the curated picks on the home page and /discover, in this order.
+#
+#   id     a record's id (the last part of /catalog/:id)
+#   blurb  optional, one line (up to 140 characters). PLACEHOLDER WORDING until the collection teams supply the real text.
+#
+# A pick that is not in the index, or that the discovery sections may not list (its asset is withheld or sensitive), is left out
+# when the page is drawn; test/models/featured_records_test.rb checks every pick against the index whenever Solr is reachable.
+featured:
+  - id: emu-407768
+    blurb: "Placeholder blurb: the soprano Nellie Melba, photographed in Victoria in 1927."
+  - id: emu-10247
+    blurb: "Placeholder blurb: a lithograph of Ferntree Gully by Eugene von Guerard."
+  - id: emu-8465
+    blurb: "Placeholder blurb: a Banksia from a bound set of eighteenth-century botanical prints."
+  - id: emu-25746
+    blurb: "Placeholder blurb: an ancient Egyptian necklace of faience and glass."
+  - id: emu-4759
+    blurb: "Placeholder blurb: an illuminated manuscript leaf, about 1100."
+  - id: emu-407748
+    blurb: "Placeholder blurb: a dancer, photographed about 1910."
+  - id: emu-26480
+    blurb: "Placeholder blurb: a silver coin of ancient Greece."
+  - id: emu-8798
+    blurb: "Placeholder blurb: the Engineering School, as photographed in 1926."
+  - id: emu-1633
+    blurb: "Placeholder blurb: the University Lake and the National Museum in 1874."
+  - id: emu-25310
+    blurb: "Placeholder blurb: a Greek wedding vase and its lid."

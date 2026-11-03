@@ -1,0 +1,20 @@
+<%# /discover (docs/similar-and-trending.md): the Pick of the day, the Featured records and, when there is enough data, the Trending
+    records, in full. The home page's "Featured and trending" section is the short version. %>
+<% content_for :title, t("nexus_ccs.discover.page_title") %>
+<% content_for :body_class, "page-saved page-discover" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.discover.title"), description: t("nexus_ccs.discover.description")) %>
+
+<main class="saved-main discover-main" id="main-content">
+  <div class="saved-main__inner">
+    <% if @sections.empty? %>
+      <div class="saved-empty">
+        <p class="saved-empty__text"><%= t("nexus_ccs.discover.empty") %></p>
+        <%= link_to t("nexus_ccs.discover.empty_link"), search_catalog_path, class: "btn btn-primary" %>
+      </div>
+    <% else %>
+      <% @sections.each do |section| %>
+        <%= render "discover/section", section: section, heading_tag: :h2 %>
+      <% end %>
+    <% end %>
+  </div>
+</main>

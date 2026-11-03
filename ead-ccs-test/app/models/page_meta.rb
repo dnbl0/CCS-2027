@@ -15,7 +15,7 @@
 # No image, and a general description, for a record the policy withholds or that is sensitive.
 class PageMeta
   # The path's first segment => the key in seo.description; any other page is described as About
-  PAGE_DESCRIPTIONS = { "accessibility" => "accessibility", "privacy" => "privacy", "help" => "help", "language-in-our-records" => "language" }.freeze
+  PAGE_DESCRIPTIONS = { "accessibility" => "accessibility", "privacy" => "privacy", "help" => "help", "language-in-our-records" => "language", "discover" => "discover" }.freeze
 
   attr_reader :canonical_url, :robots, :description, :title, :og_image, :json_ld
 
@@ -41,7 +41,7 @@ class PageMeta
   def type_of(controller, action)
     case [ controller, action ]
     in [ "pages", "home" ] then :home
-    in [ "pages", _ ] then :page
+    in [ "pages", _ ] | [ "discover", _ ] then :page
     in [ "catalog", "index" ] then :results
     in [ "catalog", "show" ] then :record
     in [ "catalog", "advanced_search" ] then :advanced

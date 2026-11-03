@@ -137,4 +137,10 @@ Rails.application.routes.draw do
       delete "share", to: "list_shares#destroy"
     end
   end
+
+  # Discovery (docs/similar-and-trending.md): the Featured and trending page, the short version the home page loads into a lazy
+  # frame, and a record's Similar records (also a lazy frame, on the record page)
+  get "discover", to: "discover#index", as: :discover
+  get "discover/frame", to: "discover#frame", as: :discover_frame
+  get "catalog/:id/similar", to: "similar#show", as: :similar, constraints: { id: %r{[^/]+} }, format: false
 end

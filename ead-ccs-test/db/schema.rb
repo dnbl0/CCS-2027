@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_03_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_03_130001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -62,6 +62,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_090000) do
     t.index "user_id, lower((name)::text)", name: "index_lists_on_user_id_and_lower_name", unique: true
     t.index ["share_token"], name: "index_lists_on_share_token", unique: true
     t.index ["user_id"], name: "index_lists_on_user_id"
+  end
+
+  create_table "record_views", force: :cascade do |t|
+    t.string "document_id", null: false
+    t.date "day", null: false
+    t.integer "views", default: 0, null: false
+    t.index ["day", "document_id"], name: "index_record_views_on_day_and_document_id", unique: true
+    t.index ["document_id"], name: "index_record_views_on_document_id"
   end
 
   create_table "saved_searches", force: :cascade do |t|

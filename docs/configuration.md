@@ -45,6 +45,10 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `CCS_MEDIA_BASE_URL` | `/digital-assets/media` | `Collections::DigitalMedia` | Where the audio, video and PDF files are served from |
 | `SEO_CANONICAL_BASE_URL` | the request's own address | `BotControls.base_url` | The site's address in canonical links, the sitemap and structured data, when a proxy hides the real host |
 | `SEO_SITEMAP_CACHE_HOURS` | `12` | `BotControls.sitemap_cache_hours` | How long the list of record ids for the sitemap is kept |
+| `TRENDING_ENABLED` | `on` | `RecordView.enabled?` | `off` stops counting record views and hides the Trending section (Featured and Pick of the day stay). See [similar-and-trending.md](../ead-ccs-test/docs/similar-and-trending.md) |
+| `TRENDING_DAYS` | `7` | `RecordView.window_days` | The window of "most viewed in the last N days" (1 to 90) |
+| `TRENDING_MIN_VIEWS` | `3` | `RecordView.min_views` | Views a record needs in the window to be trending; too few trending records and the section is left out |
+| `TRENDING_KEEP_DAYS` | `35` | `RecordView.keep_days` | Days of view counts `bin/rails record_views:prune` keeps |
 | `BOT_BLOCKED_USER_AGENTS` | empty | `BotControls.blocked_user_agents` | Comma-separated extra user-agent fragments to refuse (403) on asset and download files |
 | `RATE_LIMIT_ALLOW_IPS` | empty | `BotGuard` | Comma-separated IP addresses never limited (a monitor, the office) |
 | `RATE_LIMIT_STORE` | `memory` | `BotGuard` | `cache` counts in `Rails.cache`, shared between processes |
