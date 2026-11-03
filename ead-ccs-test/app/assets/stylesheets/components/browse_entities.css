@@ -159,3 +159,14 @@
     scroll-behavior: auto !important;
   }
 }
+/* A record's place, subject and maker values link to their entity page. Several links in one row were inline and close together,
+   which fails the 24px target size rule (WCAG 2.5.8): each linked value sits on its own line, and the link has a 24px box. */
+.record-details__row dd .record-details__value:has(> a) {
+  display: block;
+}
+
+.record-details__row dd .record-details__value > a {
+  display: inline-block;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+}
