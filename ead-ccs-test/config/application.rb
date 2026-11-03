@@ -51,7 +51,12 @@ module EadCcs
     # would fail the same way. The path is still available to the page as request.original_fullpath.
     config.exceptions_app = lambda { |env|
       env["QUERY_STRING"] = ""
-      %w[rack.request.query_string rack.request.query_hash action_dispatch.request.query_parameters].each { |key| env.delete(key) }
+      # The failed request's body goes too: a POST whose body could not be read (a broken %-encoding, bad JSON) would fail again here
+      env["rack.input"] = StringIO.new
+      env["CONTENT_LENGTH"] = "0"
+      env.delete("CONTENT_TYPE")
+      %w[rack.request.query_string rack.request.query_hash action_dispatch.request.query_parameters rack.request.form_input rack.request.form_hash
+         rack.request.form_pairs rack.request.form_vars rack.request.form_error action_dispatch.request.content_type action_dispatch.request.request_parameters action_dispatch.request.parameters].each { |key| env.delete(key) }
       Rails.application.routes.call(env)
     }
     # config.eager_load_paths << Rails.root.join("extras")

@@ -1,0 +1,26 @@
+<section class="ccs-section explore" aria-labelledby="explore-title">
+  <div class="ccs-section__inner explore__inner">
+    <header class="explore__header">
+      <h2 id="explore-title" class="ccs-section__heading">Explore the collections</h2>
+      <p class="explore__intro">No search term needed. Start from what the records are, where they come from or when they were made.</p>
+    </header>
+    <div class="explore__groups">
+      <% groups.each do |group| %>
+        <div class="explore__group">
+          <h3 class="explore__heading"><%= group.heading %></h3>
+          <ul class="explore__list">
+            <% group.items.each do |item| %>
+              <li class="explore__item">
+                <%= link_to helpers.search_action_path(item.query), class: "explore__link" do %>
+                  <span class="explore__label"><%= item.label.to_s.upcase_first %></span>
+                  <span class="explore__count"><%= count_label(item.count) %></span>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+          <%= link_to helpers.browse_hub_path(hub_slug(group)), class: "explore__all" do %>See all <%= group.heading.downcase == "time" ? "periods" : "#{group.heading.downcase}s" %><% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

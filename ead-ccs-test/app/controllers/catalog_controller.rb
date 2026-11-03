@@ -22,7 +22,7 @@ class CatalogController < ApplicationController
   # Solr down, slow or refusing a request: say so, instead of a stack trace. The pages that do not search (home, help...)
   # keep working. Timeouts come from config/blacklight.yml.
   rescue_from BlacklightRangeLimit::InvalidRange, with: :invalid_date_range
-  rescue_from Blacklight::Exceptions::ECONNREFUSED, Blacklight::Exceptions::InvalidRequest, Faraday::TimeoutError, Faraday::ConnectionFailed, with: :search_unavailable
+  rescue_from Blacklight::Exceptions::ECONNREFUSED, Blacklight::Exceptions::RepositoryTimeout, Blacklight::Exceptions::InvalidRequest, Faraday::TimeoutError, Faraday::ConnectionFailed, with: :search_unavailable
 
   # Retries a zero-result search using Solr's spelling collation
   self.search_service_class = ::SearchService
@@ -155,7 +155,15 @@ class CatalogController < ApplicationController
   # Home page, the Advanced search form again, or the default Digital asset filter: the rules are SearchDefaults'
   before_action :apply_search_defaults, only: :index
 
+  # The record page lists the records the visitor opened before (RecentlyViewed); this one is added once the page is drawn,
+  # so it is not listed beside itself
+  after_action :remember_viewed_record, only: :show
+
   private
+
+  def remember_viewed_record
+    RecentlyViewed.new(session).record(@document.id) if @document && response.successful?
+  end
 
   def apply_search_defaults
     outcome, detail = SearchDefaults.decide(request.query_parameters, html: request.format.html?, get: request.get?,
@@ -178,6 +186,7 @@ class CatalogController < ApplicationController
 
   def search_unavailable(error)
     Rails.logger.error("Search unavailable: #{error.class}: #{error.message}")
+    response.headers["Retry-After"] = ErrorsController::RETRY_AFTER.fetch("503").to_s
     respond_to do |format|
       format.html { render "catalog/unavailable", status: :service_unavailable }
       format.json { render json: { error: "Search is unavailable. Please try again shortly." }, status: :service_unavailable }

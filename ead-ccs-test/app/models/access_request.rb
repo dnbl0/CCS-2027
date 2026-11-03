@@ -18,6 +18,24 @@ class AccessRequest < ApplicationRecord
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP, allow_blank: true }
   LIMITS.each { |field, max| validates field, length: { maximum: max } }
 
+  # The same request arriving again within this many seconds is a double click or a retry, not a second request
+  DOUBLE_SUBMIT_SECONDS = 600
+
+  # Saves the request once, however many times it arrives (CCS-147): two requests at once are made to take turns by a lock on the
+  # record, email and kind, and the second is answered with the first. Returns the request (check persisted?; errors if invalid).
+  def self.submit(attributes)
+    request = new(attributes)
+    return request unless request.valid?
+
+    transaction do
+      lock_key = [ "access_request", request.document_id, request.email.downcase, request.request_type ].join(":")
+      connection.execute(sanitize_sql_array([ "SELECT pg_advisory_xact_lock(hashtext(?))", lock_key ]))
+      earlier = where(document_id: request.document_id, request_type: request.request_type, name: request.name, purpose: request.purpose)
+                .where("lower(email) = ?", request.email.downcase).where(created_at: DOUBLE_SUBMIT_SECONDS.seconds.ago..).first
+      earlier || request.tap(&:save)
+    end
+  end
+
   scope :pending, -> { where(status: "pending") }
 
   def view? = request_type == "view"
