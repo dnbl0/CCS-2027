@@ -50,7 +50,7 @@ class OembedsController < ActionController::Base
   def record_payload(id)
     document = find_record(CGI.unescape(id))
     code = EmbedCode.for_record(document, src: "#{base}#{embed_record_path(document.id)}").fitted(**limits)
-    payload(code, title: Array(document["title_tsim"]).first.presence || "Untitled").tap do |data|
+    payload(code, title: EmbedCode.heading(document)).tap do |data|
       thumb = SharedMedia.thumbnail_path(document)
       data[:thumbnail_url] = "#{base}#{thumb}" if thumb
     end

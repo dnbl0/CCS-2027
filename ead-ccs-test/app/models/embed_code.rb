@@ -7,6 +7,7 @@ require "erb"
 # lists records. The responsive snippet fills its column up to the width, at the same height.
 class EmbedCode
   PROVIDER = "Collections Navigator, University of Melbourne"
+  GENERIC_TITLE = "A record in the University of Melbourne's cultural collections"
   RECORD_WIDTH = 480
   GALLERY_WIDTH = 600
   GALLERY_HEIGHT = 560
@@ -22,10 +23,18 @@ class EmbedCode
   end
 
   def self.for_record(document, src:)
-    heading = Array(document["title_tsim"]).first.presence || "Untitled"
+    heading = self.heading(document)
     height = SharedMedia.thumbnail_path(document) ? 240 : 200
     height += 100 if SharedMedia.withheld_reason(document)
     new(src: src, title: "#{heading} - #{PROVIDER}", width: RECORD_WIDTH, height: height)
+  end
+
+  # What an embed calls a record in text another site can read (the oEmbed title, the iframe's title). A withheld or sensitive record
+  # is not named there: search engines are not given its title either (PageMeta), and the embed card itself carries the notice.
+  def self.heading(document)
+    return GENERIC_TITLE if RobotsPolicy.withheld?(document)
+
+    Array(document["title_tsim"]).first.presence || "Untitled"
   end
 
   def self.for_gallery(list, src:)

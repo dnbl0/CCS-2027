@@ -90,4 +90,22 @@ class RecordViewTest < ActiveSupport::TestCase
     assert_equal 1, RecordView.prune(days: 35)
     assert_equal [ "new" ], RecordView.pluck(:document_id)
   end
+
+  test "a flush removes rows past the keep window, once a day, so no schedule is needed" do
+    old_day = Date.current - (RecordView.keep_days + 1)
+    RecordView.create!(document_id: "emu-old", day: old_day, views: 9)
+    RecordView.instance_variable_set(:@last_prune, nil)
+
+    RecordView.record("emu-1")
+    RecordView.flush
+    assert_not RecordView.exists?(document_id: "emu-old"), "the old day is removed by the first flush"
+    assert RecordView.exists?(document_id: "emu-1")
+
+    RecordView.create!(document_id: "emu-old-2", day: old_day, views: 1)
+    RecordView.record("emu-1")
+    RecordView.flush
+    assert RecordView.exists?(document_id: "emu-old-2"), "a second flush the same day leaves it for tomorrow's"
+  ensure
+    RecordView.instance_variable_set(:@last_prune, nil)
+  end
 end

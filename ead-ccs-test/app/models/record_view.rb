@@ -8,12 +8,13 @@
 # one INSERT ... ON CONFLICT DO UPDATE statement every FLUSH_SECONDS, or sooner when FLUSH_AT different records are waiting, or when
 # the process exits. So a record page asks the database for nothing on most requests. With several processes each has its own
 # counters and they add up in the table. A process that is killed loses at most the last minute of its counts, which is acceptable
-# for "most viewed this week". A database error on a flush drops those counts (logged) rather than breaking the page.
+# for "most viewed this week". The same flush removes days past TRENDING_KEEP_DAYS once a day, so no schedule is needed. A database error on a flush drops those counts (logged) rather than breaking the page.
 #
 # Which views count is decided by the caller (CountsRecordViews: a human-looking request for a record that Discovery lists).
 class RecordView < ApplicationRecord
   FLUSH_SECONDS = 60
   FLUSH_AT = 200
+  PRUNE_SECONDS = 86_400 # a flush also removes rows older than the keep window, at most once a day per process
   MAX_ID_LENGTH = 200
   LOCK = Mutex.new
 
@@ -73,6 +74,14 @@ class RecordView < ApplicationRecord
 
     def monotonic_now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
+    # No scheduler is needed to keep the table small: the first flush after a day removes the days past TRENDING_KEEP_DAYS
+    def prune_if_due
+      return if @last_prune && monotonic_now - @last_prune < PRUNE_SECONDS
+
+      @last_prune = monotonic_now
+      prune
+    end
+
     def flush_locked
       @last_flush = monotonic_now
       rows = pending.map { |(day, id), views| { document_id: id, day: day, views: views } }
@@ -80,6 +89,7 @@ class RecordView < ApplicationRecord
       return 0 if rows.empty?
 
       upsert_all(rows, unique_by: %i[day document_id], on_duplicate: Arel.sql("views = record_views.views + EXCLUDED.views"))
+      prune_if_due
       rows.size
     rescue StandardError => error
       Rails.logger.warn("Trending counts not saved: #{error.class}: #{error.message}")
@@ -88,5 +98,6 @@ class RecordView < ApplicationRecord
   end
 
   @last_flush = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  @last_prune = nil
   at_exit { flush }
 end

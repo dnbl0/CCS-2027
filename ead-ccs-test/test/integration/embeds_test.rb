@@ -224,6 +224,16 @@ class EmbedsTest < ActionDispatch::IntegrationTest
     assert_equal "*", response.headers["Access-Control-Allow-Origin"]
   end
 
+  test "oEmbed does not name a withheld or sensitive record, in the title or the iframe's title" do
+    [ withheld_record, sensitive_record ].each do |record|
+      json = with_records(record) { oembed("http://www.example.com/catalog/#{record.id}") }
+
+      assert_equal EmbedCode::GENERIC_TITLE, json["title"], record.id
+      assert_not_includes json.to_json, Array(record["title_tsim"]).first.to_s, record.id
+      assert_equal "#{EmbedCode::GENERIC_TITLE} - #{EmbedCode::PROVIDER}", Nokogiri::HTML5.fragment(json["html"]).at("iframe")["title"]
+    end
+  end
+
   test "oEmbed gives no thumbnail for a withheld or sensitive record, and a taller frame for its notice" do
     [ withheld_record, sensitive_record ].each do |record|
       json = with_records(record) { oembed("http://www.example.com/catalog/#{record.id}") }
