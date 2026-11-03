@@ -22,6 +22,8 @@
 @import url("components/media_viewer.css");
 @import url("components/results_layout.css");
 @import url("components/result_card.css");
+@import url("components/explore.css");
+@import url("components/browse.css");
 @import url("components/results_toolbar.css");
 @import url("components/collection_intro.css");
 @import url("components/pagination.css");
@@ -36,6 +38,7 @@
 @import url("components/advanced_search.css");
 @import url("components/advanced_rules.css");
 @import url("components/record_page.css");
+@import url("components/record_tiles.css");
 @import url("components/contact_help.css");
 @import url("components/save_control.css");
 @import url("components/saved_bar.css");

@@ -96,6 +96,7 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 
 .record-summary__title {
   margin: 0;
+  font-family: inherit;
   font-size: var(--ccs-font-size-3xl);
   font-weight: var(--ccs-font-weight-semibold);
   line-height: 1.2;
