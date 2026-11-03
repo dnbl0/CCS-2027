@@ -5,6 +5,8 @@
 class List < ApplicationRecord
   NAME_LIMIT = 80
   MAX_PER_USER = 25
+  # A name made again within this many seconds is the same request twice (a double click), not a clash
+  DOUBLE_SUBMIT_SECONDS = 10
 
   belongs_to :user
   has_many :list_items, dependent: :destroy
@@ -17,6 +19,13 @@ class List < ApplicationRecord
 
   # Alphabetical, as the lists page shows them
   scope :by_name, -> { order(Arel.sql("lower(lists.name)"), :id) }
+
+  # The visitor's list of this name made a moment ago, if any: what a repeated "Create list" is answered with
+  def self.just_made(user, name)
+    return unless user.persisted?
+
+    user.lists.where("lower(lists.name) = ?", name.to_s.squish.downcase).where(created_at: DOUBLE_SUBMIT_SECONDS.seconds.ago..).first
+  end
 
   def full? = list_items.count >= ListItem::MAX_PER_LIST
 

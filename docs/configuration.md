@@ -63,6 +63,19 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `PERF_SQL` | unset | `bin/perf` | Also prints the SQL statements |
 | `PERF_LATENCY` | `170` | `bin/perf` | Browser mode: network latency in milliseconds |
 | `PERF_DOWN_KBPS` | `1125` | `bin/perf` | Browser mode: download speed in kilobytes a second |
+| `SOLR_OPEN_TIMEOUT` | `2` | `config/blacklight.yml` | Seconds to wait to connect to Solr before giving up (see [availability-reliability-scalability.md](../ead-ccs-test/docs/availability-reliability-scalability.md)) |
+| `SOLR_READ_TIMEOUT` | `15` | `config/blacklight.yml` | Seconds to wait for a Solr answer |
+| `READYZ_SOLR` | strict | `Readiness` | `optional` keeps `/readyz` at 200 ("degraded") while Solr is down, so an instance stays in rotation |
+| `READYZ_TIMEOUT_SECONDS` | `2` | `Readiness` | Time limit for each `/readyz` dependency check |
+| `READYZ_CACHE_SECONDS` | `2` | `Readiness` | How long a `/readyz` result is reused, so probes cannot load the database or Solr |
+| `PUMA_SHUTDOWN_SECONDS` | `25` | `config/puma.rb` | How long Puma lets requests finish after SIGTERM before it stops them |
+| `PUMA_FIRST_DATA_TIMEOUT` | `30` | `config/puma.rb` | Seconds Puma waits for a slow client's first bytes |
+| `PUMA_PERSISTENT_TIMEOUT` | `20` | `config/puma.rb` | Seconds an idle keep-alive connection stays open |
+| `DB_CONNECT_TIMEOUT` | `3` | `config/database.yml` | Seconds to wait to connect to PostgreSQL |
+| `DB_CHECKOUT_TIMEOUT` | `5` | `config/database.yml` | Seconds a request waits for a free database connection |
+| `DB_STATEMENT_TIMEOUT` | unset | `config/database.yml` | Milliseconds after which PostgreSQL cancels a slow query (off when unset) |
+| `RESULTS_MAX_START` | `10000` | `SearchBuilder` | Results paging beyond this offset is clamped (ranking is unchanged) |
+| `LOADTEST_DEBUG` | unset | `bin/loadtest` | Prints each client error while load testing |
 
 `RAILS_ENV` and `BUNDLE_GEMFILE` are Rails' and Bundler's own and are not listed. The Solr image also reads `SOLR_MODULES`
 (`analysis-extras`, set in the Dockerfile).

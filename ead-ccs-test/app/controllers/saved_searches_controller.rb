@@ -6,7 +6,7 @@ class SavedSearchesController < ApplicationController
   layout "pages"
 
   def index
-    @saved_searches = saved_searches.recent
+    @saved_searches = saved_searches.recent.limit(SavedSearch::MAX_PER_USER)
   end
 
   def create
@@ -15,12 +15,13 @@ class SavedSearchesController < ApplicationController
 
     params_hash = search.query_params.to_h
     user = guest_owner
-    saved = user.saved_searches.create(name: params[:name].presence || SavedSearch.default_name(params_hash), query_params: params_hash)
+    saved = SavedSearch.keep(user, name: params[:name].presence || SavedSearch.default_name(params_hash), query_params: params_hash)
 
     if saved.persisted?
       redirect_to saved_searches_path, notice: t("nexus_ccs.saved_searches.saved")
     else
-      redirect_to blacklight.search_history_path, alert: t("nexus_ccs.saved_searches.failure")
+      reason = saved.errors.where(:base, :too_many_saved_searches).any? ? t("nexus_ccs.saved_searches.too_many", count: SavedSearch::MAX_PER_USER) : t("nexus_ccs.saved_searches.failure")
+      redirect_to blacklight.search_history_path, alert: reason
     end
   end
 

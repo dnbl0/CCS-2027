@@ -127,11 +127,11 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
 
   test "one address may send only a few requests an hour" do
     needs_solr
-    AccessRequestsController::RATE_LIMIT.times { submit }
+    AccessRequestsController::RATE_LIMIT.times { |n| submit({ purpose: "Fake research purpose #{n}" }) }
     assert_equal AccessRequestsController::RATE_LIMIT, AccessRequest.count
 
     assert_no_difference "AccessRequest.count" do
-      submit
+      submit({ purpose: "Fake research purpose again" })
     end
     assert_response :too_many_requests
     assert_select ".access-form__summary", count: 0

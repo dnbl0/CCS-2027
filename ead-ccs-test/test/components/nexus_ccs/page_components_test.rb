@@ -5,8 +5,11 @@ class PageComponentsTest < ViewComponent::TestCase
     render_inline(NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Help and support", "/help" ], [ "Privacy", nil ] ]))
 
     assert_selector "nav.page-breadcrumbs[aria-label=Breadcrumb] ol.page-local-history li", count: 3
-    assert_selector "li[aria-current=page] .page-local-history__item-text", text: "Privacy"
-    assert_selector "li a[href='/help'][title='Help and support']"
+    assert_selector "li > span.page-local-history__item-text[aria-current=page]", text: "Privacy"
+    assert_no_selector "li[aria-current]"
+    assert_no_selector ".page-breadcrumbs a[title]"
+    assert_selector "a.page-local-history__item-link-home:not([aria-label]):not([title]) .sr-only", text: "Home"
+    assert_selector "li a[href='/help']:not([title])"
     assert_no_selector ".bc-mobile"
     assert_selector "nav.page-breadcrumbs ol", count: 1
     assert_selector ".breadcrumb-strip > nav.page-breadcrumbs + a.site-nav__saved[href='/bookmarks']", text: /0\s+saved records/

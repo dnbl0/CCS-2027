@@ -88,7 +88,7 @@ gaps. The earlier pivot, query and contextual facets were removed because the wo
    rights/Indigenous cultural-data restrictions (`access_condition_ssi` and `restrictions_tsi` are
    deliberately not shown), then index it into `thumbnail_path_ssi` (or a URL field) instead of the YAML.
    The record page shows a record's images (`NexusCcs::DigitalAssetsComponent`).
-3. **Dates.** About 12,700 of 41,000 records have no `date_start_isi` and about 1,700 are 0 or below, which
+3. **Dates (settled 2026-11-03: no code change; negative years are real BC dates, see `docs/blacklight-features.md`).** About 12,700 of 41,000 records have no `date_start_isi` and about 1,700 are 0 or below, which
    distorts the range histogram. Either exclude year <= 0 from the range facet or fix it at index time.
 4. **Style the rest** (the results layout, filter rail, drawer and record page are done and follow
    Europeana and the static design, see `docs/styling.md`): see `docs/styling-inventory.md` and the plan in `scratchpad/europeana/` (cards as one

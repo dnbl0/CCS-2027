@@ -58,6 +58,18 @@ module NexusCcs
 
     def help_home = SiteNavigation::Link.new(SiteNavigation::HELP_HOME_LABEL, helpers.help_path)
 
+    # The visitor's own pages, Blacklight's: saved records, lists, saved searches and the search history. The first three
+    # are hidden while config.x.saved_records is off (config/application.rb).
+    def saved_links
+      links = []
+      if Rails.configuration.x.saved_records
+        links << SiteNavigation::Link.new(I18n.t("nexus_ccs.saved.list_title"), helpers.bookmarks_path)
+        links << SiteNavigation::Link.new(I18n.t("nexus_ccs.lists.title"), helpers.lists_path)
+        links << SiteNavigation::Link.new(I18n.t("nexus_ccs.saved_searches.title"), helpers.saved_searches_path)
+      end
+      links << SiteNavigation::Link.new(I18n.t("nexus_ccs.search_history.title"), helpers.blacklight.search_history_path)
+    end
+
     def about = SiteNavigation::Link.new(SiteNavigation::ABOUT_LABEL, helpers.about_path)
 
     def all_records_path = helpers.search_catalog_path
