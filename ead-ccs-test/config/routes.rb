@@ -117,6 +117,9 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
+  # De-bias notices: the page the record page's notice links to (DebiasTerms)
+  get "language-in-our-records", to: "pages#language_in_records", as: :language_in_records
+
   # Galleries, embeds and oEmbed. A gallery is a list its owner has shared by an unguessable link, so galleries and the share
   # actions follow the saved records setting with the lists; the embed pages and oEmbed work either way. Only /embed/* may be framed.
   get "embed/records/:id", to: "embeds#record", as: :embed_record, constraints: { id: %r{[^/]+} }, format: false

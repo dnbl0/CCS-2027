@@ -15,4 +15,5 @@ class PagesController < ApplicationController
   def about; end
   def accessibility; end
   def privacy; end
+  def language_in_records; end # "About the language in our records": what the de-bias notice on a record page is
 end
