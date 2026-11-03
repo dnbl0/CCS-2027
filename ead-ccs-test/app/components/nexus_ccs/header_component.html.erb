@@ -63,12 +63,12 @@
               </div>
               <ul class="site-nav__browse-more">
                 <li><%= link_to with_images_path do %>Only records with images<%= " (#{helpers.number_with_delimiter(with_images_count)})" if with_images_count %><% end %></li>
-                <li><%= link_to "Advanced search", helpers.advanced_search_catalog_path %></li>
+                <li><%= link_to "Advanced Search", helpers.advanced_search_catalog_path %></li>
               </ul>
             </div>
           </li>
 
-          <li><%= link_to t("browse.title"), helpers.browse_home_path, aria: { current: (helpers.controller_name == "browse" ? "page" : nil) } %></li>
+          <li><%= link_to t("browse.title"), helpers.browse_path, aria: { current: (helpers.controller_name.start_with?("browse") ? "page" : nil) } %></li>
 
           <li><%= link_to about.label, about.href, aria: { current: (helpers.current_page?(about.href) ? "page" : nil) } %></li>
 
@@ -85,6 +85,20 @@
               <ul class="site-nav__panel-list">
                 <% help_links.each do |link| %>
                   <li><%= link_to link.href do %><%= image_tag "site/icon-arrow-footer.svg", alt: "" %><%= link.label %><% end %></li>
+                <% end %>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <button type="button" class="site-nav__trigger" aria-expanded="false" aria-controls="site-nav-saved"
+                    data-site-header-target="trigger" data-action="site-header#toggleSection">
+              My saved items<%= image_tag "site/icon-expand.svg", alt: "" %>
+            </button>
+            <div id="site-nav-saved" class="site-nav__panel">
+              <button type="button" class="site-nav__back" data-action="site-header#back"><%= back_label %></button>
+              <ul class="site-nav__panel-list">
+                <% saved_links.each do |link| %>
+                  <li><%= link_to link.href, aria: { current: (helpers.current_page?(link.href) ? "page" : nil) } do %><%= image_tag "site/icon-arrow-footer.svg", alt: "" %><%= link.label %><% end %></li>
                 <% end %>
               </ul>
             </div>

@@ -29,19 +29,7 @@
       </div>
     </section>
 
-    <%# Browse by creator, place, subject and time (BrowseController) %>
-    <section class="ccs-section home-browse-by" aria-labelledby="home-browse-by">
-      <div class="ccs-section__inner">
-        <h2 id="home-browse-by" class="ccs-section__heading"><%= t("browse.home.heading") %></h2>
-        <p><%= t("browse.home.lead") %></p>
-        <ul class="home-browse-by__list">
-          <% Browse::Kind.all.each do |kind| %>
-            <li><%= link_to kind.plural, browse_kind_path(kind.key), class: "home-browse-by__link" %><span><%= kind.blurb %></span></li>
-          <% end %>
-          <li><%= link_to t("browse.time.plural"), browse_time_path, class: "home-browse-by__link" %><span><%= t("browse.time.blurb") %></span></li>
-        </ul>
-      </div>
-    </section>
+    <%= render NexusCcs::ExploreComponent.new %>
 
         <section class="ccs-section home-collections" aria-labelledby="browse-collections">
       <div class="ccs-section__inner">

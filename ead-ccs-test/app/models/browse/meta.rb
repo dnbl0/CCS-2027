@@ -10,13 +10,12 @@ module Browse
   #   about         the thing the page is about, as a schema.org hash without @context, or nil
   #   keep_params   the query parameters that make a different page (the letter of a hub, the page of records)
   Meta = Data.define(:name, :description, :thin, :about, :keep_params, :parents) do
-    def self.hub(kind)
-      new(kind.plural, I18n.t("browse.kinds.#{kind.key}.hub_description"), false, nil, %w[letter page], [ [ I18n.t("browse.title"), "/browse" ] ])
+    # The index pages of BrowseController: /browse and /browse/:slug
+    def self.index = new(I18n.t("browse.title"), I18n.t("browse.description"), false, nil, [], [])
+
+    def self.hub(hub)
+      new(hub.title, "#{hub.intro} #{I18n.t('browse.hub_description')}", false, nil, %w[letter page], [ [ I18n.t("browse.title"), "/browse" ] ])
     end
-
-    def self.overview = new(I18n.t("browse.title"), I18n.t("browse.description"), false, nil, [], [])
-
-    def self.time = new(I18n.t("browse.time.title"), I18n.t("browse.time.description"), false, nil, [], [ [ I18n.t("browse.title"), "/browse" ] ])
 
     def self.entity(entry, result)
       span = span_of(result)
@@ -28,7 +27,7 @@ module Browse
     def self.period(period, total)
       new(period.label, I18n.t("browse.period.description", count: ActiveSupport::NumberHelper.number_to_delimited(total), span: period.span), total < MIN_INDEXED_RECORDS,
           { "@type" => "DefinedTerm", "name" => period.label }, %w[page],
-          [ [ I18n.t("browse.title"), "/browse" ], [ I18n.t("browse.time.plural"), "/browse/time" ] ])
+          [ [ I18n.t("browse.title"), "/browse" ], [ I18n.t("browse.periods"), "/browse/periods" ] ])
     end
 
     def self.span_of(result)

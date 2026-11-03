@@ -1,6 +1,0 @@
-<%# A list of periods ([[Browse::Period, count], ...]) as links to their pages. %>
-<ul class="browse-list">
-  <% pairs.each do |period, count| %>
-    <li><%= link_to period.label, period.path, class: "browse-list__link" %><% if period.kind == :century && period.first >= 1000 %> <span class="browse-list__span"><%= period.span %></span><% end %> <span class="browse-list__count"><%= t("browse.records", count: count) %></span></li>
-  <% end %>
-</ul>

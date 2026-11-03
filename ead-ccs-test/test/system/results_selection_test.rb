@@ -10,7 +10,8 @@ class ResultsSelectionTest < ApplicationSystemTestCase
 
   def press(key) = page.driver.browser.keyboard.type(key)
 
-  def status = find("#selection-form [role=status]").text
+  # Waits for the status to say it (the count is written by a script after the key press)
+  def assert_status(text) = assert_selector("#selection-form [role=status]", exact_text: text)
 
   def focus_on(selector)
     page.execute_script("document.querySelector(#{selector.to_json}).focus()")
@@ -63,16 +64,16 @@ class ResultsSelectionTest < ApplicationSystemTestCase
   test "a checkbox on each card is named by the record, and ticking one by keyboard announces the new count" do
     visit_results
     first_title = first(".result-card .document-title-heading a").text
-    assert_equal "No records selected", status
+    assert_status "No records selected"
 
     focus_on(".result-card__select-input")
     press(:space)
-    assert_equal "1 record selected", status
+    assert_status "1 record selected"
     assert_equal "Select: #{first_title}", accessible_name(".result-card__select-input:checked").sub(" :", ":")
 
     page.execute_script("document.querySelectorAll('.result-card__select-input')[1].focus()")
     press(:space)
-    assert_equal "2 records selected", status
+    assert_status "2 records selected"
     assert_link "View selected (2)"
   end
 
@@ -87,17 +88,17 @@ class ResultsSelectionTest < ApplicationSystemTestCase
   test "Select all on this page and Clear selection work, and the selection page lists only those records, in order" do
     visit_results
     click_button "Select all on this page"
-    assert_equal "12 records selected", status
+    assert_status "12 records selected"
     assert_selector ".result-card__select-input:checked", count: 12
 
     click_button "Clear selection"
-    assert_equal "No records selected", status
+    assert_status "No records selected"
     assert_selector ".result-card__select-input:checked", count: 0
 
     boxes = all(".result-card__select-input", minimum: 3)
     titles = all(".result-card .document-title-heading a").map(&:text)
     [ 2, 0, 1 ].each { |index| boxes[index].click }
-    assert_equal "3 records selected", status
+    assert_status "3 records selected"
 
     click_link "View selected (3)"
     assert_selector "h2", text: "3 selected records"
@@ -112,7 +113,7 @@ class ResultsSelectionTest < ApplicationSystemTestCase
     assert_selector ".result-card__select-input:checked", count: 50
 
     visit_results(per_page: 96)
-    assert_equal "50 records selected", status
+    assert_status "50 records selected"
     assert_selector ".result-card__select-input:checked", count: 50
 
     unticked = all(".result-card__select-input:not(:checked)", minimum: 1).first
@@ -125,7 +126,7 @@ class ResultsSelectionTest < ApplicationSystemTestCase
     visit_results
     boxes = all(".result-card__select-input", minimum: 3)
     boxes.first(3).each(&:click)
-    assert_equal "3 records selected", status
+    assert_status "3 records selected"
 
     click_link "View selected (3)"
     all(".result-card .document-title-heading a").first.click

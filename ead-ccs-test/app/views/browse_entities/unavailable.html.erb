@@ -1,0 +1,8 @@
+<% content_for :title, "#{t('browse.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-browse" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("browse.title"), description: t("browse.errors.unavailable")) %>
+<main class="browse-main" id="main-content">
+  <div class="browse-main__inner">
+    <p class="browse-empty"><%= link_to t("browse.errors.search_all"), search_action_path(any_assets: "1", search_field: "all_fields") %></p>
+  </div>
+</main>

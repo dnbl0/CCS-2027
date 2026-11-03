@@ -83,10 +83,13 @@ Rails.application.routes.draw do
   get "help", to: "pages#help", as: :help
   # Search tips, Indigenous cultural data and Contact are no longer pages of their own: Indigenous data and Contact
   # are sections of Help, and the old addresses go there.
-  get "help/search-tips", to: redirect("/help", status: 301)
+  get "help/search-tips", to: redirect("/catalog/advanced#advanced-search-tips-title", status: 301)
   get "help/indigenous-data", to: redirect("/help#indigenous", status: 301)
   get "contact", to: redirect("/help#contact-us", status: 301)
   get "about", to: "pages#about", as: :about
+  # The pages behind the home page's Explore tiles: every object type, place, period, maker and subject
+  get "browse", to: "browse#index", as: :browse
+  get "browse/:slug", to: "browse#show", as: :browse_hub
   # Accessibility statement and privacy notice (CCS-148); placeholder wording until the University approves it
   get "accessibility", to: "pages#accessibility", as: :accessibility
   get "privacy", to: "pages#privacy", as: :privacy
@@ -98,11 +101,14 @@ Rails.application.routes.draw do
   get "llms.txt", to: "seo#llms", format: false
 
   # What the visitor sees for an error: Rails sends the failed request to /<status> (config.exceptions_app)
-  %w[400 404 406 422 500].each { |code| match code, to: "errors#show", via: :all, defaults: { code: code }, as: "error_#{code}" }
+  %w[400 404 406 422 429 500 503].each { |code| match code, to: "errors#show", via: :all, defaults: { code: code }, as: "error_#{code}" }
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
+  # Liveness and readiness probes with a JSON answer (CCS-146): /healthz is the process only; /readyz also needs the database, Solr and the migrations.
+  get "healthz" => "health#live", as: :liveness_check, format: false
+  get "readyz" => "health#ready", as: :readiness_check, format: false
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
@@ -111,12 +117,9 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
-  # Browse hubs and entity pages (BrowseController): public, built from Solr facets. Kept in one block.
-  scope "/browse", controller: "browse" do
-    get "/", action: :index, as: :browse_home
-    get "time", action: :time, as: :browse_time
-    get "time/:slug", action: :period, as: :browse_period, constraints: { slug: /[a-z0-9-]+/ }
-    get ":kind", action: :hub, as: :browse_kind, constraints: { kind: /creators|places|subjects/ }
-    get ":kind/:slug", action: :entity, as: :browse_entity, constraints: { kind: /creators|places|subjects/, slug: /[a-z0-9-]+/ }
+  # Entity pages (BrowseEntitiesController), under the browse index pages (BrowseController): one maker, place or subject, one century or decade
+  scope "/browse", controller: "browse_entities" do
+    get "periods/:slug", action: :period, as: :browse_period, constraints: { slug: /[a-z0-9-]+/ }
+    get ":kind/:slug", action: :entity, as: :browse_entity, constraints: { kind: /makers|places|subjects/, slug: /[a-z0-9-]+/ }
   end
 end

@@ -49,7 +49,7 @@ module Browse
 
     def range_params(periods)
       if periods == :centuries
-        { "facet.range": Periods::FIELD, "facet.range.start": Periods::EARLIEST_CENTURY, "facet.range.end": Periods::LATEST_YEAR,
+        { "facet.range": Periods::FIELD, "facet.range.start": Periods::FIRST_CENTURY, "facet.range.end": Periods::LATEST_YEAR,
           "facet.range.gap": 100, "facet.range.other": "before" }
       elsif periods.respond_to?(:first) && periods.first
         { "facet.range": Periods::FIELD, "facet.range.start": periods.first, "facet.range.end": periods.last + 1, "facet.range.gap": 10 }

@@ -69,23 +69,28 @@ class BrowseIndexTest < ActiveSupport::TestCase
     assert_equal %w[Archaeology Portraits], index.top(2).map(&:name)
   end
 
-  test "loading reads one facet of the field and keeps it in the cache" do
+  test "the lists are BrowseHubs' values, grouped, and kept in the cache" do
     original = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
-    asked = []
-    repository = Object.new
-    repository.define_singleton_method(:search) do |params:|
-      asked << params
-      { "facet_counts" => { "facet_fields" => { "subject_ssim" => { "Archaeology" => 2, "Film" => 1 } } } }
-    end
+    Rails.cache.write("browse_hubs/v1/subjects", [ [ "Film", 3 ], [ "film", 2 ] ], expires_in: 1.day)
 
-    2.times { Browse::Index.for("subjects", repository: repository) }
+    entries = Browse::Index.for("subjects").entries
 
-    assert_equal 1, asked.size
-    assert_equal "subject_ssim", asked.first[:"facet.field"]
-    assert_equal(-1, asked.first[:"facet.limit"])
-    assert_equal 0, asked.first[:rows]
+    assert_equal [ [ "Film", 5 ] ], entries.map { |entry| [ entry.name, entry.count ] }
+    assert_not_nil Rails.cache.read("browse/index/v2/subjects")
   ensure
+    Rails.cache = original
+  end
+
+  test "with no list and Solr unreachable the index is unavailable" do
+    original = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+    guard = SolrGuard.method(:run)
+    SolrGuard.define_singleton_method(:run) { |*| raise Errno::ECONNREFUSED }
+
+    assert_raises(Browse::Index::Unavailable) { Browse::Index.for("places") }
+  ensure
+    SolrGuard.define_singleton_method(:run, guard)
     Rails.cache = original
   end
 end

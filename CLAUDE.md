@@ -28,3 +28,8 @@ and its Azure deployment at the same time. Every agent follows these rules so wo
    look at the exact thing that changed, at desktop and phone width where layout matters. Do it locally before opening a
    PR and again on the deployed site after a rollout, and say in the report which pages you looked at. If the browser
    cannot be used, say so plainly instead of reporting the change as verified.
+10. **Sitemap and information architecture: Blacklight out of the box.** Dean is not technical and has asked agents to
+    decide on best practice for him. Any change to the sitemap, URLs, navigation, breadcrumbs or page structure of the
+    Rails app uses Blacklight's own routes, nav actions and breadcrumb behaviour. Do not invent new page types, URL
+    schemes or navigation models. If best practice would need something Blacklight does not provide, say so in plain
+    language and stop instead of building it.

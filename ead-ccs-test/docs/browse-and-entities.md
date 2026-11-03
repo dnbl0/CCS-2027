@@ -16,10 +16,10 @@ Wording on the new pages is placeholder wording until the collections team appro
 
 | Use | Solr field | Distinct values | Records with a value | Values with 5+ records | Values with 1 record |
 | --- | --- | --- | --- | --- | --- |
-| Creators | `creator_ssim` (plain name; `creator_display_ssim` is "Name (born - died) Role") | 7,821 | 31,594 | 884 | 5,180 |
+| Makers (creators) | `creator_ssim` (plain name; `creator_display_ssim` is "Name (born - died) Role") | 7,821 | 31,594 | 884 | 5,180 |
 | Places | `production_place_ssim` | 1,018 | 13,355 | 277 | 502 |
 | Subjects | `subject_ssim` | 1,601 | 15,894 | 368 | 887 |
-| Time | `date_start_isi` (integer year; negative is BCE) | n/a | 28,264 (1,403 BCE; min -250000, max 2025) | n/a | n/a |
+| Periods | `date_start_isi` (integer year; negative is BCE) | n/a | 28,264 (1,454 before the year 1000, most of them BCE; min -250000, max 2025) | n/a | n/a |
 | Object types (not built) | `object_type_ssim` | 1,085 | 39,503 | 441 | 363 |
 | Collections | `collection_ssim` (6), `named_collection_ssim` (344) | | | | |
 
@@ -51,51 +51,63 @@ name mentions Aboriginal, Indigenous, Torres Strait Islander or First Nations; a
 sensitive records out of the grid altogether, with a note that some are not previewed. Their count is still in the totals and the
 search.
 
+## What exists, and what this adds
+
+The home page's Explore tiles (PR #25) already give the **index pages**: `/browse` (the ways in) and `/browse/:slug` for
+`object-types`, `places`, `periods`, `makers` and `subjects`, with a "Most records" list, an A to Z letter bar, a cached last-good copy
+(`BrowseHubs`, `BrowseList`, `SolrGuard`) and a plain 503 when Solr is down. This work adds, on top of them and without a second set of routes:
+
+- **Entity pages** for a maker, a place, a subject, a century and a decade (below).
+- Index entries for makers, places, subjects and periods now **link to the entity page** (the page has the "See all N records" search link);
+  object types still open the search, as they have no page.
+- A **type-to-filter box** (plain GET form, `?filter=`) and **paging** (120 a page, `?page=`) on every index page except periods.
+- Makers, places and subjects on the index pages are **grouped by spelling** (`Browse::Index`), so "Portraits" and "portraits" are one row.
+- Record pages link their place, subject and maker values to the entity page.
+- JSON-LD, robots rules, canonical addresses and sitemap entries for both the index pages and the entity pages (`Browse::Meta`).
+- The **Browse** link in the header and footer. The home page was left to the Explore tiles.
+
 ## URLs
 
 | Page | URL |
 | --- | --- |
-| Overview | `/browse` |
-| A to Z hub | `/browse/creators`, `/browse/places`, `/browse/subjects`; `?letter=G` (A-Z or `0-9`), `?filter=words`, `?page=2` |
-| Entity | `/browse/creators/grainger-percy-aldridge-4cdea47c6e` |
-| Time hub | `/browse/time` |
-| Period | `/browse/time/1900-1999` (century), `/browse/time/1920-1929` (decade), `/browse/time/bce-500-401`, `/browse/time/before-5000-bce` |
+| Index pages (existing) | `/browse`, `/browse/makers`, `/browse/places`, `/browse/subjects`, `/browse/periods`, `/browse/object-types`; `?letter=G` (A-Z or `#`), `?filter=words`, `?page=2` |
+| Entity | `/browse/makers/grainger-percy-aldridge-4cdea47c6e` (also `/browse/places/...`, `/browse/subjects/...`) |
+| Period | `/browse/periods/1900-1999` (century), `/browse/periods/1920-1929` (decade), `/browse/periods/before-1000` |
 
 **Slug scheme.** `readable-words-` plus ten hex characters of SHA-256 of `kind:folded-value`. Deterministic (a link can be built from
 a record alone, no lookup), collision-safe (the hash decides; the words are cosmetic; a stale or edited word part gets a 301 to the
 right address; an unknown hash is a 404) and safe (letters, digits and hyphens only; the value found by it comes from the index, is
-escaped as a Solr phrase, and no visitor text is ever put in a Solr query: the hub filter is applied in Ruby). Period addresses are
-validated exactly (a span must be a whole century or decade) so there is nothing to enumerate.
+escaped as a Solr phrase, and no visitor text is ever put in a Solr query: the filter box is applied in Ruby). Periods are the spans
+of `BrowseHubs.periods` (before 1000; centuries from 1000; decades). A period address is validated exactly (a whole century or decade),
+so there is nothing to enumerate; a century of 1800 or later is reached from its decades.
 
 ## How it is built
 
-- `Browse::Index` reads one facet (`facet.limit=-1`, `facet.mincount=1`) per kind and caches the grouped list for 6 hours. The
-  whole list is read at once instead of letter by letter with `facet.prefix` / `offset`: the largest field is 7,800 values, the entity
-  address lookup needs the whole list anyway, and the A-Z bar, the filter box and paging are then answered from memory. If a field
-  grows to hundreds of thousands of values, `Index.load` is the single place to switch to prefix and offset requests.
-- `Browse::Periods.counts` makes two range-facet requests (centuries from 5000 BCE; decades from 1700), cached 6 hours.
-- `Browse::Profile` makes **one** request for an entity or period page: 24 records, facets for collection, object type, creator, place
-  and subject, stats on `date_start_isi`, century (or decade) ranges, and a facet query counting records under cultural protocols.
-- Record pages link their place, subject and creator values to the browse page without any Solr request (the slug is computed from
-  the value); the link leads to a page that always exists for a non-noise value.
+- `Browse::Index` wraps `BrowseHubs.values` (one facet request per field, cached a day, last good copy a month) and caches the grouped
+  entries for 6 hours. The whole list is used at once rather than letter by letter (`facet.prefix`, offset and limit): the largest field is
+  7,800 values, the address lookup needs all of them, and the letter bar, filter box and paging are then answered from memory. If a
+  field grew to hundreds of thousands of values, `BrowseHubs.facet_pairs` is the one place to change.
+- `Browse::Profile` makes **one** request for an entity or period page: 24 records (images first), facets for collection, object type,
+  maker, place and subject, stats on `date_start_isi`, century (or decade) ranges, and a facet query counting records under cultural
+  protocols.
+- Record pages link their values without any Solr request (the slug is computed from the value); such a page exists for any non-noise value.
 - No external service is called at runtime. Enrichment hook (not built, off by default): a later `Browse::Enrichment` could add a
-  Wikidata `sameAs` to `Browse::Meta#about`; it should be a stored, reviewed mapping, never a live lookup.
+  Wikidata `sameAs` to `Browse::Meta#about`, from a stored and reviewed mapping, never a live lookup.
 
 ## Search engines
 
-- Hubs and pages with **5 or more records** (`Browse::MIN_INDEXED_RECORDS`) are indexable with a canonical address (the letter and
+- Index pages and entity pages with **5 or more records** (`Browse::MIN_INDEXED_RECORDS`) are indexable with a canonical address (the letter and
   page parameters are kept; the filter box is dropped), a title, a description and JSON-LD (`CollectionPage` with `about` as `Person`
   only when records show life dates, otherwise `Thing`; `Place`; `DefinedTerm`; a breadcrumb list). No image and no record title
   are ever put in the JSON-LD.
-- Thinner pages, filtered hub lists and page 2 on are `noindex, follow`. They work as normal.
-- **Sitemap policy:** the five hubs, every entity with 5+ records (about 1,500 today) and every century or decade with 5+ records. That is a
+- Thinner pages, filtered index lists and page 2 on are `noindex, follow`. They work as normal.
+- **Sitemap policy:** `/browse` and its six index pages, every entity with 5+ records (about 1,500 today), every listed period with 5+ records and the century of any listed decade. That is a
   small fraction of one 10,000-URL sitemap page. The lists come from the cache, so building the sitemap adds no Solr walk.
 
 ## Budgets
 
-Warm cache: a hub or the overview makes 0 Solr requests; an entity or period page makes 1. Cold: one request for each list it
-needs (at most 5 on the first visit), then cached for 6 hours. No new scripts or importmap pins; the stylesheet is one more file
-inside `application.css`. The home page grew by about 1 kB (budget 56 kB).
+Warm cache: an index page makes 0 Solr requests (it did before); an entity or period page makes 1. Cold: the lists are the existing
+cached requests. No new scripts or importmap pins; one more stylesheet inside `application.css`. Nothing was added to the home page.
 
 ## Open questions
 

@@ -2,4 +2,4 @@
 <% content_for :title, t("browse.entity.title", name: @entry.name, kind: @kind.singular) %>
 <% content_for :body_class, "page-browse page-browse-entity" %>
 <%= render NexusCcs::PageBannerComponent.new(title: @entry.name, description: @kind.singular) %>
-<%= render "browse/profile", name: @entry.name, total: @result.total, entry: @entry, period: nil %>
+<%= render "browse_entities/profile", name: @entry.name, total: @result.total, entry: @entry, period: nil %>

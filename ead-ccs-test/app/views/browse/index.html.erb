@@ -1,27 +1,16 @@
-<%# /browse: the four ways in. Each section has the most represented values and a link to the whole A to Z list. %>
-<% content_for :title, "#{t('browse.title')} — Collections Navigator — University of Melbourne" %>
 <% content_for :body_class, "page-browse" %>
-<%= render NexusCcs::PageBannerComponent.new(title: t("browse.title"), description: t("browse.intro")) %>
-
-<main class="browse-main" id="main-content">
-  <div class="browse-main__inner">
-    <div class="browse-overview">
-      <% @indexes.each do |kind, index| %>
-        <section class="browse-card" aria-labelledby="browse-<%= kind.key %>">
-          <h2 class="browse-card__title" id="browse-<%= kind.key %>"><%= link_to kind.plural, browse_kind_path(kind.key) %></h2>
-          <p class="browse-card__blurb"><%= kind.blurb %> <span class="browse-card__count"><%= t("browse.hub.count", count: number_with_delimiter(index.size), kind: kind.plural.downcase) %></span></p>
-          <h3 class="browse-card__heading"><%= t("browse.overview.featured") %></h3>
-          <%= render "browse/entity_list", entries: index.top(BrowseController::OVERVIEW_FEATURED) %>
-          <%= link_to t("browse.overview.see_all", kind: kind.plural.downcase), browse_kind_path(kind.key), class: "browse-card__more" %>
-        </section>
+<% content_for :title, "Browse the collections — Collections Navigator — University of Melbourne" %>
+<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", nil ] ]) %>
+<%= render NexusCcs::PageBannerComponent.new(title: "Browse the collections", description: "No search term needed. Start from what the records are, where they come from, when they were made, who made them or what they are about.") %>
+<main class="browse" id="main-content">
+  <div class="browse__inner">
+    <ul class="browse__hubs">
+      <% @hubs.each do |hub| %>
+        <li class="browse__hub">
+          <h2 class="browse__hub-title"><%= link_to hub.title, browse_hub_path(hub.slug), class: "browse__hub-link" %></h2>
+          <p class="browse__hub-intro"><%= hub.intro %></p>
+        </li>
       <% end %>
-      <section class="browse-card" aria-labelledby="browse-time">
-        <h2 class="browse-card__title" id="browse-time"><%= link_to t("browse.time.plural"), browse_time_path %></h2>
-        <p class="browse-card__blurb"><%= t("browse.time.blurb") %></p>
-        <h3 class="browse-card__heading"><%= t("browse.time.centuries") %></h3>
-        <%= render "browse/period_list", pairs: @periods.centuries.select { |period, _| period.kind == :century && period.first >= 1000 }.max_by(BrowseController::OVERVIEW_FEATURED) { |_, count| count }.sort_by { |period, _| period.first } %>
-        <%= link_to t("browse.time.title"), browse_time_path, class: "browse-card__more" %>
-      </section>
-    </div>
+    </ul>
   </div>
 </main>

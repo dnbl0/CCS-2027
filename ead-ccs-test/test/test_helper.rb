@@ -10,6 +10,9 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
+    # What the circuit breaker learnt in one test (a Solr that was down) must not reach the next
+    setup { SolrGuard.reset! }
+
     # Add more helper methods to be used by all tests here...
 
     # The "rails" CI job has no Solr (the system job does): a test that reads the Solr core at SOLR_URL skips itself when it

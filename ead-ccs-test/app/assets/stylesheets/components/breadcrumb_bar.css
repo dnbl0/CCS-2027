@@ -39,6 +39,12 @@
   text-decoration: underline;
 }
 
+/* White on --ccs-cyan-900 is 13:1, well over the 3:1 non-text minimum */
+.breadcrumb-bar a:focus-visible {
+  outline: 2px solid var(--ccs-text-inverse);
+  outline-offset: 2px;
+}
+
 .breadcrumb-bar__trail {
   display: flex;
   flex-wrap: wrap;
@@ -65,7 +71,7 @@
   background: url("../site/chevron-right.svg") center / 16px 16px no-repeat;
 }
 
-.breadcrumb-bar__item[aria-current="page"] {
+.breadcrumb-bar__item > [aria-current="page"] {
   font-weight: var(--ccs-font-weight-semibold);
 }
 

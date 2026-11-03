@@ -14,7 +14,7 @@ module Browse
   end
 
   Kind::ALL = [
-    Kind.new("creators", "creator_ssim", "Person"),
+    Kind.new("makers", "creator_ssim", "Person"),
     Kind.new("places", "production_place_ssim", "Place"),
     Kind.new("subjects", "subject_ssim", "DefinedTerm")
   ].freeze

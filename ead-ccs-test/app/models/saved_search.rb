@@ -4,11 +4,14 @@
 # (the same hash Blacklight's Search stores), so the link back to the results page is always built from what was saved.
 class SavedSearch < ApplicationRecord
   NAME_LIMIT = 120
+  # A visitor keeps at most this many (the saved searches page lists them all, so it must stay bounded)
+  MAX_PER_USER = 100
 
   belongs_to :user
 
   validates :name, presence: true, length: { maximum: NAME_LIMIT }
   validates :query_params, presence: true
+  validate :user_has_room, on: :create
 
   # Newest first, as the saved searches page lists them
   scope :recent, -> { order(created_at: :desc, id: :desc) }
@@ -58,4 +61,16 @@ class SavedSearch < ApplicationRecord
 
   # What the results page needs to repeat the search
   def search_params = query_params.to_h.symbolize_keys
+
+  # Saves the search once, however many times the request arrives (a double click, a second tab, a retry): under a lock on the
+  # visitor's row, the same name and parameters are found, not made again. Returns the saved search (check persisted?).
+  def self.keep(user, name:, query_params:)
+    user.with_lock { user.saved_searches.find_by(name: name, query_params: query_params) || user.saved_searches.create(name: name, query_params: query_params) }
+  end
+
+  private
+
+  def user_has_room
+    errors.add(:base, :too_many_saved_searches, count: MAX_PER_USER) if user && user.saved_searches.count >= MAX_PER_USER
+  end
 end

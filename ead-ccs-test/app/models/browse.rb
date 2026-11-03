@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-# Browse hubs and entity pages (see docs/browse-and-entities.md): an A to Z index of the creators, places and subjects in the
-# collections, a time index (centuries, then decades), and one page for each value. Everything is derived from Solr facets
-# that already exist (creator_ssim, production_place_ssim, subject_ssim, date_start_isi); nothing is stored.
+# Entity pages (see docs/browse-and-entities.md): one page for each maker, place and subject, and for each century and decade, linked from
+# the browse index pages (BrowseHubs, BrowseList, BrowseController) and from the record page. Everything is derived from Solr facets that
+# already exist (creator_ssim, production_place_ssim, subject_ssim, date_start_isi); nothing is stored.
 #
-#   Browse::Kind      which field a hub lists, and its labels
-#   Browse::Index     every value of a kind with its record count, grouped by spelling variant, cached
+#   Browse::Kind      which field a kind lists, and its labels
+#   Browse::Index     every value of a kind with its record count, grouped by spelling variant, cached (over BrowseHubs.values)
 #   Browse::Slug      the address of a value: readable words plus a short hash, so a value is found without a lookup table
-#   Browse::Periods   centuries and decades of date_start_isi
+#   Browse::Periods   centuries and decades of date_start_isi, the spans of BrowseHubs.periods
 #   Browse::Profile   one Solr request for an entity page: the records and the facts about them
-#   Browse::Meta      the title, description, robots and JSON-LD of a hub or entity page (PageMeta draws it)
-#   Browse::SitemapPaths  the entity pages that are listed in the sitemap
+#   Browse::Meta      the description, robots and JSON-LD of an entity page (PageMeta draws it)
+#   Browse::SitemapPaths  the browse pages that are listed in the sitemap
 module Browse
   # How long the value lists and counts are kept. The index is rebuilt by the first visit after this; a Solr outage does not
   # empty it while the old copy is still there (the cache entry is only replaced by a successful build).

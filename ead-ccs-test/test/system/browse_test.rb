@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-# The browse hubs and an entity page in a real browser: axe at desktop and phone width, the filter without a mouse, and a
+# The browse index pages and an entity page in a real browser: axe at desktop and phone width, the filter without a mouse, and a
 # keyboard-only path from the hub to an entity page. Needs the shared Solr core.
 class BrowseSystemTest < ApplicationSystemTestCase
   setup do
@@ -17,13 +17,13 @@ class BrowseSystemTest < ApplicationSystemTestCase
   WIDTHS.each do |name, size|
     test "the overview, a hub and an entity page have no axe violations at #{name}" do
       page.driver.resize(*size)
-      [ "/browse", "/browse/creators?letter=G", "/browse/time", "/browse/time/1900-1999" ].each do |path|
+      [ "/browse", "/browse/makers?letter=G", "/browse/periods", "/browse/periods/1900-1999" ].each do |path|
         visit path
         assert_selector "h1"
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: HEADING_ORDER)
       end
-      visit "/browse/creators?filter=bunny"
-      first(".browse-list__link").click
+      visit "/browse/makers?filter=bunny"
+      first(".browse__link").click
       assert_selector ".result-card"
       assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: HEADING_ORDER)
       assert_no_horizontal_scroll if name == "320px"
@@ -34,9 +34,10 @@ class BrowseSystemTest < ApplicationSystemTestCase
     visit "/browse/subjects"
     find("#filter").send_keys("portr", :enter)
     assert_current_path(/filter=portr/)
-    assert_selector ".browse-list__link"
-    page.driver.browser.keyboard.type(:tab) # leaves the box; links are reachable in order
-    assert_selector ".browse-letters a[aria-current=true]", text: "All"
+    assert_selector ".browse__link"
+    find(".browse__link", match: :first).send_keys(:enter) # a result opens with the keyboard
+    assert_selector "h1"
+    assert_selector ".browse-facts"
   end
 
   def assert_no_horizontal_scroll

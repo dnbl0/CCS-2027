@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
 module Browse
-  # Every value of one kind (Kind) with its number of records: one Solr request for the field's facet, cached (CACHE_TTL). The
+  # Every value of one kind (Kind) with its number of records (BrowseHubs.values: one facet request, cached). The
   # values are grouped by spelling (Slug.fold), so "Portraits" and "portraits" are one entity with two variants; the
   # variant with most records names it.
   #
-  # The whole list is read in one request rather than letter by letter (facet.prefix, facet.offset and facet.limit): the biggest
-  # field has about 8,000 values (some 300 kB of JSON), the entity pages need the whole list to turn an address back into a
-  # value, and a letter's page, the type-to-filter box and the A to Z counts are then all answered from memory. If a field ever
-  # grows to hundreds of thousands of values, Index.load is the one place to change (to prefix and offset requests).
+  # The whole list is used at once rather than letter by letter (facet.prefix, offset and limit): the largest field is 7,800 values and the
+  # address lookup needs all of them. If a field ever grows to hundreds of thousands, BrowseHubs.facet_pairs is the place to change.
   class Index
     Entry = Data.define(:kind_key, :name, :variants, :count, :token, :fold, :letter) do
       def kind = Kind.find(kind_key)
@@ -24,19 +22,20 @@ module Browse
 
     attr_reader :kind, :entries
 
-    def self.for(kind, repository: nil)
-      kind = Kind.find(kind) unless kind.is_a?(Kind)
-      entries = Rails.cache.fetch("browse/index/v1/#{kind.key}", expires_in: CACHE_TTL, skip_nil: true) do
-        group(kind, load(kind, repository || Blacklight.default_index))
-      end
-      new(kind, entries)
-    end
+    # nil values: Solr cannot answer and BrowseHubs holds no copy (its last good copy is used first)
+    class Unavailable < StandardError; end
 
-    # [[value, count], ...] from Solr
-    def self.load(kind, repository)
-      response = repository.search(params: { q: "*:*", rows: 0, facet: true, "facet.field": kind.field, "facet.limit": -1, "facet.mincount": 1,
-                                             "facet.sort": "count", "json.nl": "map", qt: "select", defType: "lucene" })
-      Browse::Facets.pairs(response, kind.field)
+    # The grouped entries of a kind, cached (CACHE_TTL) over BrowseHubs.values, which makes the one facet request, keeps it a day and
+    # keeps the last good copy for a month (CCS-147). The grouping is cached too, as folding some 8,000 names costs tens of milliseconds.
+    def self.for(kind, connection: nil)
+      kind = Kind.find(kind) unless kind.is_a?(Kind)
+      entries = Rails.cache.fetch("browse/index/v2/#{kind.key}", expires_in: CACHE_TTL, skip_nil: true) do
+        rows = BrowseHubs.values(BrowseHubs.find(kind.key), connection)
+        rows && group(kind, rows)
+      end
+      raise Unavailable, kind.key unless entries
+
+      new(kind, entries)
     end
 
     def self.sort_key(name)

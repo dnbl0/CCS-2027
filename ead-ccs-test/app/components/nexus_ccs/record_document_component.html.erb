@@ -4,14 +4,12 @@
   itemscope: true,
   itemtype: document.itemtype,
   class: "record" do %>
-  <%# The title band above the page repeats this for sighted visitors; this is the page's one real h1 %>
-  <h1 class="visually-hidden"><%= heading %></h1>
-
   <%= render NexusCcs::DigitalAssetsComponent.new(presenter: @presenter) %>
 
-  <section class="record-summary" aria-label="Summary">
+  <section class="record-summary">
     <div class="record-summary__inner">
-      <p class="record-summary__title"><%= heading %></p>
+      <%# The title band above the page is aria-hidden; this is the page's one h1 %>
+      <h1 class="record-summary__title"><%= heading %></h1>
       <% if byline %><p class="record-summary__byline"><%= byline %></p><% end %>
       <% if tags.any? %>
         <ul class="record-summary__tags" aria-label="Tags">

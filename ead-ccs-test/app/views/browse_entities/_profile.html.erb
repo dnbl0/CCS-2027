@@ -3,7 +3,7 @@
     (Browse::Profile; the count and the search include them). %>
 <% result = @result %>
 <% span = Browse::Meta.span_of(result) %>
-<% life = entry && entry.kind.key == "creators" && result.documents.filter_map { |document| Browse::Meta.life_dates(document, entry.variants) }.tally.max_by(&:last)&.first %>
+<% life = entry && entry.kind.key == "makers" && result.documents.filter_map { |document| Browse::Meta.life_dates(document, entry.variants) }.tally.max_by(&:last)&.first %>
 <main class="browse-main" id="main-content">
   <div class="browse-main__inner">
     <% advisory = result.cultural.positive? || name.match?(/aborigin|indigenous|torres strait|first nations|koori|palawa/i) %>
@@ -49,11 +49,11 @@
         <%= render_document_index_with_view :list, result.documents %>
       <% end %>
       <% if result.held_back.positive? %><p class="browse-note"><%= t("browse.entity.held_back") %></p><% end %>
-      <%= render "browse/pager", page: result.page, pages: result.pages, label: t("browse.entity.pagination") %>
+      <%= render "browse_entities/pager", page: result.page, pages: result.pages, label: t("browse.entity.pagination") %>
     </section>
 
     <% related = [] %>
-    <% related << [ t("browse.entity.related_creators"), :creators, related_entities(Browse::Kind.find("creators"), result.facets["creator_ssim"], except: (entry if entry&.kind&.key == "creators")) ] %>
+    <% related << [ t("browse.entity.related_makers"), :makers, related_entities(Browse::Kind.find("makers"), result.facets["creator_ssim"], except: (entry if entry&.kind&.key == "makers")) ] %>
     <% related << [ t("browse.entity.related_places"), :places, related_entities(Browse::Kind.find("places"), result.facets["production_place_ssim"], except: (entry if entry&.kind&.key == "places")) ] %>
     <% related << [ t("browse.entity.related_subjects"), :subjects, related_entities(Browse::Kind.find("subjects"), result.facets["subject_ssim"], except: (entry if entry&.kind&.key == "subjects")) ] %>
     <% related = related.reject { |_, _, pairs| pairs.empty? } %>

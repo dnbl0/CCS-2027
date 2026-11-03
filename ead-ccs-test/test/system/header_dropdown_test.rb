@@ -32,4 +32,38 @@ class HeaderDropdownTest < ApplicationSystemTestCase
     assert_no_selector ".site-nav__trigger[aria-expanded=true]"
     assert_nil page.evaluate_script(dim)
   end
+
+  test "My saved items opens a panel with the visitor's own pages, and a link in it opens that page" do
+    visit root_path
+    find(".site-nav__trigger", text: "My saved items").click
+    assert_selector "#site-nav-saved", visible: :visible
+    %w[Saved\ records Your\ lists Saved\ searches Search\ history].each { |label| assert_selector "#site-nav-saved a", text: label }
+    page.save_screenshot(Rails.root.join("tmp/screenshots/my_saved_items_desktop.png").to_s)
+
+    within("#site-nav-saved") { click_link "Search history" }
+    assert_current_path "/search_history"
+    assert_selector "h1", text: "Search history"
+  end
+
+  test "Escape closes an open dropdown and returns focus to its trigger" do
+    visit root_path
+    trigger = find(".site-nav__trigger", text: "Help")
+    trigger.click
+    assert_selector "#site-nav-help", visible: :visible
+    page.driver.browser.keyboard.type(:Escape)
+    assert_no_selector ".site-nav__trigger[aria-expanded=true]"
+    assert_equal "site-nav-help", page.evaluate_script("document.activeElement.getAttribute('aria-controls')")
+  end
+
+  test "on a phone, opening a section moves focus to its Back button, and Back returns it to the trigger" do
+    page.current_window.resize_to(390, 800)
+    visit root_path
+    find(".site-header__menu").click
+    find(".site-nav__trigger", text: "Help").click
+    assert_selector "#site-nav-help", visible: :visible
+    assert page.evaluate_script("document.activeElement.closest('#site-nav-help') !== null")
+
+    find("#site-nav-help .site-nav__back").click
+    assert_equal "site-nav-help", page.evaluate_script("document.activeElement.getAttribute('aria-controls')")
+  end
 end

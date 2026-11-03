@@ -7,6 +7,8 @@
   "500" => { title: "Something went wrong", lead: "We couldn't complete your request. Nothing you did caused this. Please try again in a few minutes." },
   "422" => { title: "Your request couldn't be completed", lead: "The page may have been open for a long time, or the request was rejected. Go back, refresh the page and try again." },
   "400" => { title: "We couldn't read that address", lead: "The address contains something we can't read, such as a broken or incomplete web address. Check it, or start a new search." },
+  "429" => { title: "Too many requests", lead: "You've made a lot of requests in a short time. Please wait a minute, then try again." },
+  "503" => { title: "The service is busy or unavailable", lead: "We can't reach part of the service just now. Nothing you did caused this. Please try again in a few minutes. Pages that don't need a search, such as Help and About, may still work." },
   "406" => { title: "We can't show it that way", lead: "This page isn't available in the form that was asked for. Go to the page itself, or start a new search." }
 }.fetch(@code) %>
 <% content_for :title, "#{copy[:title]} - Collections Navigator - University of Melbourne" %>
@@ -21,7 +23,7 @@
     <section aria-labelledby="error-next">
       <h2 id="error-next" class="error-page__heading">What you can do</h2>
       <ul class="error-page__links">
-        <% if @code == "500" && (request.get? || request.head?) %>
+        <% if %w[500 503 429].include?(@code) && (request.get? || request.head?) %>
           <li><%= link_to @path, class: "arrow-link" do %><%= image_tag "site/icon-arrow-footer.svg", alt: "" %>Try this page again<% end %></li>
         <% end %>
         <li><%= link_to search_catalog_path(search_field: "all_fields"), class: "arrow-link" do %><%= image_tag "site/icon-arrow-footer.svg", alt: "" %>Search all records<% end %></li>

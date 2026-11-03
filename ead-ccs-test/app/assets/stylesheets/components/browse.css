@@ -1,255 +1,48 @@
-/*
- * Browse hubs and entity pages (BrowseController, app/views/browse). The page frame is the content pages' (banner, then a
- * container); the records are the site's result cards, laid out as a grid of vertical cards.
- */
-.browse-main__inner {
-  max-width: var(--layout-container);
-  margin-inline: auto;
-  padding: var(--ccs-space-6) var(--space-32) var(--ccs-space-8);
+/* The browse pages (BrowseController): the ways in at /browse, and the list of every value of one at /browse/:slug.
+   Links are whole-row targets at least 44px tall. */
+.browse { background: var(--ccs-surface-default); }
+
+.browse__inner { display: flex; flex-direction: column; gap: var(--ccs-space-5); max-width: var(--layout-content-wide); margin-inline: auto; padding: var(--ccs-space-6) var(--ccs-space-4); }
+
+.browse__hubs, .browse__list, .browse__letter-list { margin: 0; padding: 0; list-style: none; }
+
+.browse__hubs { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: var(--ccs-space-4); }
+
+.browse__hub { display: flex; flex-direction: column; gap: var(--ccs-space-2); padding: var(--ccs-space-4); border: 1px solid var(--ccs-border-default); }
+
+.browse__hub-title { margin: 0; font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); }
+
+.browse__hub-link, .browse__letter, .browse__link { color: var(--ccs-text-link); }
+
+.browse__hub-link:hover, .browse__letter:hover, .browse__link:hover { color: var(--ccs-text-link-hover); }
+
+.browse__hub-link:focus-visible, .browse__letter:focus-visible, .browse__link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+.browse__hub-intro { margin: 0; color: var(--ccs-text-primary); }
+
+.browse__letter-list { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2); }
+
+.browse__letter {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding-inline: var(--ccs-space-3);
+  border: 1px solid var(--ccs-border-default); text-decoration: none; font-weight: var(--ccs-font-weight-semibold);
 }
 
-.browse-main h2 {
-  margin: var(--ccs-space-6) 0 var(--ccs-space-3);
-  font-size: 1.5rem;
+.browse__letter[aria-current="page"] { border-color: var(--ccs-border-strong); text-decoration: underline; }
+
+.browse__heading { margin: 0; font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); }
+
+.browse__list { display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: var(--ccs-space-2); }
+
+.browse__link {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--ccs-space-3);
+  min-height: 44px; padding: var(--ccs-space-3) var(--ccs-space-4);
+  border: 1px solid var(--ccs-border-default); text-decoration: none;
 }
 
-.browse-main h3 {
-  margin: var(--ccs-space-5) 0 var(--ccs-space-2);
-  font-size: 1.125rem;
-}
+.browse__link:hover .browse__label { text-decoration: underline; }
 
-.browse-note,
-.browse-empty,
-.browse-filter__hint {
-  color: var(--ccs-text-secondary);
-}
+.browse__label { font-weight: var(--ccs-font-weight-semibold); overflow-wrap: anywhere; }
 
-/* Lists of names with their counts: columns where there is room */
-.browse-list {
-  column-width: 20rem;
-  column-gap: var(--ccs-space-6);
-  margin: 0 0 var(--ccs-space-4);
-  padding: 0;
-  list-style: none;
-}
+.browse__count { flex: none; font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
 
-.browse-list li {
-  break-inside: avoid;
-  padding-block: var(--ccs-space-2);
-  border-bottom: 1px solid var(--ccs-border-default);
-}
-
-.browse-list__link,
-.browse-letters a,
-.browse-card__more,
-.browse-pager__link,
-.browse-filter__clear {
-  display: inline-block;
-  min-height: 1.5rem; /* 24px target */
-  color: var(--ccs-text-link);
-}
-
-.browse-list__count,
-.browse-list__span,
-.browse-card__count {
-  color: var(--ccs-text-secondary);
-  font-size: 0.9375rem;
-}
-
-/* The overview: one card to a way in */
-.browse-overview {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-  gap: var(--ccs-space-5);
-}
-
-.browse-card {
-  padding: var(--ccs-space-5);
-  border: 1px solid var(--color-border-grey-91);
-  background: var(--ccs-white);
-}
-
-.browse-card .browse-list {
-  column-width: auto;
-  columns: 1;
-}
-
-.browse-card__title {
-  margin-top: 0 !important;
-}
-
-.browse-card__heading {
-  font-size: 1rem !important;
-  text-transform: none;
-}
-
-/* The filter box and the A to Z bar */
-.browse-filter__label {
-  display: block;
-  margin-bottom: var(--ccs-space-1);
-  font-weight: 600;
-}
-
-.browse-filter__row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ccs-space-3);
-}
-
-.browse-filter__input {
-  flex: 1 1 16rem;
-  min-height: 2.75rem;
-  padding: 0 var(--ccs-space-3);
-  border: 1px solid var(--ccs-border-strong);
-}
-
-.browse-letters ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ccs-space-1);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.browse-letters li > a,
-.browse-letters__none {
-  display: inline-block;
-  min-width: 1.5rem;
-  min-height: 1.5rem;
-  padding: 0.125rem 0.5rem;
-  text-align: center;
-}
-
-.browse-letters__none {
-  color: var(--ccs-text-tertiary);
-}
-
-/* Not by colour alone: the current letter is also underlined and bold */
-.browse-letters a[aria-current="true"] {
-  font-weight: 700;
-  text-decoration: underline;
-  text-decoration-thickness: 3px;
-}
-
-.browse-letters__heading {
-  margin-top: var(--ccs-space-5) !important;
-  font-size: 1rem !important;
-}
-
-.browse-count {
-  font-size: 1.125rem !important;
-}
-
-.browse-pager {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ccs-space-4);
-  margin-top: var(--ccs-space-5);
-}
-
-/* Cultural care notice: a bordered box with a heading, so it never depends on colour */
-.browse-advisory {
-  margin-bottom: var(--ccs-space-5);
-  padding: var(--ccs-space-4) var(--ccs-space-5);
-  border: 2px solid var(--ccs-border-strong);
-  border-inline-start-width: 8px;
-  background: var(--ccs-surface-subtle);
-}
-
-.browse-advisory__title {
-  margin-top: 0 !important;
-  font-size: 1.125rem !important;
-}
-
-.browse-advisory p {
-  margin-bottom: 0;
-}
-
-/* At a glance */
-.browse-facts__list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: var(--ccs-space-4) var(--ccs-space-6);
-  margin: 0 0 var(--ccs-space-4);
-}
-
-.browse-facts__list dt {
-  font-weight: 600;
-  color: var(--ccs-text-secondary);
-}
-
-.browse-facts__list dd {
-  margin: 0;
-}
-
-.browse-facts__links {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.browse-facts__links li {
-  padding-block: var(--ccs-space-1);
-}
-
-/* The records: a grid of vertical cards (the list view's horizontal card is for a single column) */
-.browse-records .documents-list {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
-}
-
-.browse-records .documents-list .result-card {
-  flex-direction: column;
-}
-
-.browse-records .documents-list .result-card__media {
-  order: 0;
-  width: auto;
-  min-height: 0;
-  aspect-ratio: 240 / 135;
-}
-
-.browse-records .documents-list .result-card__media img {
-  position: static;
-}
-
-@media (max-width: 767px) {
-  .browse-main__inner {
-    padding-inline: var(--space-16);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .browse-main * {
-    transition: none !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* The home page's "Browse by" links */
-.home-browse-by__list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-  gap: var(--ccs-space-4);
-  margin: var(--ccs-space-4) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.home-browse-by__list li {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ccs-space-1);
-  padding: var(--ccs-space-4);
-  border: 1px solid var(--color-border-grey-91);
-  background: var(--ccs-white);
-}
-
-.home-browse-by__link {
-  min-height: 1.5rem;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--ccs-text-link);
-}
+.browse__unavailable { margin: 0; font-size: var(--ccs-font-size-lg); }

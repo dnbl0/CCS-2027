@@ -11,13 +11,13 @@ class BrowseSlugTest < ActiveSupport::TestCase
 
   test "different values do not fold together" do
     assert_not_equal Browse::Slug.fold("Europe"), Browse::Slug.fold("Europe, Eastern")
-    assert_not_equal Browse::Slug.token("creators", "Smith, J."), Browse::Slug.token("places", "Smith, J.")
+    assert_not_equal Browse::Slug.token("makers", "Smith, J."), Browse::Slug.token("places", "Smith, J.")
   end
 
   test "a slug is deterministic, readable, and made of letters, digits and hyphens only" do
-    slug = Browse::Slug.build("creators", "Grainger (née Ström), Ella Viola")
+    slug = Browse::Slug.build("makers", "Grainger (née Ström), Ella Viola")
 
-    assert_equal slug, Browse::Slug.build("creators", "Grainger (née Ström), Ella Viola")
+    assert_equal slug, Browse::Slug.build("makers", "Grainger (née Ström), Ella Viola")
     assert_match(/\Agrainger-nee-strom-ella-viola-\h{10}\z/, slug)
     assert_match Browse::Slug::PATTERN, slug
   end
@@ -53,9 +53,9 @@ class BrowseSlugTest < ActiveSupport::TestCase
 
   test "a path is built from a value alone, and noise has no page" do
     assert_match %r{\A/browse/places/australia-\h{10}\z}, Browse.path_for("places", "Australia")
-    assert_nil Browse.path_for("creators", "Unknown")
-    assert_nil Browse.path_for("creators", "Unknown (posters)")
-    assert_nil Browse.path_for("creators", "")
+    assert_nil Browse.path_for("makers", "Unknown")
+    assert_nil Browse.path_for("makers", "Unknown (posters)")
+    assert_nil Browse.path_for("makers", "")
     assert_nil Browse.path_for("colours", "Red")
   end
 end
