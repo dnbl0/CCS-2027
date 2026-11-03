@@ -46,15 +46,17 @@ class ListsController < CatalogController
     @list = List.new
   end
 
-  def edit; end
+  def edit
+    @cover_options = cover_options
+  end
 
   def create
     owner = guest_owner
-    name = params.dig(:list, :name)
-    @list = List.just_made(owner, name) || owner.lists.build(name: name) # a repeated request finds the list the first one made
+    attrs = list_params(:name, :description)
+    @list = List.just_made(owner, attrs[:name]) || owner.lists.build(attrs) # a repeated request finds the list the first one made
     document_id = params[:document_id].presence
 
-    if @list.persisted? || save_once(@list, owner, name)
+    if @list.persisted? || save_once(@list, owner, attrs[:name])
       add_once(@list, document_id) if document_id
       notice = t(document_id ? "nexus_ccs.lists.created_with_record" : "nexus_ccs.lists.created", name: @list.name)
       document_id ? back_or_to_lists(notice: notice) : redirect_to(list_path(@list), notice: notice)
@@ -66,9 +68,10 @@ class ListsController < CatalogController
   end
 
   def update
-    if @list.update(name: params.dig(:list, :name))
+    if @list.update(list_params(:name, :description, :cover_document_id))
       redirect_to list_path(@list), notice: t("nexus_ccs.lists.renamed", name: @list.name)
     else
+      @cover_options = cover_options
       render :edit, status: :unprocessable_content
     end
   end
@@ -84,6 +87,22 @@ class ListsController < CatalogController
   end
 
   private
+
+  def list_params(*fields)
+    given = params[:list]
+    given.respond_to?(:permit) ? given.permit(*fields) : {}
+  end
+
+  # [title, id] of the list's records, for choosing its cover (a gallery's picture); none if the index cannot be reached, so
+  # renaming a list never depends on it
+  def cover_options
+    ids = @list.list_items.recent.pluck(:document_id)
+    return [] if ids.empty?
+
+    documents_in_order(ids).map { |document| [ Array(document["title_tsim"]).first.presence || document.id.to_s, document.id.to_s ] }
+  rescue Blacklight::Exceptions::ECONNREFUSED, Blacklight::Exceptions::InvalidRequest, Faraday::TimeoutError, Faraday::ConnectionFailed
+    []
+  end
 
   # Saves the new list. The unique index (name, ignoring case) settles two requests at once: the one that lost finds the winner's list.
   def save_once(list, owner, name)

@@ -1,0 +1,27 @@
+<%# A record's compact card for another site's page: title, creator, date, licence, the thumbnail only where SharedMedia allows
+    (never for a withheld or sensitive record, which shows its notice), and a link back to the full record. Links open in a new
+    tab, as the frame is small. %>
+<% title = Array(@document["title_tsim"]).first.presence || "Untitled" %>
+<% creators = Array(@document["creator_display_ssim"]).first(2).join("; ").presence %>
+<% date = Array(@document["production_date_ssim"]).first.presence %>
+<% licence = Array(@document["licence_type_ssim"]).first.presence %>
+<% content_for :title, "#{title} — #{t('nexus_ccs.embed.site_name')}" %>
+<main class="embed-card <%= 'embed-card--media' if @image_path %>" id="main-content">
+  <% if @image_path %>
+    <div class="embed-card__media">
+      <%= image_tag @image_path, alt: "", decoding: "async", **ImageDimensions.for_path(@image_path).then { |w, h| w ? { width: w, height: h } : {} } %>
+    </div>
+  <% end %>
+  <div class="embed-card__body">
+    <h1 class="embed-card__title"><%= link_to @record_url, target: "_blank", rel: "noopener" do %><%= title %><span class="visually-hidden"> <%= t("nexus_ccs.embed.new_tab") %></span><% end %></h1>
+    <% if creators || date %><p class="embed-card__line"><%= [ creators, date ].compact.join(" · ") %></p><% end %>
+    <p class="embed-card__line embed-card__licence"><%= licence ? t("nexus_ccs.embed.licence", licence: licence) : t("nexus_ccs.embed.licence_none") %></p>
+    <% if @withheld %>
+      <div class="embed-card__notice" role="note">
+        <p class="embed-card__notice-title"><%= t(@withheld == :request ? "nexus_ccs.access_notice.request.title" : "nexus_ccs.sensitivity.ask.title") %></p>
+        <p><%= t(@withheld == :request ? "nexus_ccs.embed.notice_request" : "nexus_ccs.embed.notice_sensitive") %></p>
+      </div>
+    <% end %>
+    <p class="embed-card__link"><%= link_to @record_url, target: "_blank", rel: "noopener" do %><%= t("nexus_ccs.embed.view_record") %><span class="visually-hidden"> <%= t("nexus_ccs.embed.new_tab") %></span><% end %></p>
+  </div>
+</main>

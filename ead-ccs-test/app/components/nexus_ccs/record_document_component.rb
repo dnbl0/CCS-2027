@@ -7,6 +7,8 @@ module NexusCcs
   # breadcrumb above it are HeaderComponent's. The fields, their labels and their order come from the workbook
   # (config.show_fields, see DataModel); the copyright card gathers the rights fields.
   class RecordDocumentComponent < Blacklight::DocumentComponent
+    include RecordDebias # de-bias notices: the finds in the displayed text, and a value with them marked
+
     # Shown in the Copyright card, so not repeated in the details list
     COPYRIGHT_FIELDS = %w[rights_ssim credit_line_tsim].freeze
     LINK_FIELDS = %w[collection_ssim].freeze

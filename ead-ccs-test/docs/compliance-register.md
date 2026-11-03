@@ -58,6 +58,7 @@ Jira CCS-148: *"As the Nexus CCS, I want to comply with copyright law, rights-ba
 | CSV export | Only open records (404 otherwise); cells starting `= + - @` are neutralised. | `metadata_export_test.rb`, `csv_cell_test.rb` | Metadata of withheld records is still shown on the page (by design: metadata is shown on every tier). Whether metadata for ICIP records should also be restricted is a University decision. | University | Decision needed |
 | Sensitivity gate | `Sensitivity` marks records whose restriction note says "sensitive"; the visitor is asked before assets show; the choice is kept in the cookie. | `sensitivity_test.rb`, `sensitivity_choices_test.rb` | Placeholder rule until the DAM advisory flag is available. A restriction note that says "sensitive" may mean medical, cultural or other: the gate does not say which. | Dev team; collection teams | Partial |
 | Enforcement on files | None: hiding is done in the pages. Files in `public/digital-assets` are served by the web server to anyone with the address. A bot guard rate-limits and blocks listed crawlers. | `bot_guard_test.rb` | A withheld file that is on the server can be fetched by its address. Needs the real DAM (signed addresses or server-checked downloads) before real withheld files are published. | Dev team | Gap, high |
+| Recommendations and features | Similar records, Featured, Pick of the day and Trending never list a record whose asset is withheld (`:request`) or that is sensitive, and the cards draw no image for one. Trending counts only views of records that are open or view-only and not sensitive. | `discovery_test.rb`, `similar_records_test.rb`, `trending_records_test.rb`, `featured_records_test.rb` | A record that is withheld or marked sensitive later drops out of the sections when they next load; old counts for it are pruned after 35 days. | App | Done |
 | Search engines | Withheld and sensitive records are `noindex` and left out of the sitemap; personal pages are `noindex, nofollow`. | `robots_policy_test.rb`, `sitemap_test.rb`, `personal_pages_robots_test.rb` | Search engines may already know addresses from elsewhere. | App | Done |
 
 ## 3. Indigenous data governance and cultural protocols
@@ -75,6 +76,7 @@ The relevant frameworks are named here so the University can say which it follow
 | Community Restricted | `access_condition_ssi = Community Restricted` (1 record) is on request and shows the cultural protocols notice. | tests as above | As above. | University | Partial |
 | Culturally sensitive images | Records whose restriction note says "culturally sensitive" get the sensitivity gate and the cultural protocols notice. | `cultural_protocols_notice_component_test.rb` | Detection is by the word "cultur" in a free-text note. The DAM's Indigeneity flag (CCS-55) has no source yet. | Collection teams; dev team | Gap: data |
 | Indigenous names and terms | Help "Note on terminology" and "Note on language". The app shows names as the record holds them. | `help.html.erb` | No display rules (for example names of people who have died, Country names, language names with diacritics beyond the font). No Indigenous-names filter. | University with Indigenous advisers | Open |
+| Offensive or outdated language in records (de-bias notices) | A record page whose displayed text (title, description, subjects, places, names, material) contains a term from `config/debias_terms.yml` shows a notice near the title with the term in context, the reason and any suggested alternative, marks the term where the record shows it (`<mark>` with a hidden "flagged term:", not colour alone), and links to the public page "About the language in our records" and the record's contact card. The record's text is never changed or hidden; only text the page shows is scanned. `bin/rails debias:import` and `debias:report` let the team load and review a list. | `debias_terms_test.rb`, `debias_terms_importer_test.rb`, `debias_notice_component_test.rb`, `debias_notices_test.rb`, `debias_performance_test.rb`, `system/debias_notices_test.rb` | **The list ships empty (one disabled made-up example), so no record is flagged yet.** The collections team must supply the terms and explanations and Indigenous advisers must review them, the notice and the page wording (all placeholder). Matching is by whole word or phrase: it misses variant spellings, cannot tell respectful or quoted use, and records have no language field to narrow by. Fields not yet in the index (notes, inscriptions) are not scanned. The results list and the search do not show the notice. | Collections team; Indigenous advisers; dev team | Partial (mechanism built, no list) |
 | Deceased persons | Help has the note on names, images and voices of people who have died. `config/pages.yml` also holds an advisory for the Medical History Museum, which is not shown on any page now (collection pages redirect to results). | `help.html.erb`; `config/pages.yml` | No record is marked as showing a person who has died, and the Help note is not shown where the visitor meets the image. The Acknowledgement of Country is shown on the home page and in the footer. | University; dev team | Gap |
 | Who decides | Not in the app. A request goes to the collection team; the team decides outside the site. | | Needs a written decision-maker per collection and per community, and a time limit. | University | Decision needed |
 | Takedown and consultation | Not in the app. Help has a contact route. | | No process, form, log or record of consultation. CCS-112 is the separate story for removal. | University; CCS-112 | Not in app |
@@ -91,7 +93,10 @@ What the site stores, today:
 | `country_acknowledged` cookie | Browser | No | 1 day | Browser |
 | `users` row (guest) | Database | Pseudonymous | Not limited | Delete my data |
 | `bookmarks`, `lists`, `list_items`, `saved_searches` | Database | Pseudonymous | Not limited | Delete my data |
+| `lists.share_token`, `description`, `cover_document_id` (galleries) | Database | Pseudonymous; a share link is a capability: anyone holding it can read the list, which names no owner | Until the owner stops sharing, makes a new link, deletes the list or uses Delete my data (all end the link at once) | Delete my data; the owner's Stop sharing. **Placeholder privacy wording on `/privacy`; the University must approve it** |
+| Embed pages (`/embed/*`) and oEmbed | Response only; no cookie, no storage | Public data only (SharedMedia: no image for a withheld or sensitive record) | n/a | The only framable pages (`EMBED_FRAME_ANCESTORS`); noindex. The University should confirm that any site may embed |
 | `searches` (words and filters) | Database | Words a visitor typed can be personal | Not limited (`blacklight:delete_old_searches` exists but is not scheduled) | Delete my data (own history); otherwise nothing |
+| `record_views` (record id, day, number of views; for Trending) | Database | No: no visitor, session, cookie, address or user agent is stored, so no row can be traced to a person (`test/models/record_view_test.rb` fails if a column is added). Only human-looking requests for records that are open or view-only and not sensitive are counted | 35 days (`bin/rails record_views:prune`, scheduled; see `docs/similar-and-trending.md`) | Not needed (nothing is personal); the privacy notice and Delete my data say so |
 | `access_requests` (name, email, organisation, reason, record) | Database | Yes | Not limited | Not by Delete my data. By staff on request. |
 | Web server logs | Azure | Addresses and pages | Azure's setting | Not by the app |
 | `sessionStorage` (open filters, one page) | Browser | No | Tab | Browser |
@@ -151,11 +156,13 @@ Gaps found:
 | Where | What |
 |---|---|
 | `app/views/pages/accessibility.html.erb` | The whole page, including the marked notice, the WCAG 2.2 AA aim, and the reply time and complaint route. |
-| `app/views/pages/privacy.html.erb` | The whole page, including cookie wording, retention (marked), logs (marked) and the access requests paragraph. |
+| `app/views/pages/privacy.html.erb` | The whole page, including cookie wording, retention (marked), logs (marked), the access requests paragraph and "Which records are most viewed" (the 35-day retention of the counts is marked). |
 | `app/views/my_data/show.html.erb` and `nexus_ccs.my_data` in `config/locales/en.yml` | Delete my data wording. |
 | `nexus_ccs.cultural_protocols` in `config/locales/en.yml` | The cultural protocols notice (title, three reasons, link text). Needs Indigenous advisers. |
 | `nexus_ccs.rights.none_recorded` in `config/locales/en.yml` | "No licence or rights statement is recorded for this record. Ask the collection team before you reuse it." |
 | `config/locales/seo.en.yml` (`accessibility`, `privacy`) | Search-engine descriptions of the two new pages. |
+| `config/locales/debias.en.yml` and `app/views/pages/language_in_records.html.erb` | The de-bias notice and the "About the language in our records" page. Needs the collections team and Indigenous advisers; `config/debias_terms.yml` (the terms and their explanations) is empty until they supply it. |
+| `config/featured.yml`, `nexus_ccs.discover` in `config/locales/discover.en.yml` | The featured records' blurbs and the Discover wording (Featured, Pick of the day, Trending). Placeholder until the collection teams supply the text. |
 | Already in the app before this work | `nexus_ccs.bulk_download` limits; `seo.llms_txt.rights`; the Sensitivity rule. |
 
 ## 8. Where things are
@@ -165,10 +172,12 @@ Gaps found:
 | Access tiers | `app/models/access_policy.rb` |
 | Sensitivity | `app/models/sensitivity.rb` |
 | Cultural protocols notice | `app/components/nexus_ccs/cultural_protocols_notice_component.rb` |
+| De-bias notice and term list | `app/models/debias_terms.rb`, `app/components/nexus_ccs/debias_notice_component.rb`, `config/debias_terms.yml`; how to supply terms: `docs/debias-terms.md` |
 | Copyright card | `app/components/nexus_ccs/record_document_component.html.erb` |
 | Accessibility and privacy pages | `app/views/pages/accessibility.html.erb`, `privacy.html.erb` |
 | Delete my data | `app/controllers/my_data_controller.rb`, `app/models/my_data.rb`, `app/views/my_data/show.html.erb`; route `/my_data` inside the saved-records switch |
 | Security headers | `config/initializers/security_headers.rb`, `content_security_policy.rb`, `filter_parameter_logging.rb` |
+| Similar records, Featured, Trending, Pick of the day | `docs/similar-and-trending.md`; no withheld or sensitive record is listed in any of them (`app/models/discovery.rb`) |
 | Robots and sitemap | `app/models/robots_policy.rb` (`/my_data` is personal), `app/models/sitemap.rb` (the two new pages are listed) |
 | Footer links | `app/components/nexus_ccs/site_navigation.rb` (`FOOTER_LEGAL`) |
 

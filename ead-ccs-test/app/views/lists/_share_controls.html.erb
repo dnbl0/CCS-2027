@@ -1,0 +1,22 @@
+<%# The owner's side of the share dialog: what sharing does, then make, replace or stop the link. Each is a plain form that goes
+    back to the list. Placeholder wording until the University approves it. %>
+<section class="share__section" aria-labelledby="share-privacy-heading">
+  <h3 class="share__heading" id="share-privacy-heading"><%= t("nexus_ccs.galleries.share.privacy_heading") %></h3>
+  <p class="share__note"><strong><%= t("nexus_ccs.galleries.share.anyone") %></strong> <%= t("nexus_ccs.galleries.share.what_is_shown") %></p>
+  <p class="share__note"><%= t("nexus_ccs.galleries.share.not_listed") %></p>
+  <p class="share__note"><%= t("nexus_ccs.galleries.share.revoking") %></p>
+</section>
+<% if list.shared? %>
+  <section class="share__section" aria-labelledby="share-manage-heading">
+    <h3 class="share__heading" id="share-manage-heading"><%= t("nexus_ccs.galleries.share.manage_heading") %></h3>
+    <p class="share__note"><%= t("nexus_ccs.galleries.share.shared_on", date: list.shared_at.strftime("%-d %B %Y")) %></p>
+    <div class="share__buttons">
+      <%= button_to t("nexus_ccs.galleries.share.regenerate"), regenerate_list_share_path(list), class: "cite__copy",
+                    form: { class: "d-inline" }, data: { turbo_confirm: t("nexus_ccs.galleries.share.regenerate_confirm") } %>
+      <%= button_to t("nexus_ccs.galleries.share.stop"), list_share_path(list), method: :delete, class: "cite__copy",
+                    form: { class: "d-inline" }, data: { turbo_confirm: t("nexus_ccs.galleries.share.stop_confirm") } %>
+    </div>
+  </section>
+<% else %>
+  <%= button_to t("nexus_ccs.galleries.share.create"), list_share_path(list), class: "btn btn-primary", form: { class: "share__create" } %>
+<% end %>

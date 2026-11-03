@@ -30,6 +30,7 @@ module CannedSearch
     previous = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
     Rails.cache.write(BrowseMenu::CACHE_KEY, { BrowseMenu::WITH_IMAGES => 1 }, expires_in: 1.day)
+    Rails.cache.write(ExploreEntryPoints::CACHE_KEY, {}, expires_in: 1.day) # the home page's Explore tiles: none, so no Solr request
     yield
   ensure
     Rails.cache = previous if previous

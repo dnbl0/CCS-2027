@@ -41,11 +41,17 @@ module NexusCcs
     end
 
     def clauses
-      @clauses ||= (@params["clause"].is_a?(Hash) ? @params["clause"].values : []).filter_map do |clause|
-        next unless clause.is_a?(Hash) && clause["query"].present?
-
-        Clause.new(config.search_fields[clause["field"].to_s]&.label || clause["field"].to_s.humanize, (clause["op"].presence || @params["op"].presence || "must").to_s, clause["query"].to_s)
+      @clauses ||= AdvancedRules.rules(@params["clause"]).select(&:active?).map do |rule|
+        label = config.search_fields[rule.field]&.label || rule.field.humanize
+        Clause.new(label, clause_key(rule), rule.presence? ? "" : rule.query)
       end
+    end
+
+    # Which sentence (nexus_ccs.diagnostics.clause.*) tells how a rule is read: a fixed reading has its own, an old row says must / should / must_not
+    def clause_key(rule)
+      return rule.negated? ? "must_not" : rule.match unless rule.legacy?
+
+      (rule.op.presence || @params["op"].presence || "must").to_s
     end
 
     def clause_text(clause)

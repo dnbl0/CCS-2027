@@ -188,6 +188,7 @@ en:
           one: "%{count} record in your recently viewed list"
           other: "%{count} records in your recently viewed list"
       kept_heading: "What is not removed"
+      counts_note: "The site also keeps a count of how many times each record page was opened each day, for the trending records. The counts hold no cookie, visitor number or address, so they are not linked to you and there is nothing of yours to remove from them."
       kept_requests_html: "Requests for access to a record are not removed here. They hold your name and email address, and the University must be able to act on them and keep them. To have a request corrected or removed, <a href=\"%{contact}\">contact the collection team</a>."
       delete_heading: "Delete"
       delete_warning: "This removes everything listed above. It cannot be undone."

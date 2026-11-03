@@ -64,13 +64,14 @@ module SearchHighlighting
     params
   end
 
-  # The Advanced search rows that include records (not "Does not contain"), as [fields, text] pairs
+  # The Advanced search rows that include records (not "Does not contain", "has a value" or "is empty"), as [fields, text] pairs
   def self.included_clauses(search_state)
-    search_state.clause_params.values.filter_map do |clause|
-      text = clause[:query].to_s.strip
-      next if text.empty? || clause[:op].to_s == "must_not"
+    AdvancedRules.rules(search_state.clause_params).filter_map do |rule|
+      # A "has a value" / "is empty" rule has no words; a rule with a fixed reading is given the words Solr searched for
+      text = rule.legacy? ? rule.query.strip : AdvancedRules.words(rule.query).join(" ")
+      next if text.empty? || rule.negated? || rule.presence?
 
-      [ SEARCH_FIELD_SCOPE[clause[:field].to_s] || FIELDS.keys, text ]
+      [ SEARCH_FIELD_SCOPE[rule.field] || FIELDS.keys, text ]
     end
   end
   private_class_method :included_clauses

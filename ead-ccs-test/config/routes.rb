@@ -117,6 +117,33 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
+  # De-bias notices: the page the record page's notice links to (DebiasTerms)
+  get "language-in-our-records", to: "pages#language_in_records", as: :language_in_records
+
+  # Galleries, embeds and oEmbed. A gallery is a list its owner has shared by an unguessable link, so galleries and the share
+  # actions follow the saved records setting with the lists; the embed pages and oEmbed work either way. Only /embed/* may be framed.
+  get "embed/records/:id", to: "embeds#record", as: :embed_record, constraints: { id: %r{[^/]+} }, format: false
+  get "oembed", to: "oembeds#show", as: :oembed, format: false
+  constraints(->(_request) { Rails.configuration.x.saved_records }) do
+    get "embed/galleries/:token", to: "embeds#gallery", as: :embed_gallery, constraints: { token: /[A-Za-z0-9_-]{32}/ }, format: false
+    scope "galleries/:token", constraints: { token: /[A-Za-z0-9_-]{32}/ } do
+      get "", to: "galleries#show", as: :gallery
+      get "citations", to: "galleries#citations", as: :citations_gallery
+      post "copy", to: "galleries#copy", as: :copy_gallery
+    end
+    scope "lists/:list_id", constraints: { list_id: /\d+/ } do
+      post "share", to: "list_shares#create", as: :list_share
+      post "share/regenerate", to: "list_shares#regenerate", as: :regenerate_list_share
+      delete "share", to: "list_shares#destroy"
+    end
+  end
+
+  # Discovery (docs/similar-and-trending.md): the Featured and trending page, the short version the home page loads into a lazy
+  # frame, and a record's Similar records (also a lazy frame, on the record page)
+  get "discover", to: "discover#index", as: :discover
+  get "discover/frame", to: "discover#frame", as: :discover_frame
+  get "catalog/:id/similar", to: "similar#show", as: :similar, constraints: { id: %r{[^/]+} }, format: false
+
   # Entity pages (BrowseEntitiesController), under the browse index pages (BrowseController): one maker, place or subject, one century or decade
   scope "/browse", controller: "browse_entities" do
     get "periods/:slug", action: :period, as: :browse_period, constraints: { slug: /[a-z0-9-]+/ }

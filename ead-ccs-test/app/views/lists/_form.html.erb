@@ -1,5 +1,6 @@
 <%# The name of a list, to make one (new) or rename one (edit). A problem is summarised at the top, where focus goes, and
     repeated at the field, which points to it with aria-describedby. %>
+<% cover_options = local_assigns.fetch(:cover_options, []) %>
 <% errors = list.errors.full_messages_for(:name) + list.errors.full_messages_for(:base) %>
 <% describedby = [ "list-name-hint", ("list-name-error" if errors.any?) ].compact.join(" ") %>
 <% if errors.any? %>
@@ -18,6 +19,20 @@
     <%= form.text_field :name, id: "list_name", class: "form-control", maxlength: List::NAME_LIMIT, required: true, autocomplete: "off",
                         aria: { required: true, invalid: (errors.any? || nil), describedby: describedby } %>
   </div>
+  <div class="mb-3">
+    <%= form.label :description, t("nexus_ccs.galleries.description_label"), class: "form-label", for: "list_description" %>
+    <p class="form-text" id="list-description-hint"><%= t("nexus_ccs.galleries.description_hint", limit: List::DESCRIPTION_LIMIT) %></p>
+    <%= form.text_area :description, id: "list_description", class: "form-control", rows: 3, maxlength: List::DESCRIPTION_LIMIT,
+                       aria: { describedby: "list-description-hint" } %>
+  </div>
+  <% if list.persisted? && cover_options.any? %>
+    <div class="mb-3">
+      <%= form.label :cover_document_id, t("nexus_ccs.galleries.cover_label"), class: "form-label", for: "list_cover_document_id" %>
+      <p class="form-text" id="list-cover-hint"><%= t("nexus_ccs.galleries.cover_hint") %></p>
+      <%= form.select :cover_document_id, cover_options, { include_blank: t("nexus_ccs.galleries.cover_none") },
+                      id: "list_cover_document_id", class: "form-select", aria: { describedby: "list-cover-hint" } %>
+    </div>
+  <% end %>
   <div class="list-form__actions">
     <%= form.submit t(list.persisted? ? "nexus_ccs.lists.save_name" : "nexus_ccs.lists.create"), class: "btn btn-primary" %>
     <%= link_to t("nexus_ccs.lists.cancel"), (list.persisted? ? list_path(list) : lists_path), class: "btn btn-outline-primary" %>

@@ -31,8 +31,7 @@ module SearchDefaults
     return false unless query["clause"].present? && query["q"].blank?
     return false if query["f"].present? || query["f_inclusive"].present? || years_given?(query)
 
-    clauses = query["clause"].is_a?(Hash) ? query["clause"].values : []
-    clauses.none? { |clause| clause.is_a?(Hash) && clause["query"].present? }
+    AdvancedRules.rules(query["clause"]).none?(&:active?) # a term, or a "has a value" / "is empty" rule
   end
 
   # The form sends every year filter's From and To, blank or not: only a year filled in counts

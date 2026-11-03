@@ -1,0 +1,10 @@
+<%# The home page's frame (pages/_featured_and_trending): the same sections, shorter, under the home page's own h2. %>
+<turbo-frame id="home-discover">
+  <% if @sections.empty? %>
+    <p class="discover-frame__note"><%= t("nexus_ccs.discover.empty") %> <%= link_to t("nexus_ccs.discover.empty_link"), search_catalog_path %></p>
+  <% else %>
+    <% @sections.each do |section| %>
+      <%= render "discover/section", section: section, heading_tag: :h3 %>
+    <% end %>
+  <% end %>
+</turbo-frame>

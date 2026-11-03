@@ -1,0 +1,28 @@
+en:
+  nexus_ccs:
+    discover:
+      title: "Discover"
+      page_title: "Discover — Collections Navigator — University of Melbourne"
+      description: "Featured records chosen by the collection teams, the record of the day, and what other visitors are looking at."
+      home_heading: "Featured and trending"
+      home_intro: "A few records to start from."
+      see_all: "See all featured and trending records"
+      home_fallback: "The records are loading. If none appear, use the link above."
+      empty: "There is nothing to feature just now. You can still search all records."
+      empty_link: "Search all records"
+      sections:
+        pick:
+          heading: "Pick of the day"
+          description: "One record with an image you can use freely, chosen by the date. It changes each day."
+        featured:
+          heading: "Featured records"
+          description: "Chosen by the collection teams. Placeholder wording until the teams supply the text."
+        trending:
+          heading: "Trending records"
+          description: "The records most viewed in the last %{days} days. The count is of page views only: the site does not record who looked."
+    similar:
+      heading: "Similar records"
+      description: "Records that share a creator, subject, type of object or place with this one."
+  seo:
+    description:
+      discover: "Featured records, the record of the day and the most viewed records in the University of Melbourne's cultural collections."

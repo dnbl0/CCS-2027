@@ -1,0 +1,14 @@
+<%# The home page's Featured and trending section. The records load into the frame when it nears the screen, so the home page's HTML
+    stays small and asks Solr for nothing; the frame reserves its height (components/discover.css) so nothing moves when it fills,
+    and the link to /discover is there whether or not JavaScript runs. %>
+<section class="ccs-section home-discover" aria-labelledby="home-discover-heading">
+  <div class="ccs-section__inner">
+    <header class="home-discover__header">
+      <h2 id="home-discover-heading" class="ccs-section__heading"><%= t("nexus_ccs.discover.home_heading") %></h2>
+      <p class="home-discover__intro"><%= t("nexus_ccs.discover.home_intro") %> <%= link_to t("nexus_ccs.discover.see_all"), discover_path, class: "home-discover__link" %></p>
+    </header>
+    <turbo-frame id="home-discover" class="discover-frame" src="<%= discover_frame_path %>" loading="lazy">
+      <p class="discover-frame__note"><%= t("nexus_ccs.discover.home_fallback") %></p>
+    </turbo-frame>
+  </div>
+</section>

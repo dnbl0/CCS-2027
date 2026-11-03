@@ -25,12 +25,14 @@
         </div>
       <% end %>
       <div class="record-summary__cite"><%= render NexusCcs::CiteComponent.new(document: document) %></div>
+      <div class="record-summary__share"><%= render NexusCcs::ShareDialogComponent.new(kind: :record, document: document) %></div>
     </div>
   </section>
 
   <div class="record-main">
     <div class="record-main__inner">
       <div class="record-main__details">
+        <%= render NexusCcs::DebiasNoticeComponent.new(matches: debias_matches, labels: debias_labels) %>
         <section class="record-card record-details" aria-labelledby="record-details-title">
           <h2 class="record-details__title" id="record-details-title">Object details</h2>
           <dl class="record-details__list">
@@ -48,16 +50,16 @@
                       <span class="visually-hidden" role="status" data-clipboard-target="status"></span>
                     </span>
                   <% elsif row.field == "description_tsim" %>
-                    <% row.values.each do |value| %>
+                    <% row.values.each_with_index do |value, index| %>
                       <div class="record-details__truncate" data-controller="truncate">
-                        <span class="record-details__value" data-truncate-target="text"><%= value %></span>
+                        <span class="record-details__value" data-truncate-target="text"><%= flagged(row, value, index) %></span>
                         <button type="button" class="record-details__truncate-toggle" data-truncate-target="toggle" data-action="truncate#toggle" hidden>Show more</button>
                       </div>
                     <% end %>
                   <% else %>
-                    <% row.values.each do |value| %>
+                    <% row.values.each_with_index do |value, index| %>
                       <span class="record-details__value">
-                        <% if link_to_value?(row) %><%= link_to value, value_path(row, value) %><% elsif (browse = browse_path(row, value)) %><%= link_to value, browse %><% else %><%= value %><% end %>
+                        <% if link_to_value?(row) %><%= link_to value, value_path(row, value) %><% elsif (browse = browse_path(row, value)) %><%= link_to flagged(row, value, index), browse %><% else %><%= flagged(row, value, index) %><% end %>
                       </span>
                     <% end %>
                   <% end %>
@@ -99,6 +101,8 @@
         </aside>
     </div>
   </div>
+
+  <%= render NexusCcs::SimilarRecordsComponent.new(document: document) %>
 
   <%= footer %>
 <% end %>

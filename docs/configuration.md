@@ -31,6 +31,7 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `POSTGRES_USER` | `ead_ccs` | same | Database user |
 | `POSTGRES_PASSWORD` | none | same | Database password (a secret) |
 | `DB_SUFFIX` | empty | `config/database.yml` (development, test) | Appended to the database names, so a second checkout or worktree has databases of its own: `DB_SUFFIX=_2` |
+| `EMBED_FRAME_ANCESTORS` | unset (any site) | `app/models/embed_policy.rb` | Which sites may frame the embed pages (`/embed/*`, the only framable pages). Unset or `*`: any site, because embeds show only what any visitor may see. Otherwise origins separated by spaces or commas, e.g. `https://museum.example.org https://*.example.edu`; the site itself is always allowed and anything that is not a plain origin is ignored |
 | `RAILS_ASSUME_SSL` | false | `config/environments/production.rb` | `true` when a proxy ends HTTPS in front of the app |
 | `RAILS_FORCE_SSL` | false | same | `true` redirects HTTP to HTTPS and sets HSTS |
 | `RAILS_HOSTS` | none | same | Comma-separated host names the app answers to (Rails host authorisation) |
@@ -44,6 +45,10 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `CCS_MEDIA_BASE_URL` | `/digital-assets/media` | `Collections::DigitalMedia` | Where the audio, video and PDF files are served from |
 | `SEO_CANONICAL_BASE_URL` | the request's own address | `BotControls.base_url` | The site's address in canonical links, the sitemap and structured data, when a proxy hides the real host |
 | `SEO_SITEMAP_CACHE_HOURS` | `12` | `BotControls.sitemap_cache_hours` | How long the list of record ids for the sitemap is kept |
+| `TRENDING_ENABLED` | `on` | `RecordView.enabled?` | `off` stops counting record views and hides the Trending section (Featured and Pick of the day stay). See [similar-and-trending.md](../ead-ccs-test/docs/similar-and-trending.md) |
+| `TRENDING_DAYS` | `7` | `RecordView.window_days` | The window of "most viewed in the last N days" (1 to 90) |
+| `TRENDING_MIN_VIEWS` | `3` | `RecordView.min_views` | Views a record needs in the window to be trending; too few trending records and the section is left out |
+| `TRENDING_KEEP_DAYS` | `35` | `RecordView.keep_days` | Days of view counts `bin/rails record_views:prune` keeps |
 | `BOT_BLOCKED_USER_AGENTS` | empty | `BotControls.blocked_user_agents` | Comma-separated extra user-agent fragments to refuse (403) on asset and download files |
 | `RATE_LIMIT_ALLOW_IPS` | empty | `BotGuard` | Comma-separated IP addresses never limited (a monitor, the office) |
 | `RATE_LIMIT_STORE` | `memory` | `BotGuard` | `cache` counts in `Rails.cache`, shared between processes |
@@ -54,6 +59,8 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `EMU_CSV` | `data/emu.csv` | `lib/tasks/collections.rake` | The EMu export to index |
 | `VERNON_CSV` | `data/vernon.csv` | same | The Vernon export to index |
 | `FORCE` | unset | same | `FORCE=1 bin/rails collections:index` reindexes a core that already has records |
+| `CSV` | none (required) | `lib/tasks/debias.rake` | `bin/rails debias:import CSV=terms.csv` checks the collections team's term spreadsheet and writes the de-bias term list |
+| `OUT` | `config/debias_terms.yml` | same | Where `debias:import` writes the list, to try an import without replacing the real list |
 | `SOURCE_DIR` | `../public/assets/images/collections` | `lib/tasks/digital_assets.rake` | Where `digital_assets:*` reads source images |
 | `CI` | unset | `config/environments/test.rb` | When set, tests eager-load the app, as GitHub CI does. `bin/ci` sets it |
 | `PARALLEL_WORKERS` | CPU count | Rails test runner | `1` runs tests in one process; always use it for system tests |

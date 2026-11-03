@@ -1,0 +1,10 @@
+<%# Records as the site's result cards, in a grid. title_tag: the card's heading level, one below its section's heading; entries: FeaturedRecords::Entry (a record and an optional blurb). The card draws
+    no image for a record whose asset is withheld or sensitive (ResultCardComponent), and the sections never list one anyway. %>
+<ul class="discover-cards">
+  <% entries.each do |entry| %>
+    <li class="discover-cards__item">
+      <%= render NexusCcs::ResultCardComponent.new(title_tag: title_tag, document: document_presenter(entry.document), partials: blacklight_config.view_config(:list).partials) %>
+      <% if entry.blurb.present? %><p class="discover-cards__blurb"><%= entry.blurb %></p><% end %>
+    </li>
+  <% end %>
+</ul>
