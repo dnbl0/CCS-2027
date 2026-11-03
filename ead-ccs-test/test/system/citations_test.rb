@@ -37,7 +37,7 @@ class CitationsSystemTest < ApplicationSystemTestCase
   test "the dialog's controls are at least 24px and the button reaches by keyboard" do
     open_first_record
     find(".cite__button").click
-    sizes = page.evaluate_script("Array.from(document.querySelectorAll('.cite__dialog button')).map(b => { const r = b.getBoundingClientRect(); return [r.width, r.height] })")
+    sizes = page.evaluate_script("Array.from(document.querySelectorAll('.cite__dialog[open] button')).map(b => { const r = b.getBoundingClientRect(); return [r.width, r.height] })")
     assert sizes.all? { |w, h| w >= 24 && h >= 24 }, sizes.inspect
   end
 
