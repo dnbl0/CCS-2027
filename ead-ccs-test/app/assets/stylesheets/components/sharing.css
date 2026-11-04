@@ -3,13 +3,17 @@
  * the Cite dialog's look (components/citations.css, modal.css). The embed pages are plain: one card, no site header or script,
  * sized to sit in a frame from 320px wide.
  */
-.record-summary__share {
-  display: inline-block;
-  margin: var(--ccs-space-3) 0 0 var(--ccs-space-2);
+/* Cite this record and Share and embed sit side by side under the tags, the same size */
+.record-summary__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-2);
+  margin-top: var(--ccs-space-3);
 }
 
-.record-summary__cite {
-  display: inline-block;
+.record-summary__actions > .record-summary__cite,
+.record-summary__actions > .record-summary__share {
+  margin: 0;
 }
 
 .share__body {
@@ -20,6 +24,12 @@
 .share__section {
   display: grid;
   gap: var(--ccs-space-3);
+}
+
+/* sections are ruled apart, as the citations in the Cite dialog are */
+.share__section + .share__section {
+  padding-top: var(--ccs-space-5);
+  border-top: 1px solid var(--ccs-border-default);
 }
 
 .share__heading {
@@ -45,11 +55,12 @@
   font-weight: var(--ccs-font-weight-semibold);
 }
 
+/* Bootstrap's own form-control look: the site's body font, not a monospace face */
 .share__input,
 .share__code {
   width: 100%;
-  font-family: var(--ccs-font-family-mono, monospace);
-  font-size: 0.875rem;
+  font-size: var(--ccs-font-size-sm);
+  line-height: 1.5;
 }
 
 .share__buttons {
@@ -66,14 +77,14 @@
   justify-self: start;
 }
 
-/* Said in words, and with a frame, not by colour alone */
+/* Said in words, and with a frame, not by colour alone: the record page's card (border, accent, padding) */
 .share-status,
 .gallery-note {
   margin: 0 0 var(--ccs-space-4);
-  padding: var(--ccs-space-3) var(--ccs-space-4);
-  border: 1px solid var(--ccs-border-strong);
-  border-inline-start-width: 6px;
-  background: var(--ccs-surface-subtle);
+  padding: var(--ccs-space-4) var(--ccs-space-5);
+  border: 1px solid var(--ccs-border-panel);
+  border-inline-start: 4px solid var(--ccs-border-brand);
+  background: var(--ccs-surface-panel);
   color: var(--ccs-text-primary);
 }
 
@@ -98,13 +109,21 @@
   color: var(--ccs-text-secondary);
 }
 
-/* --- The embed pages --- */
+/* The embed pages run no script, so nothing would ever lift the page loading cover (page_loader.css): it does not apply here */
+html:has(body.embed)::before,
+html:has(body.embed)::after {
+  display: none;
+}
+
+/* --- The embed pages ---
+   A small University card: a navy rule, the title in Fraunces, then the lines, with the University's navy attribution band. */
 body.embed {
   margin: 0;
-  background: var(--ccs-white);
+  background: var(--ccs-surface-panel);
   color: var(--ccs-text-primary);
-  font-family: var(--ccs-font-family-sans, sans-serif);
-  line-height: 1.45;
+  font-family: var(--ccs-font-body);
+  font-size: var(--ccs-font-size-md);
+  line-height: 1.5;
 }
 
 .embed-card {
@@ -112,6 +131,7 @@ body.embed {
   flex-wrap: wrap;
   gap: var(--ccs-space-4);
   padding: var(--ccs-space-4);
+  border-top: 4px solid var(--ccs-border-brand);
 }
 
 .embed-card__media {
@@ -135,16 +155,30 @@ body.embed {
 
 .embed-card__title {
   margin: 0 0 var(--ccs-space-2);
-  font-size: var(--ccs-font-size-lg);
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-xl);
   font-weight: var(--ccs-font-weight-semibold);
+  line-height: 1.2;
+}
+
+.embed-card__title a {
+  color: var(--ccs-text-brand);
+}
+
+.embed-card__link a,
+.embed-gallery a {
+  color: var(--ccs-text-link);
 }
 
 .embed-card__title a,
 .embed-card__link a,
-.embed-gallery a,
-.embed-attribution a {
-  color: var(--ccs-text-link);
+.embed-gallery a {
   text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+.embed-card__link a {
+  font-weight: var(--ccs-font-weight-semibold);
 }
 
 .embed-card a:focus-visible,
@@ -160,14 +194,17 @@ body.embed {
 
 .embed-card__line {
   color: var(--ccs-text-secondary);
+  font-size: var(--ccs-font-size-sm);
 }
 
+/* The record page's card: border, accent and padding */
 .embed-card__notice {
   margin: 0 0 var(--ccs-space-2);
   padding: var(--ccs-space-2) var(--ccs-space-3);
-  border: 2px solid var(--ccs-border-strong);
-  border-radius: var(--ccs-radius-sm);
-  background: var(--ccs-white);
+  border: 1px solid var(--ccs-border-panel);
+  border-inline-start: 4px solid var(--ccs-border-brand);
+  background: var(--ccs-surface-panel);
+  font-size: var(--ccs-font-size-sm);
 }
 
 .embed-card__notice p {
@@ -214,15 +251,38 @@ body.embed {
   font-size: var(--ccs-font-size-sm);
 }
 
+/* The attribution is the site footer's navy band, with the University's logo */
 .embed-attribution {
-  padding: var(--ccs-space-2) var(--ccs-space-4) var(--ccs-space-4);
-  border-top: 1px solid var(--ccs-border-default);
+  display: flex;
+  align-items: center;
+  gap: var(--ccs-space-3);
+  padding: var(--ccs-space-2) var(--ccs-space-4);
+  background: var(--ccs-surface-brand);
   font-size: var(--ccs-font-size-sm);
-  color: var(--ccs-text-secondary);
+  color: var(--ccs-text-inverse);
+}
+
+/* The logo is a decorative background (no image element, nothing for a screen reader to read) */
+.embed-attribution::before {
+  content: "";
+  flex: none;
+  width: 2.75rem;
+  height: 2.25rem;
+  background: url("../site/uom-logo-vert-ondark.svg") center / contain no-repeat;
 }
 
 .embed-attribution p {
-  margin: var(--ccs-space-2) 0 0;
+  margin: 0;
+}
+
+.embed-attribution a {
+  color: var(--ccs-text-inverse);
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+.embed-attribution a:focus-visible {
+  outline-color: var(--ccs-white);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -231,4 +291,11 @@ body.embed {
     transition: none !important;
     animation: none !important;
   }
+}
+
+/* In a page toolbar the Share and embed button is the size of its neighbours, the Bootstrap .btn-outline-primary buttons */
+.saved-toolbar__actions .share__button {
+  min-height: 2.5rem;
+  padding-block: 0.375rem;
+  font-size: var(--ccs-font-size-md);
 }

@@ -2,8 +2,10 @@
    The term is marked three ways, none of them colour alone: a hidden "flagged term:" for screen readers, a thick underline, and
    a tint. Nothing changes size or position when it appears (it is in the server's HTML, with no script). */
 
+/* The notices on a record page (this, the cultural protocols notice, the access notice) are one card: the record card, a 4px accent
+   at its start, a Fraunces heading and a padded body */
 .record-debias {
-  border-inline-start: 6px solid var(--ccs-amber-600);
+  border-inline-start: 4px solid var(--ccs-amber-600);
 }
 
 .record-debias__body {
@@ -14,18 +16,16 @@
   margin: var(--ccs-space-4) 0;
   padding: 0;
   list-style: none;
-  display: grid;
-  gap: var(--ccs-space-4);
 }
 
+/* ruled apart as the Copyright card's items are, not boxes inside the box */
 .record-debias__item {
-  padding: var(--ccs-space-3) var(--ccs-space-4);
-  border: 1px solid var(--ccs-border-default);
-  background: var(--ccs-surface-subtle);
+  padding-block: var(--ccs-space-3);
+  border-top: 1px solid var(--ccs-border-default);
 }
 
-.record-debias__item--caution {
-  border-inline-start: 4px solid var(--ccs-red-600);
+.record-debias__item:last-child {
+  padding-bottom: 0;
 }
 
 .record-debias__item p {
@@ -41,9 +41,8 @@
 }
 
 .record-debias__severity {
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 0.8125rem;
+  font-weight: var(--ccs-font-weight-regular);
+  color: var(--ccs-text-secondary);
 }
 
 /* The flagged term, in the notice's quote and in the details list */

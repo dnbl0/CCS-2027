@@ -2,9 +2,9 @@
  * The access request form (/access_requests/new) and its confirmation, inside the saved-records page container
  * (saved_records.css). Fields use Bootstrap's .form-control; an error is red text with an icon, and a red border.
  */
-.access-form {
+/* The page container is /help's (saved-main), left-aligned under the banner; the form reads in the same 48rem column as a help page */
+.access-form > * {
   max-width: 48rem;
-  margin-inline: 0;
 }
 
 .access-form__summary {
@@ -19,9 +19,14 @@
   outline: none;
 }
 
-.access-form__summary-title {
+.access-form__summary-title,
+.access-form__privacy-title {
   margin: 0 0 var(--ccs-space-2);
-  font-size: var(--ccs-font-size-lg);
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-xl);
+  font-weight: var(--ccs-font-weight-semibold);
+  line-height: 1.2;
+  color: var(--ccs-text-brand);
 }
 
 .access-form__summary ul {
@@ -43,7 +48,7 @@
 }
 
 .access-form__record dt {
-  font-weight: 600;
+  font-weight: var(--ccs-font-weight-semibold);
 }
 
 .access-form__record dd {
@@ -62,7 +67,7 @@
 .access-form__label {
   display: block;
   margin-bottom: var(--ccs-space-1);
-  font-weight: 600;
+  font-weight: var(--ccs-font-weight-semibold);
 }
 
 .access-form__hint {
@@ -76,7 +81,7 @@
   gap: var(--ccs-space-2);
   margin: 0 0 var(--ccs-space-2);
   color: var(--ccs-text-error);
-  font-weight: 600;
+  font-weight: var(--ccs-font-weight-semibold);
 }
 
 .access-form__error-icon {
@@ -99,16 +104,15 @@
   overflow: hidden;
 }
 
+/* The record page's card: border, a 4px accent, white */
 .access-form__privacy {
   margin-bottom: var(--ccs-space-5);
   padding: var(--ccs-space-4) var(--ccs-space-5);
-  background: var(--ccs-surface-subtle);
+  border: 1px solid var(--ccs-border-panel);
+  border-inline-start: 4px solid var(--ccs-border-brand);
+  background: var(--ccs-surface-panel);
 }
 
-.access-form__privacy-title {
-  margin: 0 0 var(--ccs-space-2);
-  font-size: var(--ccs-font-size-lg);
-}
 
 .access-form__actions {
   display: flex;
