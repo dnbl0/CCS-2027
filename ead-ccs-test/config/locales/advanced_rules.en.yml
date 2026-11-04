@@ -4,7 +4,7 @@ en:
     free_reuse:
       facet: "Reuse"
       label: "Open licence (public domain)"
-      description: "Records whose licence lets you view and download the files. This is not legal advice: a record can have other limits, so check its Copyright card before you reuse it. Placeholder wording."
+      description: "Records whose licence lets you view and download the files. This is not legal advice: a record can have other limits, so check its Copyright card before you reuse it."
       carried: "This is already on for the search (see the filters above the form). Take it off there."
     advanced_rules:
       # How a rule reads on a filter pill, in search history, in a saved search's name and in "Why am I seeing these results?"

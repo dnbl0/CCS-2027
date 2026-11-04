@@ -1,7 +1,44 @@
 /*
- * The notice that asks whether to view a sensitive record's digital assets (NexusCcs::SensitivityGateComponent, CCS-227):
- * a light card on the dark media band, like the access notice, with its choices side by side (stacked on a phone).
+ * The notices on the dark media band: why an asset is not shown or cannot be downloaded (NexusCcs::AccessNoticeComponent) and the
+ * notice that asks whether to view a sensitive record's digital assets (NexusCcs::SensitivityGateComponent, CCS-227). Both are
+ * the record page's card: white, a 1px navy-tint border, 24px padding, a Fraunces heading, 16px body, the link underlined; the
+ * sensitivity choices sit side by side (stacked on a phone).
  */
+.access-notice,
+.sensitivity-gate {
+  margin: var(--ccs-space-4) auto;
+  padding: var(--ccs-space-5);
+  border: 1px solid var(--ccs-border-panel);
+  background: var(--ccs-surface-panel);
+  color: var(--ccs-text-primary);
+}
+
+.access-notice__title {
+  margin: 0 0 var(--ccs-space-2);
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-xl);
+  font-weight: var(--ccs-font-weight-semibold);
+  line-height: 1.2;
+  color: var(--ccs-text-brand);
+}
+
+.access-notice__body {
+  margin: 0 0 var(--ccs-space-3);
+}
+
+.access-notice__action {
+  margin: 0;
+}
+
+.access-notice__action a {
+  display: inline-block;
+  min-height: 24px;
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-link);
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
 .digital-assets .sensitivity-gate {
   max-width: 40rem;
   width: 100%;

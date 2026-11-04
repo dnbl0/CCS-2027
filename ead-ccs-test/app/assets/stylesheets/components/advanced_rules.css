@@ -34,7 +34,7 @@ form.advanced .advanced-rule select.form-select {
 
 /* The words box beside its menu is no taller than the menu */
 form.advanced .advanced-rule input[type="text"]:disabled {
-  background: #f8f9fa;
+  background: var(--bs-tertiary-bg);
   border-color: var(--ccs-border-default);
 }
 
@@ -54,13 +54,14 @@ fieldset.advanced-rule--extra {
   margin: 0;
   padding: var(--ccs-space-4);
   border: 1px solid var(--ccs-border-default);
-  background: #f8f9fa;
+  background: var(--bs-tertiary-bg);
 }
 
+/* Floated and full width (Bootstrap's own legend) so it sits inside the box's padding, not on its border */
 .advanced-rule__legend {
-  float: none;
-  width: auto;
-  margin: 0 0 var(--ccs-space-2);
+  float: left;
+  width: 100%;
+  margin: 0 0 var(--ccs-space-3);
   padding: 0;
   font-size: var(--ccs-font-size-lg);
   font-weight: var(--ccs-font-weight-semibold);
@@ -68,9 +69,14 @@ fieldset.advanced-rule--extra {
   color: var(--ccs-navy-1100);
 }
 
+fieldset.advanced-rule--extra > .advanced-rule__legend + .advanced-rule__controls {
+  clear: both;
+}
+
+/* The extra rule's labels read like the fixed rows' field names (18px, semibold, navy) */
 .advanced-rule__label {
   margin-bottom: var(--ccs-space-1);
-  font-size: var(--ccs-font-size-md);
+  font-size: var(--ccs-font-size-lg);
   font-weight: var(--ccs-font-weight-semibold);
   color: var(--ccs-navy-1100);
 }
@@ -116,43 +122,86 @@ fieldset.advanced-rule--extra input[type="text"] {
   line-height: 1.5;
 }
 
+/* "Rules" is a sub-heading of the Search tips panel: the panel's serif, a step smaller than "Search tips" */
 .advanced-search-tips__subtitle {
   margin: var(--ccs-space-4) 0 var(--ccs-space-2);
+  font-family: var(--ccs-font-heading);
   font-size: var(--ccs-font-size-lg);
   font-weight: var(--ccs-font-weight-semibold);
+  line-height: var(--ccs-line-height-tight);
+  color: var(--ccs-navy-1100);
 }
 
-/* The switch: a button that reads "on" or "off" by more than colour (the thumb moves, and the state is spoken) */
+/*
+ * The switch, drawn once for both places. It is a row like the facet accordion rows (tinted, 18px navy label, the control at the
+ * right edge): a button in the results sidebar, a Bootstrap switch on the form. The state is not colour alone: the thumb moves
+ * and the track fills, and the state is spoken (aria-checked, or the checkbox's checked state).
+ */
 .free-reuse {
-  padding: var(--ccs-space-3) 0;
+  --free-reuse-size: var(--ccs-font-size-md);
+  --free-reuse-track-w: 2.75rem;
+  --free-reuse-track-h: 1.5rem;
+  border: 1px solid var(--ccs-border-default);
+  background: var(--bs-tertiary-bg);
+  font-size: var(--free-reuse-size);
+  color: var(--ccs-navy-1100);
+}
+
+/* In the sidebar: a bordered row of its own, below the facet groups, in their 18px type */
+.filter-sidebar .free-reuse {
+  --free-reuse-size: var(--ccs-font-size-lg);
+  margin-top: var(--ccs-space-5);
+}
+
+/* On the form: a flat row among the attribute rows (tinted, a rule beneath) */
+.free-reuse--advanced {
+  border-width: 0 0 1px;
 }
 
 .free-reuse__form {
   margin: 0;
 }
 
-.free-reuse__switch {
+.free-reuse__switch,
+.free-reuse--advanced .free-reuse__check {
   display: flex;
   align-items: center;
-  gap: var(--ccs-space-2);
-  min-height: 2.75rem;
-  padding: var(--ccs-space-1) 0;
+  gap: var(--ccs-space-3);
+  width: 100%;
+  min-height: 3.6875rem;
+  padding: var(--ccs-space-4) 1.25rem;
   border: 0;
   background: transparent;
-  font-size: var(--ccs-font-size-md);
-  line-height: 1.4;
+  font: inherit;
+  line-height: 1.5;
   text-align: left;
-  color: var(--ccs-text-primary);
+  color: inherit;
+}
+
+.free-reuse__switch {
   cursor: pointer;
+}
+
+.free-reuse__label,
+.free-reuse--advanced .form-check-label {
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+.free-reuse__count {
+  flex: none;
+  order: 1;
+  color: var(--ccs-text-secondary);
 }
 
 .free-reuse__track {
   position: relative;
   flex: none;
-  width: 2.75rem;
-  height: 1.5rem;
+  order: 2;
+  width: var(--free-reuse-track-w);
+  height: var(--free-reuse-track-h);
   border: 2px solid var(--ccs-navy-1100);
-  border-radius: 999px;
+  border-radius: var(--ccs-radius-pill);
   background: var(--ccs-white);
 }
 
@@ -168,11 +217,10 @@ fieldset.advanced-rule--extra input[type="text"] {
 }
 
 .free-reuse__switch[aria-checked="true"] .free-reuse__track {
-  background: var(--ccs-navy-1100);
+  background: var(--ccs-action-primary);
 }
 
 .free-reuse__switch[aria-checked="true"] .free-reuse__thumb {
-  background: var(--ccs-white);
   transform: translateX(1.25rem);
 }
 
@@ -182,24 +230,42 @@ fieldset.advanced-rule--extra input[type="text"] {
   }
 }
 
-.free-reuse__switch:focus-visible {
-  outline: 3px solid var(--ccs-navy-1100);
+.free-reuse__switch:focus-visible,
+.free-reuse--advanced .form-check-input:focus-visible {
+  outline: 2px solid var(--ccs-focus-ring);
   outline-offset: 2px;
 }
 
-.free-reuse__count {
-  color: var(--ccs-text-primary);
-}
-
+/* What the filter means: a small muted note under the row, inside the box */
 .free-reuse__description {
-  margin: var(--ccs-space-1) 0 0;
-  font-size: 0.875rem;
-  line-height: 1.4;
-  color: var(--ccs-text-primary);
+  margin: 0;
+  padding: 0 1.25rem var(--ccs-space-4);
+  font-size: var(--ccs-font-size-sm);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-secondary);
 }
 
-/* On the form it is a Bootstrap switch: keep the box 24px or more and let the label wrap */
+/* On the form it is a Bootstrap switch, drawn as the same track and thumb: navy thumb on white, navy on cyan once on */
+.free-reuse--advanced .form-check {
+  min-height: 0;
+  margin: 0;
+}
+
 .free-reuse--advanced .form-check-input {
-  width: 2.75rem;
-  height: 1.5rem;
+  --bs-form-switch-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3E%3Ccircle r='3' fill='%23000f46'/%3E%3C/svg%3E");
+  flex: none;
+  order: 2;
+  float: none;
+  width: var(--free-reuse-track-w);
+  height: var(--free-reuse-track-h);
+  margin: 0;
+  border: 2px solid var(--ccs-navy-1100);
+  border-radius: var(--ccs-radius-pill);
+  background-color: var(--ccs-white);
+  box-shadow: none;
+}
+
+.free-reuse--advanced .form-check-input:checked {
+  border-color: var(--ccs-navy-1100);
+  background-color: var(--ccs-action-primary);
 }
