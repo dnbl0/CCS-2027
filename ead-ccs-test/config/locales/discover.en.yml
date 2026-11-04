@@ -16,7 +16,8 @@ en:
           description: "One record with an image you can use freely, chosen by the date. It changes each day."
         featured:
           heading: "Featured records"
-          description: "Chosen by the collection teams. Placeholder wording until the teams supply the text."
+          description: "Chosen by the collection teams."
+          placeholder: "Placeholder wording until the teams supply the text."
         trending:
           heading: "Trending records"
           description: "The records most viewed in the last %{days} days. The count is of page views only: the site does not record who looked."

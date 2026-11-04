@@ -5,6 +5,7 @@ module NexusCcs
   class SiteFooterComponent < Blacklight::Component
     def about_links = SiteNavigation::FOOTER_ABOUT
     def social_links = SiteNavigation::FOOTER_SOCIAL
+    def site_links = SiteNavigation::FOOTER_SITE
     def legal_links = SiteNavigation::FOOTER_LEGAL
     def identifiers = SiteNavigation::FOOTER_IDENTIFIERS
   end

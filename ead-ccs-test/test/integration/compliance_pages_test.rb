@@ -34,8 +34,8 @@ class CompliancePagesTest < ActionDispatch::IntegrationTest
 
     assert_select ".site-footer__legal a[href='https://www.unimelb.edu.au/accessibility']", text: "Accessibility"
     assert_select ".site-footer__legal a[href='https://about.unimelb.edu.au/strategy/governance/compliance-obligations/privacy']", text: "Privacy"
-    assert_select ".site-footer__legal a[href='/accessibility']"
-    assert_select ".site-footer__legal a[href='/privacy']"
+    assert_select ".site-footer__links a[href='/accessibility']" # this site's own statements sit in the link column, not the legal row
+    assert_select ".site-footer__links a[href='/privacy']"
   end
 
   test "the privacy notice links to Delete my data only while saved records are on" do

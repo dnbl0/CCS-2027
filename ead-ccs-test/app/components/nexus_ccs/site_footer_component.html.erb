@@ -24,6 +24,9 @@
         <% about_links.each do |link| %>
           <li><%= link_to link.href, class: "arrow-link arrow-link--inverse" do %><%= image_tag "site/icon-arrow-footer.svg", alt: "" %><%= link.label %><% end %></li>
         <% end %>
+        <% site_links.each do |link| %>
+          <li><%= link_to link.href, class: "arrow-link arrow-link--inverse" do %><%= image_tag "site/icon-arrow-footer.svg", alt: "" %><%= link.label %><% end %></li>
+        <% end %>
       </ul>
 
       <div class="site-footer__contact">

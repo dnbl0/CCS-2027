@@ -38,7 +38,7 @@
             </ul></dd></div>
         <% end %>
       </dl>
-      <p><%= link_to t("browse.entity.see_all", count: number_with_delimiter(total)), search_catalog_path(@search_query), class: "btn btn-primary" %></p>
+      <p class="browse-facts__action"><%= link_to t("browse.entity.see_all", count: number_with_delimiter(total)), search_catalog_path(@search_query), class: "btn btn-primary" %></p>
     </section>
 
     <section class="browse-records" aria-labelledby="browse-records-title">
@@ -61,22 +61,28 @@
     <% if related.any? || periods.any? %>
       <section class="browse-related" aria-labelledby="browse-related-title">
         <h2 id="browse-related-title"><%= t("browse.entity.related") %></h2>
+        <div class="browse-related__groups">
         <% related.each_with_index do |(heading, kind_key, pairs), i| %>
+          <div class="browse-related__group">
           <h3 id="related-<%= kind_key %>"><%= heading %></h3>
           <ul class="browse-list" aria-labelledby="related-<%= kind_key %>">
             <% pairs.each do |related_entry, count| %>
               <li><%= link_to related_entry.name, related_entry.path, class: "browse-list__link" %> <span class="browse-list__count"><%= t("browse.records", count: count) %></span></li>
             <% end %>
           </ul>
+          </div>
         <% end %>
         <% if periods.any? %>
+          <div class="browse-related__group">
           <h3 id="related-periods"><%= period ? t("browse.period.within") : t("browse.entity.related_periods") %></h3>
           <ul class="browse-list" aria-labelledby="related-periods">
             <% periods.each do |related_period, count| %>
               <li><%= link_to related_period.label, related_period.path, class: "browse-list__link" %> <span class="browse-list__count"><%= t("browse.records", count: count) %></span></li>
             <% end %>
           </ul>
+          </div>
         <% end %>
+        </div>
       </section>
     <% end %>
   </div>

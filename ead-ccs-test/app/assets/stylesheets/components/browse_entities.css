@@ -1,6 +1,7 @@
 /*
- * Entity pages (BrowseEntitiesController, app/views/browse_entities); the hubs are browse.css. The page frame is the content pages' (banner, then a
- * container); the records are the site's result cards, laid out as a grid of vertical cards.
+ * Entity pages (BrowseEntitiesController, app/views/browse_entities); the hubs are browse.css. The page frame is the content pages' (banner, then the
+ * one page container); "At a glance" is the record page's Object details panel; the records are the site's result cards (the results page's
+ * 17rem-minimum columns and 24px gutters); related values are panels of ruled rows, counts muted, as the Explore lists.
  */
 .browse-main__inner {
   max-width: var(--layout-container);
@@ -8,14 +9,24 @@
   padding: var(--ccs-space-6) var(--space-32) var(--ccs-space-8);
 }
 
+/* Section headings: the content pages' (serif, brand navy; Help's section heading) */
 .browse-main h2 {
-  margin: var(--ccs-space-6) 0 var(--ccs-space-3);
-  font-size: 1.5rem;
+  margin: var(--ccs-space-8) 0 var(--ccs-space-4);
+  font-size: var(--ccs-font-size-3xl);
+  line-height: var(--ccs-line-height-tight);
+  color: var(--ccs-text-brand);
 }
 
 .browse-main h3 {
-  margin: var(--ccs-space-5) 0 var(--ccs-space-2);
-  font-size: 1.125rem;
+  margin: 0 0 var(--ccs-space-2);
+  font-size: var(--ccs-font-size-xl);
+  line-height: var(--ccs-line-height-tight);
+  color: var(--ccs-text-brand);
+}
+
+.browse-main__inner > :first-child,
+.browse-main__inner > :first-child > h2 {
+  margin-top: 0;
 }
 
 .browse-note,
@@ -24,40 +35,50 @@
   color: var(--ccs-text-secondary);
 }
 
-/* Lists of names with their counts: columns where there is room */
+/* Lists of names with their counts: ruled rows, the count muted at the right (as the browse lists and the Explore rows) */
 .browse-list {
-  column-width: 20rem;
-  column-gap: var(--ccs-space-6);
-  margin: 0 0 var(--ccs-space-4);
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .browse-list li {
-  break-inside: avoid;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ccs-space-3);
   padding-block: var(--ccs-space-2);
   border-bottom: 1px solid var(--ccs-border-default);
 }
 
 .browse-list__link,
-.browse-pager__link,
 .browse-filter__clear {
   display: inline-block;
   min-height: 1.5rem; /* 24px target */
   color: var(--ccs-text-link);
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+.browse-list__link:hover,
+.browse-filter__clear:hover {
+  color: var(--ccs-text-link-hover);
 }
 
 .browse-list__count,
 .browse-list__span {
+  flex: none;
   color: var(--ccs-text-secondary);
-  font-size: 0.9375rem;
+  font-size: var(--ccs-font-size-sm);
 }
 
+.browse-filter {
+  margin-bottom: var(--ccs-space-2);
+}
 
 .browse-filter__label {
   display: block;
   margin-bottom: var(--ccs-space-1);
-  font-weight: 600;
+  font-weight: var(--ccs-font-weight-semibold);
 }
 
 .browse-filter__row {
@@ -68,18 +89,15 @@
 }
 
 .browse-filter__input {
-  flex: 1 1 16rem;
+  flex: 1 1 12rem;
+  width: auto;
+  min-width: 0;
   min-height: 2.75rem;
-  padding: 0 var(--ccs-space-3);
-  border: 1px solid var(--ccs-border-strong);
 }
 
-.browse-pager {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ccs-space-4);
-  margin-top: var(--ccs-space-5);
+/* Pages: the results page's pagination (components/pagination.css) */
+.browse-pager.paginate-section {
+  padding-bottom: 0;
 }
 
 /* Cultural care notice: a bordered box with a heading, so it never depends on colour */
@@ -91,49 +109,99 @@
   background: var(--ccs-surface-subtle);
 }
 
-.browse-advisory__title {
-  margin-top: 0 !important;
-  font-size: 1.125rem !important;
+.browse-main .browse-advisory__title {
+  margin: 0 0 var(--ccs-space-2);
+  font-size: var(--ccs-font-size-xl);
 }
 
 .browse-advisory p {
   margin-bottom: 0;
 }
 
-/* At a glance */
+/* At a glance: the record page's Object details panel (term and description side by side, ruled with a hairline) */
+.browse-facts {
+  border: 1px solid var(--ccs-border-panel);
+  background: var(--ccs-white);
+}
+
+.browse-main .browse-facts h2 {
+  margin: 0;
+  padding: var(--ccs-space-5) var(--ccs-space-5) var(--ccs-space-2);
+  font-size: var(--ccs-font-size-2xl);
+}
+
 .browse-facts__list {
+  margin: 0;
+  padding: var(--ccs-space-2) var(--ccs-space-5) var(--ccs-space-3);
+}
+
+.browse-facts__list > div {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: var(--ccs-space-4) var(--ccs-space-6);
-  margin: 0 0 var(--ccs-space-4);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ccs-space-1);
+  padding-block: var(--ccs-space-3);
+  border-bottom: 1px solid var(--ccs-border-default);
+  line-height: 1.5;
+}
+
+.browse-facts__list > div:last-child {
+  border-bottom: 0;
+}
+
+@media (min-width: 768px) {
+  .browse-facts__list > div {
+    grid-template-columns: 30% 70%;
+    gap: var(--ccs-space-5);
+  }
 }
 
 .browse-facts__list dt {
-  font-weight: 600;
-  color: var(--ccs-text-secondary);
+  font-weight: var(--ccs-font-weight-bold);
 }
 
 .browse-facts__list dd {
   margin: 0;
 }
 
+/* Collections and object types: links in a wrapping row, counts muted */
 .browse-facts__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-1) var(--ccs-space-5);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .browse-facts__links li {
-  padding-block: var(--ccs-space-1);
+  min-height: 1.5rem;
 }
 
-/* The records: a grid of vertical cards (the list view's horizontal card is for a single column) */
+.browse-facts__links a {
+  display: inline-block;
+  min-height: 1.5rem;
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
+.browse-facts__action {
+  margin: 0;
+  padding: var(--ccs-space-3) var(--ccs-space-5) var(--ccs-space-5);
+}
+
+/* The records: a grid of vertical cards, in the results page's columns (the list view's horizontal card is for a single column) */
 .browse-records .documents-list {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  align-items: stretch;
 }
 
 .browse-records .documents-list .result-card {
   flex-direction: column;
+  align-items: stretch;
+}
+
+.browse-records .documents-list .result-card__content {
+  flex: 1 1 auto;
+  justify-content: flex-start;
 }
 
 .browse-records .documents-list .result-card__media {
@@ -145,6 +213,23 @@
 
 .browse-records .documents-list .result-card__media img {
   position: static;
+}
+
+/* Related: a panel for each kind, ruled rows inside */
+.browse-related__groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--ccs-space-5);
+}
+
+.browse-related__group {
+  padding: var(--ccs-space-5);
+  border: 1px solid var(--ccs-border-panel);
+  background: var(--ccs-white);
+}
+
+.browse-related__group .browse-list li:last-child {
+  border-bottom: 0;
 }
 
 @media (max-width: 767px) {
@@ -169,4 +254,12 @@
   display: inline-block;
   min-width: 1.5rem;
   min-height: 1.5rem;
+}
+
+/* The site's primary button size (the Search and Filter buttons: 48px tall, semibold) */
+.browse-facts__action .btn,
+.browse-filter__row .btn {
+  min-height: 3rem;
+  padding-inline: var(--ccs-space-5);
+  font-weight: var(--ccs-font-weight-semibold);
 }

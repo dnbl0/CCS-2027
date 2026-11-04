@@ -124,7 +124,7 @@ class DebiasNoticesTest < ActionDispatch::IntegrationTest
     assert_includes sitemap.urls.map(&:first), "https://example.test/language-in-our-records"
 
     get "/help"
-    assert_select ".site-footer__legal a[href='/language-in-our-records']", text: "Language in our records"
+    assert_select ".site-footer__links a[href='/language-in-our-records']", text: "Language in our records"
   end
 
   test "the language page is not scanned: no mark or notice on it, whatever the list holds" do

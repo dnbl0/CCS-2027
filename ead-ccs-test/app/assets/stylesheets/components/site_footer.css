@@ -41,8 +41,9 @@
 .site-footer__brand { display: flex; justify-content: flex-end; }
 .site-footer__brand img { width: 144px; height: 144px; }
 .site-footer__legal-bar { background: var(--ccs-navy-1200); padding: var(--ccs-space-6) 0; }
-.site-footer__legal-bar .site-footer__inner { display: flex; flex-wrap: wrap; gap: var(--ccs-space-5); align-items: center; justify-content: space-between; font-size: var(--ccs-font-size-sm); }
-.site-footer__legal, .site-footer__identifiers { display: flex; flex-wrap: wrap; gap: var(--ccs-space-3) var(--ccs-space-3); margin: 0; padding: 0; list-style: none; }
+/* The University's pattern: the legal links in one row, the identifiers in a quieter row beneath */
+.site-footer__legal-bar .site-footer__inner { display: flex; flex-direction: column; gap: var(--ccs-space-3); align-items: flex-start; font-size: var(--ccs-font-size-sm); }
+.site-footer__legal, .site-footer__identifiers { display: flex; flex-wrap: wrap; gap: var(--ccs-space-3) var(--ccs-space-5); margin: 0; padding: 0; list-style: none; }
 .site-footer__legal a { display: inline-flex; align-items: center; min-height: 44px; font-weight: var(--ccs-font-weight-semibold); text-decoration: underline; text-underline-position: from-font; }
 .site-footer__identifiers li { color: var(--ccs-neutral-100); }
 .site-footer__identifiers strong { font-weight: var(--ccs-font-weight-semibold); }
@@ -58,7 +59,7 @@
   .site-footer__main .site-footer__inner { grid-template-columns: 1fr; gap: var(--ccs-space-7); }
   .site-footer__label { font-size: var(--ccs-font-size-xs); letter-spacing: 0.96px; margin-bottom: var(--ccs-space-4); }
   .site-footer__brand { justify-content: flex-start; }
-  .site-footer__legal-bar .site-footer__inner { flex-direction: column; align-items: flex-start; gap: var(--ccs-space-6); font-size: var(--ccs-font-size-xs); }
+  .site-footer__legal-bar .site-footer__inner { gap: var(--ccs-space-5); font-size: var(--ccs-font-size-xs); }
   .site-footer__legal { flex-direction: column; gap: 0; }
   .site-footer__identifiers { flex-direction: column; gap: var(--ccs-space-1); }
 }
