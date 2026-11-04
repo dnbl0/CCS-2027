@@ -16,9 +16,9 @@ class CompliancePagesTest < ApplicationSystemTestCase
 
   test "the footer's two statements open the pages" do
     visit "/help"
-    within(".site-footer__legal") { click_link "Accessibility of this site" }
+    within(".site-footer__links") { click_link "Accessibility of this site" }
     assert_selector "h1", text: "Accessibility of Collections Navigator"
-    within(".site-footer__legal") { click_link "Privacy and data on this site" }
+    within(".site-footer__links") { click_link "Privacy and data on this site" }
     assert_selector "h1", text: "Privacy and data on Collections Navigator"
   end
 
