@@ -1,12 +1,7 @@
-<%# Previous / Next between pages of a list, as plain links (no JavaScript). page, pages, label: what the pages are of. %>
+<%# Between pages of a list: the site's pagination (the results page's Kaminari theme and components/pagination.css), as plain links (no JavaScript).
+    page, pages: which page of how many; label: what the pages are of. Kaminari counts one "record" per page here. %>
 <% if pages > 1 %>
-  <nav class="browse-pager" aria-label="<%= label %>">
-    <% if page > 1 %>
-      <%= link_to t("browse.previous"), url_for(request.query_parameters.merge(page: page - 1 > 1 ? page - 1 : nil)), rel: "prev", class: "browse-pager__link" %>
-    <% end %>
-    <span class="browse-pager__status"><%= t("browse.page_of", page: page, pages: pages) %></span>
-    <% if page < pages %>
-      <%= link_to t("browse.next"), url_for(request.query_parameters.merge(page: page + 1)), rel: "next", class: "browse-pager__link" %>
-    <% end %>
-  </nav>
+  <%= tag.nav class: "paginate-section browse-pager", aria: { label: label } do %>
+    <%= paginate Kaminari.paginate_array([], total_count: pages).page(page).per(1), theme: "blacklight", window: 2, outer_window: 1 %>
+  <% end %>
 <% end %>

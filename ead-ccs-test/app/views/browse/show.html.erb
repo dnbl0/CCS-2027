@@ -3,10 +3,12 @@
 <%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", browse_path ], [ @hub.title, nil ] ]) %>
 <%= render NexusCcs::PageBannerComponent.new(title: "Browse #{@hub.title.downcase}", description: @hub.intro) %>
 <main class="browse" id="main-content">
-  <div class="browse__inner">
+  <div class="browse__inner<%= " browse__inner--with-letters" if @list.available? && @list.letters.any? %>">
     <% if @list.available? %>
       <% if @list.letters.any? %>
+        <%# Like the Help page's "On this page": a titled list of links in the left column, a plain list above the content on a phone %>
         <nav class="browse__letters" aria-label="Browse by letter">
+          <p class="browse__letters-title" aria-hidden="true">Browse by letter</p>
           <ul class="browse__letter-list">
             <li><%= link_to "Most records", browse_hub_path(@hub.slug), class: "browse__letter", "aria-current": (@list.letter ? nil : "page") %></li>
             <% @list.letters.each do |letter| %>
@@ -16,12 +18,13 @@
         </nav>
       <% end %>
 
+      <div class="browse__content">
       <% unless @list.periods? %>
         <%# Type to filter: a plain GET form, so it works without JavaScript %>
         <%= form_with url: browse_hub_path(@hub.slug), method: :get, class: "browse-filter", html: { role: "search", "aria-label": t("browse.filter.label", kind: @hub.title.downcase) } do |form| %>
-          <%= form.label :filter, t("browse.filter.label", kind: @hub.title.downcase), class: "browse-filter__label" %>
+          <%= form.label :filter, t("browse.filter.label", kind: @hub.title.downcase), class: "browse-filter__label form-label" %>
           <div class="browse-filter__row">
-            <%= form.search_field :filter, value: @list.filter, id: "filter", class: "browse-filter__input", autocomplete: "off", maxlength: 80 %>
+            <%= form.search_field :filter, value: @list.filter, id: "filter", class: "browse-filter__input form-control", autocomplete: "off", maxlength: 80 %>
             <%= form.button t("browse.filter.submit"), type: "submit", class: "btn btn-primary" %>
             <% if @list.filter %><%= link_to t("browse.filter.clear"), browse_hub_path(@hub.slug), class: "browse-filter__clear" %><% end %>
           </div>
@@ -41,6 +44,7 @@
         <% end %>
       </ul>
       <%= render "browse_entities/pager", page: @list.page, pages: @list.pages, label: t("browse.pagination", kind: @hub.title.downcase) if @list.paged? %>
+      </div>
     <% else %>
       <p class="browse__unavailable">The list of <%= @hub.title.downcase %> cannot be shown right now. Please try again in a few minutes, or <%= link_to "search all records", search_action_path(any_assets: "1", search_field: "all_fields") %>.</p>
     <% end %>

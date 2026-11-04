@@ -36,10 +36,22 @@
   flex: 1 1 auto;
 }
 
-.discover-cards__blurb {
+/* Placeholder wording (a blurb, until the teams supply the text): findable, but small and muted, a note rather than body text */
+.discover-cards__blurb,
+.discover-section__note {
   margin: 0;
-  font-size: var(--ccs-font-size-sm, 0.875rem);
+  font-size: var(--ccs-font-size-sm);
+  line-height: 1.5;
   color: var(--ccs-text-secondary);
+}
+
+.discover-cards__blurb {
+  padding-inline-start: var(--ccs-space-3);
+  border-inline-start: 2px solid var(--ccs-border-default);
+}
+
+.discover-section__note {
+  margin: calc(-1 * var(--ccs-space-4)) 0 var(--ccs-space-5);
 }
 
 .discover-section + .discover-section {
@@ -49,22 +61,74 @@
 .discover-section__heading {
   margin: 0 0 var(--ccs-space-2);
   font-family: var(--ccs-font-heading);
-  font-weight: var(--ccs-font-weight-regular, 400);
+  font-weight: var(--ccs-font-weight-regular);
   color: var(--ccs-text-brand);
 }
 
 h2.discover-section__heading {
-  font-size: var(--ccs-font-size-3xl, 1.875rem);
+  font-size: var(--ccs-font-size-3xl);
 }
 
 h3.discover-section__heading {
-  font-size: var(--ccs-font-size-2xl, 1.5rem);
+  font-size: var(--ccs-font-size-2xl);
 }
 
 .discover-section__description {
   margin: 0 0 var(--ccs-space-5);
   max-width: 48rem;
-  color: var(--ccs-text-secondary);
+  font-size: var(--ccs-font-size-lg);
+  color: var(--ccs-text-primary);
+}
+
+/* Pick of the day: the text beside its one card, on the page's subtle panel, so the row has no empty half */
+.discover-section--pick {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 var(--ccs-space-6);
+  padding: var(--ccs-space-5);
+  background: var(--ccs-surface-subtle);
+}
+
+.discover-section--pick .discover-cards {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* From 900px the intro is the first column and the card, laid out as the list view's horizontal card (text left, image right), spans the rest */
+@media (min-width: 900px) {
+  .discover-section--pick {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: center;
+  }
+
+  .discover-section--pick > .discover-section__heading,
+  .discover-section--pick > .discover-section__description,
+  .discover-section--pick > .discover-section__note {
+    grid-column: 1;
+  }
+
+  .discover-section--pick > .discover-cards {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+  }
+
+  .discover-section--pick .result-card {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .discover-section--pick .result-card__content {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .discover-section--pick .result-card__media {
+    order: 2;
+    flex: none;
+    width: 50%;
+  }
 }
 
 /* Record page */
@@ -75,14 +139,14 @@ h3.discover-section__heading {
 .similar-records__inner {
   max-width: calc(75rem + 2 * var(--record-gutter, 1rem));
   margin-inline: auto;
-  padding: var(--ccs-space-7) var(--record-gutter, 1rem) 3.5rem;
+  padding: var(--ccs-space-7) var(--record-gutter, 1rem) var(--ccs-space-8);
 }
 
 .similar-records__heading {
   margin: 0 0 var(--ccs-space-2);
   font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-font-size-3xl, 1.875rem);
-  font-weight: var(--ccs-font-weight-regular, 400);
+  font-size: var(--ccs-font-size-3xl);
+  font-weight: var(--ccs-font-weight-regular);
   color: var(--ccs-text-brand);
 }
 
@@ -119,7 +183,7 @@ html:not(.no-js) .discover-frame:not([complete]) {
 }
 
 body.page-home .home-discover {
-  padding-block: var(--space-48, 3rem);
+  padding-block: var(--ccs-space-8);
 }
 
 body.page-home .home-discover .ccs-section__inner {
@@ -128,22 +192,22 @@ body.page-home .home-discover .ccs-section__inner {
 
 .home-discover__intro {
   margin: 0;
-  font-size: var(--font-size-body-lg, 1.125rem);
+  font-size: var(--ccs-font-size-lg);
 }
 
 .home-discover__link {
   display: inline-block;
   min-height: 24px;
-  color: var(--interactive-800);
-  font-weight: var(--font-weight-bold, 700);
+  color: var(--ccs-text-link);
+  font-weight: var(--ccs-font-weight-bold);
   text-decoration: underline;
 }
 
 .home-discover__link:hover {
-  color: var(--interactive-700);
+  color: var(--ccs-text-link-hover);
 }
 
 .home-discover__link:focus-visible {
-  outline: 3px solid var(--brand-1100);
+  outline: 3px solid var(--ccs-focus-ring);
   outline-offset: 2px;
 }
