@@ -1,6 +1,6 @@
-<div class="sensitivity-gate sensitivity-gate--<%= state %> bg-white text-dark border border-2 border-secondary rounded p-3 my-3 mx-auto">
-  <p class="fw-bold mb-1" tabindex="-1" <%= tag.attributes(data: { controller: ("focus-on-load" if focus_on_load?) }.compact) %>><%= title %></p>
-  <p class="mb-2"><%= body %></p>
+<div class="sensitivity-gate sensitivity-gate--<%= state %>">
+  <p class="access-notice__title" tabindex="-1" <%= tag.attributes(data: { controller: ("focus-on-load" if focus_on_load?) }.compact) %>><%= title %></p>
+  <p class="access-notice__body"><%= body %></p>
   <div class="sensitivity-gate__choices">
     <% choices.each do |label, choice, css| %>
       <%= helpers.button_to label, path, params: { choice: choice }, class: css, form_class: "sensitivity-gate__form" %>

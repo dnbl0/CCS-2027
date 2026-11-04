@@ -117,3 +117,55 @@
 .record-copyright__head .record-copyright__title {
   padding-right: 0;
 }
+
+/* The record page's second column: the cultural protocols notice, then the Copyright card, the same 24px apart as the cards in the
+   first column (record_page.css .record-main__details) */
+.record-main__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-5);
+  min-width: 0;
+}
+
+/* The cultural protocols notice: the card of the de-bias notice (debias.css), a navy accent */
+.record-cultural-protocols {
+  border-inline-start: 4px solid var(--ccs-border-brand);
+}
+
+.record-cultural-protocols > p {
+  margin: 0;
+  padding: 0 var(--ccs-space-5) var(--ccs-space-4);
+}
+
+.record-cultural-protocols > p:last-child {
+  padding-bottom: var(--ccs-space-5);
+}
+
+@media (max-width: 767px) {
+  .record-cultural-protocols > p {
+    padding-inline: var(--ccs-space-4);
+  }
+}
+
+/*
+ * The ONE placeholder notice (wording the University has not approved yet): small, muted, dashed and plainly marked with its
+ * bold first words. Used on /accessibility, /privacy, /language-in-our-records and /my_data; a page's own heading and text keep
+ * the page's styling. Remove the element when the wording is approved.
+ */
+.placeholder-notice {
+  margin: 0 0 var(--ccs-space-6);
+  padding: var(--ccs-space-2) var(--ccs-space-3);
+  border: 1px dashed var(--ccs-border-strong);
+  background: var(--ccs-surface-subtle);
+  font-size: var(--ccs-font-size-sm);
+  line-height: 1.5;
+  color: var(--ccs-text-secondary);
+}
+
+.placeholder-notice p {
+  margin: 0;
+}
+
+.placeholder-notice strong {
+  color: var(--ccs-text-primary);
+}
