@@ -46,10 +46,10 @@
   overflow-wrap: anywhere;
 }
 
-/* The checkbox: a 24px target (WCAG 2.5.8) whose label is a 24px-high row, above the title link that the mosaic stretches
-   over the whole card */
+/* The checkbox, in the Save and Add to list row's type (bold navy 16px) and 44px height: a 24px box (WCAG 2.5.8) with its label
+   beside it, above the title link that the mosaic stretches over the whole card */
 .result-card__content > .result-card__select {
-  padding-top: var(--ccs-space-2);
+  padding-top: 0;
 }
 
 .result-card__select {
@@ -65,16 +65,36 @@
   width: 1.5rem;
   height: 1.5rem;
   margin: 0;
+  border: 2px solid var(--ccs-navy-1100);
+  border-radius: var(--ccs-radius-sm);
   cursor: pointer;
 }
 
+.result-card__select-input:checked {
+  border-color: var(--ccs-navy-1100);
+  background-color: var(--ccs-navy-1100);
+}
+
+.result-card__select-input:focus-visible {
+  outline: 2px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
 .result-card__select-label {
-  min-height: 1.5rem;
+  min-height: 2.75rem;
   display: inline-flex;
   align-items: center;
   font-size: var(--ccs-font-size-md);
+  font-weight: var(--ccs-font-weight-bold);
+  line-height: var(--ccs-line-height-tight);
   color: var(--ccs-text-brand);
   cursor: pointer;
+}
+
+.result-card__select-label:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 /* The strip above the results */
@@ -87,12 +107,13 @@
   margin: 0 0 var(--ccs-space-4);
   padding: var(--ccs-space-2) var(--ccs-space-3);
   border: 1px solid var(--ccs-border-panel);
-  border-radius: 0.25rem;
+  border-radius: var(--ccs-radius-panel);
   background: var(--ccs-white);
 }
 
 .selection-bar__count {
   margin: 0;
+  font-size: var(--ccs-font-size-md);
   font-weight: var(--ccs-font-weight-semibold);
   color: var(--ccs-text-brand);
 }
@@ -103,31 +124,44 @@
   gap: var(--ccs-space-2);
 }
 
-.selection-bar__button {
+/* The buttons read as the site's outline button (btn-outline-primary: square, navy) and, for View selected, its primary (cyan) */
+.selection-bar__button,
+.selection-lists__button {
   display: inline-flex;
   align-items: center;
-  min-height: 2rem;
-  padding: var(--ccs-space-1) var(--ccs-space-3);
-  border: 1px solid var(--ccs-text-link);
-  border-radius: 0.25rem;
+  min-height: 2.75rem;
+  padding: var(--ccs-space-1) var(--ccs-space-4);
+  border: 1px solid var(--ccs-navy-1100);
+  border-radius: 0;
   background: var(--ccs-white);
   font: inherit;
-  color: var(--ccs-text-link);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-navy-1100);
   text-decoration: none;
   cursor: pointer;
 }
 
-.selection-bar__button:hover {
-  background: var(--ccs-neutral-100);
-}
-
-.selection-bar__view {
-  background: var(--ccs-text-link);
+.selection-bar__button:hover,
+.selection-lists__button:hover {
+  background: var(--ccs-navy-1100);
   color: var(--ccs-white);
 }
 
-.selection-bar__view:hover {
-  background: var(--ccs-text-link-hover);
+.selection-bar__button:focus-visible,
+.selection-lists__button:focus-visible {
+  outline: 2px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.selection-bar__button.selection-bar__view {
+  border-color: var(--ccs-action-primary);
+  background: var(--ccs-action-primary);
+  color: var(--ccs-action-primary-text);
+}
+
+.selection-bar__button.selection-bar__view:hover {
+  border-color: var(--ccs-action-primary-hover);
+  background: var(--ccs-action-primary-hover);
 }
 
 .selection-bar__button[hidden] {
@@ -150,6 +184,7 @@
 
 .selection-stepper__position {
   margin: 0;
+  font-size: var(--ccs-font-size-md);
   font-weight: var(--ccs-font-weight-semibold);
 }
 
@@ -163,8 +198,10 @@
 }
 
 .selection-stepper__links a {
-  display: inline-block;
-  min-height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  font-weight: var(--ccs-font-weight-semibold);
 }
 
 /* Add selected to a list (the selection page) */
@@ -172,12 +209,13 @@
   margin-bottom: var(--ccs-space-5);
   padding: var(--ccs-space-3) var(--ccs-space-4);
   border: 1px solid var(--ccs-border-panel);
-  border-radius: 0.25rem;
+  border-radius: var(--ccs-radius-panel);
   background: var(--ccs-white);
 }
 
 .selection-lists__heading {
   margin: 0 0 var(--ccs-space-2);
+  font-family: var(--ccs-font-heading);
   font-size: var(--ccs-font-size-lg);
   font-weight: var(--ccs-font-weight-semibold);
 }
@@ -191,17 +229,6 @@
   list-style: none;
 }
 
-.selection-lists__button {
-  min-height: 2rem;
-  padding: var(--ccs-space-1) var(--ccs-space-3);
-  border: 1px solid var(--ccs-text-link);
-  border-radius: 0.25rem;
-  background: var(--ccs-white);
-  font: inherit;
-  color: var(--ccs-text-link);
-  cursor: pointer;
-}
-
 .selection-lists__none {
   margin: 0;
 }
@@ -209,27 +236,57 @@
 /* Why am I seeing these results? */
 .why-results {
   margin: var(--ccs-space-5) 0;
-  border: 1px solid var(--ccs-border-panel);
-  border-radius: 0.25rem;
+  border: 1px solid var(--ccs-border-default);
+  border-radius: var(--ccs-radius-panel);
   background: var(--ccs-white);
 }
 
+/* The summary is a row like the filter accordions' (tinted, 18px navy, a chevron at the right that turns when open) */
 .why-results__summary {
-  display: list-item; /* keeps the disclosure triangle */
-  list-style-position: inside;
-  min-height: 2.75rem;
-  padding: var(--ccs-space-3) var(--ccs-space-4);
-  font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-text-brand);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ccs-space-3);
+  min-height: 3.6875rem;
+  padding: var(--ccs-space-4) 1.25rem;
+  background: var(--bs-tertiary-bg);
+  font-size: var(--ccs-font-size-lg);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-navy-1100);
+  list-style: none;
   cursor: pointer;
 }
 
+.why-results__summary::-webkit-details-marker {
+  display: none;
+}
+
+.why-results__summary::after {
+  content: "";
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.why-results[open] > .why-results__summary::after {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+.why-results__summary:focus-visible {
+  outline: 2px solid var(--ccs-focus-ring);
+  outline-offset: -2px;
+}
+
 .why-results__body {
-  padding: 0 var(--ccs-space-4) var(--ccs-space-4);
+  padding: 0 1.25rem var(--ccs-space-4);
 }
 
 .why-results__heading {
   margin: var(--ccs-space-4) 0 var(--ccs-space-2);
+  font-family: var(--ccs-font-heading);
   font-size: var(--ccs-font-size-lg);
   font-weight: var(--ccs-font-weight-semibold);
 }
