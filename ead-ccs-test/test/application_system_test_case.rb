@@ -11,6 +11,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   driven_by :cuprite, screen_size: [ 1440, 900 ], options: { browser_options: { "no-sandbox" => nil }, process_timeout: 30, timeout: 15 }
 
+  # The cookie notice (CCS-471) is at the top of every page for a visitor who has not answered it; most tests are not about it, so
+  # each starts as a visitor who has. test/system/cookie_notice_test.rb starts without the cookie.
+  setup { page.driver.set_cookie(CookieNotice::COOKIE.to_s, CookieNotice.value("acknowledged")) }
+
   # axe-core comes from the static site's dependencies (npm install at the repository root)
   AXE = Rails.root.join("../node_modules/axe-core/axe.min.js")
   AXE_TAGS = %w[wcag2a wcag2aa wcag21a wcag21aa].freeze
