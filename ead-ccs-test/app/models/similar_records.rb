@@ -31,29 +31,32 @@ class SimilarRecords
   DATE_BOOST = 4.0
   DATE_WINDOW = 25          # years either side
   CANDIDATES = 30           # asked for, so that dropping unlistable and weak ones still leaves enough
-  SHOWN = 6                 # cards in the section
+  SHOWN = 4                 # cards in the section (one row of the record cards)
   MINIMUM = 2               # fewer than this and the section is not shown
   MIN_SCORE_RATIO = 0.35
   MAX_PER_CREATOR = 3       # so a prolific creator's series does not fill the section
 
   # document: the record. Returns up to `shown` SolrDocuments, or [] when there are fewer than MINIMUM, the record may not be
   # listed (withheld or sensitive: no recommendations beside it), or Solr cannot answer.
-  def self.for(document, shown: SHOWN)
+  #
+  # exclude: ids of records the page already shows (its Related objects), left out so one record is not listed twice
+  def self.for(document, shown: SHOWN, exclude: [])
     return [] unless document && Discovery.listable?(document)
 
-    found = new(document).documents.first(shown)
+    found = new(document, exclude: exclude).documents.first(shown)
     found.size >= MINIMUM ? found : []
   rescue StandardError => error
     Discovery.log_failure("Similar records", error)
     []
   end
 
-  def initialize(document)
+  def initialize(document, exclude: [])
     @document = document
+    @skip = Array(exclude).map(&:to_s).push(document.id.to_s)
   end
 
   def documents
-    candidates = Discovery.search(params).documents.reject { |candidate| candidate.id == @document.id }
+    candidates = Discovery.search(params).documents.reject { |candidate| @skip.include?(candidate.id.to_s) }
     best = candidates.filter_map { |candidate| candidate["score"] }.max.to_f
     kept = candidates.select { |candidate| Discovery.listable?(candidate) && strong?(candidate, best) }
     varied(kept)

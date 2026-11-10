@@ -18,7 +18,7 @@ class SimilarController < CatalogController
     document = id.length <= 200 ? Discovery.fetch([ id ]).first : nil
     raise ActionController::RoutingError, "Not Found" unless document
 
-    @documents = SimilarRecords.for(document)
+    @documents = SimilarRecords.for(document, exclude: excluded_ids)
     return head(:no_content) if @documents.empty?
 
     wrap_documents(@documents)
@@ -28,5 +28,12 @@ class SimilarController < CatalogController
   # Blacklight uses #search_action_url for the header's search box
   def search_action_url(*)
     search_catalog_url(*)
+  end
+
+  private
+
+  # The records the record page already lists as Related objects (?exclude=a,b), so none appears twice
+  def excluded_ids
+    params[:exclude].to_s.split(",").map(&:strip).select { |value| value.present? && value.length <= 200 }.first(12)
   end
 end

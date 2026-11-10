@@ -24,6 +24,10 @@ en:
     similar:
       heading: "Similar records"
       description: "Records that share a creator, subject, type of object or place with this one."
+    related:
+      heading: "Related objects"
+    recently_viewed:
+      heading: "Recently viewed"
   seo:
     description:
       discover: "Featured records, the record of the day and the most viewed records in the University of Melbourne's cultural collections."

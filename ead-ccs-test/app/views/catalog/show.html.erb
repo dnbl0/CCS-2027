@@ -14,5 +14,8 @@
   <% end %>
 <% end %>
 
-<%= render NexusCcs::RecordTilesComponent.new(id: "related-objects", heading: "Related objects", documents: RelatedObjects.for(@document)) %>
-<%= render NexusCcs::RecordTilesComponent.new(id: "recently-viewed", heading: "Recently viewed", documents: RecentlyViewed.new(session).documents(except: @document.id)) %>
+<% related = RelatedObjects.for(@document) %>
+<%= render NexusCcs::RecordCardsComponent.new(id: "related-objects", heading: t("nexus_ccs.related.heading"), documents: related) %>
+<%# Lazy: its cards load when it nears the screen. It is told which records Related objects shows, so none is listed twice %>
+<%= render NexusCcs::SimilarRecordsComponent.new(document: @document, exclude: related.first(NexusCcs::RecordCardsComponent::MAX).map { |found| found.id.to_s }) %>
+<%= render NexusCcs::RecordCardsComponent.new(id: "recently-viewed", heading: t("nexus_ccs.recently_viewed.heading"), compact: true, documents: RecentlyViewed.new(session).documents(except: @document.id)) %>

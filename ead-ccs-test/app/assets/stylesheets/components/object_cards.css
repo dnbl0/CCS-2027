@@ -1,0 +1,183 @@
+/* The record page's Related objects, Similar records and Recently viewed: one record card (NexusCcs::RecordCardComponent) in a
+   section (NexusCcs::RecordCardsComponent), after the University design system's Card and Listings. The card is one link
+   (the title's link is stretched over it), its image is shown whole in a 16:9 frame, and a record without an image has a placeholder. */
+.object-cards {
+  border-top: 1px solid var(--ccs-border-default);
+  padding-block: var(--ccs-space-7);
+}
+
+/* The same column as the record's summary and details (record_page.css) */
+.object-cards__inner {
+  max-width: calc(75rem + 2 * var(--record-gutter, var(--ccs-space-6)));
+  margin-inline: auto;
+  padding-inline: var(--record-gutter, var(--ccs-space-6));
+}
+
+/* As the headings of Object details and Copyright */
+.object-cards__heading {
+  margin: 0;
+  font-family: var(--ccs-font-heading);
+  font-size: 1.375rem;
+  font-weight: var(--ccs-font-weight-semibold);
+  line-height: var(--ccs-line-height-tight);
+  color: var(--ccs-navy-1100);
+}
+
+.object-cards__description {
+  margin: var(--ccs-space-2) 0 0;
+  color: var(--ccs-text-secondary);
+}
+
+.object-cards__list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ccs-space-5);
+  margin: var(--ccs-space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.object-cards__item {
+  display: flex;
+  min-width: 0;
+}
+
+@media (min-width: 600px) {
+  .object-cards__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .object-cards__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* Recently viewed is a history aid, not a recommendation: quieter and smaller, and it never takes the eye from the sections above */
+.object-cards--compact {
+  padding-block: var(--ccs-space-6);
+  background: var(--ccs-surface-subtle);
+}
+
+.object-cards--compact .object-cards__heading {
+  font-size: var(--ccs-font-size-lg);
+}
+
+.object-cards--compact .object-cards__list {
+  gap: var(--ccs-space-4);
+  margin-top: var(--ccs-space-4);
+}
+
+/* The card */
+.object-card {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--ccs-border-default);
+  background: var(--ccs-white);
+  transition: border-color var(--ccs-duration-base);
+}
+
+.object-card:hover {
+  border-color: var(--ccs-border-strong);
+}
+
+.object-card:has(.object-card__link:focus-visible) {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.object-card__media {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--ccs-surface-subtle);
+  border-bottom: 1px solid var(--ccs-border-default);
+}
+
+/* Shown whole, never cropped: cultural material is not cut to fit a frame */
+.object-card__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.object-card__type {
+  padding: var(--ccs-space-2) var(--ccs-space-4);
+  font-size: var(--ccs-font-size-sm);
+  font-weight: var(--ccs-font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--ccs-text-secondary);
+}
+
+.object-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--ccs-space-1);
+  padding: var(--ccs-space-4);
+}
+
+.object-card__title {
+  margin: 0;
+  font-family: var(--ccs-font-body);
+  font-size: var(--ccs-font-size-lg);
+  font-weight: var(--ccs-font-weight-semibold);
+  line-height: var(--ccs-line-height-snug);
+  overflow-wrap: anywhere;
+}
+
+/* The link of the whole card: its box covers the card, so there is one target and no nested link */
+.object-card__link {
+  color: var(--ccs-text-link);
+  text-decoration: none;
+}
+
+.object-card__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.object-card:hover .object-card__link,
+.object-card__link:focus-visible {
+  color: var(--ccs-text-link-hover);
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+.object-card__link:focus-visible {
+  outline: none; /* the card draws the focus ring */
+}
+
+.object-card__meta {
+  margin: 0;
+  font-size: var(--ccs-font-size-md);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.object-card--compact .object-card__body { padding: var(--ccs-space-3) var(--ccs-space-4); }
+.object-card--compact .object-card__title { font-size: var(--ccs-font-size-md); }
+.object-card--compact .object-card__meta { font-size: var(--ccs-font-size-sm); }
+.object-card--compact .object-card__media { aspect-ratio: 16 / 7; }
+
+/* Similar records load into a lazy frame: it holds a card row's room while it fetches, so the page below does not jump */
+.similar-frame {
+  display: block;
+}
+
+.similar-frame[busy] {
+  min-height: 24rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .object-card { transition: none; }
+}
