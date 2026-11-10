@@ -86,7 +86,7 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
   end
 
   test "the home page's Explore groups link to their full lists" do
-    Rails.cache.write(ExploreEntryPoints::CACHE_KEY, { "object_type_ssim" => [ [ "lyre", 1 ] ], "production_place_ssim" => [ [ "Japan", 1 ] ], "periods" => { ExploreEntryPoints.period_key(1900, 1999) => 1 } }, expires_in: 1.day)
+    Rails.cache.write(ExploreEntryPoints::CACHE_KEY, { "collections" => [ [ "University Art Collection", 1 ] ], "kinds" => [ [ "Paintings", 1, [ "paintings" ] ] ], "places" => [ [ "Japan", 1 ] ], "periods" => { ExploreEntryPoints.period_key(1900, 1999) => 1 } }, expires_in: 1.day)
 
     get "/"
 

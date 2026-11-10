@@ -1,0 +1,44 @@
+# What the home page's "Explore the collections" section offers (ExploreEntryPoints, docs/explore.md).
+#
+# kinds: "Kinds of records". A label and the classification_ssim values it stands for. The link opens the records with any of the values
+# (f_inclusive); the number is the real count of records with any of them (a record with two values counts once). A value the index does
+# not have is left out of the link; a kind with no records is left out of the list. The labels are sentence case and do not overlap:
+# a value belongs to one kind only. Edit this file to change the list; no code changes.
+kinds:
+  - label: Prints and drawings
+    values: [prints, drawings]
+  - label: Paintings
+    values: [paintings]
+  - label: Photographs
+    values: [Photography, photographs, photographic prints]
+  - label: Archives and documents
+    values: [Archive, Documents and Lectures, correspondence, documents]
+  - label: Music and recordings
+    values: [Music scores, "music, published", "music, manuscript", Audio / visual recordings, audio - 78rpm records]
+  - label: Medical and scientific equipment
+    values: [Medical and Surgical Equipment and Instruments, Scientific Equipment, Laboratory Equipment and Materials]
+  - label: Classics and archaeology
+    values: [Classics and archaeology]
+  - label: Ceramics and decorative arts
+    values: [ceramics, decorative arts]
+
+# collections: the tiles of "Browse by collection" come from collection_ssim, most records first.
+collections:
+  # Values that are not collections, or are too small to be a tile
+  hide: ["[other]"]
+  minimum_records: 100
+  limit: 6
+  # Tiles that never show a picture. Indigenous Collections: the choice of image is waiting for cultural review (docs/explore.md).
+  text_only: [Indigenous Collections]
+
+# places: the most common production places, without the values that repeat or enclose another one
+places:
+  limit: 5
+  skip: [Oceania, "Melbourne, Victoria, Australia", Western Europe, Great Britain]
+
+# periods: [label, first year, last year]; the last year of the last one is the current year
+periods:
+  - [Before 1800, -10000, 1799]
+  - [1800s, 1800, 1899]
+  - [1900s, 1900, 1999]
+  - [2000 onwards, 2000, null]
