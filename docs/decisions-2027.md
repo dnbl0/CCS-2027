@@ -6,7 +6,7 @@ each can be changed. **Plain-language summary first.**
 
 ## In short
 
-- Seven questions are decided and built or kept as they are.
+- Eight questions are decided and built or kept as they are.
 - Two cannot be decided by the product owner or by the developers, so they stay open on purpose: **the legal and privacy
   wording** (it has to come from the University's privacy, legal and accessibility owners) and **the de-bias term list** (it has to
   come from the collections team and Indigenous advisers). Both are marked in the pages and listed below so nothing is mistaken for
@@ -23,6 +23,7 @@ each can be changed. **Plain-language summary first.**
 | 5 | Label of the reuse switch. | Keep **"Open licence (public domain)"**. | It says only what is true: the records whose licence is public domain, the one open tier. "Free to reuse" would be a legal claim. Wording stays placeholder (see below). |
 | 6 | How many extra rules in Advanced search? | 8 extra rows beyond the five fixed fields. | Enough for any real query; a hard limit keeps the form and the Solr query bounded. |
 | 7 | Which records get entity pages and enter the sitemap? | Makers, places, subjects and periods. A page is in the sitemap only with 5 or more records; thinner pages are `noindex, follow`. Object types still open the search; collections have no entity page. | Thin pages are low value to a searcher and to a search engine. Object types and collections are already well served by facets and the home Explore tiles. |
+| 8 | Do the pages added before rule 10 stay? | Yes, as a recorded exception to CLAUDE.md rule 10: browse hubs, entity pages and /discover stay (with the Similar fragment, galleries, embeds, lists, the access-request, privacy, accessibility and help pages). The two stock record pages (/stock, /branded-stock) are design previews and are removed after the design sign-off. | A review of every added route on 2026-11-10 found browse, entity pages and Discover are the real departures from Blacklight's defaults. They are the strongest entry points (the Europeana and Google lessons), are built on Solr facets through CatalogController subclasses, and folding them into /catalog would cost 5-9 days and the landing pages in the sitemap. Revisit if a Blacklight upgrade breaks them. Any new page type still needs the plain-language stop in rule 10. |
 
 ## Not decided on purpose (needs the University)
 
