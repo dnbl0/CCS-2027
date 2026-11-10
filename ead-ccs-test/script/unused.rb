@@ -68,7 +68,7 @@ unrendered = partials.reject do |f|
   rel = f.delete_prefix("app/views/")
   name = File.basename(rel).sub(/\A_/, "").sub(/\..*\z/, "")
   dir = File.dirname(rel)
-  # config.show.partials = [ :persistent_link ] renders _persistent_link_default
+  # a show partial named by config.show.partials = [ :name ] renders _name_default
   default_for = name.delete_suffix("_default") if name.end_with?("_default")
   APP.any? { |file, body| file != f && ((default_for && body.include?(":#{default_for}")) || body.include?("#{dir}/#{name}") || body.match?(/render[ (]+(partial: ?)?["']#{name}["']/) || body.match?(/partial: ?["']#{name}["']/)) }
 end

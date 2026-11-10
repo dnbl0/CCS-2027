@@ -133,5 +133,4 @@
 <%= render NexusCcs::BreadcrumbComponent.new(items: breadcrumbs) %>
 
 <%= search_bar if chrome.banner == :search %>
-<%= render NexusCcs::RecordBannerComponent.new(title: record_title) if chrome.banner == :record %>
 <%= render NexusCcs::PageBannerComponent.new(title: helpers.t("blacklight.advanced_search.form.title"), description: helpers.t("blacklight.advanced_search.form.description")) if chrome.banner == :advanced_search %>

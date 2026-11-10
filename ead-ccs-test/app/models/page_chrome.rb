@@ -3,8 +3,7 @@
 # The parts of the site header that depend on which page is showing (see CONTEXT.md, "Page chrome"):
 #
 #   breadcrumbs  [label, href] pairs for the breadcrumb strip; the last item is the current page
-#   banner       what sits under the strip: :search (the search banner), :record (the record's title band),
-#                :advanced_search (the page banner), or nil
+#   banner       what sits under the strip: :search (the search banner), :advanced_search (the page banner), or nil
 #   saved_bar    where the saved-records bar goes: :breadcrumb (in the breadcrumb strip), :header (the header's top strip,
 #                for a page with no trail), :hero (over the home page's photo, pages/home.html.erb), or :page (a content
 #                page draws its own strip, PageBreadcrumbsComponent)

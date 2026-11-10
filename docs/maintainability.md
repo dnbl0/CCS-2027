@@ -83,7 +83,7 @@ stock record pages (ADR 0006) and go when those do.
 |---|---|---|
 | Stylesheets not imported | 0 | |
 | Stimulus controllers nothing attaches | 0 | |
-| Partials nothing renders | 2, both false positives (`_persistent_link_default`, `_contact_collection_default`: rendered by name from `config.show.partials`); 5 more override Blacklight views | kept |
+| Partials nothing renders | 0 of ours (the two record-page partials went when About this record became a component, 2026-11-11); 5 more override Blacklight views | kept |
 | Components, models, helpers nothing mentions | 0 | |
 | Images nothing mentions | 46 | 33 are OpenSeadragon button images (the viewer builds their names; kept); **13 removed** |
 | Named routes with no helper call | 41 | all are Rails/Blacklight/Turbo routes, error pages, redirects or URLs people visit; none removed |

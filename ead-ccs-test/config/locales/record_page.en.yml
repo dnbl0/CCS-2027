@@ -33,16 +33,13 @@ en:
         credit_line: "Credit line"
       copyright:
         licence: "Licence"
-        image_rights: "Image rights"
         copyright: "Copyright"
         credit_line: "Credit line"
         caption: "Caption"
         responsible_collection: "Responsible collection"
         terms: "About copyright and terms of use"
-        ask: "Ask the collection team about reuse"
       about:
         persistent_link: "Persistent link"
-        contact: "Contact the collection team"
         # PLACEHOLDER WORDING, NOT YET APPROVED
         correction: "Suggest a correction to this record"
         correction_note: "Records can hold outdated or incorrect information, and terms that are not appropriate today."
@@ -51,6 +48,5 @@ en:
         full_screen: "Full screen"
         exit_full_screen: "Exit full screen"
         close_information: "Close media information"
-        licence: "Licence"
       more_like_this:
         heading: "More like this"
