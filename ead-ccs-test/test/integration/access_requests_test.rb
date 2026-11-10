@@ -31,6 +31,8 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Request access"
     assert_select "dd a[href='/catalog/#{DOC}']"
     assert_select "dd", text: "Permission to view this record"
+    assert_select "dt", text: "Collection and ID"
+    assert_select "dd[data-testid=record-identifier]", text: /UoM ID emu-umc-9044\z/
     assert_select "label[for=access_request_name]", text: /Your name/
     assert_select "input#access_request_name[autocomplete=name][required][aria-required=true]"
     assert_select "input#access_request_email[type=email][autocomplete=email][aria-describedby=access_request_email-hint]"
@@ -78,6 +80,7 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
     assert_equal "pending", request.status
     assert_not_equal "Forged title", request.document_title
     assert request.document_title.present?
+    assert_match(/UoM ID emu-umc-9044\z/, request.document_identifier)
     assert_redirected_to "/access_requests/#{request.id}"
 
     follow_redirect!
@@ -85,6 +88,7 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Request sent"
     assert_select "dd", text: PARAMS[:email]
     assert_select "dd", text: request.document_title
+    assert_select "dd[data-testid=record-identifier]", text: request.document_identifier
     assert_select "h2", text: "What happens next"
     assert_equal "no-store", response.headers["Cache-Control"]
   end

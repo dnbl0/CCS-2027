@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_03_130001) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,6 +25,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_130001) do
     t.string "status", default: "pending", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "document_identifier"
     t.index ["document_id"], name: "index_access_requests_on_document_id"
     t.index ["status"], name: "index_access_requests_on_status"
   end

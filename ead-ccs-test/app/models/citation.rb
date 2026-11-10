@@ -4,13 +4,13 @@
 # bibliography) and Harvard (Australian author-date). Turabian was dropped from both stories. This module is the only
 # place a citation is built; the views only show what it returns. The records are museum, library and archive objects, not
 # books, so each style is its object form: the creators, date and title, then the object type, the collection that holds
-# it (the University of Melbourne), its accession number, the persistent link and the day it was looked at.
+# it (the University of Melbourne), its accession number and UoM ID, the persistent link and the day it was looked at.
 #
 #   source = Citation.source_for(document, url: "https://ccs.example/catalog/emu-1")
 #   Citation.format(source, :apa, accessed: Date.current)   # => "Grainger, P. A. (1922). ..."
 #
 # Citations are plain text (they are copied and downloaded as text), so titles are not italicised. Missing parts are left
-# out, never shown as blanks: no creator moves the title to the front, no date is "n.d.", no accession number no line.
+# out, never shown as blanks: no creator moves the title to the front, no date is "n.d.", no accession number no line. The UoM ID (CollectionIdentifier) is always there.
 module Citation
   STYLES = %i[apa mla chicago harvard].freeze
   LABELS = { apa: "APA 7th", mla: "MLA 9th", chicago: "Chicago 17th", harvard: "Harvard" }.freeze
@@ -30,7 +30,7 @@ module Citation
   end
 
   # What a style needs from a record. year is "1922", "c. 1922" or nil.
-  Source = Data.define(:title, :creators, :year, :object_type, :collection, :accession, :url)
+  Source = Data.define(:title, :creators, :year, :object_type, :collection, :accession, :uom_id, :url)
 
   module_function
 
@@ -49,6 +49,7 @@ module Citation
       object_type: first_value(document, "object_type_ssim"),
       collection: first_value(document, "collection_ssim"),
       accession: first_value(document, "accession_number_ssim"),
+      uom_id: CollectionIdentifier.uom_id(document.id),
       url: url
     )
   end
@@ -95,7 +96,7 @@ module Citation
     authors = names.size > 1 ? "#{names[0..-2].join(', ')}, & #{names.last}" : names.first
     title = [ source.title, (" [#{source.object_type}]" if source.object_type) ].join
     lead = authors ? "#{authors} (#{source.year || 'n.d.'}). #{title}" : "#{title} (#{source.year || 'n.d.'})"
-    join_parts(lead, holder(source), accession(source, "Accession number"), source.url, "Retrieved #{date_text(accessed)}.")
+    join_parts(lead, holder(source), accession(source, "Accession number"), uom_id(source), source.url, "Retrieved #{date_text(accessed)}.")
   end
 
   # Grainger, Percy Aldridge, and John Smith. Title. Ukulele, c. 1922, Grainger Museum Collection, University of Melbourne,
@@ -108,7 +109,7 @@ module Citation
     when 2 then names.join(", and ")
     else "#{names.first}, et al"
     end
-    details = [ source.object_type&.capitalize, source.year || "n.d.", source.collection, PUBLISHER, accession(source, "accession number") ].compact.join(", ")
+    details = [ source.object_type&.capitalize, source.year || "n.d.", source.collection, PUBLISHER, accession(source, "accession number"), uom_id(source) ].compact.join(", ")
     join_parts(authors, source.title, details, source.url, "Accessed #{date_text(accessed, abbreviate: true)}.")
   end
 
@@ -118,7 +119,7 @@ module Citation
     names = source.creators.map.with_index { |name, i| name.person? && i.zero? ? "#{name.family}, #{name.given}" : full_name(name) }
     names = names.first(7) + [ "et al" ] if names.size > 10
     authors = names.size > 1 ? "#{names[0..-2].join(', ')}#{names.size > 2 ? ',' : ''} and #{names.last}" : names.first
-    held = [ source.collection, (accession(source, "accession") if source.accession) ].compact.join(", ").presence
+    held = [ source.collection, (accession(source, "accession") if source.accession), uom_id(source) ].compact.join(", ").presence
     publication = "#{PLACE}: #{PUBLISHER}, #{source.year || 'n.d.'}"
     join_parts(authors, source.title, source.object_type&.capitalize, held, publication, "#{source.url} (accessed #{date_text(accessed)}).")
   end
@@ -131,7 +132,7 @@ module Citation
     authors = names.size > 1 ? "#{names[0..-2].join(', ')} & #{names.last}" : names.first
     title = [ source.title, (" [#{source.object_type}]" if source.object_type) ].join
     lead = authors ? "#{authors} #{source.year || 'n.d.'}, #{title}" : "#{title} #{source.year || 'n.d.'}"
-    rest = [ holder(source), PLACE, accession(source, "accession number"), "viewed #{date_text(accessed)}", "<#{source.url}>" ].compact.join(", ")
+    rest = [ holder(source), PLACE, accession(source, "accession number"), uom_id(source), "viewed #{date_text(accessed)}", "<#{source.url}>" ].compact.join(", ")
     "#{lead}, #{rest}."
   end
 
@@ -140,6 +141,10 @@ module Citation
   def holder(source) = [ source.collection, PUBLISHER ].compact.join(", ")
 
   def accession(source, words) = (source.accession ? "#{words} #{source.accession}" : nil)
+
+  # The stable identifier (CCS-22): CCS has no global ID, so with the collection and accession number above it is what a
+  # citation, or a request to reuse the object, quotes
+  def uom_id(source) = (source.uom_id ? "UoM ID #{source.uom_id}" : nil)
 
   def full_name(name) = name.person? ? "#{name.given} #{name.family}" : name.family
 

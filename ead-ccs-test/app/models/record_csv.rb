@@ -48,9 +48,5 @@ class RecordCsv
   private
 
   # The same UoM ID as the record page's details list
-  def uom_id
-    id = @document.id.to_s
-    prefix, uom_prefix = NexusCcs::RecordDocumentComponent::UOM_ID_PREFIXES.find { |solr_prefix, _| id.start_with?(solr_prefix) }
-    prefix ? id.sub(prefix, uom_prefix) : id
-  end
+  def uom_id = CollectionIdentifier.uom_id(@document.id)
 end

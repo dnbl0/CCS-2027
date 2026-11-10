@@ -11,6 +11,10 @@
       <dl class="access-form__record">
         <dt><%= t("#{t_key}.record") %></dt>
         <dd><%= link_to @access_request.document_title, solr_document_path(@access_request.document_id) %></dd>
+        <% if @access_request.document_identifier.present? %>
+          <dt><%= t("nexus_ccs.access_requests.identifier_label") %></dt>
+          <dd data-testid="record-identifier"><%= @access_request.document_identifier %></dd>
+        <% end %>
         <dt><%= t("#{t_key}.type") %></dt>
         <dd><%= t("nexus_ccs.access_requests.type_#{@access_request.request_type}") %></dd>
         <dt><%= t("#{t_key}.name") %></dt>
