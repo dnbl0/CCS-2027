@@ -5,7 +5,7 @@ require "test_helper"
 class PageConsistencyTest < ActionDispatch::IntegrationTest
   PAGES = %w[/ /browse /browse/makers /discover /help /about /accessibility /privacy /selection /bookmarks /my_data /lists/new /catalog/advanced].freeze
   # Pages with an h1 of their own that is the start of the <title> (the home page and /discover have a longer h1 or title)
-  TITLED = { "/help" => "Help and support", "/about" => "About", "/browse" => "Browse the collections", "/catalog/advanced" => "Advanced search",
+  TITLED = { "/help" => "Help and support", "/about" => "About Collections Navigator", "/browse" => "Browse the collections", "/catalog/advanced" => "Advanced search",
              "/selection" => "Selected records" }.freeze
 
   test "the saved-records link is in each page once (not in the header's top strip as well as the breadcrumb strip), besides the phone menu's copy" do

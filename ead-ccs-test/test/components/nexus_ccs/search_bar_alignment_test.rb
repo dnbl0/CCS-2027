@@ -11,6 +11,6 @@ class SearchBarAlignmentTest < ActiveSupport::TestCase
     assert rule, "the in-bar scope button rule (with the id in :is() so it outranks the site's dropdown rule)"
     assert_includes rule, "height: 100%;"
     assert_includes rule, "border: 0;"
-    assert_match(/border-left: 1px solid #d9d6cf;/, rule)
+    assert_match(/border-left: 1px solid var\(--ccs-border-default\);/, rule)
   end
 end
