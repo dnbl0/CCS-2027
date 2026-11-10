@@ -37,7 +37,9 @@ class AccessibilityTest < ApplicationSystemTestCase
   test "a record page has no axe violations" do
     visit search_catalog_path(any_assets: "1", q: "skull")
     first(".result-card .document-title-heading a").click
+    assert_no_selector ".result-card" # the results page has an h1 too: wait until the record page has replaced it
     assert_selector "h1"
+    assert_no_selector "html[aria-busy]" # Turbo marks the page busy while it navigates; axe flags that on the html element
     assert_accessible
   end
 
