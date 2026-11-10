@@ -1,7 +1,11 @@
-/* The home page's "Explore the collections" section (NexusCcs::ExploreComponent): the University's Sublink menu (Matrix CMS) with images,
-   on a grey band. A Fraunces H2 and a description, then three groups (object type, place, time), each with a bold navy H3, an optional
-   16:9 example picture (shown whole, never cropped), a list of arrow links with the count as the quiet description, and a "See all"
-   arrow link. Every link is at least 44px tall. Three columns from 1024px, stacked below. */
+/* The home page's "Explore the collections" section (NexusCcs::ExploreComponent), on a grey band. A Fraunces H2 and a line, then:
+   1. collection tiles, as the University's Listings component: a 16:10 face, the whole tile is the one link, its title an H3 inside the
+      link, the exact count in the same link. The face is a tinted letter (the designed default: few records have a picture) or, where
+      one was kept, the example picture shown whole and never cropped. Three per row from 768px, two from 600px, and a compact row
+      (a 48px face beside the text) on a phone.
+   2. "Kinds of records": a plain grouped list of arrow links (the University Library's collections page).
+   3. "Place and time": two lists of arrow links in disclosures, closed on a phone and open from 768px (explore_disclosure_controller.js).
+   Every link and summary is at least 44px tall. */
 .ccs-section.explore { background: var(--ccs-surface-subtle); }
 
 .explore__inner { display: flex; flex-direction: column; gap: var(--ccs-space-6); max-width: var(--layout-content-wide); }
@@ -10,67 +14,186 @@
 
 .explore__intro { margin: 0; font-size: var(--ccs-font-size-lg); color: var(--ccs-text-primary); }
 
-.explore__groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ccs-space-7) var(--ccs-space-6); }
+/* --- Collection tiles --- */
+.explore__tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ccs-space-5); margin: 0; padding: 0; list-style: none; }
 
-.explore__group { display: flex; flex-direction: column; gap: var(--ccs-space-3); min-width: 0; }
-
-/* The picture sits above its group; the group's H3 follows it. The caption is the link, so the image has empty alt. */
-.explore__figure { margin: 0 0 var(--ccs-space-2); }
-
-.explore__figure-link { display: flex; flex-direction: column; gap: var(--ccs-space-2); color: var(--ccs-text-link); text-decoration: none; }
-
-.explore__frame {
-  display: block; aspect-ratio: 16 / 9; overflow: hidden;
-  background: var(--ccs-surface-default); border: 1px solid var(--ccs-border-default);
+.explore__tile {
+  --explore-tint: var(--ccs-explore-tint-1);
+  min-width: 0; background: var(--ccs-surface-default); border: 1px solid var(--ccs-border-default);
 }
+
+.explore__tile--tint-2 { --explore-tint: var(--ccs-explore-tint-2); }
+.explore__tile--tint-3 { --explore-tint: var(--ccs-explore-tint-3); }
+.explore__tile--tint-4 { --explore-tint: var(--ccs-explore-tint-4); }
+.explore__tile--tint-5 { --explore-tint: var(--ccs-explore-tint-5); }
+.explore__tile--tint-6 { --explore-tint: var(--ccs-explore-tint-6); }
+
+.explore__tile:hover { border-color: var(--ccs-border-strong); }
+
+.explore__tile:focus-within { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+.explore__tile-link { display: flex; flex-direction: column; height: 100%; color: var(--ccs-text-link); text-decoration: none; }
+
+/* The focus ring is drawn on the tile, so the link itself has none */
+.explore__tile-link:focus-visible { outline: none; }
+
+.explore__face {
+  display: flex; align-items: flex-end; aspect-ratio: 16 / 10; overflow: hidden;
+  padding: var(--ccs-space-4); background: var(--explore-tint); color: var(--ccs-text-brand);
+}
+
+.explore__face--image { align-items: stretch; padding: 0; background: var(--ccs-surface-default); border-bottom: 1px solid var(--ccs-border-subtle); }
 
 .explore__image { display: block; width: 100%; height: 100%; object-fit: contain; }
 
-.explore__caption { font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); overflow-wrap: anywhere; }
+/* The first letter of the collection's name, large, in the heading face */
+.explore__monogram {
+  font-family: var(--ccs-font-heading); font-size: 5rem; line-height: 0.8; letter-spacing: -0.02em;
+  font-variation-settings: "SOFT" 50, "WONK" 0, "opsz" 144;
+}
 
-.explore__figure-link:hover .explore__caption { color: var(--ccs-text-link-hover); text-decoration: underline; }
+.explore__tile-body {
+  position: relative; display: flex; flex-direction: column; gap: var(--ccs-space-1); flex: 1;
+  padding: var(--ccs-space-4) var(--ccs-space-8) var(--ccs-space-4) var(--ccs-space-4);
+}
 
-.explore__figure-link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.explore__tile-title {
+  margin: 0; font-size: var(--ccs-heading-card-size); font-weight: var(--ccs-heading-weight-strong);
+  line-height: var(--ccs-line-height-tight); color: var(--ccs-text-link);
+}
+
+.explore__tile-count { font-size: var(--ccs-font-size-md); color: var(--ccs-text-secondary); }
+
+/* The arrow, at the end of the body */
+.explore__tile-body::after {
+  content: ""; position: absolute; right: var(--ccs-space-4); bottom: var(--ccs-space-4); width: 1.5rem; height: 1.5rem;
+  background: var(--ccs-text-link);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M17.15 12.75H4V11.25H17.15L10.95 5.05L12 4L20 12L12 20L10.95 18.95L17.15 12.75Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.explore__tile-link:hover .explore__tile-title { color: var(--ccs-text-link-hover); text-decoration: underline; }
+
+/* --- Kinds of records, and place and time --- */
+.explore__more { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ccs-space-7) var(--ccs-space-6); align-items: start; }
+
+.explore__group { display: flex; flex-direction: column; gap: var(--ccs-space-2); min-width: 0; }
 
 .explore__heading {
   margin: 0; font-size: var(--ccs-heading-subsection-size); font-weight: var(--ccs-heading-weight-strong);
   line-height: var(--ccs-line-height-tight); color: var(--ccs-text-brand);
 }
 
-.explore__list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.explore__links { margin: 0; padding: 0; list-style: none; }
 
-/* An arrow, the link text in bold blue, and the count under it in body text */
+.explore__links--columns { columns: 2; column-gap: var(--ccs-space-6); }
+
+.explore__links--columns li { break-inside: avoid; }
+
+/* An arrow link: the arrow, then the link text in bold blue */
 .explore__link {
-  display: grid; grid-template-columns: 1.5rem minmax(0, 1fr); column-gap: var(--ccs-space-2);
-  min-height: 44px; padding-block: var(--ccs-space-2);
-  color: var(--ccs-text-link); text-decoration: none;
+  display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: 44px;
+  font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); line-height: 1.5rem;
+  color: var(--ccs-text-link); text-decoration: none; overflow-wrap: anywhere;
 }
 
 .explore__link::before {
-  content: ""; grid-row: 1 / span 2; width: 1.5rem; height: 1.5rem; background: currentColor;
+  content: ""; flex: none; width: 1.5rem; height: 1.5rem; background: currentColor;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M17.15 12.75H4V11.25H17.15L10.95 5.05L12 4L20 12L12 20L10.95 18.95L17.15 12.75Z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
-.explore__label { font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); line-height: 1.5rem; overflow-wrap: anywhere; }
-
-.explore__count { grid-column: 2; font-size: var(--ccs-font-size-md); color: var(--ccs-text-secondary); }
-
-.explore__link:hover { color: var(--ccs-text-link-hover); }
-
-.explore__link:hover .explore__label { text-decoration: underline; }
+.explore__link:hover { color: var(--ccs-text-link-hover); text-decoration: underline; }
 
 .explore__link:focus-visible, .explore__all:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
-.explore__all { align-self: flex-start; margin-top: var(--ccs-space-2); }
+.explore__all { align-self: flex-start; }
 
-@media (max-width: 1023px) {
-  .explore__groups { grid-template-columns: 1fr; }
+.explore__disclosure { border-top: 1px solid var(--ccs-border-default); }
 
-  .explore__figure { max-width: 32rem; }
+.explore__disclosure:last-child { border-bottom: 1px solid var(--ccs-border-default); }
+
+.explore__disclosure > .explore__all { margin-bottom: var(--ccs-space-2); }
+
+.explore__summary {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--ccs-space-2); min-height: 44px; cursor: pointer; list-style: none;
+  font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-primary);
+}
+
+.explore__summary::-webkit-details-marker { display: none; }
+
+/* The state, drawn: a chevron pointing down when closed, up when open */
+.explore__summary::after {
+  content: ""; flex: none; width: 0.5rem; height: 0.5rem; margin-inline-end: var(--ccs-space-1);
+  border-right: 2px solid currentcolor; border-bottom: 2px solid currentcolor; transform: translateY(-2px) rotate(45deg);
+}
+
+.explore__disclosure[open] > .explore__summary::after { transform: translateY(2px) rotate(-135deg); }
+
+.explore__summary:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+@media (min-width: 768px) {
+  /* Wide screens: the lists show even before the script has opened the disclosures, so nothing moves when it does */
+  @supports selector(::details-content) {
+    .explore__disclosure::details-content { content-visibility: visible; }
+  }
+
+  .explore__disclosure .explore__links { column-count: 1; }
+}
+
+/* From 1024px the two lists sit side by side under the group's heading */
+@media (min-width: 1024px) {
+  .explore__group--time { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--ccs-space-6); align-items: start; }
+
+  .explore__group--time > .explore__heading { grid-column: 1 / -1; margin-bottom: var(--ccs-space-2); }
+
+  .explore__disclosure:last-child { border-bottom: 0; }
+}
+
+@media (max-width: 767px) {
+  .explore__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+  .explore__more { grid-template-columns: 1fr; gap: var(--ccs-space-5); }
+}
+
+@media (max-width: 1023px) and (min-width: 768px) {
+  .explore__links--columns { columns: 1; }
+}
+
+/* Phone: a tile is a compact row, a 48px face beside the title and the count */
+@media (max-width: 599px) {
+  .explore__inner { gap: var(--ccs-space-5); }
+
+  .explore__tiles { grid-template-columns: 1fr; gap: var(--ccs-space-2); }
+
+  .explore__tile-link { flex-direction: row; align-items: center; }
+
+  .explore__face { flex: none; align-items: center; justify-content: center; width: 3rem; aspect-ratio: 1; align-self: stretch; height: auto; padding: 0; }
+
+  .explore__face--image { width: 3.5rem; padding: var(--ccs-space-1); }
+
+  .explore__monogram { font-size: 1.75rem; line-height: 1; }
+
+  .explore__tile-body { justify-content: center; min-height: 3.5rem; padding-block: var(--ccs-space-2); }
+
+  .explore__tile-body::after { bottom: 50%; transform: translateY(50%); }
+
+  .explore__tile-title { font-size: var(--ccs-font-size-md); }
+
+  .explore__tile-count { font-size: var(--ccs-font-size-sm); }
+
+  /* The kinds list is two columns of plain rows: no arrows, so the labels wrap less */
+  .explore__links--columns .explore__link { font-size: var(--ccs-font-size-md); }
+
+  .explore__links--columns .explore__link::before { display: none; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .explore__link::before { transition: transform var(--ccs-duration-base); }
 
   .explore__link:hover::before { transform: translateX(var(--ccs-space-1)); }
+
+  .explore__tile-body::after { transition: translate var(--ccs-duration-base); }
+
+  .explore__tile-link:hover .explore__tile-body::after { translate: var(--ccs-space-1) 0; }
 }

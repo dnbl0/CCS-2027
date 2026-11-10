@@ -85,6 +85,15 @@
   --ccs-radius-control-sm: var(--ccs-radius-sm);
   --ccs-radius-panel: var(--ccs-radius-none);
   --ccs-space-panel: var(--ccs-space-5);
+
+  /* The face of a home page "Explore" collection tile that has no picture (components/explore.css): six quiet tints of the palette, each
+     with navy text (--ccs-text-brand) well above 4.5:1. The tile takes the next tint in order. */
+  --ccs-explore-tint-1: var(--ccs-sage-200);
+  --ccs-explore-tint-2: var(--ccs-cyan-150);
+  --ccs-explore-tint-3: var(--ccs-navy-200);
+  --ccs-explore-tint-4: var(--ccs-amber-100);
+  --ccs-explore-tint-5: var(--ccs-green-100);
+  --ccs-explore-tint-6: var(--ccs-sage-300);
 }
 
 @media (max-width: 767px) {
