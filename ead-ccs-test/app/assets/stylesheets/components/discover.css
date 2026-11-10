@@ -1,6 +1,6 @@
 /*
- * Similar records (record page), and Featured and trending (home page frame, /discover): the site's result cards in a grid.
- * Markup: views/discover/_cards, _section, pages/_featured_and_trending, NexusCcs::SimilarRecordsComponent. docs/similar-and-trending.md.
+ * Featured and trending (home page frame, /discover): the site's result cards in a grid.
+ * Markup: views/discover/_cards, _section, pages/_featured_and_trending, docs/similar-and-trending.md.
  * The lazy frames reserve their height while they load, and only while JavaScript runs (no-js is removed by the layout), so
  * a late-arriving section does not move what is below it, and a visitor without JavaScript is not left with an empty gap.
  */
@@ -129,30 +129,6 @@ h3.discover-section__heading {
     flex: none;
     width: 50%;
   }
-}
-
-/* Record page */
-.similar-records {
-  background: var(--ccs-surface-subtle);
-}
-
-.similar-records__inner {
-  max-width: calc(75rem + 2 * var(--record-gutter, 1rem));
-  margin-inline: auto;
-  padding: var(--ccs-space-7) var(--record-gutter, 1rem) var(--ccs-space-8);
-}
-
-.similar-records__heading {
-  margin: 0 0 var(--ccs-space-2);
-  font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-font-size-3xl);
-  font-weight: var(--ccs-font-weight-regular);
-  color: var(--ccs-text-brand);
-}
-
-.similar-records__description {
-  margin: 0 0 var(--ccs-space-5);
-  color: var(--ccs-text-secondary);
 }
 
 /* Home page: the frame holds the room its cards will need (the first section is a row of cards under a heading) */

@@ -5,7 +5,7 @@ Four ways into the collections that do not need a search. They sit on the record
 
 ## In plain language
 
-- **Similar records**: at the foot of a record page, up to six records that share its creator, subject, type of object or place.
+- **Similar records**: at the foot of a record page, up to four records that share its creator, subject, type of object or place, drawn as the same record cards as Related objects and Recently viewed (`NexusCcs::RecordCardComponent`). A record that Related objects already lists is left out (the page passes `?exclude=` ids to the frame).
 - **Featured**: records the collection teams chose (`config/featured.yml`).
 - **Pick of the day**: one record with an image anyone may download, chosen by the date, the same for everyone all day.
 - **Trending**: the records opened most often in the last seven days. The site counts page views per record per day and nothing about

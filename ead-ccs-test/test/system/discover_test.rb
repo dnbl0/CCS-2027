@@ -17,7 +17,7 @@ class DiscoverTest < ApplicationSystemTestCase
       page.execute_script("document.getElementById('similar-records').scrollIntoView()")
 
       assert_selector "#similar-records h2", text: "Similar records"
-      assert_selector "#similar-records article.result-card", minimum: 2
+      assert_selector "#similar-records article.object-card", minimum: 2
       page.execute_script("window.scrollTo(0, 0)") # the sticky search bar that appears on scrolling has a known landmark finding of its own
       assert_accessible tags: AXE_TAGS + WCAG22_TAGS
     end
@@ -43,6 +43,20 @@ class DiscoverTest < ApplicationSystemTestCase
       page.execute_script("window.scrollTo(0, 0)")
       assert_accessible tags: AXE_TAGS + WCAG22_TAGS
     end
+  end
+
+  test "the record page's card sections are whole-card links, in order, and do not scroll sideways at 390px" do
+    page.current_window.resize_to(390, 900)
+    visit "/catalog/#{first_id('id:(emu-10247 OR emu_mc-10247)')}"
+    page.execute_script("document.getElementById('similar-records').scrollIntoView()")
+
+    assert_selector "#similar-records article.object-card", minimum: 2
+    headings = page.all("h2", visible: :all).map(&:text)
+    assert_operator headings.index("Related objects") || 0, :<, headings.index("Similar records")
+    assert_selector "article.object-card h3.object-card__title a.object-card__link", minimum: 2
+    assert page.evaluate_script("document.documentElement.scrollWidth <= window.innerWidth"), "the page scrolls sideways"
+    page.execute_script("window.scrollTo(0, 0)")
+    assert_accessible tags: AXE_TAGS + WCAG22_TAGS
   end
 
   test "a record with a withheld asset has no Similar records section" do

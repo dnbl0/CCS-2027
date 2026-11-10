@@ -4,7 +4,7 @@
 # it comes from. A record with an image ranks above one without; the same collection only nudges the order, it is not a reason
 # to relate two records. The answer is kept for a day for each record (an answer that failed is not kept).
 module RelatedObjects
-  LIMIT = 6
+  LIMIT = 4 # one row of the record cards (the design system's most in a row)
   # field => how much a match counts towards the order; these fields also decide which records are related
   SIGNALS = { "object_type_ssim" => 4, "creator_ssim" => 3, "subject_ssim" => 2, "production_place_ssim" => 2 }.freeze
   NUDGE = { "collection_ssim" => 1, "has_digital_asset_bsi" => 2 }.freeze
@@ -16,7 +16,7 @@ module RelatedObjects
     clauses = SIGNALS.flat_map { |field, boost| values(document, field).map { |value| [ field, value, boost ] } }
     return [] if clauses.empty?
 
-    Rails.cache.fetch("related_objects/v1/#{document.id}", expires_in: 1.day, skip_nil: true) do
+    Rails.cache.fetch("related_objects/v2/#{document.id}", expires_in: 1.day, skip_nil: true) do
       RecordSummaries.fetch(params(document, clauses, limit), connection)
     end.to_a.map { |fields| SolrDocument.new(fields) }
   end

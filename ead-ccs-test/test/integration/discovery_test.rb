@@ -43,13 +43,19 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "turbo-frame#similar-records section[aria-labelledby=similar-records-heading]" do
       assert_select "h2#similar-records-heading", text: "Similar records"
-      assert_select "article.result-card", count: 2
-      assert_select "article[data-document-id='emu-a']"
-      assert_select "article[data-document-id='emu-b']"
+      assert_select "article.object-card", count: 2
+      assert_select "h3.object-card__title a[href='/catalog/emu-a']"
+      assert_select "h3.object-card__title a[href='/catalog/emu-b']"
     end
-    assert_select "article[data-document-id='emu-source']", count: 0
+    assert_select "a[href='/catalog/emu-source']", count: 0
     assert_no_match(/withheld-asset|sensitive-asset/, response.body)
     assert_no_match(/emu-withheld|emu-sensitive/, response.body)
+  end
+
+  test "records the page already lists as Related objects are left out of the similar records" do
+    solr { get "/catalog/emu-source/similar", params: { exclude: "emu-a,emu-b" } }
+
+    assert_response :no_content
   end
 
   test "the fragment is kept out of search results and is not a page of its own" do
