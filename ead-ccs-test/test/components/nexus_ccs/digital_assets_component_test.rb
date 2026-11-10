@@ -55,7 +55,9 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     render_for(assets(3).merge("licence_type_ssim" => [ "Copyright - Current" ],
                                "digital_media_ssim" => [ "video|video/mp4|/v.mp4|Film", "pdf|application/pdf|/d.pdf|Report" ]))
 
-    assert_selector ".access-notice--view-only a", text: "Request access to download this item"
+    assert_no_selector ".access-notice" # the notice is in the actions column (RecordActionsComponent)
+    assert_selector ".digital-assets__access--view-only", text: "View only"
+    assert_no_selector ".digital-assets__primary, a[download]"
     assert_selector "figure.digital-assets__main img[src='/digital-assets/large/a1.jpg']"
     assert_selector "video[controlslist=nodownload]"
     assert_no_selector "video a, a[href='/v.mp4'], a[href='/d.pdf'], .digital-assets__pdf"
@@ -70,9 +72,10 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_selector ".access-notice--request", text: "This item is available on request"
     assert_selector ".access-notice a", text: "Request access to this item"
     assert_no_selector "img, video, audio, figure, .digital-assets__others, [data-media-viewer-target=image]"
-    assert_no_selector "button[aria-label='Full screen']"
+    assert_no_selector "button", text: "Full screen", visible: :all
     assert_selector ".digital-assets__licence", text: "ICIP Rights"
-    assert_selector "button[aria-label='Media metadata']"
+    assert_selector "button[aria-controls=media-metadata]", text: "Media information"
+    assert_selector ".digital-assets__access--request", text: "Available on request"
     %w[/digital-assets /v.mp4 a1.jpg].each { |path| assert_not_includes rendered_content, path }
   end
 
@@ -95,7 +98,7 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_selector ".sensitivity-gate--ask button", text: "Do not view"
     assert_no_selector "img"
     assert_no_selector "video"
-    assert_no_selector "button[aria-label='Full screen']", visible: :all
+    assert_no_selector "button", text: "Full screen", visible: :all, visible: :all
     assert_not_includes rendered_content, "/digital-assets/"
     assert_not_includes rendered_content, "/v.mp4"
   end

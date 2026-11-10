@@ -1,0 +1,6 @@
+<p class="no-image" data-testid="no-image">
+  <%= t("nexus_ccs.record_page.no_image.sentence") %>
+  <% if href %>
+    <a href="<%= href %>"<% if new_tab? %> target="_blank" rel="noopener"<% end %>><%= t("nexus_ccs.record_page.no_image.ask") %><% if new_tab? %><span class="visually-hidden"> <%= t("nexus_ccs.record_page.no_image.ask_new_tab") %></span><% end %></a>
+  <% end %>
+</p>

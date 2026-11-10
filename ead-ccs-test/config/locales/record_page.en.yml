@@ -1,0 +1,56 @@
+en:
+  nexus_ccs:
+    # The record page's layout (NexusCcs::RecordDocumentComponent and the components it draws). Wording marked PLACEHOLDER
+    # is for the University and the collection teams to approve.
+    record_page:
+      header:
+        collection_id: "Collection ID"
+        copy: "Copy"
+        copy_label: "Copy collection ID"
+      no_image:
+        # PLACEHOLDER WORDING, NOT YET APPROVED
+        sentence: "No image of this record is available online."
+        ask: "Ask the collection team about this record"
+        ask_new_tab: "(opens in a new tab)"
+      access:
+        open: "Open: view and download"
+        view_only: "View only"
+        request: "Available on request"
+        download: "Download image"
+        download_label: "Download image of %{title}"
+      sections:
+        key_facts: "Key facts"
+        object_details: "Object details"
+        copyright: "Copyright and use"
+        about: "About this record"
+        actions: "Use this record"
+      key_facts:
+        date: "Date"
+        materials: "Materials"
+        classification: "Classification"
+        subject: "Subject"
+        collection: "Collection"
+        credit_line: "Credit line"
+      copyright:
+        licence: "Licence"
+        image_rights: "Image rights"
+        copyright: "Copyright"
+        credit_line: "Credit line"
+        caption: "Caption"
+        responsible_collection: "Responsible collection"
+        terms: "About copyright and terms of use"
+        ask: "Ask the collection team about reuse"
+      about:
+        persistent_link: "Persistent link"
+        contact: "Contact the collection team"
+        # PLACEHOLDER WORDING, NOT YET APPROVED
+        correction: "Suggest a correction to this record"
+        correction_note: "Records can hold outdated or incorrect information, and terms that are not appropriate today."
+      media:
+        information: "Media information"
+        full_screen: "Full screen"
+        exit_full_screen: "Exit full screen"
+        close_information: "Close media information"
+        licence: "Licence"
+      more_like_this:
+        heading: "More like this"

@@ -1,13 +1,13 @@
 <article class="<%= classes %>">
-  <div class="object-card__media<%= ' object-card__media--empty' unless image_path %>">
-    <% if image_path %>
+  <% if image_path %>
+    <div class="object-card__media">
       <%# The title names the record, so the image adds nothing to the link %>
       <%= image_tag image_path, alt: "", class: "object-card__image", loading: "lazy", decoding: "async" %>
-    <% else %>
-      <span class="object-card__type"><%= type_label %></span>
-    <% end %>
-  </div>
+    </div>
+  <% end %>
   <div class="object-card__body">
+    <%# A record with no image the visitor may see is a card of text: a small kicker, the title, the creator and date. No grey box. %>
+    <% unless image_path %><p class="object-card__kicker"><%= kicker %></p><% end %>
     <%= content_tag heading_tag, class: "object-card__title" do %>
       <%= link_to title, path, class: "object-card__link" %>
     <% end %>

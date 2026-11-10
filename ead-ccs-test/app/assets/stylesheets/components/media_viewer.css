@@ -106,9 +106,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ccs-space-2) var(--ccs-space-3);
-  padding: var(--ccs-space-2) var(--ccs-space-3);
-  max-width: 75rem;
-  margin: 0 auto;
+  padding: 0;
 }
 
 .compare-actions__form {

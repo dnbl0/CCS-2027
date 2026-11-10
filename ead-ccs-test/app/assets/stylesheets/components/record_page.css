@@ -1,12 +1,12 @@
 /*
- * A record's page, after the CCS UI "Record-detail" (Figma 258:25075, a rough demo: the layout and styling are
- * followed, the sizes adapted): a navy title band (centred), the digital asset section (digital_assets.css), a
- * summary (title, creator and date, tags), then in a 1440px column the details as a ruled list in a card with the
- * persistent link card below it, and a Copyright card beside them. Stacks below 1024px.
- * Markup: NexusCcs::RecordBannerComponent, NexusCcs::RecordDocumentComponent, NexusCcs::PersistentLinkComponent.
+ * A record's page: one header block (kicker, h1, creator and date, Collection ID), then two columns from 1200px and one below.
+ * Left: the media, or one plain sentence when the record has none, then the sections (Object details, Copyright and use, About this
+ * record). Right: a plain column, not sticky, of the actions and the Key facts. The order in the markup is the order on the page.
+ * Below 768px the sections are accordions (controllers/record_sections_controller.js); from 768px they are plain sections.
+ * Markup: NexusCcs::RecordHeaderComponent, RecordDocumentComponent, RecordActionsComponent, KeyFactsComponent, RecordAboutComponent.
  */
 :root {
-  --record-gutter: var(--ccs-space-6); /* 32px beside the 1440px column; 16px on a phone */
+  --record-gutter: var(--ccs-space-6); /* 32px beside the 1200px column; 16px on a phone */
 }
 
 body.blacklight-catalog-show {
@@ -34,80 +34,41 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   display: none;
 }
 
-/* Title band under the breadcrumb */
-.record-banner {
-  background: var(--ccs-navy-1200);
-  color: var(--ccs-text-inverse);
-}
-
-.record-banner__inner {
+.record-page__inner {
   max-width: calc(75rem + 2 * var(--record-gutter));
   margin-inline: auto;
-  padding: 2.25rem var(--record-gutter);
+  padding: var(--ccs-space-6) var(--record-gutter) var(--ccs-space-8);
 }
 
-.record-banner__title {
+/* The header block */
+.record-header {
+  max-width: 50rem;
+  margin-bottom: var(--ccs-space-5);
+}
+
+.record-header__kicker {
+  margin: 0 0 var(--ccs-space-2);
+  font-size: var(--ccs-font-size-md);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-secondary);
+}
+
+.record-header__title {
   margin: 0;
   font-family: var(--ccs-font-heading);
   font-size: var(--ccs-font-size-4xl);
   font-weight: var(--ccs-heading-weight);
   line-height: var(--ccs-line-height-tight);
-  text-align: center;
   text-wrap: balance;
   overflow-wrap: anywhere;
-}
-
-/* Summary: the creator and date, tags (the title is in the band above) */
-.record-summary__inner,
-.record-main__inner {
-  max-width: calc(75rem + 2 * var(--record-gutter));
-  margin-inline: auto;
-  padding-inline: var(--record-gutter);
-}
-
-/* Two columns: the title, creator and tags, and the Save button at the top right (it does not stack under the tags) */
-.record-summary__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: var(--ccs-space-4);
-  align-items: start;
-  padding-top: var(--ccs-space-5);
-}
-
-.record-summary__inner > :not(.record-summary__save) {
-  grid-column: 1;
-}
-
-/* The tags run the full width under the title and byline, so they wrap side by side rather than stacking in the
-   narrow column beside the Save button */
-.record-summary__inner > .record-summary__tags {
-  grid-column: 1 / -1;
-}
-
-.record-summary__save {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  justify-self: end;
-}
-
-.record-summary__title {
-  /* The band above the page shows the title; this h1 is the one the page keeps for assistive technology, in the
-     same place in the reading order (after the media), so it is visually hidden rather than shown twice. */
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+  color: var(--ccs-navy-1100);
 }
 
 .record-summary__byline {
-  margin: var(--ccs-space-2) 0 0;
+  margin: var(--ccs-space-3) 0 0;
   font-size: var(--ccs-font-size-lg);
   line-height: 1.5;
-  color: var(--ccs-text-secondary);
+  color: var(--ccs-text-primary);
 }
 
 /* The collection, accession number and UoM ID, with a Copy button (CCS-22) */
@@ -127,70 +88,54 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   font-weight: var(--ccs-font-weight-semibold);
 }
 
-.record-summary__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ccs-space-4);
-  margin: var(--ccs-space-5) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.record-tag {
-  display: inline-block;
-  padding-inline: var(--ccs-space-2);
-  background: var(--ccs-sage-200);
-  font-size: var(--ccs-font-size-sm);
-  font-weight: var(--ccs-font-weight-semibold);
-  line-height: 1.7;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: var(--ccs-text-brand);
-}
-
-.record-tag:hover,
-.record-tag:focus-visible {
-  background: var(--ccs-sage-300);
-  text-decoration: underline;
-}
-
-.record-tag:focus-visible {
-  outline: 3px solid var(--ccs-focus-ring);
-  outline-offset: 2px;
-}
-
-/* The two columns */
-.record-main__inner {
+/* The layout: one column, then two from 1200px. The right column is a plain column that scrolls with the page. */
+.record-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--ccs-space-5);
+  gap: var(--ccs-space-6);
   align-items: start;
-  padding-block: var(--ccs-space-7) 3.5rem;
 }
 
-@media (min-width: 1024px) {
-  .record-main__inner {
-    grid-template-columns: minmax(0, 1fr) 25.625rem; /* the card is 410px in the design */
-  }
-}
-
-.record-main__details {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ccs-space-5);
+.record-layout__media,
+.record-layout__aside,
+.record-layout__sections {
   min-width: 0;
 }
 
-.record-card {
-  border: 1px solid var(--ccs-border-panel);
-  background: var(--ccs-white);
+.record-layout__aside,
+.record-layout__sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-6);
 }
 
-/* Details: a heading, then term and description side by side, ruled with a hairline */
-.record-details__title {
+@media (min-width: 1200px) {
+  .record-layout {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-areas:
+      "media aside"
+      "sections aside";
+    column-gap: var(--ccs-space-7);
+  }
+
+  .record-layout__media { grid-area: media; }
+  .record-layout__aside { grid-area: aside; grid-row: 1 / span 2; }
+  .record-layout__sections { grid-area: sections; }
+}
+
+/* No image: one plain sentence, no box, no icon */
+.no-image {
   margin: 0;
-  padding: var(--ccs-space-5) var(--ccs-space-5) var(--ccs-space-2);
+  font-size: var(--ccs-font-size-md);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-secondary);
+}
+
+/* A section: its h2, then its body. A <details> so that a phone gets an accordion; the summary is a 44px row there. */
+.record-section__heading,
+.record-details__title,
+.record-copyright__title {
+  margin: 0;
   font-family: var(--ccs-font-heading);
   font-size: var(--ccs-heading-panel-size);
   font-weight: var(--ccs-heading-weight);
@@ -198,9 +143,96 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   color: var(--ccs-navy-1100);
 }
 
+.record-accordion {
+  border-top: 1px solid var(--ccs-border-default);
+}
+
+.record-accordion > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ccs-space-3);
+  min-height: 2.75rem;
+  padding-block: var(--ccs-space-3);
+  list-style: none;
+  cursor: pointer;
+}
+
+.record-accordion > summary::-webkit-details-marker {
+  display: none;
+}
+
+.record-accordion > summary::after {
+  content: "";
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--ccs-navy-1100);
+  border-bottom: 2px solid var(--ccs-navy-1100);
+  transform: rotate(45deg);
+}
+
+.record-accordion[open] > summary::after {
+  transform: rotate(-135deg);
+}
+
+.record-accordion > summary:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+/* From 768px the sections are plain: open, and the summary is a heading, not a control */
+.record-accordion.is-fixed > summary {
+  cursor: default;
+  min-height: 0;
+}
+
+.record-accordion.is-fixed > summary::after {
+  display: none;
+}
+
+.record-section__body {
+  padding-bottom: var(--ccs-space-5);
+}
+
+/* Key facts */
+.key-facts__list {
+  margin: var(--ccs-space-3) 0 0;
+}
+
+.key-facts__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ccs-space-1);
+  padding-block: var(--ccs-space-3);
+  border-top: 1px solid var(--ccs-border-subtle);
+  font-size: var(--ccs-font-size-md);
+  line-height: 1.5;
+}
+
+@media (min-width: 480px) {
+  .key-facts__row {
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: var(--ccs-space-4);
+  }
+}
+
+.key-facts__row dt {
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-secondary);
+}
+
+.key-facts__row dd {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Details: label above value on a phone; label left and value right from 768px */
 .record-details__list {
   margin: 0;
-  padding: var(--ccs-space-2) var(--ccs-space-5) var(--ccs-space-3);
 }
 
 .record-details__row {
@@ -208,25 +240,22 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   grid-template-columns: minmax(0, 1fr);
   gap: var(--ccs-space-1);
   padding-block: var(--ccs-space-3);
-  border-bottom: 1px solid var(--ccs-border-subtle);
-  font-size: var(--ccs-font-size-ui);
+  border-top: 1px solid var(--ccs-border-subtle);
+  font-size: var(--ccs-font-size-md);
   line-height: 1.5;
   color: var(--ccs-text-primary);
 }
 
-.record-details__row:last-child {
-  border-bottom: 0;
-}
-
 @media (min-width: 768px) {
   .record-details__row {
-    grid-template-columns: 30% 70%;
-    gap: var(--ccs-space-5);
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: var(--ccs-space-4);
   }
 }
 
 .record-details__row dt {
-  font-weight: var(--ccs-font-weight-bold);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-secondary);
 }
 
 .record-details__row dd {
@@ -235,10 +264,6 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   margin: 0;
   min-width: 0;
   overflow-wrap: anywhere;
-}
-
-.record-details__row dd a {
-  color: var(--ccs-text-link);
 }
 
 /* Description: collapsed to a few lines, with a Show more/Show less toggle (controllers/truncate_controller.js) */
@@ -298,39 +323,39 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   outline-offset: 2px;
 }
 
-/* Persistent link card */
+/* About this record: the persistent link, who to contact, and the correction link */
+.persistent-link,
+.contact-collection,
+.record-about__correction {
+  padding-block: var(--ccs-space-4);
+  border-top: 1px solid var(--ccs-border-subtle);
+}
+
+.persistent-link {
+  border-top: 0;
+  padding-top: 0;
+}
+
 .persistent-link__row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.875rem;
-  padding: var(--ccs-space-5);
-}
-
-.persistent-link__icon {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  background: var(--ccs-surface-raised);
-  color: var(--ccs-navy-1100);
+  gap: var(--ccs-space-3);
 }
 
 .persistent-link__text {
   display: flex;
   flex: 1 1 14rem;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--ccs-space-1);
   min-width: 0;
 }
 
 .persistent-link__heading {
   margin: 0;
   font-family: var(--ccs-font-body);
-  font-size: var(--ccs-font-size-2xs);
-  font-weight: var(--ccs-font-weight-bold);
+  font-size: var(--ccs-font-size-md);
+  font-weight: var(--ccs-font-weight-semibold);
   line-height: 1.5;
   color: var(--ccs-text-primary);
 }
@@ -351,8 +376,8 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   flex: none;
   align-items: center;
   gap: var(--ccs-space-2);
-  height: 2.5rem;
-  padding-inline: 0.875rem;
+  min-height: 2.5rem;
+  padding-inline: var(--ccs-space-3);
   border: 1px solid var(--ccs-navy-1100);
   background: var(--ccs-white);
   font-size: var(--ccs-font-size-ui);
@@ -371,8 +396,7 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   align-items: center;
   justify-content: space-between;
   gap: var(--ccs-space-2) var(--ccs-space-4);
-  padding: var(--ccs-space-5);
-  border-top: 1px solid var(--ccs-border-subtle);
+  margin-top: var(--ccs-space-3);
 }
 
 .persistent-link__note {
@@ -400,48 +424,42 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   display: none;
 }
 
-/* Copyright card */
-.record-copyright__none {
+
+.record-about__correction p {
   margin: 0;
-  padding: 0 var(--ccs-space-5) var(--ccs-space-3);
 }
 
-.record-copyright__title {
-  margin: 0;
-  padding: var(--ccs-space-5) var(--ccs-space-5) var(--ccs-space-3);
-  font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-heading-panel-size);
-  font-weight: var(--ccs-heading-weight);
-  line-height: var(--ccs-line-height-tight);
-  color: var(--ccs-navy-1100);
+/* Copyright and use */
+.record-copyright__none {
+  margin: var(--ccs-space-2) 0 0;
 }
 
 .record-copyright__list {
   display: flex;
   flex-direction: column;
-  margin: 0;
-  padding: var(--ccs-space-3) var(--ccs-space-5) 0;
+  margin: var(--ccs-space-3) 0 0;
 }
 
 .record-copyright__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ccs-space-1);
   padding-block: var(--ccs-space-3);
   border-top: 1px solid var(--ccs-border-subtle);
-  font-size: var(--ccs-font-size-sm);
+  font-size: var(--ccs-font-size-md);
   line-height: 1.5;
-  color: var(--ccs-text-secondary);
 }
 
-.record-copyright__item:first-child {
-  padding-top: 0;
-  border-top: 0;
+@media (min-width: 768px) {
+  .record-copyright__item {
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: var(--ccs-space-4);
+  }
 }
 
 .record-copyright__item dt {
-  margin-bottom: 3px;
-  font-size: var(--ccs-font-size-2xs);
-  font-weight: var(--ccs-font-weight-bold);
-  line-height: 1.5;
-  color: var(--ccs-text-primary);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-secondary);
 }
 
 .record-copyright__item dd {
@@ -449,42 +467,76 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   overflow-wrap: anywhere;
 }
 
-.record-copyright__item a,
-.record-copyright__terms a {
-  color: var(--ccs-text-link);
-}
-
 .record-copyright__terms {
+  margin: var(--ccs-space-3) 0 0;
+}
+
+/* The actions: one plain column beside the media, a wrapping strip below 1200px. Targets are 40px. */
+.record-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-4);
+}
+
+.record-actions__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ccs-space-3);
+}
+
+.record-actions__row > * {
   margin: 0;
-  padding: var(--ccs-space-3) var(--ccs-space-5) var(--ccs-space-5);
-  font-size: var(--ccs-font-size-ui);
+}
+
+.record-actions .access-notice {
+  margin: 0;
+  padding: var(--ccs-space-4);
+}
+
+.record-actions .access-notice__title {
+  font-family: var(--ccs-font-body);
+  font-size: var(--ccs-font-size-md);
   font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-primary);
 }
 
-.record-copyright__terms a {
-  text-decoration: underline;
-  text-underline-position: from-font;
+.record-actions .access-notice__action a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: var(--ccs-space-4);
+  background: var(--ccs-navy-1100);
+  color: var(--ccs-white);
+  text-decoration: none;
 }
 
+.record-actions .access-notice__action a:hover {
+  background: var(--ccs-navy-1200);
+}
+
+.record-actions .access-notice__action a:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Phone: the sections' gutters; the title is a size smaller */
 @media (max-width: 767px) {
   :root {
     --record-gutter: var(--ccs-space-4);
   }
 
-  .record-banner__title {
+  .record-header__title {
     font-size: var(--ccs-font-size-3xl);
   }
 
-  .record-details__list,
-  .persistent-link__row,
-  .persistent-link__footer {
-    padding-inline: var(--ccs-space-4);
+  .record-page__inner {
+    padding-top: var(--ccs-space-5);
   }
 
-  .record-copyright__title,
-  .record-copyright__none,
-  .record-copyright__list,
-  .record-copyright__terms {
-    padding-inline: var(--ccs-space-4);
+  .record-layout,
+  .record-layout__aside,
+  .record-layout__sections {
+    gap: var(--ccs-space-5);
   }
 }

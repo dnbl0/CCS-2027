@@ -23,7 +23,7 @@ class ContactCollectionComponentTest < ActiveSupport::TestCase
   test "an email collection gets one mailto link to its address, with the record's ID as the subject" do
     render_card
 
-    assert_selector "section[aria-labelledby=contact-collection-heading] h2#contact-collection-heading", text: "Contact the collection team"
+    assert_selector "[aria-labelledby=contact-collection-heading] h3#contact-collection-heading", text: "Contact the collection team"
     assert_selector "a[href^='mailto:mhm.info@unimelb.edu.au?']", text: "mhm.info@unimelb.edu.au", count: 1
     assert_equal "vernon-MHM00394", mailto_params["subject"]
   end

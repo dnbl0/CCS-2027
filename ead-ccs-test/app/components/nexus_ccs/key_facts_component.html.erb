@@ -1,0 +1,15 @@
+<section class="key-facts" aria-labelledby="key-facts-heading">
+  <h2 id="key-facts-heading" class="record-section__heading"><%= t("nexus_ccs.record_page.sections.key_facts") %></h2>
+  <dl class="key-facts__list">
+    <% facts.each do |fact| %>
+      <div class="key-facts__row">
+        <dt><%= fact.label %></dt>
+        <dd>
+          <% fact.values.each do |value| %>
+            <span class="key-facts__value"><% if (path = link_path(fact, value)) %><%= link_to value, path %><% else %><%= value %><% end %></span>
+          <% end %>
+        </dd>
+      </div>
+    <% end %>
+  </dl>
+</section>

@@ -42,7 +42,7 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "turbo-frame#similar-records section[aria-labelledby=similar-records-heading]" do
-      assert_select "h2#similar-records-heading", text: "Similar records"
+      assert_select "h3#similar-records-heading", text: "Similar records"
       assert_select "article.object-card", count: 2
       assert_select "h3.object-card__title a[href='/catalog/emu-a']"
       assert_select "h3.object-card__title a[href='/catalog/emu-b']"

@@ -2,18 +2,22 @@
    section (NexusCcs::RecordCardsComponent), after the University design system's Card and Listings. The card is one link
    (the title's link is stretched over it), its image is shown whole in a 16:9 frame, and a record without an image has a placeholder. */
 .object-cards {
+  margin-top: var(--ccs-space-6);
+}
+
+/* More like this: the h2 and its sub-sections, in the record's own column (the sub-sections are h3s) */
+.more-like-this {
   border-top: 1px solid var(--ccs-border-default);
   padding-block: var(--ccs-space-7);
 }
 
-/* The same column as the record's summary and details (record_page.css) */
-.object-cards__inner {
+.more-like-this__inner {
   max-width: calc(75rem + 2 * var(--record-gutter, var(--ccs-space-6)));
   margin-inline: auto;
   padding-inline: var(--record-gutter, var(--ccs-space-6));
 }
 
-/* As the headings of Object details and Copyright */
+.more-like-this__heading,
 .object-cards__heading {
   margin: 0;
   font-family: var(--ccs-font-heading);
@@ -23,8 +27,24 @@
   color: var(--ccs-navy-1100);
 }
 
+/* The sub-sections are h3s: the card heading size */
+.object-cards--nested .object-cards__heading {
+  font-family: var(--ccs-font-body);
+  font-size: var(--ccs-heading-card-size);
+  font-weight: var(--ccs-heading-weight-strong);
+}
+
+.more-like-this__heading + .object-cards {
+  margin-top: var(--ccs-space-5);
+}
+
+/* Similar records fills a lazy frame; when it answers with nothing and there is nothing else, the whole block goes */
+.more-like-this:has(turbo-frame[complete]:empty):not(:has(.object-card)) {
+  display: none;
+}
+
 .object-cards__description {
-  margin: var(--ccs-space-2) 0 0;
+  margin: var(--ccs-space-1) 0 0;
   color: var(--ccs-text-secondary);
 }
 
@@ -32,9 +52,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--ccs-space-5);
-  margin: var(--ccs-space-5) 0 0;
+  margin: var(--ccs-space-4) 0 0;
   padding: 0;
   list-style: none;
+  align-items: start;
 }
 
 .object-cards__item {
@@ -50,19 +71,14 @@
   .object-cards__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
-/* Recently viewed is a history aid, not a recommendation: quieter and smaller, and it never takes the eye from the sections above */
-.object-cards--compact {
-  padding-block: var(--ccs-space-6);
-  background: var(--ccs-surface-subtle);
-}
-
+/* Recently viewed is a history aid, not a recommendation: quieter and smaller */
 .object-cards--compact .object-cards__heading {
-  font-size: var(--ccs-font-size-lg);
+  font-size: var(--ccs-font-size-md);
 }
 
 .object-cards--compact .object-cards__list {
   gap: var(--ccs-space-4);
-  margin-top: var(--ccs-space-4);
+  margin-top: var(--ccs-space-3);
 }
 
 /* The card */
@@ -106,13 +122,11 @@
   object-fit: contain;
 }
 
-.object-card__type {
-  padding: var(--ccs-space-2) var(--ccs-space-4);
+/* A card with no image is text only: a small kicker, the title, the creator and date. No box. */
+.object-card__kicker {
+  margin: 0;
   font-size: var(--ccs-font-size-sm);
-  font-weight: var(--ccs-font-weight-semibold);
-  letter-spacing: 0.08em;
-  text-align: center;
-  text-transform: uppercase;
+  line-height: var(--ccs-line-height-normal);
   color: var(--ccs-text-secondary);
 }
 
@@ -167,7 +181,6 @@
 .object-card--compact .object-card__body { padding: var(--ccs-space-3) var(--ccs-space-4); }
 .object-card--compact .object-card__title { font-size: var(--ccs-font-size-md); }
 .object-card--compact .object-card__meta { font-size: var(--ccs-font-size-sm); }
-.object-card--compact .object-card__media { aspect-ratio: 16 / 7; }
 
 /* Similar records load into a lazy frame: it holds a card row's room while it fetches, so the page below does not jump */
 .similar-frame {
@@ -175,7 +188,7 @@
 }
 
 .similar-frame[busy] {
-  min-height: 24rem;
+  min-height: 12rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

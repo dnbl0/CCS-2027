@@ -1,10 +1,9 @@
 <section id="digital-assets" class="digital-assets" data-controller="media-viewer" aria-labelledby="digital-assets-heading">
   <h2 id="digital-assets-heading" class="visually-hidden">Digital <%= "asset".pluralize(count + media.size) %></h2>
 
+  <%# The image sits on the page, whole, at its own shape: the width and height attributes hold its space while it loads (a flat tint,
+      never a tall dark band). Dark only in full screen and in the zoom viewer. %>
   <div class="digital-assets__stage" data-media-viewer-target="stage">
-    <%# Centring and clipping live on this inner area, not the stage itself: the Media metadata panel below is a
-        sibling of it, not a child, so opening the panel (a position: absolute slide) can never feed back into
-        the centred image's layout (see digital_assets.css). %>
     <div class="digital-assets__media-area">
       <% if withheld? %>
         <%= render NexusCcs::AccessNoticeComponent.new(document: @document) %>
@@ -14,7 +13,6 @@
       <% end %>
       <% if main %>
         <figure class="digital-assets__main">
-          <%# The first thing on the page to paint: fetched first, and sized so the space is held before it arrives %>
           <%= image_tag main.first, alt: alt(1), class: "digital-assets__image", data: { media_viewer_target: "image" },
                 fetchpriority: "high", decoding: "async", **image_size(main.first) %>
           <%= render NexusCcs::DeepZoomComponent.new(sources: zoom_sources, label: alt(1)) %>
@@ -32,29 +30,6 @@
 
     <% if sensitivity_state == :viewing %>
       <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: :viewing) %>
-    <% end %>
-
-    <% if tier == :view_only %>
-      <%= render NexusCcs::AccessNoticeComponent.new(document: @document) %>
-    <% end %>
-
-    <% if metadata? %>
-      <aside id="media-metadata" class="digital-assets__panel" aria-labelledby="media-metadata-heading" aria-hidden="true" data-media-viewer-target="panel">
-        <div class="digital-assets__panel-head">
-          <h3 id="media-metadata-heading" class="digital-assets__panel-title">Media metadata</h3>
-          <button type="button" class="digital-assets__button" data-action="media-viewer#closePanel" aria-label="Close media metadata">
-            <svg width="1em" height="1em" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.67" stroke-linecap="square" aria-hidden="true" focusable="false"><path d="M4.5 4.5l11 11M15.5 4.5l-11 11" /></svg>
-          </button>
-        </div>
-        <dl class="digital-assets__list">
-          <% metadata.each do |label, text| %>
-            <div class="digital-assets__item">
-              <dt><%= label %></dt>
-              <dd><%= text %></dd>
-            </div>
-          <% end %>
-        </dl>
-      </aside>
     <% end %>
   </div>
 
@@ -78,25 +53,47 @@
     </ul>
   <% end %>
 
-  <%= render NexusCcs::CompareActionsComponent.new(document: @document, images: count) if assets_shown? %>
-
+  <%# One slim toolbar directly under the image: what the visitor may do (chip) and under what licence on the left, the media tools
+      (with text labels) and the one primary action on the right %>
   <div class="digital-assets__toolbar">
     <div class="digital-assets__toolbar-inner">
-      <% if licence %>
-        <p class="digital-assets__licence"><%= icon("media-copyright") %><span><span class="visually-hidden">Licence: </span><%= licence %></span></p>
-      <% else %>
-        <span></span>
-      <% end %>
+      <div class="digital-assets__chips">
+        <p class="digital-assets__access digital-assets__access--<%= tier.to_s.dasherize %>" data-testid="access-chip"><%= access_chip %></p>
+        <% if licence %>
+          <p class="digital-assets__licence"><%= icon("media-copyright") %><span><span class="visually-hidden">Licence: </span><%= licence %></span></p>
+        <% end %>
+      </div>
       <div class="digital-assets__controls">
         <% if metadata? %>
-          <button type="button" class="digital-assets__button" aria-controls="media-metadata" aria-expanded="false" aria-label="Media metadata" title="Media metadata"
-                  data-media-viewer-target="infoButton" data-action="media-viewer#togglePanel"><%= icon("media-info") %></button>
+          <button type="button" class="digital-assets__button" aria-controls="media-metadata" aria-expanded="false"
+                  data-media-viewer-target="infoButton" data-action="media-viewer#togglePanel"><%= icon("media-info") %><span><%= t("nexus_ccs.record_page.media.information") %></span></button>
         <% end %>
-        <% if assets_shown? %>
-        <button type="button" class="digital-assets__button" aria-label="Full screen" title="Full screen" hidden
-                data-media-viewer-target="fullscreenButton" data-action="media-viewer#toggleFullscreen"><%= icon("media-fullscreen") %></button>
+        <% if assets_shown? && main %>
+          <button type="button" class="digital-assets__button" hidden
+                  data-media-viewer-target="fullscreenButton" data-action="media-viewer#toggleFullscreen"
+                  data-label-on="<%= t("nexus_ccs.record_page.media.exit_full_screen") %>" data-label-off="<%= t("nexus_ccs.record_page.media.full_screen") %>"><%= icon("media-fullscreen") %><span data-media-viewer-target="fullscreenLabel"><%= t("nexus_ccs.record_page.media.full_screen") %></span></button>
+        <% end %>
+        <% if download_href %>
+          <a class="digital-assets__primary" href="<%= download_href %>" download aria-label="<%= t("nexus_ccs.record_page.access.download_label", title: title) %>"><%= t("nexus_ccs.record_page.access.download") %></a>
         <% end %>
       </div>
     </div>
   </div>
+
+  <% if metadata? %>
+    <aside id="media-metadata" class="digital-assets__panel" aria-labelledby="media-metadata-heading" aria-hidden="true" data-media-viewer-target="panel">
+      <div class="digital-assets__panel-head">
+        <h3 id="media-metadata-heading" class="digital-assets__panel-title">Media metadata</h3>
+        <button type="button" class="digital-assets__button" data-action="media-viewer#closePanel"><span><%= t("nexus_ccs.record_page.media.close_information") %></span></button>
+      </div>
+      <dl class="digital-assets__list">
+        <% metadata.each do |label, text| %>
+          <div class="digital-assets__item">
+            <dt><%= label %></dt>
+            <dd><%= text %></dd>
+          </div>
+        <% end %>
+      </dl>
+    </aside>
+  <% end %>
 </section>

@@ -3,19 +3,6 @@
  * the Cite dialog's look (components/citations.css, modal.css). The embed pages are plain: one card, no site header or script,
  * sized to sit in a frame from 320px wide.
  */
-/* Cite this record and Share and embed sit side by side under the tags, the same size */
-.record-summary__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ccs-space-2);
-  margin-top: var(--ccs-space-3);
-}
-
-.record-summary__actions > .record-summary__cite,
-.record-summary__actions > .record-summary__share {
-  margin: 0;
-}
-
 .share__body {
   display: grid;
   gap: var(--ccs-space-5);

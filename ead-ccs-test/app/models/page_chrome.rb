@@ -20,7 +20,7 @@ PageChrome = Data.define(:breadcrumbs, :banner, :saved_bar) do
     in [ "catalog", "index" ]
       searching ? with_trail([ [ "Search results", nil ] ], banner: :search) : new(breadcrumbs: [], banner: :search, saved_bar: :header)
     in [ "browse", _ ] then new(breadcrumbs: [], banner: nil, saved_bar: :page) # the browse pages draw their own strip (PageBreadcrumbsComponent), which carries the saved bar
-    in [ "catalog", "show" ] then with_trail(record_trail(page.record_title, page.results_url), banner: :record)
+    in [ "catalog", "show" ] then with_trail(record_trail(page.record_title, page.results_url), banner: nil)
     in [ "catalog", "advanced_search" ] then with_trail([ [ "Advanced search", nil ] ], banner: :advanced_search)
     in [ "catalog", _ ] then new(breadcrumbs: [], banner: :search, saved_bar: :header)
     in [ "bookmarks", _ ] then with_trail([ [ I18n.t("nexus_ccs.saved.list_title"), nil ] ], banner: nil)
