@@ -42,6 +42,7 @@
       <%= content_for(:skip_links) %>
     <% end %>
 
+    <%= render "layouts/cookie_notice" %>
     <%= render "layouts/noscript_notice" %>
     <%= render blacklight_config.header_component.new(blacklight_config: blacklight_config) %>
 

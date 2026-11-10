@@ -93,6 +93,8 @@ Rails.application.routes.draw do
   # Accessibility statement and privacy notice (CCS-148); placeholder wording until the University approves it
   get "accessibility", to: "pages#accessibility", as: :accessibility
   get "privacy", to: "pages#privacy", as: :privacy
+  # The answer to the cookie notice (CCS-471): a POST only, so nothing here for a crawler to list
+  post "cookie_notice", to: "cookie_notices#create", as: :cookie_notice
 
   # For crawlers (CCS-128, CCS-127): generated, so the environment's settings apply. The sitemap is an index of pages of up to 10,000 URLs.
   get "robots.txt", to: "seo#robots", format: false

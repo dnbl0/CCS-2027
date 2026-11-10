@@ -1,0 +1,72 @@
+/*
+ * The cookie notice (NexusCcs::CookieNoticeComponent, CCS-471): a band at the top of the page, in the page's flow (so nothing
+ * moves when it loads, and it never covers a focused control), light with a navy rule under it. The text and the buttons sit side
+ * by side on a wide window and stack on a phone. The buttons are ordinary .btn-primary buttons, all of one kind.
+ */
+.cookie-notice {
+  background: var(--ccs-surface-subtle);
+  border-bottom: 1px solid var(--ccs-border-strong);
+  color: var(--ccs-text-primary);
+  /*
+   * The system face, not the site's web fonts: the notice is the first thing on the page, so when Source Sans 3 swapped in
+   * its lines wrapped differently and the whole page below moved (measured: a 24px shift, 0.039 CLS). A system face never swaps.
+   */
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.cookie-notice .btn {
+  font-family: inherit;
+}
+
+.cookie-notice__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ccs-space-4);
+  max-width: 1272px; /* the page's 1240px content column plus the 16px side padding */
+  margin: 0 auto;
+  padding: var(--ccs-space-4) var(--space-16);
+}
+
+.cookie-notice__text {
+  flex: 1 1 32rem;
+  max-width: 70ch;
+  font-size: var(--ccs-font-size-md);
+  line-height: 1.5;
+}
+
+.cookie-notice__text p,
+.cookie-notice__list {
+  margin: 0 0 var(--ccs-space-2);
+}
+
+.cookie-notice__title {
+  margin: 0 0 var(--ccs-space-2);
+  font-family: inherit;
+  font-size: var(--ccs-font-size-xl);
+  font-weight: var(--ccs-font-weight-semibold);
+  line-height: 1.2;
+  color: var(--ccs-text-brand);
+}
+
+.cookie-notice__text a {
+  color: var(--ccs-text-link);
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+.cookie-notice__placeholder {
+  font-size: var(--ccs-font-size-sm);
+  color: var(--ccs-text-secondary);
+}
+
+.cookie-notice__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-3);
+}
+
+.cookie-notice__form {
+  margin: 0;
+}

@@ -15,6 +15,7 @@
   </head>
   <body class="<%= content_for(:body_class) %>">
     <a href="#main-content" class="skip-link">Skip to main content</a>
+    <%= render "layouts/cookie_notice" %>
     <%= render "layouts/noscript_notice" %>
     <%= render blacklight_config.header_component.new(blacklight_config: blacklight_config) %>
     <%= render "shared/flash_msg", layout: "shared/flash_messages" if flash.any? %>

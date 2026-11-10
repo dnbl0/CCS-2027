@@ -28,7 +28,7 @@ each can be changed. **Plain-language summary first.**
 
 | Item | Who decides | Where it shows | What is in place |
 |---|---|---|---|
-| Legal and privacy wording | The privacy, legal and accessibility owners | `/privacy`, `/accessibility`, the Delete my data page, the access request form, the share dialog, the sensitivity notice, `llms.txt`, trending retention text | Every one is marked placeholder (`[Placeholder ...]` or `data-placeholder-wording`). The register of files is in `docs/compliance-register.md`. |
+| Legal and privacy wording | The privacy, legal and accessibility owners | `/privacy`, `/accessibility`, the Delete my data page, the access request form, the share dialog, the sensitivity notice, the cookie notice, `llms.txt`, trending retention text | Every one is marked placeholder (`[Placeholder ...]` or `data-placeholder-wording`). The register of files is in `docs/compliance-register.md`. |
 | The de-bias term list | The collections team, with Indigenous advisers | `config/debias_terms.yml` (shipped empty) | The mechanism, the import (`bin/rails debias:import CSV=...`), the report (`bin/rails debias:report`) and the explanatory page are built. No terms were invented. See `ead-ccs-test/docs/debias-terms.md`. |
 | Cultural-protocols and entity-page notices | Indigenous advisers | Record and entity pages | Placeholder wording. |
 | Featured blurbs and Discover wording | The collection teams | `config/featured.yml`, `config/locales/discover.en.yml` | Placeholder. |

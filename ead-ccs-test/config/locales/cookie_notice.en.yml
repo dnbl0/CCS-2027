@@ -1,0 +1,30 @@
+en:
+  nexus_ccs:
+    # The cookie notice (CookieNotice, NexusCcs::CookieNoticeComponent) and the cookie list on /privacy (CCS-471). ALL of this
+    # wording is PLACEHOLDER wording for the University's privacy and legal owners to approve; the notice says so on the page.
+    cookie_notice:
+      title: "Cookies on this site"
+      intro_essential_only: "This site sets only the cookies it needs to work as you ask: it uses them to keep your search history, saved items and choices, and to remember what you have read here. It sets no advertising or analytics cookies, so there is nothing for you to switch on or off."
+      intro_with_choice: "This site sets cookies it needs to work, and would like to set the optional cookies below. We set them only if you accept."
+      essential_always: "The cookies the site needs to work are always set. They keep your search history, saved items and choices, and remember what you have read here."
+      more_html: "See <a href=\"%{privacy}\">what each cookie does and how long it lasts</a>."
+      placeholder: "[Placeholder wording: the University to approve this notice.]"
+      ok: "OK"
+      accept: "Accept optional cookies"
+      decline: "Decline optional cookies"
+      # The cookie list on /privacy
+      privacy:
+        intro: "These are all the cookies this site sets. Every one is needed for the site to work as you ask, so none can be switched off."
+        none_optional: "The site sets no optional cookies: no advertising, analytics or tracking cookies."
+        lifetime: "How long it lasts"
+        essential: "Needed"
+      cookies:
+        session:
+          purpose: "Links your browser to your search history, saved records, lists, saved searches and your choices about sensitive records. It holds no name or email address."
+          lifetime: "Up to 30 days"
+        country:
+          purpose: "Remembers that you have read the Acknowledgement of Country, so it is not shown again the same day. Set the first time the home page is shown."
+          lifetime: "1 day"
+        notice:
+          purpose: "Remembers that you have read the cookie notice, so it is not shown again. It holds no identifier."
+          lifetime: "About 6 months"

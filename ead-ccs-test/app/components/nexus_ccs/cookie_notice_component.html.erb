@@ -1,0 +1,31 @@
+<section class="cookie-notice" aria-labelledby="cookie-notice-title" data-controller="cookie-notice" data-turbo-temporary data-placeholder-wording>
+  <div class="cookie-notice__inner">
+    <div class="cookie-notice__text">
+      <h2 class="cookie-notice__title" id="cookie-notice-title"><%= t("nexus_ccs.cookie_notice.title") %></h2>
+      <% if choosable? %>
+        <p><%= t("nexus_ccs.cookie_notice.intro_with_choice") %></p>
+        <ul class="cookie-notice__list">
+          <% optional.each do |category| %>
+            <li><strong><%= t("nexus_ccs.cookie_notice.optional.#{category.key}.name") %>.</strong> <%= t("nexus_ccs.cookie_notice.optional.#{category.key}.purpose") %></li>
+          <% end %>
+        </ul>
+        <p><%= t("nexus_ccs.cookie_notice.essential_always") %></p>
+      <% else %>
+        <p><%= t("nexus_ccs.cookie_notice.intro_essential_only") %></p>
+      <% end %>
+      <p><%= t("nexus_ccs.cookie_notice.more_html", privacy: helpers.privacy_path(anchor: "cookies")) %></p>
+      <p class="cookie-notice__placeholder"><span data-placeholder><%= t("nexus_ccs.cookie_notice.placeholder") %></span></p>
+    </div>
+
+    <%= helpers.form_with url: helpers.cookie_notice_path, method: :post, class: "cookie-notice__form", data: { turbo: false, action: "submit->cookie-notice#save" } do %>
+      <div class="cookie-notice__actions">
+        <% if choosable? %>
+          <button type="submit" name="choice" value="declined" class="btn btn-primary"><%= t("nexus_ccs.cookie_notice.decline") %></button>
+          <button type="submit" name="choice" value="accepted" class="btn btn-primary"><%= t("nexus_ccs.cookie_notice.accept") %></button>
+        <% else %>
+          <button type="submit" name="choice" value="acknowledged" class="btn btn-primary"><%= t("nexus_ccs.cookie_notice.ok") %></button>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</section>

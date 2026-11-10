@@ -112,7 +112,8 @@ class PerformanceTest < ActionDispatch::IntegrationTest
 
   # HTML: measured 40-46 kB (9-10 kB gzipped) on 2 Nov 2026; the home page grew by about 2.5 kB with the "Explore by" tiles
   # and by about 0.5 kB with the "Featured and trending" heading, link and lazy frame (its records load later, not in this HTML)
-  { "/" => 62_000, "/help" => 56_000, "/about" => 50_000 }.each do |path, budget|
+  # CCS-471: the cookie notice adds about 1.7 kB to a page a visitor has not answered it on (the test's first visit), so the home budget rose from 62 to 64 kB
+  { "/" => 64_000, "/help" => 56_000, "/about" => 50_000 }.each do |path, budget|
     test "#{path} stays within its HTML size budget (#{budget / 1000} kB, #{14} kB compressed)" do
       get path, headers: { "Accept-Encoding" => "identity" }
       assert_operator response.body.bytesize, :<=, budget

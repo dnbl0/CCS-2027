@@ -1,0 +1,2 @@
+<%# The cookie notice (CCS-471) until the visitor has answered it. Embed pages use their own layout and never render it. %>
+<%= render NexusCcs::CookieNoticeComponent.new if CookieNotice.pending?(cookies) %>
