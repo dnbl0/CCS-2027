@@ -46,9 +46,9 @@
 
 .explore__image { display: block; width: 100%; height: 100%; object-fit: contain; }
 
-/* The first letter of the collection's name, large, in the heading face */
+/* The first letters of the collection's first two words, large, in the heading face */
 .explore__monogram {
-  font-family: var(--ccs-font-heading); font-size: 5rem; line-height: 0.8; letter-spacing: -0.02em;
+  font-family: var(--ccs-font-heading); font-size: 4.25rem; line-height: 0.8; letter-spacing: -0.03em;
   font-variation-settings: "SOFT" 50, "WONK" 0, "opsz" 144;
 }
 
@@ -172,7 +172,7 @@
 
   .explore__face--image { width: 3.5rem; padding: var(--ccs-space-1); }
 
-  .explore__monogram { font-size: 1.75rem; line-height: 1; }
+  .explore__monogram { font-size: 1.25rem; line-height: 1; letter-spacing: 0; }
 
   .explore__tile-body { justify-content: center; min-height: 3.5rem; padding-block: var(--ccs-space-2); }
 

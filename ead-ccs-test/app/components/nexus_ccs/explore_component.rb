@@ -19,8 +19,8 @@ module NexusCcs
 
     def count_label(count) = t("explore.count", count: count, number: helpers.number_with_delimiter(count))
 
-    # The first letter of the collection's name: the typographic face of a tile with no picture (decoration, hidden from assistive technology)
-    def monogram(tile) = tile.label.to_s.strip[0].to_s.upcase
+    # The first letters of the collection's first two words (UA, MH, GM): the typographic face of a tile with no picture (decoration, hidden from assistive technology)
+    def monogram(tile) = tile.label.to_s.split.first(2).map { |word| word[0].to_s.upcase }.join
 
     # Whether the tile has a picture to draw. The picture is a record's thumbnail, so only a record whose asset anyone may download and that
     # is not sensitive is ever given here (ExploreEntryPoints); this is the second lock, not the only one. The Indigenous Collections tile is

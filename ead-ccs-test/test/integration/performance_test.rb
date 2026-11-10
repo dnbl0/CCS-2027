@@ -13,10 +13,11 @@ class PerformanceTest < ActionDispatch::IntegrationTest
     @cache = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
     Rails.cache.write(BrowseMenu::CACHE_KEY, { BrowseMenu::WITH_IMAGES => 1 }, expires_in: 1.day) # as if already fetched, so no Solr is needed
-    # The home page's Explore section, full-sized (8 object types, 8 places, every period), so the budget below covers it
+    # The home page's Explore section, full-sized (six collection tiles, every kind, five places, every period), so the budget below covers it
     Rails.cache.write(ExploreEntryPoints::CACHE_KEY, {
-      ExploreEntryPoints::OBJECT_TYPE_FIELD => Array.new(8) { |n| [ "Object type number #{n}", 1000 - n ] },
-      ExploreEntryPoints::PLACE_FIELD => Array.new(8) { |n| [ "Place number #{n}", 900 - n ] },
+      "collections" => Array.new(6) { |n| [ "Collection with a long name number #{n}", 1000 - n ] },
+      "kinds" => ExploreEntryPoints.kinds.map { |label, values| [ label, 500, values ] },
+      "places" => Array.new(5) { |n| [ "Place number #{n}", 900 - n ] },
       "periods" => ExploreEntryPoints.periods.to_h { |_label, first, last| [ ExploreEntryPoints.period_key(first, last), 500 ] }
     }, expires_in: 1.day)
   end
@@ -141,8 +142,8 @@ class PerformanceTest < ActionDispatch::IntegrationTest
     assert_empty site.grep(/openseadragon|stock_/), "the site's pages preload the record viewer"
     assert_not_empty stock.grep(/openseadragon/), "the stock record page needs the viewer"
     # Each Stimulus controller is one small file, so this count grows with features (53 after the selection and media viewer
-    # controllers, 3 Nov 2026). The size that matters is the script bytes budget; this only stops a library sneaking in.
-    assert_operator site.size, :<=, 56, "the site's pages preload more scripts than the budget allows"
+    # controllers, 3 Nov 2026; 57 with the Explore disclosure controller, 11 Nov 2026). The size that matters is the script bytes budget; this only stops a library sneaking in.
+    assert_operator site.size, :<=, 57, "the site's pages preload more scripts than the budget allows"
   end
 
   test "a page does not preload the record viewer" do
