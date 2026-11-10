@@ -68,7 +68,8 @@ RightsStatements.org URI (public domain: CC Public Domain Mark; copyright: In Co
   (only `.jpg` and `.png` files under `public` are measured) is left out, as a canvas needs a size.
 - `:view_only` records are listed because their images can be viewed; the manifest points to the same files the page does. The
   image files are public static files, so "no download" is a browser-level courtesy on this site, not a protection.
-- Cache and CORS. An ordinary manifest is the same for everyone: `Cache-Control: public, max-age=3600`, and
+- Cache and CORS. An ordinary manifest is the same for everyone: `Cache-Control: public, max-age=0, must-revalidate` with an ETag
+  (a repeat request is a 304 while nothing changed, and a replaced image shows at once; see [media-refresh.md](media-refresh.md)), and
   `Access-Control-Allow-Origin: *` so a viewer on another site can read it (the IIIF spec's recommendation). A sensitive record the
   visitor chose to view depends on their session cookie: `private, no-store` and no CORS header (another origin sends no cookie
   and would get the 404).

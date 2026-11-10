@@ -11,6 +11,16 @@
       <%# The title band above the page is aria-hidden; this is the page's one h1 %>
       <h1 class="record-summary__title"><%= heading %></h1>
       <% if byline %><p class="record-summary__byline"><%= byline %></p><% end %>
+      <%# The stable identifier (CCS-22): CCS has no global ID, so the collection, its accession number and the UoM ID, to quote %>
+      <p class="record-summary__identifier" data-testid="record-identifier" data-controller="clipboard">
+        <span class="record-summary__identifier-label">Collection ID</span>
+        <span data-clipboard-target="source" data-copy="<%= identifier %>"><%= identifier %></span>
+        <button type="button" class="record-copy" data-action="clipboard#copy" data-clipboard-target="button" aria-label="Copy collection ID">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="1" /><path d="M5 15V5a1 1 0 0 1 1-1h10" /></svg>
+          <span data-clipboard-target="label">Copy</span>
+        </button>
+        <span class="visually-hidden" role="status" data-clipboard-target="status"></span>
+      </p>
       <% if tags.any? %>
         <ul class="record-summary__tags" aria-label="Tags">
           <% tags.each do |tag| %>

@@ -23,6 +23,8 @@
     <dl class="access-form__record">
       <dt><%= t("nexus_ccs.access_requests.record_label") %></dt>
       <dd><%= link_to document_presenter(@document).heading, solr_document_path(@document.id) %></dd>
+      <dt><%= t("nexus_ccs.access_requests.identifier_label") %></dt>
+      <dd data-testid="record-identifier"><%= CollectionIdentifier.new(@document) %></dd>
       <dt><%= t("nexus_ccs.access_requests.type_label") %></dt>
       <dd><%= t("nexus_ccs.access_requests.type_#{@request_type}") %></dd>
     </dl>

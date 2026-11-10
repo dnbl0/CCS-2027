@@ -55,6 +55,7 @@ module NexusCcs
       return [] unless assets_shown?
 
       items = Array(@document["digital_media_ssim"]).map { |entry| Collections::DigitalMedia.parse(entry) }
+                                                    .map { |item| item.merge(url: AssetVersion.url(item[:url]), captions: AssetVersion.url(item[:captions]), transcript: AssetVersion.url(item[:transcript])) }
       downloadable? ? items : items.select { |item| %w[video audio].include?(item[:kind]) }
     end
 
@@ -134,7 +135,8 @@ module NexusCcs
     private
 
     # Nothing of a withheld asset (or one the visitor has not chosen to view) reaches the page, not even as a path
-    def large_paths = assets_shown? ? Array(@document["digital_asset_large_paths_ssim"]) : []
-    def thumbnail_paths = assets_shown? ? Array(@document["digital_asset_paths_ssim"]) : []
+    # (and the addresses carry a version token, AssetVersion, so a replaced file is fetched again)
+    def large_paths = assets_shown? ? Array(@document["digital_asset_large_paths_ssim"]).map { |path| AssetVersion.url(path) } : []
+    def thumbnail_paths = assets_shown? ? Array(@document["digital_asset_paths_ssim"]).map { |path| AssetVersion.url(path) } : []
   end
 end

@@ -9,11 +9,26 @@ module ImageDimensions
 
   module_function
 
-  # [width, height] or nil for a path such as "/digital-assets/large/x.jpg"
+  # [width, height] or nil for a path such as "/digital-assets/large/x.jpg" (a "?v=" token on it is ignored). The size is read
+  # again when the file's modified time or size changes: a replaced image (an orientation fix) can have swapped its sides (CCS-425).
   def for_path(path, root: Rails.public_path)
     return unless path.is_a?(String) && path.start_with?("/") && !path.include?("..")
 
-    SIZES[path] ||= read(root.join(path.delete_prefix("/"))) # a file not there yet is looked for again next time
+    file = root.join(path.split("?", 2).first.delete_prefix("/"))
+    stamp = stamp(file) or return # a file not there yet is looked for again next time
+    cached_stamp, size = SIZES[file.to_s]
+    return size if cached_stamp == stamp && size
+
+    size = read(file)
+    SIZES[file.to_s] = [ stamp, size ] if size
+    size
+  end
+
+  def stamp(file)
+    stat = File.stat(file)
+    [ stat.mtime.to_f, stat.size ] if stat.file?
+  rescue SystemCallError
+    nil
   end
 
   def read(file)

@@ -59,8 +59,11 @@ class PerformanceTest < ActionDispatch::IntegrationTest
     assert_equal "public, max-age=31536000, immutable", static_cache_control("/assets/application-11c958ae.css")
   end
 
-  test "the records' images are cached for a day and other public files for an hour" do
-    assert_equal "public, max-age=86400", static_cache_control("/digital-assets/large/x.jpg")
+  # CCS-425: a file can be replaced under the same name, so an address without the version token is revalidated, not kept for a day
+  test "the records' images are cached for a year at a versioned address, revalidated at any other, and other public files for an hour" do
+    assert_equal "public, max-age=31536000, immutable", static_cache_control("/digital-assets/large/x.jpg?v=69a1b2c3f00")
+    assert_equal "public, max-age=0, must-revalidate", static_cache_control("/digital-assets/large/x.jpg")
+    assert_equal "public, max-age=0, must-revalidate", static_cache_control("/digital-assets/large/x.jpg?v=")
     assert_equal "public, max-age=3600", static_cache_control("/icon.png")
   end
 
@@ -75,7 +78,7 @@ class PerformanceTest < ActionDispatch::IntegrationTest
     assert_equal "public, max-age=3600", response.headers["cache-control"]
 
     get "/digital-assets/thumbs/0000_013_1_pf.jpg"
-    assert_equal "public, max-age=86400", response.headers["cache-control"]
+    assert_equal "public, max-age=0, must-revalidate", response.headers["cache-control"]
   end
 
   test "the stylesheet is linked once and the fingerprinted address is served from the asset server" do

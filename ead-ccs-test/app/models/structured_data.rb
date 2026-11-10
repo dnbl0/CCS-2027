@@ -49,7 +49,7 @@ module StructuredData
     path = document["thumbnail_path_ssi"].presence
     return unless path && AccessPolicy.tier(document) == :open && !Sensitivity.sensitive?(document)
 
-    path.start_with?("http") ? path : "#{base_url}#{path}"
+    path.start_with?("http") ? path : "#{base_url}#{AssetVersion.url(path)}"
   end
 
   # The JSON for a <script type="application/ld+json"> element. < > & and the line separators are written as \u escapes, so
