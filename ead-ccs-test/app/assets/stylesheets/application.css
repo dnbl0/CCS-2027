@@ -12,6 +12,7 @@
 @import url("tokens/semantic.css");
 @import url("tokens/static_site.css");
 @import url("unimelb.css");
+@import url("components/links.css");
 @import url("components/page_loader.css");
 @import url("components/arrow_link.css");
 @import url("components/site_header.css");

@@ -49,7 +49,7 @@
   height: 4rem;
   box-sizing: border-box;
   padding: 1rem;
-  font-size: 1.5rem;
+  font-size: var(--ccs-font-size-2xl);
   font-family: "source sans 3", "helvetica", "arial", sans-serif;
   color: var(--ccs-navy-1100);
 }
@@ -86,7 +86,7 @@
   background: none;
   border: 0;
   color: var(--ccs-white);
-  font-size: 0.875rem;
+  font-size: var(--ccs-font-size-sm);
   cursor: pointer;
   padding: 0.4375rem;
 }

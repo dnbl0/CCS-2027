@@ -52,7 +52,7 @@ class SiteChromeTest < ActiveSupport::TestCase
     render_header
 
     assert_selector "nav.breadcrumb-bar[aria-label=Breadcrumb] li span[aria-current=page]", text: "Search results"
-    assert_selector "section.search-banner .search-banner__title", text: "Search the Collection"
+    assert_selector "section.search-banner .search-banner__title", text: "Search the collections"
     assert_selector "section.search-banner form.search-banner__form"
     assert_no_selector "h1" # the banner title is not a heading: pages render their own h1
     assert_no_selector "nav.topbar" # Blacklight's own top navbar is replaced
@@ -67,7 +67,7 @@ class SiteChromeTest < ActiveSupport::TestCase
     assert_no_text "Featured named collections"
     assert_no_selector "#site-nav-records .site-nav__browse-more a", text: /\AAll( [\d,]+)? records\z/
     assert_selector "#site-nav-records .site-nav__browse-more a", text: /\AOnly records with images/
-    assert_selector "#site-nav-records .site-nav__browse-more a[href='/catalog/advanced']", text: "Advanced Search"
+    assert_selector "#site-nav-records .site-nav__browse-more a[href='/catalog/advanced']", text: "Advanced search"
   end
 
   test "My saved items lists the visitor's own pages: saved records, lists, saved searches and the search history" do

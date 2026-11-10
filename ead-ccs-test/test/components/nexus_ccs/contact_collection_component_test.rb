@@ -56,7 +56,7 @@ class ContactCollectionComponentTest < ActiveSupport::TestCase
     assert_selector ".contact-collection__team", text: "Medical History Museum"
   end
 
-  test "a collection with no contact points to the Contact Us section of Help" do
+  test "a collection with no contact points to the Contact us section of Help" do
     render_card("collection_ssim" => [ "Somewhere Else" ])
 
     assert_no_selector "a[href^='mailto:']"

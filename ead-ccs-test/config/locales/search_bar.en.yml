@@ -2,10 +2,12 @@ en:
   blacklight:
     advanced_search:
       # The link under the search bar, styled like the footer links
-      more_options: Advanced Search
+      more_options: Advanced search
       # The page's title, from the reviewed copy (page 6). Blacklight's own form, otherwise unchanged
       form:
-        title: Advanced Search
-        # The CCS design's wording (Figma, Advanced Search)
+        title: Advanced search
+        # The line under the page title, as the other pages have one: plain, what the page does
+        description: Search by several fields at once, then narrow the results by details such as maker, date or collection.
+        # The CCS design's wording (Figma, Advanced search)
         query_criteria_heading_html: "Find items that match %{select_menu} of the fields below"
-      page_title: Advanced Search - %{application_name}
+      page_title: Advanced search - %{application_name}

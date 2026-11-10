@@ -66,11 +66,11 @@
 }
 
 h2.discover-section__heading {
-  font-size: var(--ccs-font-size-3xl);
+  font-size: var(--ccs-heading-section-size);
 }
 
 h3.discover-section__heading {
-  font-size: var(--ccs-font-size-2xl);
+  font-size: var(--ccs-heading-panel-size);
 }
 
 .discover-section__description {

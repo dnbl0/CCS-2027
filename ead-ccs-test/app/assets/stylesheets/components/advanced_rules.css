@@ -27,7 +27,7 @@
 form.advanced .advanced-rule select.form-select {
   height: 3rem;
   border: 1px solid var(--ccs-navy-1100);
-  border-radius: 0;
+  border-radius: var(--ccs-radius-none);
   font-size: var(--ccs-font-size-md);
   color: var(--ccs-text-primary);
 }
@@ -84,7 +84,7 @@ fieldset.advanced-rule--extra > .advanced-rule__legend + .advanced-rule__control
 fieldset.advanced-rule--extra input[type="text"] {
   height: 3rem;
   border: 1px solid var(--ccs-navy-1100);
-  border-radius: 0;
+  border-radius: var(--ccs-radius-none);
   font-size: var(--ccs-font-size-md);
 }
 
@@ -92,7 +92,7 @@ fieldset.advanced-rule--extra input[type="text"] {
 .advanced-rule__remove,
 .advanced-rules__add {
   min-height: 2.75rem;
-  border-radius: 0;
+  border-radius: var(--ccs-radius-none);
   font-size: var(--ccs-font-size-md);
   font-weight: var(--ccs-font-weight-semibold);
 }
@@ -125,9 +125,9 @@ fieldset.advanced-rule--extra input[type="text"] {
 /* "Rules" is a sub-heading of the Search tips panel: the panel's serif, a step smaller than "Search tips" */
 .advanced-search-tips__subtitle {
   margin: var(--ccs-space-4) 0 var(--ccs-space-2);
-  font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-font-size-lg);
-  font-weight: var(--ccs-font-weight-semibold);
+  font-family: var(--ccs-font-body);
+  font-size: var(--ccs-heading-card-size);
+  font-weight: var(--ccs-heading-weight-strong);
   line-height: var(--ccs-line-height-tight);
   color: var(--ccs-navy-1100);
 }
@@ -211,7 +211,7 @@ fieldset.advanced-rule--extra input[type="text"] {
   left: 2px;
   width: 1.125rem;
   height: 1.125rem;
-  border-radius: 50%;
+  border-radius: var(--ccs-radius-circle);
   background: var(--ccs-navy-1100);
   transition: transform 120ms ease;
 }

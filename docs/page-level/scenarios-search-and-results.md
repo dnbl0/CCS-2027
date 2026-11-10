@@ -18,7 +18,7 @@ Key numbers
 | S3 | Any | Typeahead | Happy | typing in banner or overlay | Autocomplete from the `suggest` handler | search_banner_component.rb:16 | R |
 | S4 | Any | Query over 255 | Edge | typing or pasting | `maxlength=255`; server also trims | query_rules.rb:12-16 | R |
 | H1 | Results | Bare front page | Happy | `/` or `/catalog`, no params | Redirects to `f[has_digital_asset][]=with&view=masonry`; "Records with digital assets" switch on | catalog_controller.rb:128-132 | Both |
-| H2 | Results | Banner | Happy | any results page | "Search the Collection"; "Explore artworks, objects, manuscripts, photographs and recordings held across the University of Melbourne's cultural collections."; search form; "Advanced Search" link | search_banner_component.rb:7-8 | Both |
+| H2 | Results | Banner | Happy | any results page | "Search the collections"; "Explore artworks, objects, manuscripts, photographs and recordings held across the University of Melbourne's cultural collections."; search form; "Advanced search" link | search_banner_component.rb:7-8 | Both |
 | H3 | Results | Banner summary | Happy | `?q=skull` | "1,234 results for "skull"" replaces the description | search_banner_component.rb:37-44 | R |
 | H4 | Results | Toolbar count | Happy | `?q=skull` | h2 "N results for" then pills; "N results" with no query or filters | constraints_component.rb:22-26 | Both |
 | H5 | Results | One result | Edge | query matching one record | "1 result" | same | Both |
@@ -69,8 +69,8 @@ Key numbers
 | L1 | Loading | Page loader | Happy | first paint up to 15s | Navy cover, spinner, "Loading Cultural Collections Search" | page_loader.css:1-25 | R |
 | L2 | Loading | Skeleton | Happy | change slower than 150ms | Tiles, facet values and pills shimmer grey; pagination and toolbar at 50%; `aria-busy`; reduced motion flat grey | search_loading.js; skeleton.css | R |
 | L3 | Loading | Static skeleton | Happy | any change (static) | 420ms loading state with placeholder cards, "Loading results" | search-results.html:376-384 | S |
-| A1 | Advanced | Page | Happy | `/catalog/advanced` | Banner "Advanced Search" / "Combine fields and filters to find exactly what you're looking for across every collection."; Search (rows, "Add row"), Filters ("Add filter"), Dates, "Sort results by"; "Start over", "Search"; Search help sidebar | advanced_search.en.yml | Both |
-| A2 | Advanced | Flyout | Happy | "Advanced Search" link (XHR) | Same form in a modal, prefilled; static iframe flyout; full width at 576 and under | advanced_flyout.css:91 | Both |
+| A1 | Advanced | Page | Happy | `/catalog/advanced` | Banner "Advanced search" / "Combine fields and filters to find exactly what you're looking for across every collection."; Search (rows, "Add row"), Filters ("Add filter"), Dates, "Sort results by"; "Start over", "Search"; Search help sidebar | advanced_search.en.yml | Both |
+| A2 | Advanced | Flyout | Happy | "Advanced search" link (XHR) | Same form in a modal, prefilled; static iframe flyout; full width at 576 and under | advanced_flyout.css:91 | Both |
 | A3 | Advanced | Row limit | Edge | reaching 8 rows | "You can add up to 8 rows." | advanced_search_form_component.rb:16 | R |
 | A4 | Advanced | Empty submit | Sad | search with nothing entered | "There is a problem": "Enter search terms or choose a filter to search." | advanced_search_controller.js:137-143 | R |
 | A5 | Advanced | Date order | Sad | From later than To | "<Field>: the From year must not be later than the To year." | same | R |

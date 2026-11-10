@@ -140,18 +140,18 @@ class SearchJourneysTest < ApplicationSystemTestCase
 
   test "the advanced search link is a standalone page, Blacklight's own form, not a modal" do
     visit search_catalog_path(any_assets: "1", q: "skull")
-    click_link "Advanced Search"
+    click_link "Advanced search"
 
     assert_current_path(%r{\A/catalog/advanced\?.*clause.*skull})
     assert_no_selector "dialog#blacklight-modal[open]"
-    assert_selector "h1", text: "Advanced Search"
-    assert_selector "nav.breadcrumb-bar li", text: "Advanced Search"
+    assert_selector "h1", text: "Advanced search"
+    assert_selector "nav.breadcrumb-bar li", text: "Advanced search"
     assert_selector "form.advanced"
   end
 
   test "the advanced search form is Blacklight's own: one fixed row per search field, a plain match-all/any select" do
     visit search_catalog_path(any_assets: "1", q: "skull")
-    click_link "Advanced Search"
+    click_link "Advanced search"
 
     op = find("select#op", visible: :all)
     assert_equal %w[must should], op.all("option", visible: :all).map { |o| o["value"] }
@@ -239,6 +239,6 @@ class SearchJourneysTest < ApplicationSystemTestCase
     assert_selector "#site-nav", visible: true
 
     find("button.site-nav__trigger[aria-controls=site-nav-help]").click
-    assert_selector "#site-nav-help a", text: "Frequently Asked Questions", visible: true
+    assert_selector "#site-nav-help a", text: "Frequently asked questions", visible: true
   end
 end

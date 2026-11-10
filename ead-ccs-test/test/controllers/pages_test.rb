@@ -81,7 +81,7 @@ class PagesTest < ActionDispatch::IntegrationTest
     assert_select "p.help-intro", count: 1
   end
 
-  test "the Contact Us section lists the collection contacts, and the Indigenous section links to the priorities" do
+  test "the Contact us section lists the collection contacts, and the Indigenous section links to the priorities" do
     get "/help"
 
     assert_select "#contact-us .help-section__contact", minimum: 5
@@ -102,7 +102,7 @@ class PagesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the old search tips topic link goes to the tips on the Advanced Search page" do
+  test "the old search tips topic link goes to the tips on the Advanced search page" do
     get "/help", params: { topic: "search-tips" }
 
     assert_redirected_to "/catalog/advanced#advanced-search-tips-title"

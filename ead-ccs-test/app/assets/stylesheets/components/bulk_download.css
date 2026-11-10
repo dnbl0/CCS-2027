@@ -5,7 +5,7 @@
 .bulk-select {
   margin-bottom: var(--ccs-space-5);
   border: 1px solid var(--ccs-border-panel);
-  border-radius: 0.25rem;
+  border-radius: var(--ccs-radius-sm);
   background: var(--ccs-white);
 }
 

@@ -33,7 +33,7 @@
 .explore__figure-link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
 .explore__heading {
-  margin: 0; font-size: var(--ccs-font-size-2xl); font-weight: var(--ccs-font-weight-bold);
+  margin: 0; font-size: var(--ccs-heading-subsection-size); font-weight: var(--ccs-heading-weight-strong);
   line-height: var(--ccs-line-height-tight); color: var(--ccs-text-brand);
 }
 

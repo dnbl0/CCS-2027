@@ -38,7 +38,7 @@
   margin: var(--ccs-space-2) 0 0;
   font-size: var(--ccs-font-size-lg);
   line-height: 1.75rem;
-  color: rgb(255 255 255 / 92%);
+  color: var(--ccs-text-inverse-strong);
   text-wrap: pretty;
 }
 
@@ -69,13 +69,13 @@
 }
 
 :is(.search-banner, .ccs-hero__search, .sticky-search) .input-group:focus-within {
-  box-shadow: 0 0 0 3px rgb(70 200 240 / 45%);
+  box-shadow: 0 0 0 3px var(--ccs-focus-ring-glow-on-dark);
 }
 
 :is(.search-banner, .ccs-hero__search, .sticky-search) .input-group > * {
   height: 100%;
   border: 0;
-  border-radius: 0;
+  border-radius: var(--ccs-radius-none);
 }
 
 :is(.search-banner, .ccs-hero__search, .sticky-search) .search-autocomplete-wrapper {
@@ -104,8 +104,8 @@
   width: auto;
   max-width: 12.5rem;
   padding-inline: 0.875rem 2rem;
-  border-left: 1px solid #d9d6cf;
-  background-color: #f4f5f8;
+  border-left: 1px solid var(--ccs-border-default);
+  background-color: var(--ccs-surface-raised);
   font-size: var(--ccs-font-size-sm);
   font-weight: var(--ccs-font-weight-semibold);
   color: var(--ccs-navy-1100);
@@ -146,7 +146,7 @@
   white-space: nowrap;
 }
 
-/* Advanced Search: a link under the search bar, styled like the footer links: a blue arrow, then a bold white label */
+/* Advanced search: a link under the search bar, styled like the footer links: a blue arrow, then a bold white label */
 :is(.search-banner, .ccs-hero__search, .sticky-search) .advanced_search {
   display: inline-flex;
   align-items: center;
@@ -216,7 +216,7 @@
     width: 100%;
     max-width: none;
     height: 2.75rem;
-    border-top: 1px solid #d9d6cf;
+    border-top: 1px solid var(--ccs-border-default);
     border-left: 0;
   }
 }
@@ -238,8 +238,8 @@
   height: 100%;
   line-height: calc(3rem - 2px);
   border: 0;
-  border-left: 1px solid #d9d6cf;
-  border-radius: 0;
+  border-left: 1px solid var(--ccs-border-default);
+  border-radius: var(--ccs-radius-none);
 }
 
 @media (max-width: 575.98px) {
@@ -253,7 +253,7 @@
   .search-banner .input-group > :is(#sortAndPerPage .btn-group, .ccs-select) > .dropdown-toggle {
     height: 2.75rem;
     line-height: 2.75rem;
-    border-top: 1px solid #d9d6cf;
+    border-top: 1px solid var(--ccs-border-default);
     border-left: 0;
   }
 }

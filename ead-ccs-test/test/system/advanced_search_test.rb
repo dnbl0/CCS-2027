@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-# The advanced search page (the CCS design, Figma "Advanced Search"): Blacklight's own form under a page banner, beside the search tips.
+# The advanced search page (the CCS design, Figma "Advanced search"): Blacklight's own form under a page banner, beside the search tips.
 class AdvancedSearchTest < ApplicationSystemTestCase
   setup { page.driver.set_cookie("country_acknowledged", "1") }
 
@@ -8,7 +8,7 @@ class AdvancedSearchTest < ApplicationSystemTestCase
     visit "/catalog/advanced"
 
     assert_selector "h1", count: 1
-    assert_selector ".page-banner h1", text: "Advanced Search"
+    assert_selector ".page-banner h1", text: "Advanced search"
     assert_no_selector ".page-banner .page-banner__desc"
     assert_selector ".advanced-search__form form.advanced"
     assert_selector ".advanced-search__tips section.advanced-search-tips h2", text: "Search tips"

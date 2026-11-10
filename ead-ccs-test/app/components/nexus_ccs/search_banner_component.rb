@@ -4,7 +4,7 @@ module NexusCcs
   # Dark banner under the site header: page title, result summary and the search form.
   # Takes the place of Blacklight's light search band (Blacklight::SearchNavbarComponent).
   class SearchBannerComponent < Blacklight::SearchNavbarComponent
-    TITLE = "Search the Collection"
+    TITLE = "Search the collections"
     DESCRIPTION = "Explore artworks, objects, manuscripts, photographs and recordings held across the University of Melbourne's cultural collections."
 
     # The gem's default classes size the form with grid columns; the banner sizes it in CSS.

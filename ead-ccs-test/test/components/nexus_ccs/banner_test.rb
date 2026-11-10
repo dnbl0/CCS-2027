@@ -7,7 +7,7 @@ class BannerTest < ActiveSupport::TestCase
 
   test "the banner copy is the default description until there is a search" do
     assert_match(/Explore artworks, objects, manuscripts/, NexusCcs::SearchBannerComponent::DESCRIPTION)
-    assert_equal "Search the Collection", NexusCcs::SearchBannerComponent::TITLE
+    assert_equal "Search the collections", NexusCcs::SearchBannerComponent::TITLE
   end
 
   test "the banner styles follow the static page: 48px bar, 720px, visible Advanced search link" do

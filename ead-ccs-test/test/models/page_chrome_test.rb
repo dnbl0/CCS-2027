@@ -53,10 +53,17 @@ class PageChromeTest < ActiveSupport::TestCase
     assert_equal :breadcrumb, record.saved_bar
   end
 
+  test "a browse page draws its own breadcrumb strip, so the saved bar is not also in the header" do
+    browse = chrome("browse", "index")
+
+    assert_equal [], browse.breadcrumbs
+    assert_equal :page, browse.saved_bar
+  end
+
   test "advanced search: its own trail and page banner, not the search banner" do
     advanced = chrome("catalog", "advanced_search")
 
-    assert_equal [ [ "Advanced Search", nil ] ], advanced.breadcrumbs
+    assert_equal [ [ "Advanced search", nil ] ], advanced.breadcrumbs
     assert_equal :advanced_search, advanced.banner
   end
 

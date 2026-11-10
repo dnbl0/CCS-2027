@@ -2,7 +2,7 @@
 
 module NexusCcs
   # The search bar of the sticky strip: the same bar as the banner's and the home hero's (query, scope menu, search
-  # button, "Advanced Search" link), built from the same Blacklight SearchBarComponent. It shares a page with that
+  # button, "Advanced search" link), built from the same Blacklight SearchBarComponent. It shares a page with that
   # bar, so its field ids are namespaced ("sticky_q", "sticky_search_field"), the search button and the suggestion list
   # have their own ids; the field names stay q and search_field, so it submits exactly like the other. Suggestions as
   # you type are Blacklight's own (the same suggest endpoint as the banner's bar).

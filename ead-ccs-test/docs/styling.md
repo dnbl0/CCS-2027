@@ -86,7 +86,7 @@ informed the drawer and cards. Files: `components/results_layout.css`, `filter_d
 `results_toolbar.css`, `search_banner.css`; `NexusCcs::FilterSidebarComponent`, `FilterToggleComponent`,
 `ConstraintsComponent`, `ResultCardComponent`; `catalog/_sort_and_per_page.html.erb`.
 
-- **Banner**: compact: "Search the Collection" and a 2.5rem search bar (field selector left, cyan button).
+- **Banner**: compact: "Search the collections" and a 2.5rem search bar (field selector left, cyan button).
   The result count moved to the toolbar; "Advanced search" is a link under the search bar in the banner, as on the static site.
 - **Sidebar** (left, flush with the window edge, ruled on its right): the "Search filters (n)" heading, then Blacklight's own facet
   groups (the workbook's section titles as headings) of accordion filters. Creator role sits above Creator name (in the design,

@@ -133,9 +133,9 @@ body.blacklight-catalog-index .search-banner__inner {
 
 .results-empty__title {
   margin: 0;
-  font-family: var(--font-heading);
-  font-size: var(--font-size-title-4);
-  font-weight: var(--font-weight-medium);
+  font-family: var(--ccs-font-body);
+  font-size: var(--ccs-heading-subsection-size);
+  font-weight: var(--ccs-heading-weight-strong);
 }
 
 .results-empty__text {

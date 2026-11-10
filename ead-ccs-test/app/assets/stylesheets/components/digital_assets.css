@@ -6,7 +6,7 @@
  * controllers/media_viewer_controller.js.
  */
 .digital-assets {
-  --media-band: #1a1a1a;
+  --media-band: var(--ccs-text-primary);
   margin: 0;
   background: var(--media-band);
   border-bottom: 1px solid var(--ccs-border-panel);
@@ -120,16 +120,16 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--ccs-space-3) var(--ccs-space-3) var(--ccs-space-3) var(--ccs-space-4);
-  border-bottom: 1px solid #e7e7e9;
+  border-bottom: 1px solid var(--ccs-border-subtle);
 }
 
 .digital-assets__panel-title {
   margin: 0;
-  font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-font-size-md);
-  font-weight: var(--ccs-font-weight-semibold);
-  line-height: 1.2;
-  color: #1a1a1a;
+  font-family: var(--ccs-font-body);
+  font-size: var(--ccs-heading-card-size);
+  font-weight: var(--ccs-heading-weight-strong);
+  line-height: var(--ccs-line-height-tight);
+  color: var(--ccs-text-primary);
 }
 
 .digital-assets__list {
@@ -140,23 +140,23 @@
 
 .digital-assets__item {
   padding: 0.875rem var(--ccs-space-4);
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--ccs-border-subtle);
 }
 
 .digital-assets__item dt {
   margin-bottom: var(--ccs-space-1);
-  font-size: 0.8125rem;
+  font-size: var(--ccs-font-size-2xs);
   font-weight: var(--ccs-font-weight-semibold);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #5b6070;
+  color: var(--ccs-text-secondary);
 }
 
 .digital-assets__item dd {
   margin: 0;
   font-size: var(--ccs-font-size-sm);
   line-height: 1.5;
-  color: #1a1a1a;
+  color: var(--ccs-text-primary);
   text-wrap: pretty;
   overflow-wrap: anywhere;
 }
@@ -164,7 +164,7 @@
 /* Toolbar */
 .digital-assets__toolbar {
   padding: var(--ccs-space-2) var(--ccs-space-3);
-  border-top: 1px solid #e7e7e9;
+  border-top: 1px solid var(--ccs-border-subtle);
   background: var(--ccs-surface-subtle);
 }
 
@@ -184,10 +184,10 @@
   gap: 0.375rem;
   margin: 0;
   padding: 0.375rem 0.625rem;
-  background: #f1f0ec;
+  background: var(--ccs-surface-subtle);
   font-size: var(--ccs-font-size-sm);
   line-height: 1.4;
-  color: #1b1f2a;
+  color: var(--ccs-text-primary);
 }
 
 .digital-assets__controls {
@@ -204,7 +204,7 @@
   padding: 0;
   border: 0;
   background: none;
-  font-size: 1.25rem;
+  font-size: var(--ccs-font-size-xl);
   color: var(--ccs-navy-1100);
   cursor: pointer;
 }

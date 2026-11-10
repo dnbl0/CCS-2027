@@ -3,7 +3,7 @@
 # How to contact the team of a record's collection (CCS-47, confirmed in Product Group on 2 July): the Medical History
 # Museum, the Dental Museum and the Anatomy museum have an email address; the University Art Collection and the Grainger
 # Museum Collection use Museums & Collections' Smartsheet form. Keyed by the record's collection (collection_ssim).
-# The Help page's Contact Us section lists the same contacts (app/views/pages/help.html.erb).
+# The Help page's Contact us section lists the same contacts (app/views/pages/help.html.erb).
 class CollectionContact
   ACCESS_REQUEST_FORM = "https://app.smartsheet.com/b/form/209fed78a83f400e80d0836d6fb517c4"
 
