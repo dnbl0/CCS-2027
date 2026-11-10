@@ -1,0 +1,56 @@
+# Handoff for agents continuing CCS 2027 work
+
+Written 2026-11-10 so any agent can carry on when a session reaches its limit. Read `CLAUDE.md` and `AGENTS.md` first. This is a snapshot: check `gh pr list` and `git log origin/main` for what has changed since.
+
+## If you are an agent resuming after the session limit
+1. `gh pr list --repo dnbl0/CCS-2027 --state open` and `git -C /Users/nobled/CCS-2027 worktree list`. Check `ListAgents` first (CLAUDE.md rule 1) and do not duplicate a running agent.
+2. Finish what is in flight (table below) before starting anything new. For each open PR: merge `origin/main` into its branch, re-run the checks, wait for CI (`rails` ~2 min, `system` ~6-20 min), confirm the green result is for the latest commit (`gh pr view N --json headRefOid,statusCheckRollup`), then `gh pr merge N --repo dnbl0/CCS-2027 --merge`. Tell the user after each merge. Give regular short status updates: the user said "i need more regular updates".
+3. Then refresh the local site (see Environment) and report before/after to the user.
+
+## User rules (explicit, keep applying)
+- Do NOT edit or comment on Jira, ever (reading is fine; cloud id 7371a026-6eac-4483-8a94-0ed2fd1f7264). Re-confirmed 2026-11-10: "dont make any edits or leave any comments to any of the jira tickets".
+- No hosting/Azure work (Azure for Students subscription disabled; hosting undecided). The "Push images to Azure Container Registry" workflow fails after each merge: expected, leave it. Never push to the org repo's main (Enterprise-Services-Group/CCS-2027).
+- Keep CCS 2026 and 2027 unconnected: do not message or answer `ccs-static-*` sessions (one asked about 2026 refactor files on 2026-11-07; not answered). Never touch CCS-Static or CCS-2026-MVP.
+- Local 2027 work needs no dev-team approval. Best-judgement decisions are delegated to me; wording for University / collections team / Indigenous advisers stays marked placeholder.
+- Finished work -> PR to dnbl0/CCS-2027 -> merge to main -> tell the user. Several agents in parallel are fine.
+- Never read env files (e.g. /Users/nobled/ead-ccs/ead-ccs/.devcontainer/.env.development); the dev-team repo /Users/nobled/ead-ccs/ead-ccs is read-only reference. No secrets in files, messages or PRs.
+- Shared Solr (:8984, 40,962 records, ~137 with images) is read-only: never reindex or delete.
+- Europeana code is EUPL-1.2 (copyleft): ideas only, never copy code or styles.
+
+## State of main (dnbl0/CCS-2027): 316973d (PR #43)
+Merged since the last note: every Jira CCS-2027 ticket the app can do without hosting or dev-team data; five Europeana-style features (entity pages, galleries and embeds, similar/trending/featured, rule-based advanced search with open-licence switch, de-bias notices); design alignment #34 (advanced search/results), #35 (browse, entities, Discover, footer), #36 (record notices, share dialog, embeds, access form); #37 Rails 8.1.4.1 (security advisories); #41 CCS-22 collection ID surfaced (model `CollectionIdentifier`); #42 CCS-425 refreshed media (`AssetVersion`, `?v=` tokens, docs/media-refresh.md); #43 CCS-471 guest cookie notice (`CookieNotice`, essential cookies only, wording placeholder).
+
+## In flight (started 2026-11-10; spec at the overhaul spec in the session scratchpad (decisions are summarised below); if lost, the decisions are below)
+| agent / worktree | branch | task | DB_SUFFIX / port |
+|---|---|---|---|
+| a51e2cef0ed4f88f4 / /Users/nobled/CCS-2027-worktrees/dexplore | design/home-explore | Home "Explore the collections" as the University Sublink menu pattern (grey band, Fraunces H2, 3 groups with arrow links, count as description, optional header image from open-tier non-sensitive records) | _dexplore / 3061 |
+| a950db24ac0d666f6 / /Users/nobled/CCS-2027-worktrees/dcards | design/record-page-cards | One `RecordCardComponent` for Related objects, Similar records, Recently viewed (16:9 frame, image whole not cropped, placeholder, stretched title link, max 4, 4/2/1 columns; Recently viewed compact) | _dcards / 3062 |
+Neither agent merges; each opens a PR and reports. If an agent died (rate limit 429), resume with SendMessage to its id and tell it to commit as it goes; if the id is lost start a fresh agent with the same brief. Verify screenshots (`scratchpad/dexplore/`, `scratchpad/dcards/`) by looking at them before merging. Combine check: both touch application.css imports and shared tests; merge one then update the other.
+
+## Design decisions behind the overhaul
+Sources: designsystem.web.unimelb.edu.au (Card: 16:9, max 4 per row; Listings: whole-card link, h3 default), Matrix CMS content components (Sublink menu: 2-4 groups, arrow links with description; Features panel: up to 4, sage buttons; Pathfinder: max 4) read with Claude in Chrome (WebFetch gets 403 on unimelb.edu.au and europeana.eu; Chrome works). Europeana: one preview card everywhere. Google: image-led entry tiles, quiet record page. Images shown whole (cultural objects must not be cropped); Related and Similar stay separate sections with identical look; no asset path for withheld/sensitive records.
+
+## Merge procedure per branch (works)
+1. In the branch's worktree: `git fetch origin && git merge --no-edit origin/main`. Conflict hotspots: robots_policy PERSONAL_PREFIXES, robots_txt, page_chrome, routes.rb, sitemap(+test), page_meta, schema version, application.css imports, locales (check duplicate YAML keys), duplicate migration timestamps, test/application_system_test_case.rb.
+2. From ead-ccs-test/: `export DB_SUFFIX=_x SOLR_URL=http://127.0.0.1:8984/solr/blacklight-core`; `bin/rails db:migrate`; `bin/rails test` with Solr up AND `SOLR_URL=http://127.0.0.1:1/solr/blacklight-core`; `bin/rubocop`; `bundle exec erb_lint --lint-all`; `bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error`; `bin/bundler-audit`; `ruby script/check_docs.rb` (new ENV vars go in docs/configuration.md); `ruby script/i18n_check.rb`; system tests `PARALLEL_WORKERS=1`. Tests that read Solr call `needs_solr`.
+3. `git push`; `gh pr create --repo dnbl0/CCS-2027 --base main`; wait for CI; merge. Commit messages end with `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`; PR bodies end with `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
+- Branch prefixes: use design/, nfr/, chore/, discover/ ... NEVER feature/, bugfix/ or enhance/ (auto-merge.yml merges them without CI when .md/.css/.js outside ead-ccs-test change).
+- CI flakes seen: timing-sensitive system tests (axe while Turbo has aria-busy on html; layout-shift budgets) and DebiasPerformanceTest/BotGuardTest under load. Fix the test to wait for the real state; do not just re-run. New gem advisories: `bundle update --conservative <gem>`, own chore PR.
+- macOS sed: use the Edit tool, not sed -i.
+
+## Environment
+- Local site http://localhost:3002 = worktree /Users/nobled/CCS-2027-worktrees/main-test (detached at origin/main; DB_SUFFIX=_mainlocal; SAVED_RECORDS=on). Refresh: `cd /Users/nobled/CCS-2027-worktrees/main-test && git fetch origin && git checkout --detach origin/main`; from ead-ccs-test: `export DB_SUFFIX=_mainlocal SOLR_URL=http://127.0.0.1:8984/solr/blacklight-core; bundle install; bin/rails db:migrate; bin/rails dartsass:build`; kill the listener on 3002 (`lsof -ti tcp:3002 -sTCP:LISTEN`); `rm -f tmp/pids/server.pid`; `(SAVED_RECORDS=on nohup bin/rails server -p 3002 > ../../main-test-rails.log 2>&1 &)`. It was last refreshed at 316973d.
+- Solr container ccs2027-solr (:8984): `docker start ccs2027-solr`. Do not touch ccslocal-* or ead-ccs-app-* containers. Postgres: Homebrew postgresql@17; each worktree needs its own DB_SUFFIX, `bin/rails dartsass:build`, and node_modules symlinked from /Users/nobled/CCS-2027/node_modules (axe tests look at Rails.root/../node_modules). The shared checkout /Users/nobled/CCS-2027 is stale (hundreds of commits behind origin/main) and dirty: do not work or branch there; use worktrees under /Users/nobled/CCS-2027-worktrees/. Remove worktrees of merged branches with `git worktree remove`.
+- Headless Cuprite scripts for screenshots work; Claude in Chrome works for external sites (one tab from 2026-11-10 may still be open: close it).
+- Status Monitors tend to die: use bounded loops (`for i in $(seq 1 9); do ...; sleep 60; done`), not persistent.
+
+## Repo rules in CLAUDE.md that matter here
+- **Rule 8 (deploy to Azure) does not apply to 2027 work for now:** the user said no hosting or Azure work until the hosting decision is made. Do not deploy.
+- **Rule 9 (check every change in a real browser):** before opening a PR, look at the changed pages in Chrome (Claude in Chrome) or at least a headless-browser screenshot, at desktop and phone width, and say in the report which pages you looked at. `curl` is not a check. If the browser cannot be used, say so.
+- **Rule 10 (Blacklight out of the box for sitemap, URLs, navigation, page structure):** added 2026-11-03. Pages added earlier (browse hubs, entity pages, /discover, galleries, embeds, the cookie notice route) were built before this was noticed. Do not add new page types or URL schemes without checking it: say in plain language what Blacklight does not provide and stop. The user has been told about this overlap and decides what to do with the existing pages.
+
+## Open (not mine to decide, or needs data)
+- Wording needing University approval: access-request privacy and retention, help tips, sensitivity notice, llms.txt, /accessibility, /privacy (incl. cookie notice and whether essential-only cookies need a notice), /my_data, cultural protocols, rationale/selection/diagnostics, de-bias notice and About page, open-licence label, collection ID labels. De-bias term list stays empty (collections team + Indigenous advisers). Register: docs/compliance-register.md, decisions: docs/decisions-2027.md.
+- Jira, not buildable now: CCS-472 (where Collections Navigator sits on unimelb.edu.au: a question for the user or web team); CCS-51 (accessibility: axe in CI covers much; a full WCAG audit needs the user's scope call); DAM-field tickets CCS-44/67/69/163/227/315 (built on the licence-type placeholder; need DAM fields; CCS-44 and 69 de-prioritised for MVP; Allison and Jason disagree on 'Not licensed' vs 'DA Advisory = Yes'); EMu/FEIT data tickets (119, 161, 168, 208, 210, 232, 249, 351); CCS-35 language (approval pending; not only Austlang); CCS-36 PDF text; CCS-56 multilingual; SSO and authenticated features (59, 60, 61, 136: skipped); CCS-112 remove a record; hosting-dependent parts of 144/146/147/148.
+- Dependabot PR #26 (cuprite bump) untouched. Production indexing is ON by default (SEO_INDEXING=off for staging). Still coupled to 2026: public/ static prototype, scripts/sync-rails-assets.js (docs/decoupling-from-2026.md).
+- Possible next candidates (Europeana/Google ideas): related-topic tag chips under record details, colour search and visual similarity (need images: only ~137 have them), full-text PDF, map browse, stories in Markdown, multilingual, public API, PWA.
