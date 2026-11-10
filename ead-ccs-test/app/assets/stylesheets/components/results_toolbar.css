@@ -40,7 +40,7 @@
   display: inline-flex;
   max-width: 100%;
   overflow: hidden;
-  border-radius: 0;
+  border-radius: var(--ccs-radius-none);
   background: var(--col-bg-accent-soft);
 }
 
@@ -49,7 +49,7 @@
   align-items: center;
   min-height: 1.5rem;
   border: 0;
-  border-radius: 0;
+  border-radius: var(--ccs-radius-none);
   background: transparent;
   font-size: var(--ccs-font-size-sm);
   font-weight: var(--ccs-font-weight-semibold);
@@ -144,7 +144,7 @@
   line-height: 2.875rem;
   overflow: hidden;
   border: 1px solid var(--ccs-navy-1100);
-  border-radius: 0;
+  border-radius: var(--ccs-radius-none);
   background: var(--ccs-white);
   font-size: var(--ccs-font-size-md);
   text-align: start;
@@ -156,7 +156,7 @@
 /* the open menu's button and the pointer over it tint the box; the static page does not tint the pointer */
 :is(#sortAndPerPage .btn-group, .ccs-select) > .dropdown-toggle:hover,
 :is(#sortAndPerPage .btn-group, .ccs-select) > .dropdown-toggle.show {
-  background: #f0f2f7;
+  background: var(--ccs-surface-raised);
   color: var(--ccs-text-primary);
 }
 
@@ -180,7 +180,7 @@
   --bs-dropdown-min-width: 100%;
   --bs-dropdown-padding-y: 0;
   --bs-dropdown-border-color: var(--ccs-navy-1100);
-  --bs-dropdown-border-radius: 0;
+  --bs-dropdown-border-radius: var(--ccs-radius-none);
   --bs-dropdown-box-shadow: none;
   --bs-dropdown-item-padding-x: 0.875rem;
   --bs-dropdown-item-padding-y: 0.6875rem;
@@ -218,7 +218,7 @@
   height: 3rem;
   padding: 0;
   border-color: var(--color-border-grey-91);
-  border-radius: 0;
+  border-radius: var(--ccs-radius-none);
   background: var(--ccs-white);
   color: var(--ccs-text-brand);
 }
@@ -291,7 +291,7 @@
 
   :is(#sortAndPerPage .btn-group, .ccs-select) > .dropdown-toggle {
     padding: 0 2.5rem 0 var(--ccs-space-3);
-    font-size: 0.9375rem;
+    font-size: var(--ccs-font-size-ui);
   }
 
   :is(#sortAndPerPage .btn-group, .ccs-select) > .dropdown-toggle::after {
@@ -310,7 +310,7 @@
   @media (max-width: 400px) {
     :is(#sortAndPerPage .btn-group, .ccs-select) > .dropdown-toggle {
       padding-left: 0.625rem;
-      font-size: 0.875rem;
+      font-size: var(--ccs-font-size-sm);
     }
   }
 

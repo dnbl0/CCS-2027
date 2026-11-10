@@ -345,7 +345,7 @@ en:
       icip: "This record is marked as Indigenous Cultural and Intellectual Property (ICIP). The community it comes from may decide who can see it, and how it can be used."
       community: "Access to this record is limited to a community. The community may decide who can see it, and how it can be used."
       cultural_note: "The collection team has noted that this record needs cultural care. It may be held back or shown only on request."
-      read_html: "Read <a href=\"%{help}\">Indigenous Cultural Data and Access</a>, or <a href=\"%{contact}\">contact the collection team</a> before you use this record."
+      read_html: "Read <a href=\"%{help}\">Indigenous cultural data and access</a>, or <a href=\"%{contact}\">contact the collection team</a> before you use this record."
 
     # Placeholder wording (CCS-167): the University must approve it, and set the limits (BulkDownload::MAX_*).
     # Why a result matched (CCS-39, NexusCcs::MatchRationaleComponent). Placeholder wording for the collections team to approve.

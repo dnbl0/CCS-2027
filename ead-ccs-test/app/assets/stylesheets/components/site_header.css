@@ -65,7 +65,7 @@ a.site-header__title:hover { color: var(--ccs-cyan-400); text-decoration: underl
    #000b34; a 30px serif title with its arrow, a hairline, then 18px / 600 links with 20px arrows. The header is the positioning
    context (the nav items are static), so every panel lines up the same whichever button opened it. */
 .site-nav__panel { position: absolute; top: 100%; right: 0; width: max-content; min-width: 26rem; max-width: 90vw; padding: var(--ccs-space-6); background: var(--ccs-navy-1200); border-top: 2px solid var(--ccs-cyan-400); box-shadow: var(--ccs-shadow-xl); color: var(--ccs-white); z-index: calc(var(--ccs-z-header) + 1); }
-.site-nav__panel-title { display: inline-flex; align-items: center; gap: 0.25rem; min-height: 50px; font-family: var(--ccs-font-heading); font-size: 1.875rem; font-weight: var(--ccs-font-weight-regular); line-height: 1.1; letter-spacing: -0.3px; color: var(--ccs-white); text-decoration: none; font-variation-settings: "SOFT" 50, "WONK" 0, "opsz" 9; }
+.site-nav__panel-title { display: inline-flex; align-items: center; gap: 0.25rem; min-height: 50px; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-3xl); font-weight: var(--ccs-font-weight-regular); line-height: 1.1; letter-spacing: -0.3px; color: var(--ccs-white); text-decoration: none; font-variation-settings: "SOFT" 50, "WONK" 0, "opsz" 9; }
 .site-nav__panel-title:hover, .site-nav__panel-list a:hover { text-decoration: underline; color: var(--ccs-cyan-400); }
 .site-nav__panel-title img { width: 30px; height: 30px; flex: none; }
 .site-nav__panel-list img { width: 20px; height: 20px; flex: none; }

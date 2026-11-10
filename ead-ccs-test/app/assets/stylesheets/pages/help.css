@@ -19,12 +19,12 @@ body.page-help .help-search-tips__group--v2 {
   display: grid;
   grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);
   margin: 0 0 var(--space-24);
-  border: 1px solid #c8c8c8;
+  border: 1px solid var(--ccs-border-default);
   border-bottom: 0;
 }
 body.page-help .help-search-tips__group--v2 > * {
   padding: var(--space-12) var(--space-16);
-  border-bottom: 1px solid #c8c8c8;
+  border-bottom: 1px solid var(--ccs-border-default);
 }
 body.page-help .help-search-tips__group--v2 > :nth-child(-n + 2) {
   background: var(--brand-1100);
@@ -32,7 +32,7 @@ body.page-help .help-search-tips__group--v2 > :nth-child(-n + 2) {
 }
 body.page-help .help-search-tips__strong--v2,
 body.page-help .help-search-tips__text--v4 {
-  background: #f1f1f1;
+  background: var(--ccs-surface-subtle);
 }
 body.page-help .help-search-tips__group--v1 {
   display: grid;
@@ -47,7 +47,7 @@ body.page-help .help-section {
 body.page-help .help-layout__content .help-section + .help-section {
   margin-top: var(--space-48);
   padding-top: var(--space-48);
-  border-top: 1px solid #c8c8c8;
+  border-top: 1px solid var(--ccs-border-default);
 }
 body.page-help .help-section__header {
   margin: 0 0 var(--space-32);

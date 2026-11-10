@@ -17,8 +17,8 @@
 .object-cards__heading {
   margin: 0;
   font-family: var(--ccs-font-heading);
-  font-size: 1.375rem;
-  font-weight: var(--ccs-font-weight-semibold);
+  font-size: var(--ccs-heading-panel-size);
+  font-weight: var(--ccs-heading-weight);
   line-height: var(--ccs-line-height-tight);
   color: var(--ccs-navy-1100);
 }

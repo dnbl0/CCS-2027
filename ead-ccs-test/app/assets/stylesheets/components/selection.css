@@ -9,7 +9,7 @@
 .result-card mark,
 .result-card__snippet mark {
   padding: 0 0.1em;
-  border-radius: 0.125rem;
+  border-radius: var(--ccs-radius-sm);
   background: var(--ccs-amber-100);
   color: inherit;
   text-decoration: underline;
@@ -132,7 +132,7 @@
   min-height: 2.75rem;
   padding: var(--ccs-space-1) var(--ccs-space-4);
   border: 1px solid var(--ccs-navy-1100);
-  border-radius: 0;
+  border-radius: var(--ccs-radius-none);
   background: var(--ccs-white);
   font: inherit;
   font-weight: var(--ccs-font-weight-semibold);
@@ -215,9 +215,9 @@
 
 .selection-lists__heading {
   margin: 0 0 var(--ccs-space-2);
-  font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-font-size-lg);
-  font-weight: var(--ccs-font-weight-semibold);
+  font-family: var(--ccs-font-body);
+  font-size: var(--ccs-heading-card-size);
+  font-weight: var(--ccs-heading-weight-strong);
 }
 
 .selection-lists__lists {
@@ -286,9 +286,9 @@
 
 .why-results__heading {
   margin: var(--ccs-space-4) 0 var(--ccs-space-2);
-  font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-font-size-lg);
-  font-weight: var(--ccs-font-weight-semibold);
+  font-family: var(--ccs-font-body);
+  font-size: var(--ccs-heading-card-size);
+  font-weight: var(--ccs-heading-weight-strong);
 }
 
 .why-results__list {

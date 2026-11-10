@@ -23,7 +23,7 @@ html.has-open-modal {
 
 dialog::backdrop,
 dialog.modal[open]::backdrop {
-  background-color: var(--ccs-scrim, rgb(0 11 52 / 80%));
+  background-color: var(--ccs-scrim);
 }
 
 dialog.modal {
@@ -92,7 +92,7 @@ dialog.modal .btn-close {
   background: none;
   opacity: 1;
   font-family: var(--ccs-font-body);
-  font-size: 0.875rem;
+  font-size: var(--ccs-font-size-sm);
   font-weight: var(--ccs-font-weight-regular);
   line-height: 1.4;
   color: var(--ccs-text-brand);

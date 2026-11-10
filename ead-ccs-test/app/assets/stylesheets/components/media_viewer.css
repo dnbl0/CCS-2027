@@ -122,7 +122,7 @@
   min-height: 2.75rem;
   padding: 0 var(--ccs-space-4);
   border: 1px solid var(--ccs-navy-1100);
-  border-radius: 0;
+  border-radius: var(--ccs-radius-none);
   background: var(--ccs-white);
   font: inherit;
   font-size: var(--ccs-font-size-md);

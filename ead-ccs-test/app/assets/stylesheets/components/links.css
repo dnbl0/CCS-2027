@@ -1,0 +1,58 @@
+/*
+ * The one in-content link: a link inside a sentence, a list or a table on a white or pale page. Link blue
+ * (--ccs-text-link, 8.6:1 on white), underlined at rest, a thicker line and the hover blue on hover, the site's focus
+ * ring on focus. Weight and size come from the text around it.
+ *
+ * Not covered, because they are different patterns with their own look: the arrow link (arrow_link.css), a whole card
+ * that is one link (a stretched link on its heading), the header, footer and breadcrumb links, and buttons.
+ * To use the style on a new link, give it the class ccs-text-link or put it in a <p>, <li> or <dd> in <main> without a class.
+ */
+:is(main, #main-container, .help-layout__content, .notice) a:where(:not([class])),
+.ccs-text-link,
+.help-layout__content a,
+.notice a,
+.cookie-notice__text a,
+.collection-intro__visit a,
+.browse-facts__links a,
+.filter-sidebar__clear,
+.advanced-search-start-over,
+.record-details__truncate-toggle,
+.persistent-link__browser .uom-action {
+  color: var(--ccs-text-link);
+  font-weight: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: var(--ccs-link-underline-thickness);
+  text-underline-offset: var(--ccs-link-underline-offset);
+  text-underline-position: from-font;
+}
+
+:is(main, #main-container, .help-layout__content, .notice) a:where(:not([class])):hover,
+.ccs-text-link:hover,
+.help-layout__content a:hover,
+.notice a:hover,
+.cookie-notice__text a:hover,
+.collection-intro__visit a:hover,
+.browse-facts__links a:hover,
+.filter-sidebar__clear:hover,
+.advanced-search-start-over:hover,
+.record-details__truncate-toggle:hover,
+.persistent-link__browser .uom-action:hover {
+  color: var(--ccs-text-link-hover);
+  text-decoration-thickness: var(--ccs-link-underline-thickness-hover);
+}
+
+:is(main, #main-container, .help-layout__content, .notice) a:where(:not([class])):focus-visible,
+.ccs-text-link:focus-visible,
+.help-layout__content a:focus-visible,
+.notice a:focus-visible,
+.cookie-notice__text a:focus-visible,
+.collection-intro__visit a:focus-visible,
+.browse-facts__links a:focus-visible,
+.filter-sidebar__clear:focus-visible,
+.advanced-search-start-over:focus-visible,
+.record-details__truncate-toggle:focus-visible,
+.persistent-link__browser .uom-action:focus-visible {
+  border-radius: var(--ccs-radius-sm);
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}

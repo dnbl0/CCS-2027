@@ -6,6 +6,10 @@ en:
       range_begin_short: From
       range_end_short: To
     search:
+      # Sentence case (Blacklight ships "Search Results"): the page title and the visually hidden results heading
+      search_results: Search results
+      page_title:
+        title: "%{constraints} - %{application_name} search results"
       # The names of the result views: button names, tooltips and the screen reader captions
       view:
         list: List view

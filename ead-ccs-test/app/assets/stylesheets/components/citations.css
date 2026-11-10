@@ -18,7 +18,7 @@
   padding-inline: 0.875rem;
   border: 1px solid var(--ccs-navy-1100);
   background: var(--ccs-white);
-  font-size: 0.9375rem;
+  font-size: var(--ccs-font-size-ui);
   font-weight: var(--ccs-font-weight-semibold);
   color: var(--ccs-navy-1100);
   cursor: pointer;
@@ -70,8 +70,9 @@
 
 .cite__style {
   margin: 0;
-  font-size: var(--ccs-font-size-md);
-  font-weight: var(--ccs-font-weight-semibold);
+  font-family: var(--ccs-font-body);
+  font-size: var(--ccs-heading-card-size);
+  font-weight: var(--ccs-heading-weight-strong);
   color: var(--ccs-text-brand);
 }
 

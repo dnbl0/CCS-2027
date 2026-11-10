@@ -12,14 +12,14 @@
 /* Section headings: the content pages' (serif, brand navy; Help's section heading) */
 .browse-main h2 {
   margin: var(--ccs-space-8) 0 var(--ccs-space-4);
-  font-size: var(--ccs-font-size-3xl);
+  font-size: var(--ccs-heading-section-size);
   line-height: var(--ccs-line-height-tight);
   color: var(--ccs-text-brand);
 }
 
 .browse-main h3 {
   margin: 0 0 var(--ccs-space-2);
-  font-size: var(--ccs-font-size-xl);
+  font-size: var(--ccs-heading-card-size);
   line-height: var(--ccs-line-height-tight);
   color: var(--ccs-text-brand);
 }
@@ -111,7 +111,7 @@
 
 .browse-main .browse-advisory__title {
   margin: 0 0 var(--ccs-space-2);
-  font-size: var(--ccs-font-size-xl);
+  font-size: var(--ccs-heading-card-size);
 }
 
 .browse-advisory p {
@@ -127,7 +127,7 @@
 .browse-main .browse-facts h2 {
   margin: 0;
   padding: var(--ccs-space-5) var(--ccs-space-5) var(--ccs-space-2);
-  font-size: var(--ccs-font-size-2xl);
+  font-size: var(--ccs-heading-panel-size);
 }
 
 .browse-facts__list {

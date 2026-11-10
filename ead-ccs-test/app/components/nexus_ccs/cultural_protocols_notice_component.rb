@@ -3,7 +3,7 @@
 module NexusCcs
   # Tells the visitor that cultural protocols apply to a record, on the record page (CCS-148). The access notice says only that
   # the asset is "available on request", and the sensitivity gate only that it may distress: neither says WHY an Indigenous
-  # record is held back or who decides. This does, and points to Help (Indigenous Cultural Data and Access) and the collection team.
+  # record is held back or who decides. This does, and points to Help (Indigenous cultural data and access) and the collection team.
   #
   # It does not decide anything: AccessPolicy still decides what is shown (its ICIP and Community Restricted rules are unchanged),
   # and Sensitivity the gate. This component reads the same record fields to know when to speak. The wording is in

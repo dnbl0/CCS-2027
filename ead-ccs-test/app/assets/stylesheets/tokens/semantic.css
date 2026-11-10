@@ -18,6 +18,7 @@
   --ccs-text-link-hover: var(--ccs-blue-700);
   --ccs-text-inverse: var(--ccs-white);
   --ccs-text-inverse-muted: rgb(255 255 255 / 85%);
+  --ccs-text-inverse-strong: rgb(255 255 255 / 92%);
   --ccs-text-error: var(--ccs-red-600);
 
   /* Surfaces */
@@ -27,9 +28,11 @@
   --ccs-surface-brand: var(--ccs-navy-1100);
   --ccs-surface-brand-strong: var(--ccs-navy-1200);
   --ccs-surface-error: #fff1f2;
+  --ccs-surface-raised: var(--ccs-navy-100); /* the quiet fill of a field's scope select, a toolbar, an icon tile */
 
   /* Borders */
   --ccs-border-default: var(--ccs-neutral-300);
+  --ccs-border-subtle: var(--ccs-neutral-200); /* a hairline between rows */
   --ccs-border-panel: var(--ccs-navy-200);
   --ccs-border-strong: var(--ccs-navy-400);
   --ccs-border-brand: var(--ccs-navy-1100);
@@ -50,15 +53,42 @@
   /* Focus */
   --ccs-focus-ring: var(--ccs-blue-600);
   --ccs-focus-ring-glow: rgb(13 108 221 / 40%);
+  --ccs-focus-ring-glow-on-dark: rgb(70 200 240 / 45%); /* the cyan halo round a field on a navy band */
 
   /* Typography roles */
   --ccs-font-body: var(--ccs-font-family-sans);
   --ccs-font-heading: var(--ccs-font-family-serif);
   --ccs-font-code: var(--ccs-font-family-mono);
 
+  /* Type steps that sit between the sizes in primitives.css (the design system's 13 and 15) */
+  --ccs-font-size-2xs: 0.8125rem; /* 13px */
+  --ccs-font-size-ui: 0.9375rem;  /* 15px */
+
+  /* Headings: one scale for every page. A page section is the home page's section heading (Fraunces 40px, 30px on a
+     phone); a panel, form section or card title in a bordered box is Fraunces 24px; a sub-heading in running text is
+     Source Sans 3 600 at 24px; a card or list item title is Source Sans 3 600 at 18px. */
+  --ccs-heading-section-size: 2.5rem;
+  --ccs-heading-panel-size: var(--ccs-font-size-2xl);
+  --ccs-heading-subsection-size: var(--ccs-font-size-2xl);
+  --ccs-heading-card-size: var(--ccs-font-size-lg);
+  --ccs-heading-weight: var(--ccs-font-weight-regular);
+  --ccs-heading-weight-strong: var(--ccs-font-weight-semibold);
+
+  /* In-content links: one style (links.css). Underlined at rest, a thicker line on hover. */
+  --ccs-link-underline-thickness: 1px;
+  --ccs-link-underline-thickness-hover: 2px;
+  --ccs-link-underline-offset: 0.15em;
+
   /* Shape and spacing roles */
+  --ccs-radius-circle: 50%;
   --ccs-radius-control: var(--ccs-radius-md);
   --ccs-radius-control-sm: var(--ccs-radius-sm);
   --ccs-radius-panel: var(--ccs-radius-none);
   --ccs-space-panel: var(--ccs-space-5);
+}
+
+@media (max-width: 767px) {
+  :root {
+    --ccs-heading-section-size: 1.875rem;
+  }
 }

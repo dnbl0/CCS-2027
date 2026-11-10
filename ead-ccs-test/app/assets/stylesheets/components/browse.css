@@ -21,7 +21,7 @@
 
 .browse__hub:hover, .browse__hub:focus-within { border-color: var(--ccs-border-strong); }
 
-.browse__hub-title { margin: 0; font-size: var(--ccs-font-size-2xl); line-height: var(--ccs-line-height-tight); }
+.browse__hub-title { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-heading-card-size); font-weight: var(--ccs-heading-weight-strong); line-height: var(--ccs-line-height-tight); }
 
 .browse__hub-link { color: var(--ccs-text-brand); text-decoration: none; }
 
@@ -57,7 +57,7 @@
 
 .browse__letter[aria-current="page"] { background: var(--ccs-sage-200); color: var(--ccs-navy-1100); text-decoration: none; }
 
-.browse__heading { margin: 0; font-size: var(--ccs-font-size-3xl); color: var(--ccs-text-brand); }
+.browse__heading { margin: 0; font-size: var(--ccs-heading-section-size); color: var(--ccs-text-brand); }
 
 .browse__content { display: flex; flex-direction: column; gap: var(--ccs-space-5); min-width: 0; }
 

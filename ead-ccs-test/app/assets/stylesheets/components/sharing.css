@@ -34,8 +34,9 @@
 
 .share__heading {
   margin: 0;
-  font-size: var(--ccs-font-size-md);
-  font-weight: var(--ccs-font-weight-semibold);
+  font-family: var(--ccs-font-body);
+  font-size: var(--ccs-heading-card-size);
+  font-weight: var(--ccs-heading-weight-strong);
   color: var(--ccs-text-brand);
 }
 

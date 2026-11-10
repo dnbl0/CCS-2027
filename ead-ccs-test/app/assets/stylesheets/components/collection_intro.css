@@ -18,9 +18,9 @@
 .collection-intro__title {
   margin: 0 0 var(--ccs-space-2);
   font-family: var(--ccs-font-heading);
-  font-size: 1.875rem;
-  font-weight: var(--ccs-font-weight-regular);
-  line-height: 1.15;
+  font-size: var(--ccs-heading-section-size);
+  font-weight: var(--ccs-heading-weight);
+  line-height: var(--ccs-line-height-tight);
   color: var(--ccs-navy-1100);
 }
 
@@ -105,8 +105,7 @@
   text-decoration: underline;
 }
 
-.collection-intro__named a:focus-visible,
-.collection-intro__visit a:focus-visible {
+.collection-intro__named a:focus-visible {
   outline: 2px solid var(--ccs-focus-ring);
   outline-offset: 2px;
 }
@@ -115,11 +114,4 @@
   margin: 0;
 }
 
-.collection-intro__visit a {
-  font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-text-link);
-}
 
-.collection-intro__visit a:hover {
-  color: var(--ccs-text-link-hover);
-}

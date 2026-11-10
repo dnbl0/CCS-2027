@@ -86,9 +86,9 @@ The licence badge (`StockLicenceBadgeComponent`) shows the reviewed copy as hove
 Current"), and "means you can use this item with conditions." for CC licences with NC or ND (as on the static site). "Reproduction
 Licence - Current" has no hover text: the copy does not cover it, a stakeholder decision.
 
-## Advanced Search title
+## Advanced search title
 
-The one change to the stock form is its title, "Advanced Search", through the locale (`config/locales/search_bar.en.yml`:
+The one change to the stock form is its title, "Advanced search", through the locale (`config/locales/search_bar.en.yml`:
 `blacklight.advanced_search.form.title` and `page_title`). The rest of the wording in the reviewed copy (description, "Enter search term",
 tips, "Filters") has no locale hook in stock Blacklight and describes controls only the static form has (rows, match types, Add
 filter), so it is not applied here: a decision for the product owner.

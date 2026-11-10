@@ -140,7 +140,7 @@
 }
 
 .history-action:hover {
-  background: var(--ccs-navy-100, #e8ecf3);
+  background: var(--ccs-navy-100);
   border-color: currentcolor;
 }
 
@@ -196,7 +196,7 @@
 .list-form__error {
   margin: 0 0 var(--ccs-space-2);
   font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-text-error, #b3261e);
+  color: var(--ccs-text-error);
 }
 
 .list-form__actions {
@@ -257,7 +257,7 @@
   width: 18rem;
   max-width: calc(100vw - 2 * var(--space-16));
   padding: var(--ccs-space-3);
-  border: 1px solid var(--ccs-border-default, #c7ccd6);
+  border: 1px solid var(--ccs-border-default);
   border-radius: var(--ccs-radius-sm);
   background: var(--ccs-white);
   box-shadow: 0 4px 16px rgb(0 0 0 / 15%);
@@ -313,7 +313,7 @@
 }
 
 .list-menu__item:hover {
-  background: var(--ccs-navy-100, #e8ecf3);
+  background: var(--ccs-navy-100);
 }
 
 .list-menu__item--in {
@@ -322,7 +322,7 @@
 
 .list-menu__new {
   padding-top: var(--ccs-space-2);
-  border-top: 1px solid var(--ccs-border-default, #c7ccd6);
+  border-top: 1px solid var(--ccs-border-default);
 }
 
 .list-menu__label {

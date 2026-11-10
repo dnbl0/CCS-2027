@@ -27,7 +27,7 @@
   height: 2rem;
   padding: 0.125rem 0.25rem;
   border: 0;
-  border-radius: 0;
+  border-radius: var(--ccs-radius-none);
   background: var(--ccs-white);
   font-size: var(--ccs-font-size-lg);
   line-height: 1.4;

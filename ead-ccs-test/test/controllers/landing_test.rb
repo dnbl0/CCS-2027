@@ -28,7 +28,7 @@ class LandingTest < ActionDispatch::IntegrationTest
     assert_redirected_to "/"
   end
 
-  test "every page carries the sticky strip: the title, the same search bar and Advanced Search, hidden until the banner has scrolled away" do
+  test "every page carries the sticky strip: the title, the same search bar and Advanced search, hidden until the banner has scrolled away" do
     [ "/", "/help", "/about" ].each do |path|
       get path
 

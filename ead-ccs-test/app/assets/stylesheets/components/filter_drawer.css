@@ -11,7 +11,7 @@
   height: 2.5rem;
   padding: 0 var(--ccs-space-4);
   border: 1px solid var(--ccs-navy-1100);
-  border-radius: 0;
+  border-radius: var(--ccs-radius-none);
   background: var(--ccs-white);
   font-weight: var(--ccs-font-weight-semibold);
   color: var(--ccs-text-brand);
@@ -201,15 +201,6 @@
   margin-bottom: var(--ccs-space-4);
 }
 
-.filter-sidebar__clear {
-  color: var(--interactive-800);
-  text-decoration: underline;
-}
-
-.filter-sidebar__clear:hover {
-  color: var(--interactive-700);
-}
-
 /*
  * Sidebar type, after the University's filtered listings (designsystem.web.unimelb.edu.au/components/filtered-listings, measured):
  * the section heading is 24px / 600 Source Sans, a filter group's title (its legend) 18px / 600, and the filter names and their values
@@ -218,9 +209,9 @@
 .filter-sidebar__heading {
   margin: 0;
   font-family: var(--ccs-font-body);
-  font-size: 1.5rem;
-  font-weight: var(--ccs-font-weight-semibold);
-  line-height: 1.2;
+  font-size: var(--ccs-heading-subsection-size);
+  font-weight: var(--ccs-heading-weight-strong);
+  line-height: var(--ccs-line-height-tight);
 }
 
 .filter-sidebar .facets-heading {

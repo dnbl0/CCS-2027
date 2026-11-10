@@ -1,10 +1,10 @@
 /*
  * Sticky search strip. Layout follows the CCS Design Documentation (Figma "search") as a reference only; no new tokens or
  * styles come from it. A navy band fixed to the top of the window: the site title on the left, then 48px (--space-48),
- * then one group that takes the rest: the search bar (grows) and, 16px (--space-16) after it, the "Advanced Search" link.
+ * then one group that takes the rest: the search bar (grows) and, 16px (--space-16) after it, the "Advanced search" link.
  * The bar is the banner's and hero's search bar, styled by the same rules in search_banner.css (their :is() lists include
  * .sticky-search). Layout is Bootstrap's own (position-fixed, d-flex) with the site's existing spacing tokens.
- * Phones: the bar alone, full width. Tablets (768px+): the bar and Advanced Search. Desktop (992px+): the title too.
+ * Phones: the bar alone, full width. Tablets (768px+): the bar and Advanced search. Desktop (992px+): the title too.
  * Markup: NexusCcs::StickySearchComponent; behaviour: controllers/sticky_search_controller.js. Above the page, below modals.
  */
 .sticky-search {
@@ -46,7 +46,7 @@ html {
   white-space: nowrap;
 }
 
-/* The bar's wrapper is the group: the form grows, the Advanced Search link follows it 16px away. Its <search> element
+/* The bar's wrapper is the group: the form grows, the Advanced search link follows it 16px away. Its <search> element
    drops out of the layout so the form and the link are the group's own items. */
 .sticky-search .search-banner__search {
   display: flex;
@@ -91,7 +91,7 @@ html {
   outline-offset: 2px;
 }
 
-/* Tablets: no room for the title; the bar and Advanced Search share the strip */
+/* Tablets: no room for the title; the bar and Advanced search share the strip */
 @media (max-width: 991.98px) {
   .sticky-search__title {
     display: none;

@@ -85,6 +85,18 @@ h3, h4, h5, h6, .h3, .h4, .h5, .h6 {
   font-weight: 600;
 }
 
+/* Buttons and form controls use the site's body font. The browser's own buttons are system-ui, and a control inside a
+   heading (the Advanced search "match all" menu) would otherwise take the heading's serif. */
+button,
+input,
+select,
+textarea,
+optgroup,
+.btn {
+  --bs-btn-font-family: var(--ccs-font-body);
+  font-family: var(--ccs-font-body);
+}
+
 /* Buttons
    -------------------------------------------------- */
 /* Bootstrap compiles .btn-* colours from Sass rather than --bs-primary,
@@ -138,7 +150,7 @@ h3, h4, h5, h6, .h3, .h4, .h5, .h6 {
 .form-control:focus,
 .form-select:focus {
   border-color: var(--uom-focus);
-  box-shadow: 0 0 0 2px rgba(13, 108, 221, 0.35);
+  box-shadow: 0 0 0 2px var(--ccs-focus-ring-glow);
 }
 
 /* Modals ------------------------------------- */
@@ -186,8 +198,8 @@ dialog.modal {
 
 /* Applied filters --------------------------------- */
 .constraints-container .applied-filter {
-  --bs-btn-border-radius: 999px;
-  font-size: 0.8rem;
+  --bs-btn-border-radius: var(--ccs-radius-pill);
+  font-size: var(--ccs-font-size-2xs);
 }
 
 /* The pill shows just the value; the filter name stays for screen readers */
@@ -214,7 +226,7 @@ dialog.modal {
 
 .documents-list .document-title-heading {
   font-family: var(--uom-font-sans);
-  font-size: 1.05rem;
+  font-size: var(--ccs-heading-card-size);
   font-weight: 600;
 }
 
@@ -251,8 +263,8 @@ dialog.modal {
 
 .show-tools .card-header h2 {
   font-family: var(--uom-font-serif);
-  font-size: 1.5rem;
-  font-weight: 400;
+  font-size: var(--ccs-heading-panel-size);
+  font-weight: var(--ccs-heading-weight);
   text-transform: none;
 }
 
