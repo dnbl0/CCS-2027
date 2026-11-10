@@ -56,7 +56,7 @@ module NexusCcs
     # Not for a record whose asset is withheld (AccessPolicy :request), nor a sensitive one (Sensitivity: the visitor
     # chooses on the record page): its card is the "no media" one
     def media_path
-      document["thumbnail_path_ssi"].presence if AccessPolicy.view?(document) && !Sensitivity.sensitive?(document)
+      AssetVersion.url(document["thumbnail_path_ssi"].presence) if AccessPolicy.view?(document) && !Sensitivity.sensitive?(document)
     end
 
     def media?

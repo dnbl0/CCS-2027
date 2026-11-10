@@ -5,10 +5,11 @@
 # record is not sensitive (Sensitivity). A visitor's choice to view a sensitive record is made on the record page and kept in
 # their cookie, so it is deliberately not honoured here: an embed or a link read by someone else must not carry it.
 module SharedMedia
-  # document: a SolrDocument. The site-relative path of the thumbnail, or nil.
+  # document: a SolrDocument. The site-relative path of the thumbnail
+  # (with a version token, AssetVersion), or nil.
   def self.thumbnail_path(document)
     path = document["thumbnail_path_ssi"].presence
-    path if path && AccessPolicy.view?(document) && !Sensitivity.sensitive?(document)
+    AssetVersion.url(path) if path && AccessPolicy.view?(document) && !Sensitivity.sensitive?(document)
   end
 
   # Why a record has no image here: :request (withheld by its tier), :sensitive, or nil (it has an image, or never had one)

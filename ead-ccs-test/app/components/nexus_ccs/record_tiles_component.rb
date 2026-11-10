@@ -22,7 +22,7 @@ module NexusCcs
     end
 
     def image_path(document)
-      document["thumbnail_path_ssi"].presence if AccessPolicy.view?(document) && !Sensitivity.sensitive?(document)
+      AssetVersion.url(document["thumbnail_path_ssi"].presence) if AccessPolicy.view?(document) && !Sensitivity.sensitive?(document)
     end
 
     def image_size(path)

@@ -30,7 +30,7 @@ class StockOpenseadragonEmbedComponent < Blacklight::Gallery::OpenseadragonEmbed
 
   def image
     @image ||= begin
-      urls = Array(presenter.document[IMAGES_FIELD]).compact_blank
+      urls = Array(presenter.document[IMAGES_FIELD]).compact_blank.map { |url| AssetVersion.url(url) }
       urls.map { |url| { url => { type: "image", url: url } } } if urls.any?
     end
   end
@@ -39,7 +39,7 @@ class StockOpenseadragonEmbedComponent < Blacklight::Gallery::OpenseadragonEmbed
   def thumbnails
     large = Array(presenter.document[IMAGES_FIELD]).compact_blank
     small = Array(presenter.document[THUMBNAILS_FIELD]).compact_blank
-    large.each_with_index.map { |url, index| small[index].presence || url }
+    large.each_with_index.map { |url, index| AssetVersion.url(small[index].presence || url) }
   end
 
   # The sheet's DAM fields (Licence Type, Advisory, Terms of Use, Producer): the media metadata
