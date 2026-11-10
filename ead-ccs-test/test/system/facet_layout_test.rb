@@ -37,7 +37,7 @@ class FacetLayoutTest < ApplicationSystemTestCase
     visit search_catalog_path(any_assets: "1", q: "")
     page.execute_script("document.querySelector('#sidebar a[data-blacklight-modal=trigger]').click()")
     assert_selector "#blacklight-modal .modal-title"
-    assert_equal "28px", style("#blacklight-modal .modal-title", "fontSize")
+    assert_equal "24px", style("#blacklight-modal .modal-title", "fontSize") # the panel heading size (--ccs-heading-panel-size)
     first("#blacklight-modal a.sort_change.az").click
     assert_selector "#blacklight-modal .alpha-filter .page-link", minimum: 27
     assert page.evaluate_script(<<~JS), "the letter bar is wider than the modal"
