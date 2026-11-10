@@ -111,6 +111,23 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   color: var(--record-text-muted);
 }
 
+/* The collection, accession number and UoM ID, with a Copy button (CCS-22) */
+.record-summary__identifier {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ccs-space-1) var(--ccs-space-2);
+  margin: var(--ccs-space-2) 0 0;
+  font-size: var(--ccs-font-size-sm);
+  line-height: 1.5;
+  color: var(--record-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.record-summary__identifier-label {
+  font-weight: var(--ccs-font-weight-semibold);
+}
+
 .record-summary__tags {
   display: flex;
   flex-wrap: wrap;

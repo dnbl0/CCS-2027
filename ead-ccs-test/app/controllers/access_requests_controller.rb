@@ -26,7 +26,7 @@ class AccessRequestsController < ApplicationController
     return redirect_to(solr_document_path(@document.id)) if params[:website].present?
 
     @access_request = AccessRequest.submit(access_request_params.merge(
-      document_id: @document.id, document_title: document_title, request_type: @request_type
+      document_id: @document.id, document_title: document_title, document_identifier: CollectionIdentifier.new(@document).to_s, request_type: @request_type
     ))
     if @access_request.persisted?
       # The confirmation shows the requester's details, so only the browser that made the request may open it
