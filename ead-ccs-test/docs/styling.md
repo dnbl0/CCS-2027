@@ -67,6 +67,21 @@ bundle exec rails test
 `CCS_STATIC_URL` is the base URL of the static site that hosts Help and Contact; when unset the
 header omits those items (in development it defaults to `http://localhost:3000`).
 
+## Headings, links and controls (one style for every page)
+
+- **Heading scale** (`tokens/semantic.css`, `--ccs-heading-*`): a page section h2 is the home page's section heading (Fraunces
+  40px, 30px on a phone); a panel, form section or card-box h2 is Fraunces 24px; a sub-heading in running text (h3 on Help,
+  Explore group titles) is Source Sans 3 600 at 24px; a card or list item title is Source Sans 3 600 at 18px. Use the tokens, not sizes.
+- **In-content link** (`components/links.css`): link blue, underlined at rest, a 2px line and the hover blue on hover, the site
+  focus ring. Add the class `ccs-text-link`, or leave a link in a paragraph, list item or `dd` of `<main>` without a class. Arrow
+  links, links that stretch over a whole card, the header, footer and breadcrumb links and the Help "On this page" navigation are
+  separate patterns.
+- **Controls** use the body font (`unimelb.css`): buttons and inputs would otherwise be the browser's system font. The one
+  exception is the "all / any" menu in the Advanced search heading, which is set in the heading's serif by the design.
+- **Colours, radii and sizes** come from `--ccs-*` tokens. A size, colour or radius the scale lacks gets a token in
+  `tokens/semantic.css` (for example `--ccs-font-size-ui`, `--ccs-border-subtle`, `--ccs-radius-circle`), not a literal.
+- **Wording**: titles and headings are sentence case ("Advanced search", "Help and support"), and a page's `<title>` starts with its h1.
+
 ## Filter rail and record page
 
 - **Filter rail**: Blacklight's default facets (default components, markup, multi-select and the range limit plugin), unstyled
@@ -74,7 +89,7 @@ header omits those items (in development it defaults to `http://localhost:3000`)
   follows the University's filtered listings: the "Search filters" heading is 24px / 600 Source Sans, a group's heading 18px / 600,
   filter names and values 18px, at every width.
 - **Record page** (`components/record_page.css`, `digital_assets.css`): `RecordBannerComponent` (dark title
-  band, hidden from assistive technology because Blacklight's own h1 stays), `RecordEmbedComponent` (the
+  band, the one visible title, hidden from assistive technology because the page's h1, visually hidden in the summary, stays), `RecordEmbedComponent` (the
   digital assets on a dark band, then type and collection, creator and date, licence), Blacklight's details
   list as ruled label and value rows in one white card, and `PersistentLinkComponent` (CCS-25, with a copy
   button, `clipboard_controller.js`). Field labels have no trailing colon (`blacklight.en.yml`).

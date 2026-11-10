@@ -9,7 +9,7 @@ class AdvancedSearchTest < ApplicationSystemTestCase
 
     assert_selector "h1", count: 1
     assert_selector ".page-banner h1", text: "Advanced search"
-    assert_no_selector ".page-banner .page-banner__desc"
+    assert_selector ".page-banner .page-banner__desc", text: "Search by several fields at once" # a line under the title, as the other pages have
     assert_selector ".advanced-search__form form.advanced"
     assert_selector ".advanced-search__tips section.advanced-search-tips h2", text: "Search tips"
     assert_selector "ul.advanced-help > li", count: 8

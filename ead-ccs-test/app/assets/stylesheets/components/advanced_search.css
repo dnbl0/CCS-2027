@@ -120,11 +120,6 @@ form.advanced .row > [class*="col-"] {
   padding-inline: 0;
 }
 
-/* The "match all / any" menu sits inside the first heading: it is a control, so the body font, not the heading's serif */
-form.advanced .query-criteria-heading select {
-  font-family: var(--ccs-font-body);
-}
-
 /* The three section headings: the panel heading (serif 24px, navy) */
 form.advanced .query-criteria-heading,
 form.advanced .limit-criteria-heading,

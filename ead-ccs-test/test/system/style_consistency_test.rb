@@ -5,6 +5,11 @@ require "application_system_test_case"
 class StyleConsistencyTest < ApplicationSystemTestCase
   PAGES = %w[/ /browse /help /about /accessibility /privacy /selection /bookmarks /lists/new /catalog/advanced].freeze
 
+  setup do
+    page.driver.remove_cookie(CookieNotice::COOKIE.to_s)
+    page.driver.set_cookie("country_acknowledged", "1")
+  end
+
   def computed(selector, property)
     page.evaluate_script(<<~JS)
       Array.from(document.querySelectorAll(#{selector.to_json})).filter(function (e) { return e.getClientRects().length > 0 })
@@ -15,7 +20,8 @@ class StyleConsistencyTest < ApplicationSystemTestCase
   test "every button and form control uses the body font, not the browser's" do
     PAGES.each do |path|
       visit path
-      fonts = computed("button, .btn, input:not([type=hidden]), select, textarea", "fontFamily")
+      # The one exception is the "all / any" menu in the Advanced search heading: the design sets it in the heading's own serif
+      fonts = computed("button, .btn, input:not([type=hidden]), select:not(.input-small), textarea", "fontFamily")
 
       assert_not_empty fonts, path
       assert fonts.all? { |font| font.include?("Source Sans 3") }, "#{path}: #{fonts.uniq.inspect}"
@@ -26,7 +32,7 @@ class StyleConsistencyTest < ApplicationSystemTestCase
     %w[/help /about /accessibility /privacy].each do |path|
       visit path
       links = page.evaluate_script(<<~JS)
-        Array.from(document.querySelectorAll("main p a, main li a, main dd a")).filter(function (e) { return e.getClientRects().length > 0 })
+        Array.from(document.querySelectorAll("main p a:not(.jump-nav__link), main li a:not(.jump-nav__link), main dd a")).filter(function (e) { return e.getClientRects().length > 0 })
           .map(function (e) { var s = getComputedStyle(e); return [s.color, s.textDecorationLine] })
       JS
 
