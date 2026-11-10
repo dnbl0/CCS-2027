@@ -33,3 +33,5 @@ and its Azure deployment at the same time. Every agent follows these rules so wo
     Rails app uses Blacklight's own routes, nav actions and breadcrumb behaviour. Do not invent new page types, URL
     schemes or navigation models. If best practice would need something Blacklight does not provide, say so in plain
     language and stop instead of building it.
+11. **Resuming after a session limit.** Read [docs/handoff-2027.md](docs/handoff-2027.md) for the state of the 2027 work,
+    the rules the user gave, what is in flight and how to merge and refresh the local site.
