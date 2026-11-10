@@ -19,6 +19,15 @@ class AccessibilityTest < ApplicationSystemTestCase
     end
   end
 
+  test "the home page's Explore section has no axe violations, with and without example images, and its links are 44px tall" do
+    visit "/"
+    assert_selector "section.explore .explore__link"
+    assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
+    heights = page.evaluate_script("[...document.querySelectorAll('.explore__link, .explore__all')].map(a => a.getBoundingClientRect().height)")
+    assert_operator heights.min, :>=, 44
+    assert_equal false, page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
+  end
+
   test "the check fails on a page with a violation, so a pass means something" do
     visit "/contact"
     page.execute_script("document.body.insertAdjacentHTML('beforeend', '<img src=\"/icon.png\"><button></button>')")

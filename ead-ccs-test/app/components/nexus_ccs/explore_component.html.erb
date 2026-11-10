@@ -7,8 +7,17 @@
     <div class="explore__groups">
       <% groups.each do |group| %>
         <div class="explore__group">
-          <h3 class="explore__heading"><%= group.heading %></h3>
-          <ul class="explore__list">
+          <% if image?(group) %>
+            <%# The caption is the link text, so the picture itself is decorative (empty alt) %>
+            <figure class="explore__figure">
+              <%= link_to image_record_path(group), class: "explore__figure-link" do %>
+                <span class="explore__frame"><%= image_tag image_path(group), alt: "", width: group.image.width, height: group.image.height, loading: "lazy", decoding: "async", class: "explore__image" %></span>
+                <figcaption class="explore__caption"><%= group.image.title %></figcaption>
+              <% end %>
+            </figure>
+          <% end %>
+          <h3 id="<%= heading_id(group) %>" class="explore__heading"><%= group.heading %></h3>
+          <ul class="explore__list" aria-labelledby="<%= heading_id(group) %>">
             <% group.items.each do |item| %>
               <li class="explore__item">
                 <%= link_to helpers.search_action_path(item.query), class: "explore__link" do %>
@@ -18,7 +27,7 @@
               </li>
             <% end %>
           </ul>
-          <%= link_to helpers.browse_hub_path(hub_slug(group)), class: "explore__all" do %>See all <%= group.heading.downcase == "time" ? "periods" : "#{group.heading.downcase}s" %><% end %>
+          <%= link_to helpers.browse_hub_path(hub_slug(group)), class: "arrow-link arrow-link--icon explore__all" do %><%= see_all_label(group) %><% end %>
         </div>
       <% end %>
     </div>
