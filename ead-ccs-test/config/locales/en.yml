@@ -105,6 +105,8 @@ en:
       description_view: "This record is not available to view online. You can ask for access, and the collection's staff will decide."
       description_download: "This record can be viewed online but not downloaded. You can ask for a copy, and the collection's staff will decide."
       record_label: "Record"
+      # Placeholder wording: the University must approve what it calls the identifier staff and reusers quote.
+      identifier_label: "Collection and ID"
       type_label: "What you are asking for"
       type_view: "Permission to view this record"
       type_download: "A copy of this record to download"

@@ -48,6 +48,11 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_equal [ "vernon-MHM00394" ], uom_id.(FIELDS.merge("id" => "vernon-MHM00394"))
   end
 
+  test "the identifier is the collection, accession number and UoM ID (CCS-22)" do
+    assert_equal "Grainger Museum Collection, accession number 00.0001, UoM ID emu-umc-1",
+                 component(FIELDS.merge("accession_number_ssim" => [ "00.0001" ])).identifier
+  end
+
   test "the rights fields are in the Copyright card, not in the details list" do
     c = component(FIELDS)
     fields = c.rows.map(&:field)

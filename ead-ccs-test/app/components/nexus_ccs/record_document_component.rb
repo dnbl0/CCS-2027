@@ -64,15 +64,10 @@ module NexusCcs
       end
     end
 
-    # The University has three EMu systems (emu-umc, emu-feit, emu-prints), so the UoM ID names which one. Every EMu
-    # record here comes from Museums & Collections' (emu-umc). The record's URL keeps its Solr id (emu-400329).
-    UOM_ID_PREFIXES = { "emu-" => "emu-umc-" }.freeze
+    # "Grainger Museum Collection, accession number 00.0001, UoM ID emu-umc-400329" (CCS-22)
+    def identifier = CollectionIdentifier.new(document).to_s
 
-    def uom_id
-      id = document.id.to_s
-      prefix, uom_prefix = UOM_ID_PREFIXES.find { |solr_prefix, _| id.start_with?(solr_prefix) }
-      prefix ? id.sub(prefix, uom_prefix) : id
-    end
+    def uom_id = CollectionIdentifier.uom_id(document.id)
 
     def link_to_value?(row) = row.field.in?(LINK_FIELDS)
 

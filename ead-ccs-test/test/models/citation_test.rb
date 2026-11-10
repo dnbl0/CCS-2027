@@ -16,7 +16,7 @@ class CitationTest < ActiveSupport::TestCase
 
   test "APA 7th: author, year, title with its type, holder, accession, link and retrieval date" do
     assert_equal "Grainger, P. A. (1922). Portrait sketch [drawing]. Grainger Museum Collection, University of Melbourne. " \
-                 "Accession number 1999.0042. #{URL} Retrieved 2 November 2026.", cite(:apa)
+                 "Accession number 1999.0042. UoM ID emu-umc-401422. #{URL} Retrieved 2 November 2026.", cite(:apa)
   end
 
   test "APA joins several creators with an ampersand and puts the title first without one" do
@@ -27,7 +27,7 @@ class CitationTest < ActiveSupport::TestCase
 
   test "MLA 9th: inverted first author, title, details, link and access date" do
     assert_equal "Grainger, Percy Aldridge. Portrait sketch. Drawing, 1922, Grainger Museum Collection, University of Melbourne, " \
-                 "accession number 1999.0042. #{URL} Accessed 2 Nov. 2026.", cite(:mla)
+                 "accession number 1999.0042, UoM ID emu-umc-401422. #{URL} Accessed 2 Nov. 2026.", cite(:mla)
   end
 
   test "MLA names the second author in direct order and shortens three or more to et al." do
@@ -36,7 +36,7 @@ class CitationTest < ActiveSupport::TestCase
   end
 
   test "Chicago 17th: notes and bibliography entry with place and publisher" do
-    assert_equal "Grainger, Percy Aldridge. Portrait sketch. Drawing. Grainger Museum Collection, accession 1999.0042. " \
+    assert_equal "Grainger, Percy Aldridge. Portrait sketch. Drawing. Grainger Museum Collection, accession 1999.0042, UoM ID emu-umc-401422. " \
                  "Melbourne: University of Melbourne, 1922. #{URL} (accessed 2 November 2026).", cite(:chicago)
   end
 
@@ -46,7 +46,7 @@ class CitationTest < ActiveSupport::TestCase
 
   test "Harvard (Australian): author initials, year, title, holder, place, viewed date and link in angle brackets" do
     assert_equal "Grainger, P.A. 1922, Portrait sketch [drawing], Grainger Museum Collection, University of Melbourne, Melbourne, " \
-                 "accession number 1999.0042, viewed 2 November 2026, <#{URL}>.", cite(:harvard)
+                 "accession number 1999.0042, UoM ID emu-umc-401422, viewed 2 November 2026, <#{URL}>.", cite(:harvard)
   end
 
   test "Harvard shortens four or more authors to the first and et al." do

@@ -21,11 +21,7 @@ module NexusCcs
     def accession_number = document.first("accession_number_ssim").presence
 
     # What the team calls the record: its UoM ID (RecordDocumentComponent), which is also the id in its link
-    def persistent_id
-      id = document.id.to_s
-      prefix, uom_prefix = RecordDocumentComponent::UOM_ID_PREFIXES.find { |solr_prefix, _| id.start_with?(solr_prefix) }
-      prefix ? id.sub(prefix, uom_prefix) : id
-    end
+    def persistent_id = CollectionIdentifier.uom_id(document.id)
 
     def mailto
       lines = [ "Record: #{title}", "ID: #{persistent_id}", "Link: #{url}" ]

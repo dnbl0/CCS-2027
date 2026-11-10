@@ -10,7 +10,7 @@ class AccessRequestsExportTest < ActiveSupport::TestCase
   end
 
   def make(status:, name:, purpose: "Fake purpose")
-    AccessRequest.create!(document_id: "emu-1", document_title: "Fake, record", request_type: "view", name: name,
+    AccessRequest.create!(document_id: "emu-1", document_identifier: "Grainger Museum Collection, UoM ID emu-umc-1", document_title: "Fake, record", request_type: "view", name: name,
                           email: "fake@example.invalid", purpose: purpose, status: status)
   end
 
@@ -21,9 +21,10 @@ class AccessRequestsExportTest < ActiveSupport::TestCase
     output, = capture_io { Rake::Task["access_requests:export"].execute }
     rows = CSV.parse(output, headers: true)
 
-    assert_equal %w[id requested_at request_type document_id document_title name email organisation purpose], rows.headers
+    assert_equal %w[id requested_at request_type document_id document_identifier document_title name email organisation purpose], rows.headers
     assert_equal [ "Pending Person" ], rows.map { |row| row["name"] }
     assert_equal "Line one,\nline two", rows.first["purpose"]
     assert_equal "Fake, record", rows.first["document_title"]
+    assert_equal "Grainger Museum Collection, UoM ID emu-umc-1", rows.first["document_identifier"]
   end
 end
