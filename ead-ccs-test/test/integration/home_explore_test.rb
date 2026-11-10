@@ -37,6 +37,22 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
     assert_select "a.explore__link[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999']", text: /1900–1999/
   end
 
+  test "a group's example image is on the home page only when kept for it, and a withheld record's path never is" do
+    path = "/digital-assets/thumbs/0000_013_1_pf.jpg"
+    image = { id: "emu-1", title: "A bronze lyre", path: path, width: 400, height: 300 }
+    Rails.cache.write(ExploreEntryPoints::CACHE_KEY, COUNTS.merge("images" => { "object-type" => image }), expires_in: 1.day)
+
+    get "/"
+
+    assert_select "section.explore figure", count: 1
+    assert_select "section.explore img[alt=''][loading=lazy][width='400'][height='300']", count: 1
+    assert_select "section.explore figcaption", text: "A bronze lyre"
+
+    Rails.cache.write(ExploreEntryPoints::CACHE_KEY, COUNTS, expires_in: 1.day)
+    get "/"
+    assert_select "section.explore img", count: 0
+  end
+
   test "every way in opens all the matching records, not only those with images" do
     Rails.cache.write(ExploreEntryPoints::CACHE_KEY, COUNTS, expires_in: 1.day)
 

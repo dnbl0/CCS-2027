@@ -7,7 +7,7 @@ body.page-home {
 /* Hero: the welcome line is the lead */
 body.page-home .ccs-hero__text { font-size: var(--font-size-title-5); line-height: var(--line-height-tight); }
 /* Light band: Content Block with the statement in the first column and the description beside it */
-body.page-home .home-about { background: var(--neutral-100); }
+body.page-home .home-about { background: var(--white-100); }
 body.page-home .home-about__inner { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-48); align-items: start; max-width: var(--layout-content-wide); }
 body.page-home .home-about__statement { margin: 0; font-family: "Fraunces", serif; font-size: var(--font-size-28); font-weight: var(--font-weight-regular); line-height: var(--line-height-tight); letter-spacing: -0.28px; color: var(--brand-1100); font-variation-settings: "SOFT" 50, "WONK" 0, "opsz" 72; }
 body.page-home .home-about__text { margin: 0; font-size: var(--font-size-body-lg); color: var(--neutral-1000); }

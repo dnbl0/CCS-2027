@@ -5,3 +5,7 @@
 .arrow-link--inverse { color: var(--ccs-white); }
 .arrow-link--inverse:hover { color: var(--ccs-cyan-400); }
 .arrow-link--underline { text-decoration: underline; text-underline-position: from-font; }
+/* The same arrow drawn from a mask, so it takes the link's colour on a light band (the footer's image arrow is cyan, for the navy footer) */
+.arrow-link--icon::before { content: ""; width: 24px; height: 24px; flex: none; background: currentColor; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M17.15 12.75H4V11.25H17.15L10.95 5.05L12 4L20 12L12 20L10.95 18.95L17.15 12.75Z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.arrow-link--icon { gap: var(--ccs-space-2); color: var(--ccs-text-link); }
+.arrow-link--icon:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
