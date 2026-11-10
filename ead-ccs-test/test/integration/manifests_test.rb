@@ -10,14 +10,16 @@ class ManifestsTest < ActionDispatch::IntegrationTest
     with_records(document) { get "/catalog/#{document.id}/manifest.json" }
   end
 
-  test "an open record gives a Presentation 3.0 manifest of its images, open to other sites, cached for an hour" do
+  test "an open record gives a Presentation 3.0 manifest of its images, open to other sites, revalidated" do
     manifest_for(stub_document("open-1"))
 
     assert_response :success
     assert_match %r{\Aapplication/ld\+json;\s*profile="http://iiif.io/api/presentation/3/context.json"}, response.headers["Content-Type"]
     assert_equal "*", response.headers["Access-Control-Allow-Origin"]
     assert_match(/public/, response.headers["Cache-Control"])
-    assert_match(/max-age=3600/, response.headers["Cache-Control"])
+    assert_match(/max-age=0/, response.headers["Cache-Control"])
+    assert_match(/must-revalidate/, response.headers["Cache-Control"])
+    assert response.headers["ETag"].present?
     assert_nil response.headers["Set-Cookie"], "a public, cacheable response sets no cookie"
     assert_match(/noindex/, response.headers["X-Robots-Tag"].to_s)
 

@@ -36,11 +36,11 @@ class SensitivityChoicesTest < ActionDispatch::IntegrationTest
       follow_redirect!
 
       assert_select ".sensitivity-gate--viewing [data-controller=focus-on-load]"
-      assert_select "img[src='#{IMAGE}']"
+      assert_select "img[src^='#{IMAGE}']"
       assert_select ".sensitivity-gate--viewing button", text: "Hide this item"
 
       get "/catalog/#{OPEN}"
-      assert_select "img[src='#{IMAGE}']"
+      assert_select "img[src^='#{IMAGE}']"
       assert_select "[data-controller=focus-on-load]", count: 0
     end
   end

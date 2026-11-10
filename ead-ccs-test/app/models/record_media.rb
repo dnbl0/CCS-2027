@@ -30,7 +30,8 @@ class RecordMedia
   # Whether the record has an image at all, whatever the policy says (for deciding whether to offer anything)
   def images? = large_paths.any?
 
-  # The image(s) the visitor may see; the large file, its thumbnail, its IIIF info.json when the record has one
+  # The image(s) the visitor may see; the large file, its thumbnail, its IIIF info.json when the record has one. The addresses carry
+  # a version token (AssetVersion), so a replaced file is fetched again.
   def images
     return [] unless shown?
 
@@ -38,7 +39,7 @@ class RecordMedia
     infos = Array(document[MediaTypes::IIIF_INFO_FIELD])
     count = large_paths.size
     large_paths.each_with_index.map do |url, index|
-      Image.new(url: url, thumbnail: thumbs[index].presence || url, info_url: infos[index].presence,
+      Image.new(url: AssetVersion.url(url), thumbnail: AssetVersion.url(thumbs[index].presence || url), info_url: infos[index].presence,
                 alt: count == 1 ? title : "#{title}, image #{index + 1} of #{count}")
     end
   end
