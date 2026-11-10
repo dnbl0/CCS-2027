@@ -21,7 +21,7 @@ class CookieNoticeSystemTest < ApplicationSystemTestCase
   end
 
   test "the privacy page's cookie list, with the notice above it, has no axe violations" do
-    visit "/privacy#cookies"
+    visit "/privacy"
 
     assert_selector NOTICE
     assert_selector "#cookies code", text: "_ccs_session"
