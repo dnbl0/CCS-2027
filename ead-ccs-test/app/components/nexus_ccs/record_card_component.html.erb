@@ -1,0 +1,16 @@
+<article class="<%= classes %>">
+  <div class="object-card__media<%= ' object-card__media--empty' unless image_path %>">
+    <% if image_path %>
+      <%# The title names the record, so the image adds nothing to the link %>
+      <%= image_tag image_path, alt: "", class: "object-card__image", loading: "lazy", decoding: "async" %>
+    <% else %>
+      <span class="object-card__type"><%= type_label %></span>
+    <% end %>
+  </div>
+  <div class="object-card__body">
+    <%= content_tag heading_tag, class: "object-card__title" do %>
+      <%= link_to title, path, class: "object-card__link" %>
+    <% end %>
+    <% if meta.present? %><p class="object-card__meta"><%= meta %></p><% end %>
+  </div>
+</article>

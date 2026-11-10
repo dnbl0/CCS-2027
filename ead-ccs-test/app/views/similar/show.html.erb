@@ -1,10 +1,5 @@
-<%# The record page's Similar records section (SimilarController), the content of its lazy frame (NexusCcs::SimilarRecordsComponent) %>
-<turbo-frame id="similar-records">
-  <section class="similar-records" aria-labelledby="similar-records-heading">
-    <div class="similar-records__inner">
-      <h2 class="similar-records__heading" id="similar-records-heading"><%= t("nexus_ccs.similar.heading") %></h2>
-      <p class="similar-records__description"><%= t("nexus_ccs.similar.description") %></p>
-      <%= render "discover/cards", entries: @entries, title_tag: :h3 %>
-    </div>
-  </section>
+<%# The record page's Similar records section (SimilarController), the content of its lazy frame (NexusCcs::SimilarRecordsComponent): the same cards as Related objects %>
+<turbo-frame id="similar-records" class="similar-frame">
+  <%= render NexusCcs::RecordCardsComponent.new(id: "similar-records-section", heading_id: "similar-records-heading", heading: t("nexus_ccs.similar.heading"),
+                                                description: t("nexus_ccs.similar.description"), documents: @documents) %>
 </turbo-frame>

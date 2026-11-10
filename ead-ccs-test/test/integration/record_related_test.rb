@@ -21,14 +21,15 @@ class RecordRelatedTest < ActionDispatch::IntegrationTest
   def path_for(doc) = "/catalog/#{ERB::Util.url_encode(doc['id'])}"
 
   test "a record page lists other records of the same kind, never the record itself" do
-    first, second = records_of_one_type
+    first, = records_of_one_type
 
     get path_for(first)
 
     assert_response :success
     assert_select "section#related-objects h2", text: "Related objects"
-    assert_select "section#related-objects a.record-tiles__link[href='#{path_for(second)}']"
-    assert_select "section#related-objects a.record-tiles__link[href='#{path_for(first)}']", count: 0
+    assert_select "section#related-objects h3.object-card__title a.object-card__link"
+    assert_operator css_select("section#related-objects article.object-card").size, :<=, 4
+    assert_select "section#related-objects a.object-card__link[href='#{path_for(first)}']", count: 0
   end
 
   test "the first record a visitor opens has no recently viewed list; later ones list the earlier ones, newest first" do
@@ -39,11 +40,11 @@ class RecordRelatedTest < ActionDispatch::IntegrationTest
 
     get path_for(second)
     assert_select "section#recently-viewed h2", text: "Recently viewed"
-    assert_select "section#recently-viewed a.record-tiles__link[href='#{path_for(first)}']"
-    assert_select "section#recently-viewed a.record-tiles__link[href='#{path_for(second)}']", count: 0
+    assert_select "section#recently-viewed a.object-card__link[href='#{path_for(first)}']"
+    assert_select "section#recently-viewed a.object-card__link[href='#{path_for(second)}']", count: 0
 
     get path_for(third)
-    links = css_select("section#recently-viewed a.record-tiles__link").pluck("href")
+    links = css_select("section#recently-viewed a.object-card__link").pluck("href")
     assert_equal [ path_for(second), path_for(first) ], links
   end
 

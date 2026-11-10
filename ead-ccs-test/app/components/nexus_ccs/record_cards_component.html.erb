@@ -1,0 +1,11 @@
+<section id="<%= id %>" class="<%= classes %>" aria-labelledby="<%= heading_id %>">
+  <div class="object-cards__inner">
+    <h2 id="<%= heading_id %>" class="object-cards__heading"><%= heading %></h2>
+    <% if description.present? %><p class="object-cards__description"><%= description %></p><% end %>
+    <ul class="object-cards__list">
+      <% documents.each do |document| %>
+        <li class="object-cards__item"><%= render NexusCcs::RecordCardComponent.new(document: document, compact: compact?) %></li>
+      <% end %>
+    </ul>
+  </div>
+</section>
