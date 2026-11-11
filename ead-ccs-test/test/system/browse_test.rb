@@ -8,10 +8,6 @@ class BrowseSystemTest < ApplicationSystemTestCase
     needs_solr
   end
 
-  # The result card's title is an h5 on every page that draws it (NexusCcs::ResultCardComponent::TITLE_TAG); a best-practice
-  # rule, tracked with the card, not with these pages
-  HEADING_ORDER = %w[heading-order].freeze
-
   WIDTHS = { "desktop" => [ 1440, 900 ], "320px" => [ 320, 700 ] }.freeze
 
   WIDTHS.each do |name, size|
@@ -20,12 +16,12 @@ class BrowseSystemTest < ApplicationSystemTestCase
       [ "/browse", "/browse/makers?letter=G", "/browse/periods", "/browse/periods/1900-1999" ].each do |path|
         visit path
         assert_selector "h1"
-        assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: HEADING_ORDER)
+        assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
       end
       visit "/browse/makers?filter=bunny"
       first(".browse__link").click
       assert_selector ".result-card"
-      assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: HEADING_ORDER)
+      assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
       assert_no_horizontal_scroll if name == "320px"
     end
   end

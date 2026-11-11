@@ -30,7 +30,7 @@ class SharingSystemTest < ApplicationSystemTestCase
       assert_selector "h1", text: "Strings"
       assert_selector ".result-card", count: 3
       assert_button "Add to my list"
-      assert_accessible tags: AXE_TAGS + WCAG22_TAGS, except: %w[heading-order]
+      assert_accessible tags: AXE_TAGS + WCAG22_TAGS
       assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, width, "no horizontal scroll at #{width}px"
     end
   end
@@ -44,7 +44,7 @@ class SharingSystemTest < ApplicationSystemTestCase
 
     assert_selector "dialog.share__dialog[open]"
     assert_selector "textarea.share__code", count: 2
-    at_sizes { assert_accessible tags: AXE_TAGS + WCAG22_TAGS, except: %w[heading-order] }
+    at_sizes { assert_accessible tags: AXE_TAGS + WCAG22_TAGS }
 
     within("dialog.share__dialog") do
       first(:button, "Copy link").click
@@ -66,7 +66,7 @@ class SharingSystemTest < ApplicationSystemTestCase
 
     assert_selector "dialog[open] input[readonly][value*='/galleries/']"
     assert_selector ".share-status", text: /Anyone with the link/
-    assert_accessible tags: AXE_TAGS + WCAG22_TAGS, except: %w[heading-order]
+    assert_accessible tags: AXE_TAGS + WCAG22_TAGS
   end
 
   test "an embed page is accessible at desktop and 320px" do
@@ -85,6 +85,6 @@ class SharingSystemTest < ApplicationSystemTestCase
     visit "/catalog/emu-400198"
     click_button "Share and embed"
     assert_selector "dialog.share__dialog[open]"
-    assert_accessible tags: AXE_TAGS + WCAG22_TAGS, except: %w[heading-order]
+    assert_accessible tags: AXE_TAGS + WCAG22_TAGS
   end
 end

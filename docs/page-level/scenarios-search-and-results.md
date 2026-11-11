@@ -24,7 +24,7 @@ Key numbers
 | H5 | Results | One result | Edge | query matching one record | "1 result" | same | Both |
 | H6 | Results | Mosaic (default) | Happy | no `view`, or `view=masonry` | Columns 1 below 632px, 2 at 632, 3 at 928; with sidebar 2 at 992, 3 at 1264, 4 at 1560, 5 at 1856, 6 at 2152 | results_layout.css:83-116 | R |
 | H7 | Results | List view | Happy | `view=list` | Below 768 vertical card; 768+ horizontal (text left, 324x182 image right); 2 columns from 1800px | result_card.css:176-215 | R |
-| H8 | Results | Card with image | Happy | thumbnail exists | 16:9 lazy image, h5 title, up to 3 lines (creator, object type, collection), Save control | result_card_component.html.erb | Both |
+| H8 | Results | Card with image | Happy | thumbnail exists | 16:9 lazy image, h3 title (styled like an h5), up to 3 lines (creator, object type, collection), Save control | result_card_component.html.erb | Both |
 | H9 | Results | Card without image | Edge | no `thumbnail_path_ssi` | Text only. Mosaic shows a placeholder cycling 3 shapes (landscape, portrait, square); list shows nothing and text takes full width | catalog_controller.rb:42-47 | R |
 | H10 | Results | Missing fields, long title | Edge | record lacking creator, type or collection | Missing lines dropped, no dash or label. No truncation rule for long titles | result_card_component.rb:43-45 | R |
 | H11 | Results | Save states | Happy/Edge | click Save | "Save", "Saving...", "Saved"; accessible name "Save record: <title>"; no-JS button "Save"/"Remove"; failure "Sorry, there was a problem saving the record." | en.yml | Both |

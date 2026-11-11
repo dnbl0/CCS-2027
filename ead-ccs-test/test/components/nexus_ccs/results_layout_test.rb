@@ -105,9 +105,9 @@ class ResultsLayoutTest < ActiveSupport::TestCase
     assert_nil withheld.media_path
   end
 
-  test "the card heading is an h5" do
-    assert_equal :h5, NexusCcs::ResultCardComponent::TITLE_TAG
-    assert_equal :h5, card("title_tsim" => [ "Untitled" ]).instance_variable_get(:@title_component)
+  test "the card heading is an h3" do
+    assert_equal :h3, NexusCcs::ResultCardComponent::TITLE_TAG
+    assert_equal :h3, card("title_tsim" => [ "Untitled" ]).instance_variable_get(:@title_component)
   end
 
   test "the card's three lines are the creator, the object type and the collection, whichever the record has" do
