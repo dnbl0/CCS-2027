@@ -86,7 +86,10 @@ class RecordDebiasTest < ActiveSupport::TestCase
   Row = Struct.new(:label, :values, :field, :copy, keyword_init: true)
   class Host
     include NexusCcs::RecordDebias
+    Row = RecordDebiasTest::Row
     attr_reader :rows
+
+    def heading = "blorp" # the title, shown in the header and scanned with the details
 
     def initialize(rows) = @rows = rows
     def link_to_value?(row) = row.field == "collection_ssim"
@@ -94,8 +97,7 @@ class RecordDebiasTest < ActiveSupport::TestCase
   end
 
   test "only the displayed rows are scanned, the copy and link rows are not, and flagged marks one value of one field" do
-    host = Host.new([ Row.new(label: "Title", values: [ "blorp" ], field: "title_tsim"),
-                      Row.new(label: "UoM ID", values: [ "blorp" ], field: "id", copy: true),
+    host = Host.new([ Row.new(label: "UoM ID", values: [ "blorp" ], field: "id", copy: true),
                       Row.new(label: "Collection", values: [ "blorp" ], field: "collection_ssim"),
                       Row.new(label: "Subject", values: [ "plain", "a blorp" ], field: "subject_ssim") ])
 
@@ -108,10 +110,11 @@ class RecordDebiasTest < ActiveSupport::TestCase
   end
 
   test "with no terms flagged returns the very same value" do
-    host = Host.new([ Row.new(label: "Title", values: [ "blorp" ], field: "title_tsim") ])
+    host = Host.new([ Row.new(label: "Subject", values: [ "blorp" ], field: "subject_ssim") ])
     with_debias_terms do
       value = "blorp"
       assert_same value, host.flagged(host.rows.first, value, 0)
+      assert_equal "blorp", host.title_markup
     end
   end
 end

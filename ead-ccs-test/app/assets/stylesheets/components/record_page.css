@@ -152,7 +152,6 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   align-items: center;
   justify-content: space-between;
   gap: var(--ccs-space-3);
-  min-height: 2.75rem;
   padding-block: var(--ccs-space-3);
   list-style: none;
   cursor: pointer;
@@ -160,6 +159,12 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 
 .record-accordion > summary::-webkit-details-marker {
   display: none;
+}
+
+@media (max-width: 767px) {
+  .record-accordion > summary {
+    min-height: 2.75rem;
+  }
 }
 
 .record-accordion > summary::after {
@@ -184,11 +189,12 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 /* From 768px the sections are plain: open, and the summary is a heading, not a control */
 .record-accordion.is-fixed > summary {
   cursor: default;
-  min-height: 0;
 }
 
-.record-accordion.is-fixed > summary::after {
-  display: none;
+@media (min-width: 768px) {
+  .record-accordion > summary::after {
+    display: none;
+  }
 }
 
 .record-section__body {

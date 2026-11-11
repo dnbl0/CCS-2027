@@ -1,6 +1,6 @@
 <header class="record-header">
   <% if kicker %><p class="record-header__kicker" data-testid="record-kicker"><%= kicker %></p><% end %>
-  <h1 class="record-summary__title record-header__title"><%= title %></h1>
+  <h1 class="record-summary__title record-header__title"><%= title_markup %></h1>
   <% if byline? %>
     <p class="record-summary__byline record-header__byline">
       <% creators.each_with_index do |(name, path), index| %><%= "; " if index.positive? %><% if path %><%= link_to name, path %><% else %><%= name %><% end %><% end %><%= " · " if creators.any? && date %><%= date %>

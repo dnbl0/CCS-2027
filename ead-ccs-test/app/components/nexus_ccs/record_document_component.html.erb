@@ -6,7 +6,7 @@
   class: "record" do %>
   <div class="record-page" data-controller="record-sections">
     <div class="record-page__inner">
-      <%= render NexusCcs::RecordHeaderComponent.new(document: document) %>
+      <%= render NexusCcs::RecordHeaderComponent.new(document: document, title_markup: title_markup) %>
 
       <div class="record-layout">
         <%# Reading order is visual order: the media, the column beside it (actions, Key facts), then the sections %>

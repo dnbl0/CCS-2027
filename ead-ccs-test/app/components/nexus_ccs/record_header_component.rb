@@ -5,13 +5,17 @@ module NexusCcs
   # to the maker's browse page where there is one) and date, and the Collection ID with a Copy button (CCS-22). It replaces the
   # dark title band, so the title sits beside the creator and date it belongs to.
   class RecordHeaderComponent < ViewComponent::Base
-    def initialize(document:)
+    def initialize(document:, title_markup: nil)
       @document = document
+      @title_markup = title_markup
     end
 
     attr_reader :document
 
     def title = Array(document["title_tsim"]).first.presence || document.id.to_s
+
+    # The title with any de-bias finds marked (RecordDebias), else the plain title
+    def title_markup = @title_markup || title
 
     # "Painting · University Art Collection"
     def kicker
