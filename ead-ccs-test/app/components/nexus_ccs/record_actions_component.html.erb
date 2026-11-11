@@ -9,7 +9,7 @@
         <%= render NexusCcs::AddToListComponent.new(document: document) %>
       </div>
     <% end %>
-    <details class="record-actions__more">
+    <details class="record-actions__more" data-record-sections-target="section">
       <summary><%= t("nexus_ccs.record_page.more_actions") %></summary>
       <div class="record-actions__more-body">
         <%= render NexusCcs::CompareActionsComponent.new(document: document, images: compare? ? media.images.size : 0) %>
