@@ -49,17 +49,19 @@
   position: relative;
 }
 
+/* Above the viewer's canvas, so the toggle can still be pressed (mouse and keyboard) once the viewer is on */
 .deep-zoom__toggle {
   position: absolute;
   left: var(--ccs-space-2);
   bottom: var(--ccs-space-2);
+  z-index: 3;
 }
 
 .deep-zoom__controls {
   position: absolute;
   top: var(--ccs-space-2);
   right: var(--ccs-space-2);
-  z-index: 2;
+  z-index: 3;
   display: flex;
   flex-wrap: wrap;
   gap: var(--ccs-space-1);
@@ -70,6 +72,8 @@
 }
 
 .deep-zoom__stage {
+  position: relative;
+  z-index: 0; /* the viewer's own layers stay inside it, under the buttons */
   width: 100%;
   height: min(38.5rem, 70vh);
   background: var(--ccs-navy-1200);
