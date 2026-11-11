@@ -16,7 +16,10 @@
 .browse__hub {
   position: relative; display: flex; flex-direction: column; gap: var(--ccs-space-3);
   padding: var(--ccs-space-5); border: 1px solid var(--ccs-border-panel); background: var(--ccs-white);
-  transition: border-color var(--ccs-duration-base);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .browse__hub { transition: border-color var(--ccs-duration-base); }
 }
 
 .browse__hub:hover, .browse__hub:focus-within { border-color: var(--ccs-border-strong); }

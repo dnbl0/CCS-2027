@@ -72,39 +72,49 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   test "an open record with images offers Compare images, Add to compare, Cite and Share, and no access notice" do
     render_actions(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
-    assert_selector ".record-actions .compare-actions a[href='/compare?record=emu-1']", text: "Compare images"
-    assert_selector ".compare-actions form[action='/compare/items'] button", text: "Add to compare"
-    assert_selector ".record-summary__cite .cite__button"
-    assert_selector ".record-summary__share .share__button", text: /Share and embed/
+    assert_selector ".record-actions .compare-actions a[href='/compare?record=emu-1']", text: "Compare images", visible: :all
+    assert_selector ".compare-actions form[action='/compare/items'] button", text: "Add to compare", visible: :all
+    assert_selector ".record-summary__cite .cite__button", visible: :all
+    assert_selector ".record-summary__share .share__button", text: /Share and embed/, visible: :all
     assert_no_selector ".access-notice"
+  end
+
+  test "Compare, Cite and Share sit in a More actions disclosure that is closed in the markup; Save and Add to list are outside it" do
+    render_actions(IMAGES)
+
+    assert_selector "details.record-actions__more:not([open]) > summary", text: "More actions", visible: :all
+    assert_selector "details.record-actions__more .compare-actions", visible: :all
+    assert_selector "details.record-actions__more .record-summary__cite .cite__button", visible: :all
+    assert_selector "details.record-actions__more .record-summary__share .share__button", visible: :all
+    assert_no_selector "details.record-actions__more .record-summary__save", visible: :all
   end
 
   test "a record with one image offers Add to compare but not Compare images" do
     render_actions("digital_asset_large_paths_ssim" => [ "/digital-assets/large/a.jpg" ], "digital_asset_paths_ssim" => [ "/digital-assets/thumbs/a.jpg" ],
                    "licence_type_ssim" => [ "Public domain - Copyright expired" ])
 
-    assert_no_selector ".compare-actions a", text: "Compare images"
-    assert_selector ".compare-actions button", text: "Add to compare"
+    assert_no_selector ".compare-actions a", text: "Compare images", visible: :all
+    assert_selector ".compare-actions button", text: "Add to compare", visible: :all
   end
 
   test "a view-only record's access notice is in the actions, with the request link and nothing that downloads" do
     render_actions(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ]))
 
     assert_selector ".record-actions .access-notice--view-only a[href='/access_requests/new?document_id=emu-1']", text: "Request access to download this item"
-    assert_selector ".compare-actions button", text: "Add to compare"
+    assert_selector ".compare-actions button", text: "Add to compare", visible: :all
     assert_no_selector "a[download]"
   end
 
   test "a request-only, a not-yet-chosen sensitive and an imageless record offer no compare, and no notice here for the first and last" do
     render_actions(IMAGES.merge("licence_type_ssim" => [ "ICIP Rights" ]))
-    assert_no_selector ".compare-actions, .access-notice"
+    assert_no_selector ".compare-actions, .access-notice", visible: :all
 
     render_actions(IMAGES.merge("restrictions_tsi" => [ "Culturally sensitive images" ]))
-    assert_no_selector ".compare-actions"
+    assert_no_selector ".compare-actions", visible: :all
 
     render_actions
-    assert_no_selector ".compare-actions, .access-notice"
-    assert_selector ".cite__button"
+    assert_no_selector ".compare-actions, .access-notice", visible: :all
+    assert_selector ".cite__button", visible: :all
   end
 
   # --- media: the three tiers, in markup

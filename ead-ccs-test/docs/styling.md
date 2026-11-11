@@ -144,6 +144,9 @@ the media (or one plain sentence when the record has no digital asset, `NoImageC
 plain column that scrolls with the page (nothing on the page is sticky, so focus is never covered) holding the actions
 (`RecordActionsComponent`: the access notice of a view-only record, Save, Add to list, Compare, Cite, Share and embed) and the Key
 facts (`KeyFactsComponent`, a `dl`). Below 1200px it is one column in the same order; the actions strip wraps and its targets are 40px.
+Below 768px Compare, Cite and Share sit in a "More actions" disclosure (a `details` closed in the markup, so nothing shifts); Save and
+Add to list stay visible. From 768px the disclosure is plain: its summary is hidden and its content shows (`::details-content`).
+Motion is guarded by `prefers-reduced-motion: no-preference` in the result card, browse hub and results toolbar styles.
 
 - **Media** (`DigitalAssetsComponent`, `digital_assets.css`): the image sits on the page surface, whole, at its own shape (at most
   70vh high), on a flat tint that holds its room from the `width` and `height` attributes (no minimum height, no dark band). Dark
