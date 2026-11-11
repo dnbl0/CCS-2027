@@ -172,11 +172,12 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
     render_inline(NexusCcs::RecordAboutComponent.new(document: doc("collection_ssim" => [ "University Art Collection" ]), url: "http://example.test/catalog/emu-1"))
 
     assert_selector "details#about-this-record h2", text: "About this record"
-    assert_selector "[data-controller=clipboard] input[readonly][value='http://example.test/catalog/emu-1']"
-    assert_selector "button[data-action='clipboard#copy']", text: "Copy link"
-    assert_selector "h3", text: "Contact the collection team"
-    assert_selector "strong", text: "emu-umc-1"
-    assert_selector ".record-about__correction a", text: "Suggest a correction to this record"
+    # closed in the markup (a phone opens it), so look at all of it
+    assert_selector "[data-controller=clipboard] input[readonly][value='http://example.test/catalog/emu-1']", visible: :all
+    assert_selector "button[data-action='clipboard#copy']", text: "Copy link", visible: :all
+    assert_selector "h3", text: "Contact the collection team", visible: :all
+    assert_selector "strong", text: "emu-umc-1", visible: :all
+    assert_selector ".record-about__correction a", text: "Suggest a correction to this record", visible: :all
   end
 
   # --- more like this

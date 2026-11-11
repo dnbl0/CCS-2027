@@ -12,7 +12,9 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     def search_service
       return super unless RecordSolr.documents
 
-      Struct.new(:docs) { def fetch(id, *) = docs.fetch(id) }.new(RecordSolr.documents)
+      # The stand-in answers for its own records; any other id (a related record, the visitor's history) goes to the real index
+      real = super
+      Struct.new(:docs, :real) { def fetch(id, *rest) = docs.fetch(id) { real.fetch(id, *rest) } }.new(RecordSolr.documents, real)
     end
   end
   CatalogController.prepend(RecordSolr)
@@ -39,6 +41,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
   }.freeze
 
   WIDTHS = { "desktop" => [ 1440, 900 ], "phone" => [ 390, 844 ] }.freeze
+  SIZES = WIDTHS.merge("narrow" => [ 320, 800 ]).freeze
 
   teardown do
     RecordSolr.documents = nil
@@ -49,7 +52,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
 
   def open_record(extra, width)
     RecordSolr.documents = { "emu-9044" => document(extra) }
-    page.current_window.resize_to(*WIDTHS.fetch(width))
+    page.current_window.resize_to(*SIZES.fetch(width))
     visit "/catalog/emu-9044"
     assert_selector "h1"
     assert_no_selector "html[aria-busy]"
@@ -81,6 +84,13 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
         JS
         assert_equal 0, small, "a control is smaller than 24px"
       end
+    end
+  end
+
+  test "at 320px every variant fits without scrolling sideways, long Collection ID and all" do
+    VARIANTS.each_value do |extra|
+      open_record(extra.merge("title_tsim" => [ "A very long title with Supercalifragilisticexpialidocious-and-more words" ]), "narrow")
+      assert_equal false, page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
     end
   end
 

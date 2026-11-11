@@ -85,6 +85,12 @@ module NexusCcs
       width ? { width: width, height: height } : {}
     end
 
+    # "800 / 1200" for the main image when its size is known, else nil
+    def ratio
+      size = image_size(main.first)
+      "#{size[:width]} / #{size[:height]}" if size[:width]
+    end
+
     def media_title(item) = item[:label].presence || title
     def others = images.drop(1)
 

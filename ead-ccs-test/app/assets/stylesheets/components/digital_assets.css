@@ -27,6 +27,30 @@
   background: var(--ccs-surface-subtle); /* the flat tint that holds the image's room until it arrives */
 }
 
+/* Its size is known: the figure keeps the image's shape (and at most 70vh) before and after the image arrives, the image fills it
+   contained, and the zoom viewer fills the same box */
+.digital-assets__main--sized {
+  position: relative;
+  width: 100%;
+  max-height: 70vh;
+  aspect-ratio: var(--digital-assets-ratio);
+}
+
+.digital-assets__main--sized .digital-assets__image {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+}
+
+.digital-assets__main--sized .deep-zoom {
+  position: absolute;
+  inset: 0;
+}
+
+.digital-assets__main--sized .deep-zoom__stage {
+  height: 100%;
+}
+
 .digital-assets__image {
   display: block;
   max-width: 100%;
@@ -242,7 +266,8 @@
   background: transparent;
 }
 
-.digital-assets.is-fullscreen .digital-assets__image {
+.digital-assets.is-fullscreen .digital-assets__image,
+.digital-assets.is-fullscreen .digital-assets__main--sized {
   max-height: calc(100vh - 8rem);
 }
 

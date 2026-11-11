@@ -12,7 +12,8 @@
         <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: sensitivity_state) %>
       <% end %>
       <% if main %>
-        <figure class="digital-assets__main">
+        <%# The figure holds the image's own shape from its known width and height (aspect-ratio), so nothing moves when the image arrives %>
+        <figure class="digital-assets__main<%= ' digital-assets__main--sized' if ratio %>"<% if ratio %> style="--digital-assets-ratio: <%= ratio %>"<% end %>>
           <%= image_tag main.first, alt: alt(1), class: "digital-assets__image", data: { media_viewer_target: "image" },
                 fetchpriority: "high", decoding: "async", **image_size(main.first) %>
           <%= render NexusCcs::DeepZoomComponent.new(sources: zoom_sources, label: alt(1)) %>

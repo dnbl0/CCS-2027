@@ -191,9 +191,15 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   cursor: default;
 }
 
+/* Closed in the markup so a phone does not shift when the script collapses them; from 768px their content shows whether or not the
+   script has opened them yet (::details-content), so that width does not shift either */
 @media (min-width: 768px) {
   .record-accordion > summary::after {
     display: none;
+  }
+
+  .record-accordion::details-content {
+    content-visibility: visible;
   }
 }
 

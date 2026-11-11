@@ -276,6 +276,14 @@
   display: none;
 }
 
+/* With scripting on, the panel is closed from the first paint (the script would hide it a moment later, and the page below it
+   would jump up); without scripting it stays in the page */
+@media (scripting: enabled) {
+  .list-menu__button[hidden] + .list-menu__panel {
+    display: none;
+  }
+}
+
 .list-menu__heading {
   margin: 0 0 var(--ccs-space-2);
   font-weight: var(--ccs-font-weight-semibold);
