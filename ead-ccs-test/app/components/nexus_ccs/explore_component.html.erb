@@ -1,33 +1,59 @@
 <section class="ccs-section explore" aria-labelledby="explore-title">
   <div class="ccs-section__inner explore__inner">
     <header class="explore__header">
-      <h2 id="explore-title" class="ccs-section__heading">Explore the collections</h2>
-      <p class="explore__intro">No search term needed. Start from what the records are, where they come from or when they were made.</p>
+      <h2 id="explore-title" class="ccs-section__heading"><%= t("explore.title") %></h2>
+      <p class="explore__intro"><%= t("explore.intro") %></p>
     </header>
-    <div class="explore__groups">
-      <% groups.each do |group| %>
-        <div class="explore__group">
-          <% if image?(group) %>
-            <%# The caption is the link text, so the picture itself is decorative (empty alt) %>
-            <figure class="explore__figure">
-              <%= link_to image_record_path(group), class: "explore__figure-link" do %>
-                <span class="explore__frame"><%= image_tag image_path(group), alt: "", width: group.image.width, height: group.image.height, loading: "lazy", decoding: "async", class: "explore__image" %></span>
-                <figcaption class="explore__caption"><%= group.image.title %></figcaption>
+
+    <% if overview.collections.any? %>
+      <ul class="explore__tiles" aria-label="<%= t("explore.collections.label") %>">
+        <% overview.collections.each do |tile| %>
+          <li class="explore__tile explore__tile--tint-<%= tile.tint %>">
+            <%= link_to helpers.search_action_path(tile.query), class: "explore__tile-link" do %>
+              <% if image?(tile) %>
+                <%# The title is the link text, so the picture itself is decorative (empty alt) %>
+                <span class="explore__face explore__face--image"><%= image_tag image_path(tile), alt: "", width: tile.image.width, height: tile.image.height, loading: "lazy", decoding: "async", class: "explore__image" %></span>
+              <% else %>
+                <span class="explore__face" aria-hidden="true"><span class="explore__monogram"><%= monogram(tile) %></span></span>
               <% end %>
-            </figure>
-          <% end %>
-          <h3 id="<%= heading_id(group) %>" class="explore__heading"><%= group.heading %></h3>
-          <ul class="explore__list" aria-labelledby="<%= heading_id(group) %>">
-            <% group.items.each do |item| %>
-              <li class="explore__item">
-                <%= link_to helpers.search_action_path(item.query), class: "explore__link" do %>
-                  <span class="explore__label"><%= item.label.to_s.upcase_first %></span>
-                  <span class="explore__count"><%= count_label(item.count) %></span>
-                <% end %>
-              </li>
+              <span class="explore__tile-body">
+                <h3 class="explore__tile-title"><%= tile.label %></h3>
+                <span class="explore__tile-count"><%= count_label(tile.count) %></span>
+              </span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <div class="explore__more">
+      <% if overview.kinds.any? %>
+        <div class="explore__group">
+          <h3 id="explore-kinds" class="explore__heading"><%= t("explore.kinds.heading") %></h3>
+          <ul class="explore__links explore__links--columns" aria-labelledby="explore-kinds">
+            <% overview.kinds.each do |kind| %>
+              <li><%= link_to kind.label, helpers.search_action_path(kind.query), class: "explore__link" %></li>
             <% end %>
           </ul>
-          <%= link_to helpers.browse_hub_path(hub_slug(group)), class: "arrow-link arrow-link--icon explore__all" do %><%= see_all_label(group) %><% end %>
+          <%= link_to t("explore.kinds.see_all"), helpers.browse_hub_path("object-types"), class: "arrow-link arrow-link--icon explore__all" %>
+        </div>
+      <% end %>
+
+      <% if overview.places.any? || overview.periods.any? %>
+        <div class="explore__group explore__group--time">
+          <h3 class="explore__heading"><%= t("explore.place_time.heading") %></h3>
+          <% [ [ :places, overview.places, "places", "see_all_places" ], [ :periods, overview.periods, "periods", "see_all_periods" ] ].each do |key, links, slug, see_all| %>
+            <% next if links.empty? %>
+            <details class="explore__disclosure" data-controller="explore-disclosure">
+              <summary class="explore__summary"><%= t("explore.place_time.#{key}") %></summary>
+              <ul class="explore__links">
+                <% links.each do |link| %>
+                  <li><%= link_to link.label, helpers.search_action_path(link.query), class: "explore__link" %></li>
+                <% end %>
+              </ul>
+              <%= link_to t("explore.place_time.#{see_all}"), helpers.browse_hub_path(slug), class: "arrow-link arrow-link--icon explore__all" %>
+            </details>
+          <% end %>
         </div>
       <% end %>
     </div>

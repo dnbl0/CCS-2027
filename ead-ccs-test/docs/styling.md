@@ -78,6 +78,8 @@ header omits those items (in development it defaults to `http://localhost:3000`)
   separate patterns.
 - **Controls** use the body font (`unimelb.css`): buttons and inputs would otherwise be the browser's system font. The one
   exception is the "all / any" menu in the Advanced search heading, which is set in the heading's serif by the design.
+- **Explore tiles** (`components/explore.css`, docs/explore.md): the face of a collection tile with no picture is one of six tints, `--ccs-explore-tint-1..6`
+  in `tokens/semantic.css`, mapped to palette tokens, with navy text. A new tint is a new token there, not a hex in the component.
 - **Colours, radii and sizes** come from `--ccs-*` tokens. A size, colour or radius the scale lacks gets a token in
   `tokens/semantic.css` (for example `--ccs-font-size-ui`, `--ccs-border-subtle`, `--ccs-radius-circle`), not a literal.
 - **Wording**: titles and headings are sentence case ("Advanced search", "Help and support"), and a page's `<title>` starts with its h1.

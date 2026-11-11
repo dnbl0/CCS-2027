@@ -53,7 +53,7 @@ search.
 
 ## What exists, and what this adds
 
-The home page's Explore tiles (PR #25) already give the **index pages**: `/browse` (the ways in) and `/browse/:slug` for
+The home page's Explore section (PR #25; redesigned as collection tiles, docs/explore.md) already give the **index pages**: `/browse` (the ways in) and `/browse/:slug` for
 `object-types`, `places`, `periods`, `makers` and `subjects`, with a "Most records" list, an A to Z letter bar, a cached last-good copy
 (`BrowseHubs`, `BrowseList`, `SolrGuard`) and a plain 503 when Solr is down. This work adds, on top of them and without a second set of routes:
 
