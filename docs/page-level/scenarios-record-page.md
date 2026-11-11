@@ -3,11 +3,12 @@
 Source: research agent, 2026-10-12 (code read). Rails: `catalog#show` template (`show.html.erb`), body is
 `NexusCcs::RecordDocumentComponent`. Static: `public/collections/record.html?id=N` (or `?item=CA-nn`), driven by `collection-data.js`.
 
-> Rails layout changed on 2026-11-11 (branch design/record-page-layout): no dark title band (the header block has the kicker, h1, creator,
-> date and Collection ID); the media sits on the page with one toolbar under it; no-image records start at the header and say so in one
-> sentence; actions and Key facts are in a plain right column; Object details, Copyright and use, About this record are sections; More like
-> this has no tabs. Rows below that name the title band, the Copyright card or the media band describe the earlier layout (and the static site).
-> See ead-ccs-test/docs/styling.md, "The record page layout".
+> Rails layout changed again on 2026-11-11 (branch design/record-page-v2): a sub-navigation from 1200px; two columns, the viewer on the left
+> (stage, round controls, strip of images, three short lines) and the record on the right (kicker, large title, byline, description, an
+> access card with one primary button and quiet text actions); a centred 960px specifications column (Object details, Copyright and use,
+> About this record); More like this without tabs. There is no title band, no Key facts and no toolbar. Rows below that name the title band,
+> the Copyright card or the media band describe earlier layouts (and the static site). See ead-ccs-test/docs/styling.md, "The record page
+> layout".
 
 | ID | Page | Scenario | Type | How reached | What the UI shows | Source | R/S/B |
 |---|---|---|---|---|---|---|---|

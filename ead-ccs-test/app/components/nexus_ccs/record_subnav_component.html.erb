@@ -1,0 +1,10 @@
+<nav class="record-subnav" aria-label="<%= t("nexus_ccs.record_page.subnav.label") %>">
+  <div class="record-subnav__inner">
+    <p class="record-subnav__title"><%= title %></p>
+    <ul class="record-subnav__links">
+      <% links.each do |label, href| %>
+        <li><a href="<%= href %>"><%= label %></a></li>
+      <% end %>
+    </ul>
+  </div>
+</nav>

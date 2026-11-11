@@ -2,7 +2,7 @@ require "test_helper"
 require "view_component/test_helpers"
 require "capybara/minitest"
 
-# The record page's layout components (header, actions, Key facts, no image, About this record, More like this) and the three
+# The record page's layout components (header, actions rail, related rail, no image, About this record, More like this) and the three
 # access tiers they must respect: no asset address in the markup for a withheld or not-yet-chosen sensitive record, and no download
 # link for a view-only one.
 class RecordPageLayoutTest < ActiveSupport::TestCase
@@ -44,7 +44,8 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
     assert_selector "header.record-header p.record-header__kicker", text: "Tone tool · Grainger Museum Collection"
     assert_selector "h1", count: 1, text: "Kangaroo-pouch tone-tool"
     assert_selector ".record-header__byline", text: "Grainger, Percy Aldridge · 1952"
-    assert_selector "[data-testid=record-identifier] button[aria-label='Copy collection ID']"
+    assert_selector ".record-header__place", text: "Paper" # no place: the material
+    assert_no_selector "[data-testid=record-identifier]" # the Collection ID is in the actions rail
     assert_no_selector ".record-banner, .record-tag"
   end
 
@@ -54,27 +55,45 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
     assert_no_selector ".record-header__byline"
   end
 
-  # --- key facts
-  test "Key facts are a description list of the facts the record has, and nothing for a record with none" do
-    render_inline(NexusCcs::KeyFactsComponent.new(document: doc))
+  # --- the details list and the rail
+  test "the description is read first, and Object details lists the rest with chips for the terms that link" do
+    component = NexusCcs::RecordDocumentComponent.new(id: "document", component: :div, show: true,
+                                                      document: Blacklight::DocumentPresenter.new(doc("description_tsim" => [ "A long account." ]), nil, CatalogController.blacklight_config))
 
-    assert_selector "section.key-facts h2", text: "Key facts"
-    assert_equal [ "Date", "Materials", "Classification", "Subject", "Collection", "Credit line" ], page.all("dt").map(&:text)
+    assert_equal "A long account.", component.description_row.values.first
+    assert_not_includes component.rows.map(&:field), "description_tsim"
+    assert_includes component.rows.map(&:field), "material_ssim"
+    assert component.chips?(component.rows.find { |row| row.field == "material_ssim" })
+    assert_not component.chips?(component.rows.find { |row| row.field == "accession_number_ssim" })
+    assert_equal({ f: { "material_ssim" => [ "Paper" ] } }, component.filter_query("material_ssim", "Paper"))
+  end
 
-    render_inline(NexusCcs::KeyFactsComponent.new(document: SolrDocument.new("id" => "x", "material_ssim" => [ "Paper" ])))
-    assert_equal [ "Materials" ], page.all("dt").map(&:text)
+  test "the rail ends with the Collection ID and its Copy button" do
+    render_actions
 
-    render_inline(NexusCcs::KeyFactsComponent.new(document: SolrDocument.new("id" => "x")))
-    assert_no_selector ".key-facts"
+    assert_selector "[data-testid=record-identifier] button[aria-label='Copy collection ID']", visible: :all
+    assert_selector "[data-testid=record-identifier]", text: /Grainger Museum Collection, accession number 00\.0001/, visible: :all
+  end
+
+  test "the sub-navigation has the title and anchors to the sections, and leaves out a section the record cannot have" do
+    render_inline(NexusCcs::RecordSubnavComponent.new(document: doc))
+
+    assert_selector "nav.record-subnav[aria-label='On this page'] .record-subnav__title", text: "Kangaroo-pouch tone-tool"
+    assert_equal [ "#record-overview", "#record-details", "#record-copyright", "#about-this-record" ], page.all(".record-subnav__links a").map { |link| link["href"] }.first(4)
+
+    render_inline(NexusCcs::RecordSubnavComponent.new(document: doc("restrictions_tsi" => [ "Culturally sensitive images" ]), details: false))
+    assert_no_selector "a[href='#record-details'], a[href='#more-like-this']"
   end
 
   # --- actions
-  test "an open record with images offers Compare images, Add to compare, Cite and Share, and no access notice" do
+  test "an open record has the access card: a large line, one full-width Download image button, and the quiet text actions" do
     render_actions(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
     assert_selector ".record-actions .compare-actions a[href='/compare?record=emu-1']", text: "Compare images", visible: :all
     assert_selector ".compare-actions form[action='/compare/items'] button", text: "Add to compare", visible: :all
     assert_selector ".record-summary__cite .cite__button", visible: :all
+    assert_selector ".access-card__headline", text: "Download this image"
+    assert_selector "a.access-card__primary[download][href='/digital-assets/large/a.jpg']", text: "Download image"
     assert_selector ".record-summary__share .share__button", text: /Share and embed/, visible: :all
     assert_no_selector ".access-notice"
   end
@@ -85,7 +104,6 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
     assert_selector "details.record-actions__more:not([open]) > summary", text: "More actions", visible: :all
     assert_selector "details.record-actions__more .compare-actions", visible: :all
     assert_selector "details.record-actions__more .record-summary__cite .cite__button", visible: :all
-    assert_selector "details.record-actions__more .record-summary__share .share__button", visible: :all
     assert_no_selector "details.record-actions__more .record-summary__save", visible: :all
   end
 
@@ -97,41 +115,59 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
     assert_selector ".compare-actions button", text: "Add to compare", visible: :all
   end
 
-  test "a view-only record's access notice is in the actions, with the request link and nothing that downloads" do
+  test "a record with no media has no large line and no primary button, only the quiet actions" do
+    render_actions
+
+    assert_no_selector ".access-card__headline, .access-card__primary"
+    assert_selector "details.record-actions__more .record-summary__share .share__button", text: /Share and embed/, visible: :all
+  end
+
+  test "a view-only record's card says so in plain text with a link to ask, and has no button and nothing that downloads" do
     render_actions(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ]))
 
-    assert_selector ".record-actions .access-notice--view-only a[href='/access_requests/new?document_id=emu-1']", text: "Request access to download this item"
-    assert_selector ".compare-actions button", text: "Add to compare", visible: :all
-    assert_no_selector "a[download]"
+    assert_selector ".access-card__headline", text: "View only"
+    assert_selector ".access-card__reason a[href='/access_requests/new?document_id=emu-1']", text: "Request access to download this item"
+    assert_no_selector ".access-card__primary, a[download], .access-notice"
+  end
+
+  test "a request-only record's card has one Request access button, and no asset address" do
+    render_actions(IMAGES.merge("licence_type_ssim" => [ "ICIP Rights" ]))
+
+    assert_selector ".access-card__headline", text: "Request access"
+    assert_selector "a.access-card__primary[href='/access_requests/new?document_id=emu-1']"
+    assert_not_includes rendered_content, "/digital-assets/"
   end
 
   test "a request-only, a not-yet-chosen sensitive and an imageless record offer no compare, and no notice here for the first and last" do
     render_actions(IMAGES.merge("licence_type_ssim" => [ "ICIP Rights" ]))
-    assert_no_selector ".compare-actions, .access-notice", visible: :all
+    assert_no_selector ".compare-actions", visible: :all
 
     render_actions(IMAGES.merge("restrictions_tsi" => [ "Culturally sensitive images" ]))
     assert_no_selector ".compare-actions", visible: :all
 
     render_actions
-    assert_no_selector ".compare-actions, .access-notice", visible: :all
+    assert_no_selector ".compare-actions", visible: :all
     assert_selector ".cite__button", visible: :all
   end
 
   # --- media: the three tiers, in markup
-  test "an open record has a Download image link, the access chip, the licence, and the labelled media buttons in one toolbar" do
+  test "the viewer has round controls on the stage, the strip of images, and three short lines under it: access, licence, what there is" do
     render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
-    assert_selector ".digital-assets__toolbar .digital-assets__access--open", text: "Open: view and download"
-    assert_selector ".digital-assets__toolbar a.digital-assets__primary[download][href='/digital-assets/large/a.jpg']", text: "Download image"
-    assert_selector ".digital-assets__toolbar button", text: "Full screen", visible: :all
-    assert_no_selector ".digital-assets__stage ~ .digital-assets__stage"
+    assert_selector ".digital-assets__stage .digital-assets__overlay button", text: "Media information"
+    assert_selector ".digital-assets__stage .digital-assets__overlay button", text: "Full screen", visible: :all
+    assert_selector ".digital-assets__stage + .digital-assets__others li", count: 2
+    assert_selector ".digital-assets__facts .digital-assets__access--open", text: "Open: view and download"
+    assert_selector ".digital-assets__facts .digital-assets__licence", text: "Public domain - Copyright expired"
+    assert_selector ".digital-assets__facts .digital-assets__files", text: "2 images"
+    assert_no_selector "a[download]" # Download image is the access card's one button
   end
 
   test "a view-only record has no download link in its markup, and the image keeps its own shape (width and height held)" do
     render_media(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ]))
 
     assert_no_selector "a[download], a.digital-assets__primary, a[href*='/digital-assets/']"
-    assert_selector ".digital-assets__access--view-only", text: "View only"
+    assert_selector ".digital-assets__facts .digital-assets__access--view-only", text: "View only"
     assert_selector "img.digital-assets__image[src='/digital-assets/large/a.jpg']"
   end
 
@@ -165,16 +201,17 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   test "a record with no image gets one plain sentence, no box or icon, and a request link only where the collection takes questions" do
     render_inline(NexusCcs::NoImageComponent.new(document: doc("collection_ssim" => [ "University Art Collection" ]), url: "http://example.test/catalog/emu-1"))
 
-    assert_selector "p.no-image", text: "No image of this record is available online."
-    assert_selector "p.no-image a[target=_blank][href^='https://app.smartsheet.com/']"
+    assert_selector "div.no-image .no-image__text", text: "No image of this record is available online."
+    assert_selector ".no-image a[target=_blank][href^='https://app.smartsheet.com/']"
+    assert_selector ".no-image__monogram[aria-hidden=true]", text: "UA"
     assert_no_selector "svg, img, .record-card"
 
     render_inline(NexusCcs::NoImageComponent.new(document: doc("collection_ssim" => [ "Medical History Museum" ]), url: "http://example.test/catalog/emu-1"))
-    assert_selector "p.no-image a[href^='mailto:mhm.info@unimelb.edu.au?']"
+    assert_selector ".no-image a[href^='mailto:mhm.info@unimelb.edu.au?']"
 
     render_inline(NexusCcs::NoImageComponent.new(document: doc("collection_ssim" => [ "Somewhere else" ]), url: "http://example.test/catalog/emu-1"))
-    assert_selector "p.no-image", text: "No image of this record is available online."
-    assert_no_selector "p.no-image a"
+    assert_selector ".no-image", text: "No image of this record is available online."
+    assert_no_selector ".no-image a"
   end
 
   # --- about
@@ -192,14 +229,14 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
 
   # --- more like this
   test "More like this is one h2 with an h3 per non-empty sub-section, and no tabs" do
-    related = [ SolrDocument.new("id" => "r1", "title_tsim" => [ "Related one" ]) ]
+    related = 3.times.map { |n| SolrDocument.new("id" => "r#{n}", "title_tsim" => [ "Related #{n}" ]) }
     render_inline(NexusCcs::MoreLikeThisComponent.new(document: doc, related: related, recent: []))
 
     assert_selector "section#more-like-this h2", text: "More like this", count: 1
     assert_selector "h3", text: "Related objects"
+    assert_selector ".object-card", count: 3
     assert_no_selector "h3", text: "Recently viewed"
     assert_no_selector "[role=tablist], [role=tab]"
-    assert_selector ".object-card--text", count: 1
   end
 
   test "More like this is not drawn when there is nothing to put in it" do

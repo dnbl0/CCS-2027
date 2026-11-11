@@ -19,19 +19,21 @@ en:
         request: "Available on request"
         download: "Download image"
         download_label: "Download image of %{title}"
+      subnav:
+        label: "On this page"
+        overview: "Overview"
+      access_card:
+        open:
+          headline: "Download this image"
+        view_only:
+          headline: "View only"
+        request:
+          headline: "Request access"
       sections:
-        key_facts: "Key facts"
         object_details: "Object details"
         copyright: "Copyright and use"
         about: "About this record"
         actions: "Use this record"
-      key_facts:
-        date: "Date"
-        materials: "Materials"
-        classification: "Classification"
-        subject: "Subject"
-        collection: "Collection"
-        credit_line: "Credit line"
       copyright:
         licence: "Licence"
         copyright: "Copyright"
@@ -45,6 +47,14 @@ en:
         correction: "Suggest a correction to this record"
         correction_note: "Records can hold outdated or incorrect information, and terms that are not appropriate today."
       media:
+        images: "Images of this record"
+        images_count:
+          one: "%{count} image"
+          other: "%{count} images"
+        kind:
+          video: "Video"
+          audio: "Audio"
+          pdf: "PDF"
         information: "Media information"
         full_screen: "Full screen"
         exit_full_screen: "Exit full screen"

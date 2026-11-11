@@ -68,6 +68,10 @@ export default class extends Controller {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.button) return
     event.preventDefault()
     const link = event.currentTarget
+    this.element.querySelectorAll(".digital-assets__other").forEach((other) => {
+      other.classList.toggle("is-current", other === link)
+      if (other === link) other.setAttribute("aria-current", "true"); else other.removeAttribute("aria-current")
+    })
     this.imageTarget.src = link.dataset.mediaViewerLarge
     this.imageTarget.alt = link.dataset.mediaViewerAlt
     this.dispatch("shown", { detail: { src: this.imageTarget.getAttribute("src"), alt: this.imageTarget.alt } }) // the zoom viewer follows

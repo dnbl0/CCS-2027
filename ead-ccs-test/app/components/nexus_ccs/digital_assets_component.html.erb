@@ -1,5 +1,5 @@
 <section id="digital-assets" class="digital-assets" data-controller="media-viewer" aria-labelledby="digital-assets-heading">
-  <h2 id="digital-assets-heading" class="visually-hidden">Digital <%= "asset".pluralize(count + media.size) %></h2>
+  <span id="digital-assets-heading" class="visually-hidden">Digital <%= "asset".pluralize(count + media.size) %></span>
 
   <%# The image sits on the page, whole, at its own shape: the width and height attributes hold its space while it loads (a flat tint,
       never a tall dark band). Dark only in full screen and in the zoom viewer. %>
@@ -13,7 +13,7 @@
       <% end %>
       <% if main %>
         <%# The figure holds the image's own shape from its known width and height (aspect-ratio), so nothing moves when the image arrives %>
-        <figure class="digital-assets__main<%= ' digital-assets__main--sized' if ratio %>"<% if ratio %> style="--digital-assets-ratio: <%= ratio %>"<% end %>>
+        <figure class="digital-assets__main<%= ' digital-assets__main--sized' if ratio %>"<% if ratio %> style="--digital-assets-ratio: <%= ratio %>; --digital-assets-aspect: <%= aspect %>"<% end %>>
           <%= image_tag main.first, alt: alt(1), class: "digital-assets__image", data: { media_viewer_target: "image" },
                 fetchpriority: "high", decoding: "async", **image_size(main.first) %>
           <%= render NexusCcs::DeepZoomComponent.new(sources: zoom_sources, label: alt(1)) %>
@@ -32,59 +32,56 @@
     <% if sensitivity_state == :viewing %>
       <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: :viewing) %>
     <% end %>
-  </div>
 
-  <% if others.any? %>
-    <ul class="digital-assets__others">
-      <% others.each_with_index do |(large, thumbnail), index| %>
-        <li>
-          <% if downloadable? %>
-            <%= link_to large, class: "digital-assets__other", target: "_blank", rel: "noopener",
-                  data: { action: "media-viewer#show", media_viewer_large: large, media_viewer_alt: alt(index + 2) } do %>
-              <%= image_tag thumbnail, alt: "#{alt(index + 2)} (opens full size in a new tab)", loading: "lazy", decoding: "async" %>
-            <% end %>
-          <% else %>
-            <%# No link to the file: the thumbnail only changes the image on show %>
-            <button type="button" class="digital-assets__other" data-action="media-viewer#show" data-media-viewer-large="<%= large %>" data-media-viewer-alt="<%= alt(index + 2) %>">
-              <%= image_tag thumbnail, alt: alt(index + 2), loading: "lazy", decoding: "async" %>
-            </button>
-          <% end %>
-        </li>
+    <%# Round dark controls at the stage's bottom right, after a museum viewer: what the visitor may know about the media, and full screen %>
+    <div class="digital-assets__overlay">
+      <% if metadata? %>
+        <button type="button" class="digital-assets__button" aria-controls="media-metadata" aria-expanded="false"
+                data-media-viewer-target="infoButton" data-action="media-viewer#togglePanel"><%= icon("media-info") %><span><%= t("nexus_ccs.record_page.media.information") %></span></button>
       <% end %>
-    </ul>
-  <% end %>
-
-  <%# One slim toolbar directly under the image: what the visitor may do (chip) and under what licence on the left, the media tools
-      (with text labels) and the one primary action on the right %>
-  <div class="digital-assets__toolbar">
-    <div class="digital-assets__toolbar-inner">
-      <div class="digital-assets__chips">
-        <p class="digital-assets__access digital-assets__access--<%= tier.to_s.dasherize %>" data-testid="access-chip"><%= access_chip %></p>
-        <% if licence %>
-          <p class="digital-assets__licence"><%= icon("media-copyright") %><span><span class="visually-hidden">Licence: </span><%= licence %></span></p>
-        <% end %>
-      </div>
-      <div class="digital-assets__controls">
-        <% if metadata? %>
-          <button type="button" class="digital-assets__button" aria-controls="media-metadata" aria-expanded="false"
-                  data-media-viewer-target="infoButton" data-action="media-viewer#togglePanel"><%= icon("media-info") %><span><%= t("nexus_ccs.record_page.media.information") %></span></button>
-        <% end %>
-        <% if assets_shown? && main %>
-          <button type="button" class="digital-assets__button" hidden
-                  data-media-viewer-target="fullscreenButton" data-action="media-viewer#toggleFullscreen"
-                  data-label-on="<%= t("nexus_ccs.record_page.media.exit_full_screen") %>" data-label-off="<%= t("nexus_ccs.record_page.media.full_screen") %>"><%= icon("media-fullscreen") %><span data-media-viewer-target="fullscreenLabel"><%= t("nexus_ccs.record_page.media.full_screen") %></span></button>
-        <% end %>
-        <% if download_href %>
-          <a class="digital-assets__primary" href="<%= download_href %>" download aria-label="<%= t("nexus_ccs.record_page.access.download_label", title: title) %>"><%= t("nexus_ccs.record_page.access.download") %></a>
-        <% end %>
-      </div>
+      <% if assets_shown? && main %>
+        <button type="button" class="digital-assets__button" hidden
+                data-media-viewer-target="fullscreenButton" data-action="media-viewer#toggleFullscreen"
+                data-label-on="<%= t("nexus_ccs.record_page.media.exit_full_screen") %>" data-label-off="<%= t("nexus_ccs.record_page.media.full_screen") %>"><%= icon("media-fullscreen") %><span data-media-viewer-target="fullscreenLabel"><%= t("nexus_ccs.record_page.media.full_screen") %></span></button>
+      <% end %>
     </div>
   </div>
+
+    <% if strip.any? %>
+      <ul class="digital-assets__others" aria-label="<%= t("nexus_ccs.record_page.media.images") %>">
+        <% strip.each_with_index do |(large, thumbnail), index| %>
+          <li>
+            <% if downloadable? %>
+              <%= link_to large, class: "digital-assets__other#{' is-current' if index.zero?}", target: "_blank", rel: "noopener", aria: ({ current: "true" } if index.zero?),
+                    data: { action: "media-viewer#show", media_viewer_large: large, media_viewer_alt: alt(index + 1) } do %>
+                <%= image_tag thumbnail, alt: "#{alt(index + 1)} (opens full size in a new tab)", loading: "lazy", decoding: "async" %>
+              <% end %>
+            <% else %>
+              <%# No link to the file: the thumbnail only changes the image on show %>
+              <button type="button" class="digital-assets__other<%= ' is-current' if index.zero? %>" aria-current="<%= index.zero? ? "true" : "false" %>" data-action="media-viewer#show" data-media-viewer-large="<%= large %>" data-media-viewer-alt="<%= alt(index + 1) %>">
+                <%= image_tag thumbnail, alt: alt(index + 1), loading: "lazy", decoding: "async" %>
+              </button>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+
+  <%# Three short lines under the viewer, after Apple's: what the visitor may do, under what licence, and what there is to see %>
+  <ul class="digital-assets__facts">
+    <li class="digital-assets__fact digital-assets__access digital-assets__access--<%= tier.to_s.dasherize %>" data-testid="access-chip"><%= icon("media-info") %><span><%= access_chip %></span></li>
+    <% if licence %>
+      <li class="digital-assets__fact digital-assets__licence"><%= icon("media-copyright") %><span><span class="visually-hidden">Licence: </span><%= licence %></span></li>
+    <% end %>
+    <% if file_summary.present? %>
+      <li class="digital-assets__fact digital-assets__files"><%= icon("media-fullscreen") %><span><%= file_summary %></span></li>
+    <% end %>
+  </ul>
 
   <% if metadata? %>
     <aside id="media-metadata" class="digital-assets__panel" aria-labelledby="media-metadata-heading" aria-hidden="true" data-media-viewer-target="panel">
       <div class="digital-assets__panel-head">
-        <h3 id="media-metadata-heading" class="digital-assets__panel-title">Media metadata</h3>
+        <p id="media-metadata-heading" class="digital-assets__panel-title">Media metadata</p>
         <button type="button" class="digital-assets__button" data-action="media-viewer#closePanel"><span><%= t("nexus_ccs.record_page.media.close_information") %></span></button>
       </div>
       <dl class="digital-assets__list">

@@ -14,7 +14,7 @@ module NexusCcs
     # The title is shown in the header, not in the details list, and is scanned and marked like a detail
     def title_row = @title_row ||= self.class::Row.new(label: "Title", values: [ heading ], field: "title_tsim")
 
-    def scanned_rows = [ title_row ] + rows
+    def scanned_rows = [ title_row ] + all_rows
 
     def title_markup = flagged(title_row, heading, 0)
 
