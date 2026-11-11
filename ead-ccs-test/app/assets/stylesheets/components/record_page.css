@@ -106,7 +106,7 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 .record-layout__sections {
   display: flex;
   flex-direction: column;
-  gap: var(--ccs-space-6);
+  gap: var(--ccs-space-5);
 }
 
 @media (min-width: 1200px) {
@@ -192,7 +192,7 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 }
 
 .record-section__body {
-  padding-bottom: var(--ccs-space-5);
+  padding-bottom: var(--ccs-space-3);
 }
 
 /* Key facts */
@@ -520,10 +520,25 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   outline-offset: 2px;
 }
 
+/* The notices (cultural protocols, de-bias): a bordered card with a coloured edge, its heading in the section heading's size */
+.record-card {
+  border: 1px solid var(--ccs-border-panel);
+  background: var(--ccs-white);
+}
+
+.record-card > .record-copyright__title {
+  padding: var(--ccs-space-4) var(--ccs-space-5) var(--ccs-space-2);
+  font-size: var(--ccs-font-size-xl);
+}
+
 /* Phone: the sections' gutters; the title is a size smaller */
 @media (max-width: 767px) {
   :root {
     --record-gutter: var(--ccs-space-4);
+  }
+
+  .record-card > .record-copyright__title {
+    padding-inline: var(--ccs-space-4);
   }
 
   .record-header__title {

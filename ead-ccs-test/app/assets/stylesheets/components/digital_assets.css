@@ -54,12 +54,6 @@
   border: 2px solid transparent;
 }
 
-/* Why an asset can't be downloaded or isn't shown (NexusCcs::AccessNoticeComponent): a light card on the band */
-.digital-assets .access-notice {
-  max-width: 40rem;
-  width: 100%;
-}
-
 .digital-assets__other:hover,
 .digital-assets__other:focus-visible {
   border-color: var(--ccs-cyan-400);

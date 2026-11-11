@@ -26,7 +26,7 @@ class RecordContactHelpTest < ApplicationSystemTestCase
 
   test "the card names the team and gives a way to write to it, and the controls are at least 24px" do
     within ".contact-collection" do
-      assert_selector "h2", text: "Contact the collection team"
+      assert_selector "h3", text: "Contact the collection team"
       assert_selector "a[href^='mailto:'], a[href^='https://app.smartsheet.com/']"
     end
     sizes = page.evaluate_script("[...document.querySelectorAll('.contact-collection a:not(.help-tip__text a), .help-tip__button')].map(e => { const r = e.getBoundingClientRect(); return [r.width, r.height] })")

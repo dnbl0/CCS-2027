@@ -55,7 +55,6 @@
   margin: var(--ccs-space-4) 0 0;
   padding: 0;
   list-style: none;
-  align-items: start;
 }
 
 .object-cards__item {

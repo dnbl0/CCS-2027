@@ -39,8 +39,10 @@
   text-underline-position: from-font;
 }
 
-.digital-assets .sensitivity-gate {
-  max-width: 40rem;
+/* In the media's place: the width of the media, so nothing moves when the visitor chooses */
+.digital-assets .sensitivity-gate,
+.digital-assets .access-notice {
+  margin: 0;
   width: 100%;
 }
 

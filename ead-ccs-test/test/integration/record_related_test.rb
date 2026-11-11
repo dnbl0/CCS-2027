@@ -26,7 +26,7 @@ class RecordRelatedTest < ActionDispatch::IntegrationTest
     get path_for(first)
 
     assert_response :success
-    assert_select "section#related-objects h2", text: "Related objects"
+    assert_select "section#related-objects h3", text: "Related objects"
     assert_select "section#related-objects h3.object-card__title a.object-card__link"
     assert_operator css_select("section#related-objects article.object-card").size, :<=, 4
     assert_select "section#related-objects a.object-card__link[href='#{path_for(first)}']", count: 0
@@ -39,7 +39,7 @@ class RecordRelatedTest < ActionDispatch::IntegrationTest
     assert_select "section#recently-viewed", count: 0
 
     get path_for(second)
-    assert_select "section#recently-viewed h2", text: "Recently viewed"
+    assert_select "section#recently-viewed h3", text: "Recently viewed"
     assert_select "section#recently-viewed a.object-card__link[href='#{path_for(first)}']"
     assert_select "section#recently-viewed a.object-card__link[href='#{path_for(second)}']", count: 0
 

@@ -8,8 +8,6 @@
     <div class="record-page__inner">
       <%= render NexusCcs::RecordHeaderComponent.new(document: document) %>
 
-      <%= render NexusCcs::CulturalProtocolsNoticeComponent.new(document: document) %>
-      <%= render NexusCcs::DebiasNoticeComponent.new(matches: debias_matches, labels: debias_labels) %>
 
       <div class="record-layout">
         <%# Reading order is visual order: the media, the column beside it (actions, Key facts), then the sections %>
@@ -22,11 +20,13 @@
         </div>
 
         <div class="record-layout__aside">
+          <%= render NexusCcs::CulturalProtocolsNoticeComponent.new(document: document) %>
           <%= render NexusCcs::RecordActionsComponent.new(document: document) %>
           <%= render NexusCcs::KeyFactsComponent.new(document: document) %>
         </div>
 
         <div class="record-layout__sections">
+          <%= render NexusCcs::DebiasNoticeComponent.new(matches: debias_matches, labels: debias_labels) %>
           <% if rows.any? %>
             <details class="record-section record-accordion" open data-open-on-phone data-record-sections-target="section">
               <summary><h2 class="record-section__heading record-details__title" id="record-details-title"><%= t("nexus_ccs.record_page.sections.object_details") %></h2></summary>
@@ -59,7 +59,7 @@
             </details>
           <% end %>
 
-          <details class="record-section record-accordion" open data-record-sections-target="section">
+          <details class="record-section record-accordion record-copyright" open data-record-sections-target="section">
             <summary><h2 class="record-section__heading record-copyright__title" id="record-copyright-title"><%= t("nexus_ccs.record_page.sections.copyright") %></h2></summary>
             <div class="record-section__body">
               <% unless rights_recorded? %>
