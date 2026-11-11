@@ -1,4 +1,4 @@
-<article class="<%= classes %>"<%= tag.attributes(data: { controller: "image-fallback" }) if image_path %>>
+<article class="<%= classes %>"<%= tag.attributes(data: { controller: "image-fallback", image_fallback_add_class_value: "object-card--text" }) if image_path %>>
   <% if image_path %>
     <div class="object-card__media" data-image-fallback-target="media">
       <%# The title names the record, so the image adds nothing to the link %>

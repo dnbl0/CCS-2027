@@ -92,6 +92,16 @@ class ResultsLayoutTest < ActiveSupport::TestCase
     assert_equal "no-media", without.variant
   end
 
+  test "a card with an image becomes the no-media card if the file fails to load (no broken-image box)" do
+    template = Rails.root.join("app/components/nexus_ccs/result_card_component.html.erb").read
+
+    assert_includes template, 'controller: "image-fallback"'
+    assert_includes template, 'image_fallback_remove_class_value: "result-card--media"'
+    assert_includes template, 'image_fallback_add_class_value: "result-card--no-media"'
+    assert_includes template, 'data: { image_fallback_target: "media" }'
+    assert_includes template, 'action: "error->image-fallback#failed"'
+  end
+
   test "a card keeps its thumbnail for an open or view-only record, and drops it (and its path) for a request record" do
     thumb = "/digital-assets/thumbs/a.jpg"
     fields = { "thumbnail_path_ssi" => thumb, "title_tsim" => [ "Untitled" ] }
