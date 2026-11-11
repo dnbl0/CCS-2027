@@ -11,16 +11,18 @@
 
 .digital-assets__stage {
   position: relative;
-  padding: var(--ccs-space-4);
-  border-radius: var(--ccs-radius-md);
+  overflow: hidden;
+  border-radius: var(--ccs-radius-lg);
   background: var(--ccs-surface-subtle);
 }
 
+/* The picture, with a band under it that the controls sit in, so they never cover it */
 .digital-assets__media-area {
   display: flex;
   flex-direction: column;
   gap: var(--ccs-space-4);
   width: 100%;
+  padding: var(--ccs-space-6) var(--ccs-space-6) 5.25rem;
 }
 
 .digital-assets__main {
@@ -32,7 +34,6 @@
 /* Its size is known: the figure keeps the image's shape (and at most min(78vh, 760px)) before and after the image arrives, the image
    fills it contained, and the zoom viewer fills the same box, so nothing moves when the image arrives */
 .digital-assets__main--sized {
-  position: relative;
   width: min(100%, calc(min(78vh, 47.5rem) * var(--digital-assets-aspect)));
   margin-inline: auto;
   max-height: min(78vh, 47.5rem);
@@ -48,6 +49,13 @@
 .digital-assets__main--sized .deep-zoom {
   position: absolute;
   inset: 0;
+  pointer-events: none; /* it covers the whole stage: only its viewer (switched on) and its buttons take clicks */
+}
+
+.digital-assets__main--sized .deep-zoom.is-active,
+.digital-assets__main--sized .deep-zoom .deep-zoom__button,
+.digital-assets__main--sized .deep-zoom__controls {
+  pointer-events: auto;
 }
 
 .digital-assets__main--sized .deep-zoom__stage {
@@ -63,7 +71,9 @@
   object-fit: contain;
 }
 
-/* Round dark controls at the stage's bottom right */
+/* The controls: one family, one height, one baseline. Zoom and pan at the stage's bottom left, Media information and Full screen at its
+   bottom right; on a phone they are icons. They are positioned against the stage (the figure takes no position), so the zoom toggle and the
+   rest line up. */
 .digital-assets__overlay {
   position: absolute;
   right: var(--ccs-space-4);
@@ -75,43 +85,63 @@
   gap: var(--ccs-space-2);
 }
 
-.digital-assets__button {
+.digital-assets .digital-assets__button,
+.digital-assets .deep-zoom__button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--ccs-space-2);
+  min-width: 2.75rem;
   min-height: 2.75rem;
   padding: 0 var(--ccs-space-4);
-  border: 0;
-  border-radius: 1.375rem;
-  background: var(--ccs-navy-1200);
+  border: 1px solid var(--ccs-border-strong);
+  border-radius: var(--ccs-radius-pill);
+  background: var(--ccs-white);
   font: inherit;
   font-size: var(--ccs-font-size-ui);
   font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-white);
+  line-height: var(--ccs-line-height-tight);
+  color: var(--ccs-navy-1100);
   cursor: pointer;
 }
 
-.digital-assets__button svg {
+.digital-assets .digital-assets__button svg,
+.digital-assets .deep-zoom__button svg {
   flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
   font-size: var(--ccs-font-size-xl);
 }
 
-.digital-assets__button[hidden] {
+.digital-assets .digital-assets__button[hidden],
+.digital-assets .deep-zoom__button[hidden] {
   display: none;
 }
 
-.digital-assets__button:hover {
-  background: var(--ccs-navy-1100);
+.digital-assets .digital-assets__button:hover,
+.digital-assets .deep-zoom__button:hover {
+  border-color: var(--ccs-navy-1100);
+  background: var(--ccs-navy-100);
 }
 
-.digital-assets__button:focus-visible {
+.digital-assets .digital-assets__button:focus-visible,
+.digital-assets .deep-zoom__button:focus-visible {
   outline: 3px solid var(--ccs-focus-ring);
   outline-offset: 2px;
 }
 
-.digital-assets__button[aria-expanded="true"] {
-  background: var(--ccs-navy-700);
+/* On: the information panel's button fills navy; the zoom toggle, on the dark viewer, stays white with a heavier edge */
+.digital-assets .digital-assets__button[aria-expanded="true"] {
+  border-color: var(--ccs-navy-1100);
+  background: var(--ccs-navy-1100);
+  color: var(--ccs-white);
+}
+
+.digital-assets .deep-zoom__button[aria-pressed="true"] {
+  border-color: var(--ccs-white);
+  background: var(--ccs-white);
+  box-shadow: 0 0 0 3px var(--ccs-navy-700);
+  color: var(--ccs-navy-1100);
 }
 
 /* The strip of every image under the stage; the current one is outlined. Shown whole, never cropped. It scrolls sideways when it
@@ -272,8 +302,8 @@
 
 /* On a phone the image fills the width at its own shape, at most 60vh high */
 @media (max-width: 767px) {
-  .digital-assets__stage {
-    padding: var(--ccs-space-2);
+  .digital-assets__media-area {
+    padding: var(--ccs-space-3) var(--ccs-space-3) 4.5rem;
   }
 
   .digital-assets__main--sized {
@@ -285,11 +315,22 @@
     max-height: 60vh;
   }
 
-  /* The controls sit under the image on a phone, so they never cover the zoom toggle, the sensitivity choices or the picture */
-  .digital-assets__overlay {
-    position: static;
-    justify-content: flex-start;
-    margin-top: var(--ccs-space-3);
+  /* Icons only: the labels stay for assistive technology */
+  .digital-assets .digital-assets__button > span,
+  .digital-assets .deep-zoom__toggle > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .digital-assets .digital-assets__button,
+  .digital-assets .deep-zoom__toggle {
+    padding: 0;
   }
 }
 

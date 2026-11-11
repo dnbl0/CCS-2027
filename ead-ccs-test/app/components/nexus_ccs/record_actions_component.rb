@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # The access card of a record page, after the summary card of Apple's product pages: a large line saying what the visitor can do with
-  # the record's media, ONE full-width primary button where there is something to do (Download image for an open record, Request access
-  # for a withheld one; none for a view-only record, which gets its plain reason and a text link to ask instead), then the quiet text
-  # actions as 44px rows: Save, Add to list, Compare, Cite this record and Share and embed. The Collection ID with Copy (CCS-22) ends
-  # it. Compare, Cite and Share sit in a "More actions" disclosure that is closed on a phone and open from 768px
-  # (controllers/record_sections_controller.js). Follows AccessPolicy; nothing of a withheld asset is in the markup.
+  # The access card of a record page, after the summary card of Apple's product pages: a line saying what the visitor can do with the
+  # record's media, ONE full-width primary button where there is something to do (Download image for an open record, Request access for a
+  # withheld one; a view-only record gets its plain reason and a bordered link to ask instead), then Save as one full-width bar and Add
+  # to list, Compare, Cite and Share as equal tiles, an icon over a label (record_actions.css). The Collection ID with Copy (CCS-22) ends
+  # it. Follows AccessPolicy; nothing of a withheld asset is in the markup.
   class RecordActionsComponent < ViewComponent::Base
     def initialize(document:)
       @document = document

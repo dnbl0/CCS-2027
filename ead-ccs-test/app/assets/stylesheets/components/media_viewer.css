@@ -46,22 +46,22 @@
 }
 
 /* On the record page: the toggle sits over the image's corner; switched on, the viewer fills the figure */
-.digital-assets__main {
+.digital-assets__main:not(.digital-assets__main--sized) {
   position: relative;
 }
 
 /* Above the viewer's canvas, so the toggle can still be pressed (mouse and keyboard) once the viewer is on */
 .deep-zoom__toggle {
   position: absolute;
-  left: var(--ccs-space-2);
-  bottom: var(--ccs-space-2);
+  left: var(--ccs-space-4);
+  bottom: var(--ccs-space-4);
   z-index: 3;
 }
 
 .deep-zoom__controls {
   position: absolute;
-  top: var(--ccs-space-2);
-  right: var(--ccs-space-2);
+  top: var(--ccs-space-4);
+  right: var(--ccs-space-4);
   z-index: 3;
   display: flex;
   flex-wrap: wrap;

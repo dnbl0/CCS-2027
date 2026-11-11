@@ -25,15 +25,15 @@ class RecordCardComponentTest < ViewComponent::TestCase
     card(doc("thumbnail_path_ssi" => "/digital-assets/thumbs/x.jpg", "licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
     assert_selector ".object-card__media img.object-card__image[src*='x.jpg'][alt='']"
-    assert_no_selector ".object-card__kicker"
+    assert_no_selector ".object-card__face:not([hidden])"
   end
 
-  test "a card with an image can fall back to a text card if the file is missing: the kicker waits hidden and the image reports its failure" do
+  test "a card with an image can fall back to its face if the file is missing: the face waits hidden and the image reports its failure" do
     card(doc("thumbnail_path_ssi" => "/digital-assets/thumbs/x.jpg", "licence_type_ssim" => [ "Public domain - Copyright expired" ], "object_type_ssim" => [ "harp" ]))
 
     assert_selector "article.object-card[data-controller='image-fallback']"
     assert_selector "[data-image-fallback-target='media'] img[data-action='error->image-fallback#failed']"
-    assert_selector "p.object-card__kicker[hidden][data-image-fallback-target='kicker']", visible: :all
+    assert_selector "span.object-card__face[hidden][data-image-fallback-target='face']", text: "Harp", visible: :all
   end
 
   test "a withheld or sensitive record has no image or asset path, only a text card" do
@@ -45,18 +45,17 @@ class RecordCardComponentTest < ViewComponent::TestCase
 
       assert_no_selector "img"
       assert_no_match(%r{digital-assets}, page.native.to_html)
-      assert_selector ".object-card--text .object-card__kicker"
-      assert_no_selector ".object-card__media"
+      assert_selector ".object-card--text .object-card__media .object-card__face"
     end
   end
 
-  test "a card with no image is text: a kicker with the object type (else Record) and the collection, and no box" do
+  test "a card with no image has the same face as the others: the object type (else Record) on a tint, and no img" do
     card(doc("object_type_ssim" => [ "harp" ], "collection_ssim" => [ "Grainger Museum Collection" ]))
-    assert_selector ".object-card--text .object-card__kicker", text: "Harp · Grainger Museum Collection"
-    assert_no_selector ".object-card__media"
+    assert_selector ".object-card--text .object-card__media .object-card__face", text: "Harp"
+    assert_no_selector "img"
 
     card
-    assert_selector ".object-card__kicker", text: "Record"
+    assert_selector ".object-card__face", text: "Record"
   end
 
   test "the compact variant is marked, and a record with no creator or date has no meta line" do

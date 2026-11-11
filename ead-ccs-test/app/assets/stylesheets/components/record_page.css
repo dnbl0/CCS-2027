@@ -150,7 +150,7 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   gap: var(--ccs-space-6);
   max-width: calc(60rem + 2 * var(--record-gutter));
   margin-inline: auto;
-  padding: var(--ccs-space-6) var(--record-gutter) var(--ccs-space-8);
+  padding: var(--ccs-space-7) var(--record-gutter) var(--ccs-space-8);
 }
 
 /* The header block */
@@ -199,29 +199,6 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   color: var(--ccs-text-secondary);
 }
 
-/* The collection, accession number and UoM ID, with a Copy button (CCS-22) */
-.record-summary__identifier {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ccs-space-1) var(--ccs-space-2);
-  margin: var(--ccs-space-3) 0 0;
-  padding-top: var(--ccs-space-3);
-  border-top: 1px solid var(--ccs-border-default);
-  font-size: var(--ccs-font-size-sm);
-  line-height: 1.5;
-  color: var(--ccs-text-secondary);
-  overflow-wrap: anywhere;
-}
-
-.record-summary__identifier-label {
-  flex-basis: 100%;
-  font-size: var(--ccs-font-size-2xs);
-  font-weight: var(--ccs-font-weight-semibold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 /* No image: a slim tinted band with the collection's monogram and one plain sentence, in place of the stage */
 .no-image {
   display: flex;
@@ -260,6 +237,14 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   font-weight: var(--ccs-heading-weight);
   line-height: var(--ccs-line-height-tight);
   color: var(--ccs-navy-1100);
+}
+
+@media (min-width: 768px) {
+  .record-section__heading,
+  .record-details__title,
+  .record-copyright__title {
+    font-size: var(--ccs-font-size-4xl);
+  }
 }
 
 .record-accordion {
@@ -313,6 +298,19 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 /* Closed in the markup so a phone does not shift when the script collapses them; from 768px their content shows whether or not the
    script has opened them yet (::details-content), so that width does not shift either */
 @media (min-width: 768px) {
+  .record-specs {
+    gap: 5rem;
+  }
+
+  /* Whitespace, not rules, between the sections */
+  .record-accordion {
+    border-top: 0;
+  }
+
+  .record-accordion > summary {
+    padding-block: 0 var(--ccs-space-4);
+  }
+
   .record-accordion > summary::after {
     display: none;
   }
@@ -335,26 +333,29 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--ccs-space-1);
-  padding-block: var(--ccs-space-3);
+  padding-block: var(--ccs-space-4);
   border-top: 1px solid var(--ccs-border-subtle);
-  font-size: var(--ccs-font-size-md);
-  line-height: 1.5;
+  font-size: var(--ccs-font-size-lg);
+  line-height: 1.55;
   color: var(--ccs-text-primary);
+}
+
+.record-details__row:first-child {
+  border-top: 0;
 }
 
 @media (min-width: 768px) {
   .record-details__row {
-    grid-template-columns: 11rem minmax(0, 1fr);
-    gap: var(--ccs-space-4);
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: var(--ccs-space-5);
   }
 }
 
 .record-details__row dt,
 .record-copyright__item dt {
-  font-size: var(--ccs-font-size-2xs);
-  font-weight: var(--ccs-font-weight-semibold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: var(--ccs-font-size-lg);
+  font-weight: var(--ccs-font-weight-regular, 400);
+  line-height: 1.55;
   color: var(--ccs-text-secondary);
 }
 
@@ -366,30 +367,23 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   overflow-wrap: anywhere;
 }
 
-/* Terms that open the records sharing them: outlined chips, 44px high */
+/* Terms that open the records sharing them: plain links, side by side, never boxed */
 .record-details__row dd.record-details__chips {
   flex-direction: row;
   flex-wrap: wrap;
-  gap: var(--ccs-space-2);
+  gap: var(--ccs-space-1) var(--ccs-space-5);
 }
 
 .record-chip {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem;
-  padding: 0 var(--ccs-space-3);
-  border: 1px solid var(--ccs-border-strong);
-  border-radius: var(--ccs-radius-control-sm);
-  background: var(--ccs-white);
-  font-size: var(--ccs-font-size-ui);
-  line-height: 1.3;
   color: var(--ccs-text-link);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
 }
 
 .record-chip:hover {
-  border-color: var(--ccs-navy-1100);
-  background: var(--ccs-surface-subtle);
+  color: var(--ccs-text-link-hover);
+  text-decoration-thickness: 2px;
 }
 
 .record-chip:focus-visible {
@@ -576,29 +570,28 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 .record-copyright__list {
   display: flex;
   flex-direction: column;
-  margin: var(--ccs-space-3) 0 0;
+  margin: 0;
 }
 
 .record-copyright__item {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--ccs-space-1);
-  padding-block: var(--ccs-space-3);
+  padding-block: var(--ccs-space-4);
   border-top: 1px solid var(--ccs-border-subtle);
-  font-size: var(--ccs-font-size-md);
-  line-height: 1.5;
+  font-size: var(--ccs-font-size-lg);
+  line-height: 1.55;
+}
+
+.record-copyright__item:first-child {
+  border-top: 0;
 }
 
 @media (min-width: 768px) {
   .record-copyright__item {
-    grid-template-columns: 11rem minmax(0, 1fr);
-    gap: var(--ccs-space-4);
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: var(--ccs-space-5);
   }
-}
-
-.record-copyright__item dt {
-  font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-text-secondary);
 }
 
 .record-copyright__item dd {
@@ -608,146 +601,6 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 
 .record-copyright__terms {
   margin: var(--ccs-space-3) 0 0;
-}
-
-/* The access card, after the summary card of Apple's product pages: soft grey, a large line, one full-width primary button, and under it
-   the quiet text actions as 44px rows. Save, Add to list, Compare, Cite and Share keep their own markup and behaviour; here they are
-   plain icon and label rows, not outlined buttons. */
-.access-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ccs-space-3);
-  padding: var(--ccs-space-5);
-  border-radius: var(--ccs-radius-md);
-  background: var(--ccs-surface-subtle);
-}
-
-.access-card__headline {
-  margin: 0;
-  font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-font-size-3xl);
-  line-height: var(--ccs-line-height-tight);
-  color: var(--ccs-navy-1100);
-}
-
-.access-card__reason {
-  margin: 0;
-  color: var(--ccs-text-secondary);
-}
-
-.access-card__primary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 3.25rem;
-  padding: 0 var(--ccs-space-5);
-  border-radius: var(--ccs-radius-control);
-  background: var(--ccs-navy-1100);
-  font-size: var(--ccs-font-size-lg);
-  font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-white);
-  text-decoration: none;
-}
-
-.access-card__primary:hover {
-  background: var(--ccs-navy-1200);
-  color: var(--ccs-white);
-}
-
-.access-card__primary:focus-visible {
-  outline: 3px solid var(--ccs-focus-ring);
-  outline-offset: 2px;
-}
-
-.record-actions__row {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0;
-}
-
-.record-actions__row > * {
-  margin: 0;
-}
-
-.record-actions .record-summary__save {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.record-actions .cite__button,
-.record-actions .share__button,
-.record-actions .compare-actions__link,
-.record-actions .compare-actions__button {
-  min-height: 2.75rem;
-  padding: var(--ccs-space-1) 0;
-  border: 0;
-  background: none;
-  font-size: var(--ccs-font-size-md);
-  font-weight: var(--ccs-font-weight-bold);
-  color: var(--ccs-text-brand);
-}
-
-.record-actions .cite__button:hover,
-.record-actions .share__button:hover,
-.record-actions .compare-actions__link:hover,
-.record-actions .compare-actions__button:hover {
-  background: none;
-  color: var(--ccs-text-link-hover);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-
-.record-actions .compare-actions {
-  padding: 0;
-}
-
-/* "More actions": below 768px Compare, Cite and Share sit in a disclosure (closed in the markup, so nothing shifts); from 768px they
-   show whether or not the disclosure is open (::details-content) and the summary is hidden */
-.record-actions__more > summary {
-  display: flex;
-  align-items: center;
-  min-height: 2.75rem;
-  list-style: none;
-  font-weight: var(--ccs-font-weight-bold);
-  color: var(--ccs-text-brand);
-  cursor: pointer;
-}
-
-.record-actions__more > summary::-webkit-details-marker {
-  display: none;
-}
-
-.record-actions__more > summary:focus-visible {
-  outline: 3px solid var(--ccs-focus-ring);
-  outline-offset: 2px;
-}
-
-.record-actions__more-body {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding-block: var(--ccs-space-1);
-}
-
-@media (min-width: 768px) {
-  .record-actions__more {
-    display: block;
-  }
-
-  .record-actions__more > summary {
-    display: none;
-  }
-
-  .record-actions__more::details-content {
-    display: contents;
-    content-visibility: visible;
-  }
-
-  .record-actions__more-body {
-    display: flex;
-  }
 }
 
 /* The notices (cultural protocols, de-bias): a bordered card with a coloured edge, its heading in the section heading's size */

@@ -98,13 +98,14 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
     assert_no_selector ".access-notice"
   end
 
-  test "Compare, Cite and Share sit in a More actions disclosure that is closed in the markup; Save and Add to list are outside it" do
+  test "Compare, Cite and Share are tiles in one grid with the other actions, with no disclosure" do
     render_actions(IMAGES)
 
-    assert_selector "details.record-actions__more:not([open]) > summary", text: "More actions", visible: :all
-    assert_selector "details.record-actions__more .compare-actions", visible: :all
-    assert_selector "details.record-actions__more .record-summary__cite .cite__button", visible: :all
-    assert_no_selector "details.record-actions__more .record-summary__save", visible: :all
+    assert_selector ".record-actions__row[style*='--record-tiles']"
+    assert_selector ".record-actions__row .compare-actions__button svg", visible: :all
+    assert_selector ".record-actions__row .record-summary__cite .cite__button"
+    assert_selector ".record-actions__row .record-summary__share .share__button"
+    assert_no_selector "details.record-actions__more", visible: :all
   end
 
   test "a record with one image offers Add to compare but not Compare images" do
@@ -119,7 +120,7 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
     render_actions
 
     assert_no_selector ".access-card__headline, .access-card__primary"
-    assert_selector "details.record-actions__more .record-summary__share .share__button", text: /Share and embed/, visible: :all
+    assert_selector ".record-actions__row .record-summary__share .share__button", text: /Share and embed/
   end
 
   test "a view-only record's card says so in plain text with a link to ask, and has no button and nothing that downloads" do

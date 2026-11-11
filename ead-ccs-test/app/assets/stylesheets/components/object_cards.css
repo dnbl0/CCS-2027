@@ -1,14 +1,12 @@
-/* The record page's Related objects, Similar records and Recently viewed: one record card (NexusCcs::RecordCardComponent) in a
-   section (NexusCcs::RecordCardsComponent), after the University design system's Card and Listings. The card is one link
-   (the title's link is stretched over it), its image is shown whole in a 16:9 frame, and a record without an image has a placeholder. */
-.object-cards {
-  margin-top: var(--ccs-space-6);
-}
+/* The record page's Related objects, Similar records and Recently viewed: one tile (NexusCcs::RecordCardComponent) in a row
+   (NexusCcs::RecordCardsComponent), after Apple's product tiles. Every tile has the same face (the image shown whole, never cropped, or the
+   object type on a tint), a title that is the link of the whole tile, and one quiet line. Four across from 1024px; below that the row
+   scrolls sideways and snaps, with the next tile peeking so it reads as scrollable. */
 
-/* More like this: the h2 and its sub-sections, in the record's own column (the sub-sections are h3s) */
+/* More like this: a soft band under the page's white, one h2 and its sub-sections (h3s) */
 .more-like-this {
-  border-top: 1px solid var(--ccs-border-default);
-  padding-block: var(--ccs-space-7);
+  padding-block: var(--ccs-space-8);
+  background: var(--ccs-surface-subtle);
 }
 
 .more-like-this__inner {
@@ -17,7 +15,23 @@
   padding-inline: var(--record-gutter, var(--ccs-space-6));
 }
 
-.more-like-this__heading,
+.more-like-this__heading {
+  margin: 0;
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-4xl);
+  font-weight: var(--ccs-heading-weight);
+  line-height: var(--ccs-line-height-tight);
+  color: var(--ccs-navy-1100);
+}
+
+.object-cards {
+  margin-top: var(--ccs-space-7);
+}
+
+.more-like-this__heading + .object-cards {
+  margin-top: var(--ccs-space-6);
+}
+
 .object-cards__heading {
   margin: 0;
   font-family: var(--ccs-font-heading);
@@ -27,15 +41,17 @@
   color: var(--ccs-navy-1100);
 }
 
-/* The sub-sections are h3s: the card heading size */
+/* The sub-sections are h3s, in the body face */
 .object-cards--nested .object-cards__heading {
   font-family: var(--ccs-font-body);
-  font-size: var(--ccs-heading-card-size);
+  font-size: var(--ccs-font-size-2xl);
   font-weight: var(--ccs-heading-weight-strong);
 }
 
-.more-like-this__heading + .object-cards {
-  margin-top: var(--ccs-space-5);
+.object-cards__description {
+  margin: var(--ccs-space-1) 0 0;
+  font-size: var(--ccs-font-size-lg);
+  color: var(--ccs-text-secondary);
 }
 
 /* Similar records fills a lazy frame; when it answers with nothing and there is nothing else, the whole block goes */
@@ -43,74 +59,89 @@
   display: none;
 }
 
-.object-cards__description {
-  margin: var(--ccs-space-1) 0 0;
-  color: var(--ccs-text-secondary);
-}
-
+/* The row: a scrolling, snapping strip on a phone and tablet; four equal columns from 1024px */
 .object-cards__list {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--ccs-space-5);
-  margin: var(--ccs-space-4) 0 0;
-  padding: 0;
+  grid-auto-flow: column;
+  grid-auto-columns: 68%;
+  gap: var(--ccs-space-4);
+  margin: var(--ccs-space-5) 0 0;
+  padding: var(--ccs-space-1) var(--ccs-space-1) var(--ccs-space-3);
+  overflow-x: auto;
   list-style: none;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--ccs-space-1);
+  overscroll-behavior-x: contain;
 }
 
 .object-cards__item {
   display: flex;
   min-width: 0;
+  scroll-snap-align: start;
 }
 
 @media (min-width: 600px) {
-  .object-cards__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .object-cards__list { grid-auto-columns: 38%; }
 }
 
 @media (min-width: 1024px) {
-  .object-cards__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .object-cards__list {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-columns: auto;
+    gap: var(--ccs-space-5);
+    overflow: visible;
+    padding: 0;
+  }
 }
 
 /* Recently viewed is a history aid, not a recommendation: quieter and smaller */
 .object-cards--compact .object-cards__heading {
-  font-size: var(--ccs-font-size-md);
+  font-size: var(--ccs-font-size-xl);
 }
 
 .object-cards--compact .object-cards__list {
-  gap: var(--ccs-space-4);
-  margin-top: var(--ccs-space-3);
+  grid-auto-columns: 44%;
+  gap: var(--ccs-space-3);
 }
 
-/* The card */
+@media (min-width: 600px) {
+  .object-cards--compact .object-cards__list { grid-auto-columns: 24%; }
+}
+
+@media (min-width: 1024px) {
+  .object-cards--compact .object-cards__list {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--ccs-space-4);
+  }
+}
+
+/* The tile */
 .object-card {
   position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
+  gap: var(--ccs-space-3);
   min-width: 0;
-  overflow: hidden;
-  border: 1px solid var(--ccs-border-default);
-  background: var(--ccs-white);
-  transition: border-color var(--ccs-duration-base);
-}
-
-.object-card:hover {
-  border-color: var(--ccs-border-strong);
 }
 
 .object-card:has(.object-card__link:focus-visible) {
   outline: 3px solid var(--ccs-focus-ring);
-  outline-offset: 2px;
+  outline-offset: 4px;
+  border-radius: var(--ccs-radius-lg);
 }
 
+/* The face: one size for every tile, so a row is even whatever its records hold */
 .object-card__media {
   display: flex;
   flex: none;
   align-items: center;
   justify-content: center;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
-  background: var(--ccs-surface-subtle);
-  border-bottom: 1px solid var(--ccs-border-default);
+  border-radius: var(--ccs-radius-lg);
+  background: var(--ccs-white);
 }
 
 /* Shown whole, never cropped: cultural material is not cut to fit a frame */
@@ -118,15 +149,25 @@
   display: block;
   width: 100%;
   height: 100%;
+  padding: var(--ccs-space-3);
   object-fit: contain;
 }
 
-/* A card with no image is text only: a small kicker, the title, the creator and date. No box. */
-.object-card__kicker {
-  margin: 0;
-  font-size: var(--ccs-font-size-sm);
-  line-height: var(--ccs-line-height-normal);
-  color: var(--ccs-text-secondary);
+.object-card__face {
+  padding: var(--ccs-space-3);
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-2xl);
+  line-height: var(--ccs-line-height-tight);
+  color: var(--ccs-navy-600);
+  text-align: center;
+}
+
+.object-card__face[hidden] {
+  display: none;
+}
+
+.object-card--compact .object-card__face {
+  font-size: var(--ccs-font-size-lg);
 }
 
 .object-card__body {
@@ -134,21 +175,25 @@
   flex: 1;
   flex-direction: column;
   gap: var(--ccs-space-1);
-  padding: var(--ccs-space-4);
 }
 
 .object-card__title {
+  display: -webkit-box;
   margin: 0;
+  overflow: hidden;
   font-family: var(--ccs-font-body);
   font-size: var(--ccs-font-size-lg);
   font-weight: var(--ccs-font-weight-semibold);
   line-height: var(--ccs-line-height-snug);
   overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
-/* The link of the whole card: its box covers the card, so there is one target and no nested link */
+/* The link of the whole tile: its box covers the tile, so there is one target and no nested link */
 .object-card__link {
-  color: var(--ccs-text-link);
+  color: var(--ccs-text-brand);
   text-decoration: none;
 }
 
@@ -160,36 +205,37 @@
 
 .object-card:hover .object-card__link,
 .object-card__link:focus-visible {
-  color: var(--ccs-text-link-hover);
   text-decoration: underline;
-  text-underline-position: from-font;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 
 .object-card__link:focus-visible {
-  outline: none; /* the card draws the focus ring */
+  outline: none; /* the tile draws the focus ring */
 }
 
 .object-card__meta {
+  display: -webkit-box;
   margin: 0;
-  font-size: var(--ccs-font-size-md);
+  overflow: hidden;
+  font-size: var(--ccs-font-size-ui);
   line-height: var(--ccs-line-height-normal);
   color: var(--ccs-text-secondary);
   overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
-.object-card--compact .object-card__body { padding: var(--ccs-space-3) var(--ccs-space-4); }
-.object-card--compact .object-card__title { font-size: var(--ccs-font-size-md); }
+.object-card--compact .object-card__media { aspect-ratio: 1; }
+.object-card--compact .object-card__title { font-size: var(--ccs-font-size-ui); }
 .object-card--compact .object-card__meta { font-size: var(--ccs-font-size-sm); }
 
-/* Similar records load into a lazy frame: it holds a card row's room while it fetches, so the page below does not jump */
+/* Similar records load into a lazy frame: it holds a row's room while it fetches, so the page below does not jump */
 .similar-frame {
   display: block;
 }
 
 .similar-frame[busy] {
-  min-height: 12rem;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .object-card { transition: none; }
+  min-height: 18rem;
 }

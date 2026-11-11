@@ -3,7 +3,6 @@ en:
     # The record page's layout (NexusCcs::RecordDocumentComponent and the components it draws). Wording marked PLACEHOLDER
     # is for the University and the collection teams to approve.
     record_page:
-      more_actions: "More actions"
       header:
         collection_id: "Collection ID"
         copy: "Copy"

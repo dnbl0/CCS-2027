@@ -1,0 +1,249 @@
+/*
+ * The access card on a record page (NexusCcs::RecordActionsComponent), after the summary card of Apple's product pages: a soft card
+ * that says in one line what the visitor can do with the media, gives the one thing to do as a full-width primary button, and then
+ * keeps everything else quiet and even: Save as one full-width bar, then Add to list, Compare, Cite and Share as equal tiles with an
+ * icon over a label. The buttons keep their own markup and behaviour (save_control.css, saved_records.css, citations.css,
+ * media_viewer.css); only their look is set here, so it is loaded after them.
+ */
+.access-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-4);
+  padding: var(--ccs-space-5);
+  border-radius: var(--ccs-radius-lg);
+  background: var(--ccs-surface-subtle);
+}
+
+.access-card__headline {
+  margin: 0;
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-2xl);
+  line-height: var(--ccs-line-height-tight);
+  color: var(--ccs-navy-1100);
+}
+
+.access-card__reason {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-3);
+  margin: calc(-1 * var(--ccs-space-2)) 0 0;
+  font-size: var(--ccs-font-size-ui);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-secondary);
+}
+
+/* Asking for access is the one thing to do for a view-only record, so its link is a button, quieter than the primary one */
+.access-card__reason a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0 var(--ccs-space-4);
+  border: 1px solid var(--ccs-navy-1100);
+  border-radius: var(--ccs-radius-control);
+  background: var(--ccs-white);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-navy-1100);
+  text-align: center;
+  text-decoration: none;
+}
+
+.access-card__reason a:hover {
+  background: var(--ccs-navy-100);
+}
+
+.access-card__primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  padding: 0 var(--ccs-space-5);
+  border-radius: var(--ccs-radius-control);
+  background: var(--ccs-navy-1100);
+  font-size: var(--ccs-font-size-lg);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-white);
+  text-align: center;
+  text-decoration: none;
+}
+
+.access-card__primary:hover {
+  background: var(--ccs-navy-1200);
+  color: var(--ccs-white);
+}
+
+.access-card a:focus-visible,
+.access-card button:focus-visible,
+.access-card .save-control:has(:focus-visible) .toggle-bookmark-label {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+/* One grid for the actions. The wrappers around Save, Compare, Cite and Share take no box of their own, so each button is a cell. */
+.record-actions__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--record-tiles, 4), minmax(0, 1fr));
+  gap: var(--ccs-space-2);
+  padding-top: var(--ccs-space-4);
+  border-top: 1px solid var(--ccs-border-default);
+}
+
+.record-actions__row > *,
+.record-actions__row .record-summary__save > * {
+  margin: 0;
+}
+
+.record-actions .record-summary__save,
+.record-actions .list-menu,
+.record-actions .compare-actions,
+.record-actions .record-summary__cite,
+.record-actions .record-summary__share,
+.record-actions .cite,
+.record-actions .share,
+.record-actions .compare-actions__form {
+  display: contents;
+}
+
+/* Save: one full-width bar. Saved: the bar fills. */
+.record-actions .save-control {
+  display: block;
+  grid-column: 1 / -1;
+}
+
+.record-actions .save-control .toggle-bookmark .toggle-bookmark-label {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0 var(--ccs-space-4);
+  border: 1px solid var(--ccs-navy-1100);
+  border-radius: var(--ccs-radius-control);
+  background: var(--ccs-white);
+  font-size: var(--ccs-font-size-md);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-navy-1100);
+}
+
+.record-actions .save-control .toggle-bookmark .toggle-bookmark-label:hover {
+  background: var(--ccs-navy-100);
+}
+
+.record-actions .save-control .toggle-bookmark .toggle-bookmark-label.checked {
+  background: var(--ccs-navy-1100);
+  color: var(--ccs-white);
+}
+
+.record-actions .save-control .toggle-bookmark .toggle-bookmark-label.checked .blacklight-icons svg {
+  color: var(--ccs-white);
+}
+
+.record-actions .save-control .toggle-bookmark-label.checked .save-control__text {
+  text-decoration: none;
+}
+
+/* Add to list, Compare, Cite and Share: equal tiles, an icon over a label */
+.record-actions .list-menu__button,
+.record-actions .compare-actions__button,
+.record-actions .cite__button,
+.record-actions .share__button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--ccs-space-2);
+  width: 100%;
+  min-height: 4.75rem;
+  padding: var(--ccs-space-3) var(--ccs-space-1) var(--ccs-space-2);
+  border: 1px solid var(--ccs-border-default);
+  border-radius: var(--ccs-radius-control);
+  background: var(--ccs-white);
+  font-family: inherit;
+  font-size: var(--ccs-font-size-2xs);
+  font-weight: var(--ccs-font-weight-semibold);
+  line-height: var(--ccs-line-height-tight);
+  color: var(--ccs-navy-1100);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.record-actions .list-menu__button svg,
+.record-actions .compare-actions__button svg,
+.record-actions .cite__button svg,
+.record-actions .share__button svg {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.record-actions .list-menu__button:hover,
+.record-actions .compare-actions__button:hover,
+.record-actions .cite__button:hover,
+.record-actions .share__button:hover {
+  border-color: var(--ccs-navy-1100);
+  background: var(--ccs-navy-100);
+  color: var(--ccs-navy-1100);
+  text-decoration: none;
+}
+
+.record-actions .list-menu__button:hover .list-menu__text {
+  text-decoration: none;
+}
+
+/* The links Compare adds for a record with several images, and once something is in the comparison: a quiet line under the tiles */
+.record-actions .compare-actions__link {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: var(--ccs-font-size-ui);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-link);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.record-actions .compare-actions__link:hover {
+  background: none;
+  color: var(--ccs-text-link-hover);
+}
+
+.record-actions .compare-actions__note {
+  grid-column: 1 / -1;
+  font-size: var(--ccs-font-size-ui);
+  color: var(--ccs-text-secondary);
+}
+
+/* The Add to list panel opens under the tiles, the width of the card */
+.record-actions .list-menu__button:not([hidden]) + .list-menu__panel {
+  inset-inline: 0;
+  top: calc(100% + var(--ccs-space-2));
+  width: auto;
+  max-width: none;
+}
+
+/* The Collection ID: a label and its value, then Copy */
+.record-summary__identifier {
+  display: grid;
+  gap: var(--ccs-space-1);
+  margin: 0;
+  padding-top: var(--ccs-space-4);
+  border-top: 1px solid var(--ccs-border-default);
+  font-size: var(--ccs-font-size-sm);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-secondary);
+}
+
+.record-summary__identifier-label {
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-navy-1100);
+}
+
+.record-summary__identifier .record-copy {
+  justify-self: start;
+  min-height: 2.75rem;
+}

@@ -46,6 +46,7 @@
 @import url("components/saved_records.css");
 @import url("components/citations.css");
 @import url("components/sharing.css");
+@import url("components/record_actions.css");
 @import url("components/sensitivity_gate.css");
 @import url("components/bulk_download.css");
 @import url("components/selection.css");

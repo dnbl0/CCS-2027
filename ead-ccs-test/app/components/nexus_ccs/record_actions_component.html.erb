@@ -11,21 +11,16 @@
     <%# Why it cannot be downloaded, and where to ask: plain text and a link, not a button %>
     <p class="access-card__reason access-notice--view-only"><%= t("nexus_ccs.access_notice.view_only.title") %>. <a class="access-notice__link" href="<%= request_path %>"><%= t("nexus_ccs.access_notice.view_only.link") %></a></p>
   <% end %>
-  <div class="record-actions__row">
+  <div class="record-actions__row" style="--record-tiles: <%= saved_records? ? 4 : 3 %>">
     <% if saved_records? %>
       <div class="record-summary__save">
         <%= render NexusCcs::SaveControlComponent.new(document: document) %>
         <%= render NexusCcs::AddToListComponent.new(document: document) %>
       </div>
     <% end %>
-    <details class="record-actions__more" data-record-sections-target="section">
-      <summary><%= t("nexus_ccs.record_page.more_actions") %></summary>
-      <div class="record-actions__more-body">
-        <%= render NexusCcs::CompareActionsComponent.new(document: document, images: compare? ? media.images.size : 0) %>
-        <div class="record-summary__cite"><%= render NexusCcs::CiteComponent.new(document: document) %></div>
-        <div class="record-summary__share"><%= render NexusCcs::ShareDialogComponent.new(kind: :record, document: document) %></div>
-      </div>
-    </details>
+    <%= render NexusCcs::CompareActionsComponent.new(document: document, images: compare? ? media.images.size : 0) %>
+    <div class="record-summary__cite"><%= render NexusCcs::CiteComponent.new(document: document) %></div>
+    <div class="record-summary__share"><%= render NexusCcs::ShareDialogComponent.new(kind: :record, document: document) %></div>
   </div>
   <%# The stable identifier (CCS-22): CCS has no global ID, so the collection, its accession number and the UoM ID, to quote %>
   <p class="record-summary__identifier" data-testid="record-identifier" data-controller="clipboard">
