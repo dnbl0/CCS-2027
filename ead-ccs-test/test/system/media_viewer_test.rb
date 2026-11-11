@@ -48,7 +48,7 @@ class MediaViewerTest < ApplicationSystemTestCase
     visit "/catalog/#{MULTI}"
     click_button "Zoom and pan"
     assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all
-    first(".digital-assets__other").click
+    all(".digital-assets__other")[1].click # the strip lists every image, the current one first
     assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all
     assert_match(/image 2 of 2/, page.evaluate_script("document.querySelector('.deep-zoom__stage .openseadragon-canvas').getAttribute('aria-label')"))
   end
