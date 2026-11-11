@@ -15,9 +15,12 @@ on:
       - 'eslint.config.js'
       - '.stylelintrc.json'
       - '.github/workflows/ci.yml'
-  push:
-    branches:
-      - main
+  # No run on push to main: the pull request already ran these checks, and a private repo's minutes are limited
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
