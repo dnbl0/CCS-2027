@@ -27,11 +27,12 @@
           <figcaption><%= media_title(item) %></figcaption>
         </figure>
       <% end %>
-    </div>
 
-    <% if sensitivity_state == :viewing %>
-      <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: :viewing) %>
-    <% end %>
+      <%# Inside the picture area, above the band the controls sit in, so the controls never cover it %>
+      <% if sensitivity_state == :viewing %>
+        <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: :viewing) %>
+      <% end %>
+    </div>
 
     <%# Round dark controls at the stage's bottom right, after a museum viewer: what the visitor may know about the media, and full screen %>
     <div class="digital-assets__overlay">

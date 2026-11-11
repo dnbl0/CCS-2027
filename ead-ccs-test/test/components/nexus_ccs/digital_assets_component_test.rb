@@ -119,4 +119,13 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_no_selector ".sensitivity-gate"
     assert_selector "img.digital-assets__image"
   end
+
+  test "the choice notice of a sensitive record is inside the picture area, above the band the controls sit in, so they never cover it" do
+    template = Rails.root.join("app/components/nexus_ccs/digital_assets_component.html.erb").read
+    area = template.index('class="digital-assets__media-area"')
+    gate = template.index("state: :viewing")
+    controls = template.index('class="digital-assets__overlay"')
+
+    assert area < gate && gate < controls
+  end
 end
