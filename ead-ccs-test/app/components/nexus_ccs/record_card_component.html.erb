@@ -1,13 +1,14 @@
-<article class="<%= classes %>">
+<article class="<%= classes %>"<%= tag.attributes(data: { controller: "image-fallback" }) if image_path %>>
   <% if image_path %>
-    <div class="object-card__media">
+    <div class="object-card__media" data-image-fallback-target="media">
       <%# The title names the record, so the image adds nothing to the link %>
-      <%= image_tag image_path, alt: "", class: "object-card__image", loading: "lazy", decoding: "async" %>
+      <%= image_tag image_path, alt: "", class: "object-card__image", loading: "lazy", decoding: "async", data: { action: "error->image-fallback#failed" } %>
     </div>
   <% end %>
   <div class="object-card__body">
     <%# A record with no image the visitor may see is a card of text: a small kicker, the title, the creator and date. No grey box. %>
-    <% unless image_path %><p class="object-card__kicker"><%= kicker %></p><% end %>
+    <%# With an image the kicker waits, hidden: if the file turns out to be missing, the card becomes this text card (image-fallback controller) %>
+    <p class="object-card__kicker"<%= tag.attributes(hidden: true, data: { image_fallback_target: "kicker" }) if image_path %>><%= kicker %></p>
     <%= content_tag heading_tag, class: "object-card__title" do %>
       <%= link_to title, path, class: "object-card__link" %>
     <% end %>

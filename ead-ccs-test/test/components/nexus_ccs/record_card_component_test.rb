@@ -28,6 +28,14 @@ class RecordCardComponentTest < ViewComponent::TestCase
     assert_no_selector ".object-card__kicker"
   end
 
+  test "a card with an image can fall back to a text card if the file is missing: the kicker waits hidden and the image reports its failure" do
+    card(doc("thumbnail_path_ssi" => "/digital-assets/thumbs/x.jpg", "licence_type_ssim" => [ "Public domain - Copyright expired" ], "object_type_ssim" => [ "harp" ]))
+
+    assert_selector "article.object-card[data-controller='image-fallback']"
+    assert_selector "[data-image-fallback-target='media'] img[data-action='error->image-fallback#failed']"
+    assert_selector "p.object-card__kicker[hidden][data-image-fallback-target='kicker']", visible: :all
+  end
+
   test "a withheld or sensitive record has no image or asset path, only a text card" do
     withheld = doc("thumbnail_path_ssi" => "/digital-assets/thumbs/w.jpg", "licence_type_ssim" => [ "ICIP Rights" ], "object_type_ssim" => [ "harp" ])
     sensitive = doc("thumbnail_path_ssi" => "/digital-assets/thumbs/s.jpg", "restrictions_tsi" => [ "Culturally sensitive images" ])
