@@ -9,8 +9,13 @@
         <%= render NexusCcs::AddToListComponent.new(document: document) %>
       </div>
     <% end %>
-    <%= render NexusCcs::CompareActionsComponent.new(document: document, images: compare? ? media.images.size : 0) %>
-    <div class="record-summary__cite"><%= render NexusCcs::CiteComponent.new(document: document) %></div>
-    <div class="record-summary__share"><%= render NexusCcs::ShareDialogComponent.new(kind: :record, document: document) %></div>
+    <details class="record-actions__more" data-record-sections-target="section">
+      <summary><%= t("nexus_ccs.record_page.more_actions") %></summary>
+      <div class="record-actions__more-body">
+        <%= render NexusCcs::CompareActionsComponent.new(document: document, images: compare? ? media.images.size : 0) %>
+        <div class="record-summary__cite"><%= render NexusCcs::CiteComponent.new(document: document) %></div>
+        <div class="record-summary__share"><%= render NexusCcs::ShareDialogComponent.new(kind: :record, document: document) %></div>
+      </div>
+    </details>
   </div>
 </div>

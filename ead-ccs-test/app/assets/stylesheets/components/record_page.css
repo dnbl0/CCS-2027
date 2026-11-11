@@ -287,6 +287,7 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 }
 
 .record-details__truncate-toggle {
+  min-height: 2.75rem;
   padding: 0;
   border: 0;
   background: none;
@@ -499,6 +500,56 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 
 .record-actions__row > * {
   margin: 0;
+}
+
+/* "More actions": below 768px Compare, Cite and Share sit in a disclosure (closed in the markup, so nothing shifts); from 768px the
+   strip is as it was, with the summary hidden and the content shown whether or not the disclosure is open (::details-content) */
+.record-actions__more > summary {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  list-style: none;
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-link);
+  text-decoration: underline;
+  text-underline-position: from-font;
+  cursor: pointer;
+}
+
+.record-actions__more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.record-actions__more > summary:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.record-actions__more-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ccs-space-3);
+  padding-block: var(--ccs-space-2);
+}
+
+@media (min-width: 768px) {
+  .record-actions__more {
+    display: contents;
+  }
+
+  .record-actions__more > summary {
+    display: none;
+  }
+
+  .record-actions__more::details-content {
+    display: contents;
+    content-visibility: visible;
+  }
+
+  .record-actions__more-body {
+    display: contents;
+  }
 }
 
 .record-actions .access-notice {
