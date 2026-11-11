@@ -7,9 +7,12 @@ on:
       - 'ead-ccs-test/**'
       - 'package.json' # the system job installs axe-core from the root package.json
       - '.github/workflows/rails-ci.yml'
-  push:
-    branches:
-      - main
+  # No run on push to main: the pull request already ran these checks, and a private repo's minutes are limited
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   rails:
