@@ -102,7 +102,7 @@ class CatalogController < ApplicationController
     config.show.document_embed_component = NexusCcs::RecordEmbedComponent
 
     # After the details: the persistent link, then how to contact the collection team (CCS-47).
-    config.show.partials = [ :persistent_link, :contact_collection ]
+    config.show.partials = [] # the record page draws its sections itself (RecordDocumentComponent): the persistent link and contact are in About this record
 
     CatalogConfig::Facets.apply(config)
 

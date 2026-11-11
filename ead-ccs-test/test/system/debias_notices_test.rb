@@ -21,8 +21,8 @@ class DebiasNoticesSystemTest < ApplicationSystemTestCase
       visit RECORD
 
       assert_selector "aside.record-debias h2", text: "This record contains language that may be offensive or outdated"
-      assert_selector "dd mark.debias-flag .visually-hidden", text: "flagged term:", visible: :all
-      assert_equal "underline", page.evaluate_script("getComputedStyle(document.querySelector('dd mark.debias-flag')).textDecorationLine")
+      assert_selector "mark.debias-flag .visually-hidden", text: "flagged term:", visible: :all
+      assert_equal "underline", page.evaluate_script("getComputedStyle(document.querySelector('mark.debias-flag')).textDecorationLine")
       assert_accessible tags: AXE_TAGS + WCAG22_TAGS
     end
   end
@@ -66,9 +66,9 @@ class DebiasNoticesSystemTest < ApplicationSystemTestCase
   test "the notice does not move the page once it has loaded" do
     flagged_record do
       visit RECORD
-      top = page.evaluate_script("document.querySelector('.record-details').getBoundingClientRect().top")
+      top = page.evaluate_script("document.querySelector('.record-layout__sections').getBoundingClientRect().top")
       sleep 0.5
-      assert_equal top, page.evaluate_script("document.querySelector('.record-details').getBoundingClientRect().top")
+      assert_equal top, page.evaluate_script("document.querySelector('.record-layout__sections').getBoundingClientRect().top")
     end
   end
 end

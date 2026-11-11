@@ -27,8 +27,8 @@ class MediaSectionTest < ActiveSupport::TestCase
     render_for(FIELDS)
 
     assert_selector ".digital-assets__toolbar .digital-assets__licence", text: "In copyright"
-    assert_selector "button[aria-controls=media-metadata][aria-expanded=false][aria-label='Media metadata']"
-    assert_selector "button[aria-label='Full screen'][hidden]", visible: :all
+    assert_selector "button[aria-controls=media-metadata][aria-expanded=false]", text: "Media information"
+    assert_selector "button[hidden]", text: "Full screen", visible: :all
   end
 
   test "the metadata panel is closed until opened, with licence type, advisory and terms of use" do

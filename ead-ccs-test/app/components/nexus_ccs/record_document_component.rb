@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # A record's page body, after the CCS UI "Record-detail" (Figma 258:25075): the digital assets, a summary
-  # (title, creator and date, tags), then the details as a ruled list in a card with the persistent link below it,
-  # and a Copyright card beside them. Registered as the show page's document_component; the title band and the
-  # breadcrumb above it are HeaderComponent's. The fields, their labels and their order come from the workbook
-  # (config.show_fields, see DataModel); the copyright card gathers the rights fields.
+  # A record's page body: one header block (RecordHeaderComponent), then two columns from 1200px (the media or one plain sentence
+  # about its absence, with the details under it; and a plain column of actions and Key facts) and one column below. After the
+  # Key facts come Object details, Copyright and use, About this record. Registered as the show page's document_component; the
+  # breadcrumb above it is HeaderComponent's. The fields, their labels and their order come from the workbook (config.show_fields,
+  # see DataModel); the Copyright and use section gathers the rights fields.
   class RecordDocumentComponent < Blacklight::DocumentComponent
     include RecordDebias # de-bias notices: the finds in the displayed text, and a value with them marked
 
@@ -23,21 +23,11 @@ module NexusCcs
       Array(document["digital_asset_large_paths_ssim"]).any?
     end
 
-    # "Grainger, Percy Aldridge · 1952"
-    def byline
-      creators = Array(document["creator_ssim"]).first(2).join("; ")
-      [ creators.presence, Array(document["production_date_ssim"]).first ].compact.join(" · ").presence
+    # Whether the record has a digital asset to draw (DigitalAssetsComponent), whatever the policy lets this visitor see; if not, the
+    # page says so in one plain sentence (NoImageComponent)
+    def assets?
+      Array(document["digital_asset_large_paths_ssim"]).any? || Array(document["digital_media_ssim"]).any?
     end
-
-    Tag = Struct.new(:field, :value)
-
-    # Small chips under the byline: the record's format and its collection, each a link to that filter
-    def tags
-      [ Tag.new("format", Array(document["format"]).first), Tag.new("collection_ssim", Array(document["collection_ssim"]).first) ]
-        .select { |tag| tag.value.present? }
-    end
-
-    def tag_path(tag) = helpers.search_action_path(filter_query(tag.field, tag.value))
 
     # Fields that name a collection: their links open all of it, as the header's Search collections menu does
     # (BrowseMenu, docs/adr/0004). Any other detail keeps the search's default.
@@ -47,20 +37,15 @@ module NexusCcs
       WHOLE_SET_FIELDS.include?(field) ? BrowseMenu.query(field, value) : { f: { field => [ value ] } }
     end
 
-    # The details list: Title, then every workbook field the record has a value for, the UoM ID (the record's own
-    # id, with a Copy button) just before the collection
+    # The details list: every workbook field the record has a value for, except the ones shown elsewhere on the page: the Key facts
+    # (KeyFactsComponent), the Copyright and use section, and the header (the title and the Collection ID, which holds the UoM ID)
     def rows
-      @rows ||= begin
-        list = [ Row.new(label: "Title", values: [ heading ], field: "title_tsim") ]
-        @presenter.configuration.show_fields.each_value do |config|
-          name = config.field
-          next if COPYRIGHT_FIELDS.include?(name)
+      @rows ||= @presenter.configuration.show_fields.each_value.filter_map do |config|
+        name = config.field
+        next if COPYRIGHT_FIELDS.include?(name) || KeyFactsComponent.fields.include?(name)
 
-          values = Array(document[name]).map(&:to_s).compact_blank
-          list << Row.new(label: config.label, values: values, field: name) if values.any?
-        end
-        index = list.index { |row| row.field.in?(%w[named_collection_ssim collection_ssim]) } || list.size
-        list.insert(index, Row.new(label: "UoM ID", values: [ uom_id ], field: "id", copy: true))
+        values = Array(document[name]).map(&:to_s).compact_blank
+        Row.new(label: config.label, values: values, field: name) if values.any?
       end
     end
 
@@ -92,6 +77,10 @@ module NexusCcs
     def responsible_collection = Array(document["collection_ssim"]).first
 
     def responsible_collection_query = filter_query(BrowseMenu::COLLECTION_FIELD, responsible_collection)
+
+    # The caption the DAM supplies, shown in Copyright and use only when there is one: the page's own title, date, creator and
+    # rights are already above it, so a caption built from them would add nothing
+    def dam_caption = Array(document["caption_tsim"]).first.presence
 
     # "Title. Date. Creator. Material. © Rights. Collection."
     def caption

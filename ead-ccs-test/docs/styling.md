@@ -90,11 +90,8 @@ header omits those items (in development it defaults to `http://localhost:3000`)
   by the app beyond the sidebar column, its type scale and the mobile drawer (`filter_drawer.css`, `facet_list.css`). The type
   follows the University's filtered listings: the "Search filters" heading is 24px / 600 Source Sans, a group's heading 18px / 600,
   filter names and values 18px, at every width.
-- **Record page** (`components/record_page.css`, `digital_assets.css`): `RecordBannerComponent` (dark title
-  band, the one visible title, hidden from assistive technology because the page's h1, visually hidden in the summary, stays), `RecordEmbedComponent` (the
-  digital assets on a dark band, then type and collection, creator and date, licence), Blacklight's details
-  list as ruled label and value rows in one white card, and `PersistentLinkComponent` (CCS-25, with a copy
-  button, `clipboard_controller.js`). Field labels have no trailing colon (`blacklight.en.yml`).
+- **Record page** (`components/record_page.css`, `digital_assets.css`, `object_cards.css`): see "The record page layout" below.
+  Field labels have no trailing colon (`blacklight.en.yml`).
 
 ## Search results layout
 
@@ -138,3 +135,28 @@ theme on pages whose own styles are light only (a half-dark page). `config.dark_
 
 Nothing from the static pages: help, about and the home hero are ported (the collection landing pages and the contact and search tips pages
 were removed on both sites). See `docs/styling-inventory.md`.
+
+## The record page layout
+
+One header block, not a title band: `RecordHeaderComponent` has a kicker (object type and collection, plain text, not chips), the
+page's one h1, the creator (a browse link) and date, and the Collection ID with Copy. Under it, from 1200px, two columns (7/5):
+the media (or one plain sentence when the record has no digital asset, `NoImageComponent`) with the sections under it, and a
+plain column that scrolls with the page (nothing on the page is sticky, so focus is never covered) holding the actions
+(`RecordActionsComponent`: the access notice of a view-only record, Save, Add to list, Compare, Cite, Share and embed) and the Key
+facts (`KeyFactsComponent`, a `dl`). Below 1200px it is one column in the same order; the actions strip wraps and its targets are 40px.
+
+- **Media** (`DigitalAssetsComponent`, `digital_assets.css`): the image sits on the page surface, whole, at its own shape (at most
+  70vh high), on a flat tint that holds its room from the `width` and `height` attributes (no minimum height, no dark band). Dark
+  only in full screen and in the zoom viewer. One slim toolbar directly under the image: the access chip (Open, View only,
+  Available on request) and the licence on the left; "Media information" and "Full screen" (icon and text label) and, for an open
+  record only, "Download image" on the right. A view-only record has no download link in its markup; a request-only or
+  not-yet-chosen sensitive record has no asset path in it, and its notice sits where the media would, the same width.
+- **Sections** (`record_sections_controller.js`): Object details (the workbook fields not shown above), Copyright and use (licence,
+  copyright note, credit line, a DAM caption only when there is one, responsible collection, terms link) and About this record
+  (persistent link with Copy link, who to contact with the record ID, and a correction link to the same contact) are `<details>`.
+  From 768px they are open and plain; below it they are accordions with 44px summaries, Object details open.
+- **More like this** (`MoreLikeThisComponent`): one h2 and up to three h3 sub-sections (Related objects, Similar records in its lazy
+  frame, Recently viewed), up to four `RecordCardComponent`s each, no tabs. A record with no image the visitor may see is a text
+  card (kicker, title, creator and date), never a grey box.
+- Headings: h1 the title; h2 Key facts, Object details, Copyright and use, About this record, More like this; h3 the sub-sections.
+  Wording marked placeholder is in `config/locales/record_page.en.yml`.

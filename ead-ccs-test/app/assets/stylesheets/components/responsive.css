@@ -41,26 +41,6 @@
   }
 }
 
-/* The record page's title sits beside the Save and Add to list buttons; on a phone they stack under the title (the
-   title broke a word, "Ethelred a", in the narrow column left beside them) */
-@media (max-width: 599px) {
-  .record-summary__inner {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .record-summary__save {
-    grid-column: 1;
-    grid-row: auto;
-    justify-self: start;
-    flex-wrap: wrap;
-    margin-top: var(--ccs-space-3);
-  }
-
-  .record-summary__inner > .record-summary__tags {
-    grid-column: 1;
-  }
-}
-
 /* Text at 200%, or the user's letter and line spacing, on a phone: rows wrap instead of widening the page */
 .site-footer__acknowledgement .site-footer__inner > *,
 .site-footer__flags {
@@ -69,15 +49,6 @@
 
 .site-footer__flags {
   flex-wrap: wrap;
-}
-
-.digital-assets__controls {
-  flex: none;
-}
-
-.digital-assets__button {
-  width: 40px;
-  height: 40px;
 }
 
 #sortAndPerPage .view-type-group {
@@ -117,20 +88,6 @@
     width: 44px;
     height: 44px;
   }
-}
-
-/* The licence chip and the two buttons: the chip can shrink to its words, and the row wraps when large text needs it */
-.digital-assets__toolbar-inner {
-  flex-wrap: wrap;
-}
-
-.digital-assets__licence {
-  flex: 0 1 auto;
-  min-width: min(100%, 8rem);
-}
-
-.digital-assets__licence > span {
-  min-width: 0;
 }
 
 /* The facet "more" modal's value links were 22px tall (the modal sits outside <main>, so the rule above does not reach it) */

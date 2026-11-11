@@ -3,10 +3,6 @@
  * A help tip is a button (a question-mark icon, named by hidden text) that shows a note in the page; the note sits
  * under its heading rather than floating, so it reflows and is never clipped.
  */
-.contact-collection {
-  padding: var(--ccs-space-5);
-}
-
 .contact-collection__head {
   display: flex;
   flex-wrap: wrap;
@@ -16,11 +12,11 @@
 
 .contact-collection__heading {
   margin: 0;
-  font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-heading-panel-size);
-  font-weight: var(--ccs-heading-weight);
+  font-family: var(--ccs-font-body);
+  font-size: var(--ccs-font-size-md);
+  font-weight: var(--ccs-font-weight-semibold);
   line-height: var(--ccs-line-height-tight);
-  color: var(--ccs-navy-1100);
+  color: var(--ccs-text-primary);
 }
 
 .contact-collection__team {
@@ -92,39 +88,19 @@
 }
 
 /* The tip sits after its heading; its note takes a line of its own under both */
-.persistent-link__title,
-.record-copyright__head {
+.persistent-link__title {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   column-gap: var(--ccs-space-2);
 }
 
-.persistent-link__title .help-tip,
-.record-copyright__head .help-tip {
+.persistent-link__title .help-tip {
   display: contents;
 }
 
-.persistent-link__title .help-tip__text,
-.record-copyright__head .help-tip__text {
+.persistent-link__title .help-tip__text {
   flex-basis: 100%;
-}
-
-.record-copyright__head .help-tip__text {
-  margin-inline: var(--ccs-space-5);
-}
-
-.record-copyright__head .record-copyright__title {
-  padding-right: 0;
-}
-
-/* The record page's second column: the cultural protocols notice, then the Copyright card, the same 24px apart as the cards in the
-   first column (record_page.css .record-main__details) */
-.record-main__aside {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ccs-space-5);
-  min-width: 0;
 }
 
 /* The cultural protocols notice: the card of the de-bias notice (debias.css), a navy accent */

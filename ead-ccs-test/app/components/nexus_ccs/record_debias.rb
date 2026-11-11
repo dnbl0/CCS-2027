@@ -6,10 +6,17 @@ module NexusCcs
   # With an empty term list `flagged` returns the value untouched, so the page is byte for byte what it was.
   module RecordDebias
     def debias_matches
-      @debias_matches ||= DebiasTerms.scan(rows.reject { |row| row.copy || link_to_value?(row) }.to_h { |row| [ row.field, row.values ] })
+      @debias_matches ||= DebiasTerms.scan(scanned_rows.reject { |row| row.copy || link_to_value?(row) }.to_h { |row| [ row.field, row.values ] })
     end
 
-    def debias_labels = rows.to_h { |row| [ row.field, row.label ] }
+    def debias_labels = scanned_rows.to_h { |row| [ row.field, row.label ] }
+
+    # The title is shown in the header, not in the details list, and is scanned and marked like a detail
+    def title_row = @title_row ||= self.class::Row.new(label: "Title", values: [ heading ], field: "title_tsim")
+
+    def scanned_rows = [ title_row ] + rows
+
+    def title_markup = flagged(title_row, heading, 0)
 
     def flagged(row, value, index)
       @debias_by_value ||= debias_matches.group_by { |match| [ match.field, match.value_index ] }

@@ -46,14 +46,7 @@ class RecordPageTest < ActiveSupport::TestCase
     assert_selector ".digital-assets + .record-summary"
   end
 
-  test "the title band is hidden from assistive technology so the visible title in the summary is the one h1" do
-    render_inline(NexusCcs::RecordBannerComponent.new(title: "Dimalan Leaves"))
-
-    assert_selector "section.record-banner[aria-hidden=true] p.record-banner__title", text: "Dimalan Leaves"
-    assert_no_selector "h1"
-  end
-
-  test "a record page has the title band and no search banner" do
+  test "a record page has no title band (the header block has the title) and no search banner" do
     with_controller_class(CatalogController) do
       with_request_url("/catalog/vernon-MHM2017.28") do
         vc_test_controller.action_name = "show"
@@ -61,14 +54,14 @@ class RecordPageTest < ActiveSupport::TestCase
       end
     end
 
-    assert_selector ".record-banner"
+    assert_no_selector ".record-banner"
     assert_no_selector ".search-banner"
   end
 
   test "the persistent link has the link, a copy button and a status line for screen readers" do
     render_inline(NexusCcs::PersistentLinkComponent.new(url: "http://example.test/catalog/x"))
 
-    assert_selector "section.persistent-link[data-controller=clipboard] input[readonly][value='http://example.test/catalog/x']"
+    assert_selector "div.persistent-link[data-controller=clipboard] input[readonly][value='http://example.test/catalog/x']"
     assert_selector "button[data-action='clipboard#copy']", text: "Copy link"
     assert_selector "[role=status][data-clipboard-target=status]", visible: :all
   end
@@ -86,7 +79,7 @@ class RecordPageTest < ActiveSupport::TestCase
     assert_selector ".persistent-link__note", text: "Quote this link when contacting the collection team."
   end
 
-  test "the persistent link and the contact card are show partials" do
-    assert_equal [ :persistent_link, :contact_collection ], CatalogController.blacklight_config.view_config(:show).partials
+  test "the persistent link and the contact are drawn in About this record, not as show partials" do
+    assert_empty CatalogController.blacklight_config.view_config(:show).partials
   end
 end

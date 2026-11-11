@@ -1,0 +1,19 @@
+<header class="record-header">
+  <% if kicker %><p class="record-header__kicker" data-testid="record-kicker"><%= kicker %></p><% end %>
+  <h1 class="record-summary__title record-header__title"><%= title_markup %></h1>
+  <% if byline? %>
+    <p class="record-summary__byline record-header__byline">
+      <% creators.each_with_index do |(name, path), index| %><%= "; " if index.positive? %><% if path %><%= link_to name, path %><% else %><%= name %><% end %><% end %><%= " · " if creators.any? && date %><%= date %>
+    </p>
+  <% end %>
+  <%# The stable identifier (CCS-22): CCS has no global ID, so the collection, its accession number and the UoM ID, to quote %>
+  <p class="record-summary__identifier" data-testid="record-identifier" data-controller="clipboard">
+    <span class="record-summary__identifier-label"><%= t("nexus_ccs.record_page.header.collection_id") %></span>
+    <span data-clipboard-target="source" data-copy="<%= identifier %>"><%= identifier %></span>
+    <button type="button" class="record-copy" data-action="clipboard#copy" data-clipboard-target="button" aria-label="<%= t("nexus_ccs.record_page.header.copy_label") %>">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="1" /><path d="M5 15V5a1 1 0 0 1 1-1h10" /></svg>
+      <span data-clipboard-target="label"><%= t("nexus_ccs.record_page.header.copy") %></span>
+    </button>
+    <span class="visually-hidden" role="status" data-clipboard-target="status"></span>
+  </p>
+</header>

@@ -12,7 +12,7 @@ title that contains one word but not another. Without JavaScript the same button
 files (the "open" tier of `AccessPolicy`). It is a filter like any other: it shows as a pill, can be taken off, is kept in search
 history and saved searches, and is counted in "Why am I seeing these results?". The wording is a placeholder: "free to reuse"
 would be a legal claim, and the University has not approved one. A record can still have limits that are not in its licence
-(moral rights, cultural protocols), so the switch says so and sends people to the Copyright card.
+(moral rights, cultural protocols), so the switch says so and sends people to the Copyright and use section.
 
 ## Rule model
 

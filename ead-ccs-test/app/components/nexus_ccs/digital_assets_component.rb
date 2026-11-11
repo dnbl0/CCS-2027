@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # A record's media on its page, after the CCS UI "Record-detail" media section: a dark band with the large
-  # image (a row of thumbnails under it when there are several), a "Media metadata" panel that slides over the
-  # band's right edge, and a toolbar with the licence and the buttons for that panel and for full screen.
+  # A record's media on its page: the large image on the page itself, shown whole at its own shape (a row of thumbnails under it
+  # when there are several), one slim toolbar under it (the access chip and licence, the "Media information" and "Full screen"
+  # buttons with text labels, and Download for an open record) and a "Media metadata" panel that opens under the toolbar.
   # Renders nothing for a record without assets. What it shows follows AccessPolicy: all of it for :open; for :view_only no
   # download (the media players' download button, the PDF link and the thumbnails' links to the files go) and a notice; for
   # :request none of the assets, only the notice, the licence and the media metadata. A sensitive record's assets are
@@ -74,10 +74,21 @@ module NexusCcs
     end
 
 
+    def access_chip = t("nexus_ccs.record_page.access.#{tier}")
+
+    # The one primary action: the image of an open record, to download (never for a view-only or withheld one: no path is in the markup)
+    def download_href = (main&.first if downloadable? && assets_shown?)
+
     # The image's width and height attributes (nothing when its size cannot be read), so the page holds its space while it loads
     def image_size(path)
       width, height = ImageDimensions.for_path(path)
       width ? { width: width, height: height } : {}
+    end
+
+    # "800 / 1200" for the main image when its size is known, else nil
+    def ratio
+      size = image_size(main.first)
+      "#{size[:width]} / #{size[:height]}" if size[:width]
     end
 
     def media_title(item) = item[:label].presence || title

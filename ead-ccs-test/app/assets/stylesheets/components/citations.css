@@ -3,10 +3,6 @@
  * and the "Cite records" page of a list or the saved records (views/citations/show.html.erb). Each citation sits in its own
  * block with a Copy button; the dialog reuses the site's modal look (components/modal.css).
  */
-.record-summary__cite {
-  margin: var(--ccs-space-3) 0 0;
-}
-
 .cite__button,
 .share__button, /* the Share and embed button looks the same as Cite this record */
 .cite__copy {

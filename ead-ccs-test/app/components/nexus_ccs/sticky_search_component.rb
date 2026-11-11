@@ -7,7 +7,7 @@ module NexusCcs
   # (position-fixed, container, d-grid) over Blacklight's search bar, so it sits with Blacklight's markup.
   class StickySearchComponent < ViewComponent::Base
     # The first of these on the page is "the banner": the home page hero, the search banner and the content pages' banner.
-    BANNERS = ".ccs-hero, .search-banner, .page-banner, .record-banner"
+    BANNERS = ".ccs-hero, .search-banner, .page-banner"
 
     def initialize(blacklight_config:)
       @blacklight_config = blacklight_config

@@ -1,6 +1,6 @@
-<section class="contact-collection record-card" aria-labelledby="contact-collection-heading">
+<div class="contact-collection" aria-labelledby="contact-collection-heading" role="group">
   <div class="contact-collection__head">
-    <h2 id="contact-collection-heading" class="contact-collection__heading">Contact the collection team</h2>
+    <h3 id="contact-collection-heading" class="contact-collection__heading">Contact the collection team</h3>
     <%= render NexusCcs::HelpTipComponent.new(topic: :contact) %>
   </div>
   <% if contact %>
@@ -22,4 +22,4 @@
   <% if request_access? %>
     <p class="contact-collection__access">To view or download this record's digital assets, <a href="<%= request_access_path %>">Request access</a>.</p>
   <% end %>
-</section>
+</div>

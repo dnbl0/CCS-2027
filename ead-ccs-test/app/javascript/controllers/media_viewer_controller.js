@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
-// A record's media: the "Media metadata" panel (opened by the info button, closed by its own button or Esc, with
-// focus going to the panel's close button and back to the info button), full screen for the band, and the
+// A record's media: the "Media metadata" panel (opened by the "Media information" button, closed by its own button or Esc, with
+// focus going to the panel's close button and back to the opening button), full screen for the media section, and the
 // thumbnails swapping the large image. Without JavaScript the panel stays closed, the thumbnails are links to
 // the full-size images, and the full screen button never appears.
 //
@@ -10,7 +10,7 @@ import { Controller } from "@hotwired/stimulus"
 // justify-content centring, jolting the large image. Opening and closing it only ever toggles the "is-open"
 // class (transform/visibility, both paint-only) and aria-hidden, which never touches that layout.
 export default class extends Controller {
-  static targets = [ "stage", "image", "panel", "infoButton", "fullscreenButton" ]
+  static targets = [ "stage", "image", "panel", "infoButton", "fullscreenButton", "fullscreenLabel" ]
 
   connect() {
     this.onKey = (event) => { if (event.key === "Escape" && this.isOpen) this.closePanel() }
@@ -58,8 +58,8 @@ export default class extends Controller {
     const on = document.fullscreenElement === this.element
     this.element.classList.toggle("is-fullscreen", on)
     if (this.hasFullscreenButtonTarget) {
-      this.fullscreenButtonTarget.setAttribute("aria-label", on ? "Exit full screen" : "Full screen")
-      this.fullscreenButtonTarget.title = on ? "Exit full screen" : "Full screen"
+      const button = this.fullscreenButtonTarget
+      if (this.hasFullscreenLabelTarget) this.fullscreenLabelTarget.textContent = on ? button.dataset.labelOn : button.dataset.labelOff
     }
   }
 

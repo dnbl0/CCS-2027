@@ -1,5 +1,5 @@
 <%# The record page's Similar records section (SimilarController), the content of its lazy frame (NexusCcs::SimilarRecordsComponent): the same cards as Related objects %>
 <turbo-frame id="similar-records" class="similar-frame">
   <%= render NexusCcs::RecordCardsComponent.new(id: "similar-records-section", heading_id: "similar-records-heading", heading: t("nexus_ccs.similar.heading"),
-                                                description: t("nexus_ccs.similar.description"), documents: @documents) %>
+                                                description: t("nexus_ccs.similar.description"), documents: @documents, nested: true) %>
 </turbo-frame>

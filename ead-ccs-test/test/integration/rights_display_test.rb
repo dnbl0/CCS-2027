@@ -23,8 +23,8 @@ class RightsDisplayTest < ActionDispatch::IntegrationTest
       get "/catalog/#{ERB::Util.url_encode(doc['id'])}"
 
       assert_response :success, doc["id"]
-      assert_select "aside.record-copyright", 1, doc["id"]
-      card = css_select("aside.record-copyright").first.text
+      assert_select "details.record-copyright", 1, doc["id"]
+      card = css_select("details.record-copyright").first.text
       stated = doc["licence_type_ssim"].present? || doc["rights_ssim"].present? || doc["credit_line_tsim"].present?
       if stated
         assert_not_includes card, NONE, doc["id"]
@@ -32,7 +32,7 @@ class RightsDisplayTest < ActionDispatch::IntegrationTest
       else
         assert_includes card, NONE, doc["id"]
       end
-      assert_select "aside.record-copyright a[href='/help#copyright']", text: "About copyright and terms of use"
+      assert_select "details.record-copyright a[href='/help#copyright']", text: "About copyright and terms of use"
     end
   end
 

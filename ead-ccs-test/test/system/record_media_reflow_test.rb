@@ -29,7 +29,7 @@ class RecordMediaReflowTest < ApplicationSystemTestCase
     assert_selector ".digital-assets__panel.is-open", visible: :all
     assert_no_sideways_scroll("open")
 
-    find("button[aria-label='Close media metadata']").click
+    click_button "Close media information"
     assert_no_selector ".digital-assets__panel.is-open", visible: :all
     sleep 0.4 # let the slide-out transition finish
     assert_no_sideways_scroll("closed again")

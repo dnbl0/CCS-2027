@@ -25,10 +25,10 @@ class RecordCardComponentTest < ViewComponent::TestCase
     card(doc("thumbnail_path_ssi" => "/digital-assets/thumbs/x.jpg", "licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
     assert_selector ".object-card__media img.object-card__image[src*='x.jpg'][alt='']"
-    assert_no_selector ".object-card__type"
+    assert_no_selector ".object-card__kicker"
   end
 
-  test "a withheld or sensitive record has no image or asset path, only the placeholder" do
+  test "a withheld or sensitive record has no image or asset path, only a text card" do
     withheld = doc("thumbnail_path_ssi" => "/digital-assets/thumbs/w.jpg", "licence_type_ssim" => [ "ICIP Rights" ], "object_type_ssim" => [ "harp" ])
     sensitive = doc("thumbnail_path_ssi" => "/digital-assets/thumbs/s.jpg", "restrictions_tsi" => [ "Culturally sensitive images" ])
 
@@ -37,16 +37,18 @@ class RecordCardComponentTest < ViewComponent::TestCase
 
       assert_no_selector "img"
       assert_no_match(%r{digital-assets}, page.native.to_html)
-      assert_selector ".object-card__media--empty .object-card__type"
+      assert_selector ".object-card--text .object-card__kicker"
+      assert_no_selector ".object-card__media"
     end
   end
 
-  test "the placeholder names the object type, else Record" do
-    card(doc("object_type_ssim" => [ "harp" ]))
-    assert_selector ".object-card__type", text: "Harp"
+  test "a card with no image is text: a kicker with the object type (else Record) and the collection, and no box" do
+    card(doc("object_type_ssim" => [ "harp" ], "collection_ssim" => [ "Grainger Museum Collection" ]))
+    assert_selector ".object-card--text .object-card__kicker", text: "Harp · Grainger Museum Collection"
+    assert_no_selector ".object-card__media"
 
     card
-    assert_selector ".object-card__type", text: "Record"
+    assert_selector ".object-card__kicker", text: "Record"
   end
 
   test "the compact variant is marked, and a record with no creator or date has no meta line" do

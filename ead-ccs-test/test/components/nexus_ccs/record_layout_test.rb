@@ -24,28 +24,24 @@ class RecordLayoutTest < ActiveSupport::TestCase
     "format" => [ "Object" ]
   }.freeze
 
-  test "the summary is the title, the creator and date, and tags" do
-    c = component(FIELDS)
-
-    assert_equal "Grainger, Percy Aldridge · 1952", c.byline
-    assert_equal [ "Object", "Grainger Museum Collection" ], c.tags.map(&:value)
-    assert_equal [ "format", "collection_ssim" ], c.tags.map(&:field)
-    assert_equal "Kangaroo-pouch tone-tool", c.heading
+  test "the heading is the record's title" do
+    assert_equal "Kangaroo-pouch tone-tool", component(FIELDS).heading
   end
 
-  test "the details list is Title first, the record's own id (UoM ID, copyable) just before the collection" do
+  test "the details list leaves out what the header, the Key facts and Copyright and use show: no Title, UoM ID, Collection, date or materials" do
     labels = component(FIELDS).rows.map(&:label)
 
-    assert_equal "Title", labels.first
-    assert_equal "UoM ID", labels[labels.index("Collection") - 1]
-    assert component(FIELDS).rows.find { |row| row.label == "UoM ID" }.copy
+    assert_not_includes labels, "Title"
+    assert_not_includes labels, "UoM ID"
+    assert_not_includes labels, "Collection"
+    assert_not_includes labels, "Date"
+    assert_not_includes labels, "Materials"
+    assert_includes labels, "Object Type"
   end
 
   test "the UoM ID names the EMu system: M&C's EMu records are emu-umc, Vernon ids are unchanged" do
-    uom_id = ->(fields) { component(fields).rows.find { |row| row.label == "UoM ID" }.values }
-
-    assert_equal [ "emu-umc-1" ], uom_id.(FIELDS)
-    assert_equal [ "vernon-MHM00394" ], uom_id.(FIELDS.merge("id" => "vernon-MHM00394"))
+    assert_equal "emu-umc-1", component(FIELDS).uom_id
+    assert_equal "vernon-MHM00394", component(FIELDS.merge("id" => "vernon-MHM00394")).uom_id
   end
 
   test "the identifier is the collection, accession number and UoM ID (CCS-22)" do
@@ -68,16 +64,13 @@ class RecordLayoutTest < ActiveSupport::TestCase
 
     assert_not c.rights_recorded?
     # (the card's markup is checked on real record pages: test/integration/rights_display_test.rb)
-    assert_nil c.byline
-    assert_empty c.tags
   end
 
-  test "the Save button is at the top right of the summary, in a second column beside the title and byline, with the tags full width below" do
+  test "the layout is one column, then 7/5 columns from 1200px, with a plain (not sticky) right column" do
     css = Rails.root.join("app/assets/stylesheets/components/record_page.css").read
 
-    assert_match(/\.record-summary__inner \{\s+display: grid;\s+grid-template-columns: minmax\(0, 1fr\) auto;/, css)
-    assert_match(/\.record-summary__save \{\s+grid-column: 2;\s+grid-row: 1 \/ span 2;\s+justify-self: end;/, css)
-    assert_match(/\.record-summary__inner > \.record-summary__tags \{\s+grid-column: 1 \/ -1;/, css)
+    assert_match(/@media \(min-width: 1200px\) \{\s+\.record-layout \{\s+grid-template-columns: minmax\(0, 7fr\) minmax\(0, 5fr\);/, css)
+    assert_no_match(/position: sticky/, css)
   end
 
   test "the document component for a record is registered with Blacklight" do

@@ -28,6 +28,17 @@ class CollectionContact
     @url = url
   end
 
+  # A link that starts a message to the team about a record: its ID as the subject; its title, link and accession number in the body
+  def mailto(document:, url:)
+    title = Array(document["title_tsim"]).first.presence || document.id
+    id = CollectionIdentifier.uom_id(document.id)
+    lines = [ "Record: #{title}", "ID: #{id}", "Link: #{url}" ]
+    accession = document.first("accession_number_ssim").presence
+    lines << "Accession number: #{accession}" if accession
+    body = "#{lines.join("\n")}\n\nMy question:\n"
+    "mailto:#{address}?subject=#{ERB::Util.url_encode(id)}&body=#{ERB::Util.url_encode(body)}"
+  end
+
   def email? = address.present?
   def form? = url.present?
 end

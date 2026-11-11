@@ -17,7 +17,7 @@ use to ask; the record page's own component keeps its checks.
 
 | Kind | How | Notes |
 |---|---|---|
-| Image | The large image; **Zoom and pan** swaps it for an OpenSeadragon viewer | The viewer is loaded on first use (a dynamic import), so an ordinary page view costs nothing extra. Buttons Zoom in, Zoom out, Reset view; the viewer's canvas is focusable, arrow keys pan, `=` and `-` zoom, `0` resets. The mouse wheel does not zoom (it would trap page scrolling). Full screen is the media toolbar's button. Reduced motion turns the animation off. |
+| Image | The large image; **Zoom and pan** swaps it for an OpenSeadragon viewer | The viewer is loaded on first use (a dynamic import), so an ordinary page view costs nothing extra. Buttons Zoom in, Zoom out, Reset view; the viewer's canvas is focusable, arrow keys pan, `=` and `-` zoom, `0` resets. The mouse wheel does not zoom (it would trap page scrolling). Full screen is a labelled button in the toolbar under the image (with Media information and, for an open record, Download image). Reduced motion turns the animation off. |
 | Video | The browser's `<video controls>` | Keyboard and screen-reader support are the browser's. A `<track kind="captions">` is added when the record has a captions file. No download button unless the tier is `:open`. |
 | Audio | The browser's `<audio controls>` | As video; a transcript link when the record has one. |
 | PDF | A link that opens the file in a new tab | Only for `:open` records: a PDF cannot be read without being downloadable. An in-page reader would be a new dependency. |

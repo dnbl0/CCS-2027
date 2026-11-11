@@ -28,15 +28,7 @@ class MediaViewerComponentTest < ActiveSupport::TestCase
     assert_equal "https://iiif.example.org/a/info.json", sources.first["info"]
     assert_equal "A portrait, image 1 of 2", sources.first["alt"]
     %w[Zoom\ in Zoom\ out Reset\ view].each { |name| assert_selector ".deep-zoom__controls button", text: name, visible: :all }
-    assert_selector ".compare-actions a[href='/compare?record=emu-1']", text: "Compare images"
-    assert_selector ".compare-actions form[action='/compare/items'] button[aria-label='Add to compare: A portrait']", text: "Add to compare"
-  end
-
-  test "a record with one image offers Add to compare but not Compare images" do
-    render_for("digital_asset_large_paths_ssim" => [ "/digital-assets/large/a.jpg" ], "digital_asset_paths_ssim" => [ "/digital-assets/thumbs/a.jpg" ])
-
-    assert_no_selector ".compare-actions a", text: "Compare images"
-    assert_selector ".compare-actions button", text: "Add to compare"
+    assert_no_selector ".compare-actions" # Compare is in the actions column (RecordActionsComponent)
   end
 
   test "a withheld record offers neither, and has no image address in the page" do
@@ -51,7 +43,6 @@ class MediaViewerComponentTest < ActiveSupport::TestCase
     render_for("licence_type_ssim" => [ "Copyright - Current" ])
 
     assert_selector ".deep-zoom", visible: :all
-    assert_selector ".compare-actions button", text: "Add to compare"
     assert_no_selector "a[href='/digital-assets/large/b.jpg']"
   end
 

@@ -23,12 +23,7 @@ module NexusCcs
     # What the team calls the record: its UoM ID (RecordDocumentComponent), which is also the id in its link
     def persistent_id = CollectionIdentifier.uom_id(document.id)
 
-    def mailto
-      lines = [ "Record: #{title}", "ID: #{persistent_id}", "Link: #{url}" ]
-      lines << "Accession number: #{accession_number}" if accession_number
-      body = "#{lines.join("\n")}\n\nMy question:\n"
-      "mailto:#{contact.address}?subject=#{ERB::Util.url_encode(persistent_id)}&body=#{ERB::Util.url_encode(body)}"
-    end
+    def mailto = contact.mailto(document: document, url: url)
 
     def request_access? = AccessPolicy.tier(document) != :open
     def request_access_path = AccessPolicy.request_path(document)

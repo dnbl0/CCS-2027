@@ -16,7 +16,7 @@ class DiscoverTest < ApplicationSystemTestCase
       visit "/catalog/emu-10247"
       page.execute_script("document.getElementById('similar-records').scrollIntoView()")
 
-      assert_selector "#similar-records h2", text: "Similar records"
+      assert_selector "#similar-records h3", text: "Similar records"
       assert_selector "#similar-records article.object-card", minimum: 2
       page.execute_script("window.scrollTo(0, 0)") # the sticky search bar that appears on scrolling has a known landmark finding of its own
       assert_accessible tags: AXE_TAGS + WCAG22_TAGS
@@ -51,7 +51,7 @@ class DiscoverTest < ApplicationSystemTestCase
     page.execute_script("document.getElementById('similar-records').scrollIntoView()")
 
     assert_selector "#similar-records article.object-card", minimum: 2
-    headings = page.all("h2", visible: :all).map(&:text)
+    headings = page.all("h2, h3", visible: :all).map(&:text)
     assert_operator headings.index("Related objects") || 0, :<, headings.index("Similar records")
     assert_selector "article.object-card h3.object-card__title a.object-card__link", minimum: 2
     assert page.evaluate_script("document.documentElement.scrollWidth <= window.innerWidth"), "the page scrolls sideways"
