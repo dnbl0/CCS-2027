@@ -75,6 +75,16 @@
   position: relative;
 }
 
+/* The zoom viewer keeps the page's own surface (the dark stage of the older viewer made a fitted picture jump to dark bars the moment zoom
+   was switched on); only full screen is dark */
+.viewer-media .deep-zoom__stage {
+  background: var(--ccs-surface-paper);
+}
+
+.viewer-media.is-fullscreen .deep-zoom__stage {
+  background: var(--ccs-navy-1200);
+}
+
 .viewer-media__picture {
   display: flex;
   flex-direction: column;
@@ -352,10 +362,28 @@
 
 /* The other actions, quiet: icon and label rows that wrap */
 .viewer-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, max-content));
   align-items: center;
-  gap: 0 var(--ccs-space-5);
+  gap: 0 var(--ccs-space-6);
+}
+
+.viewer-actions .compare-actions,
+.viewer-actions .compare-actions__form,
+.viewer-actions .cite,
+.viewer-actions .share,
+.viewer-actions .record-summary__cite,
+.viewer-actions .record-summary__share {
+  display: contents;
+}
+
+.viewer-actions .list-menu__button,
+.viewer-actions .cite__button,
+.viewer-actions .share__button,
+.viewer-actions .compare-actions__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ccs-space-2);
 }
 
 .viewer-actions > * {
@@ -470,6 +498,14 @@
   overflow-wrap: anywhere;
 }
 
+/* Linked values stacked in a row: each link is a 32px-high target, so neighbours never crowd each other (WCAG 2.5.8) */
+.viewer-list__row dd a {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: 2rem;
+}
+
 .viewer-accordion .record-copyright__terms,
 .viewer-accordion .record-copyright__none,
 .viewer-about {
@@ -553,7 +589,8 @@
 
 .viewer-band .object-card__media {
   aspect-ratio: 4 / 3;
-  background: var(--ccs-white);
+  border: 1px solid var(--ccs-border-subtle);
+  background: var(--ccs-surface-subtle);
 }
 
 .viewer-band .object-card__title {

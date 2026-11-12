@@ -85,6 +85,33 @@ class RecordViewerLayoutSystemTest < ApplicationSystemTestCase
     assert_selector ".viewer-pill button[aria-label='Zoom in']"
   end
 
+  test "the mouse wheel is left to the page over the picture, switched on or not: no zoom, and no scroll trap" do
+    open_record(VARIANTS.fetch("several images, open"), "desktop")
+    find(".viewer-pill button[aria-label='Zoom in']").click
+    assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all
+    assert_selector ".viewer-pill button[aria-label='Zoom out']:not([disabled])", wait: 8
+
+    # dispatchEvent returns false when something called preventDefault on the event
+    not_prevented = page.evaluate_script("document.querySelector('.deep-zoom__stage .openseadragon-canvas').dispatchEvent(new WheelEvent('wheel', { deltaY: 200, bubbles: true, cancelable: true }))")
+    assert not_prevented, "the viewer swallows the mouse wheel over a zoomed picture"
+  end
+
+  test "the viewer stage keeps the page's light surface when zoom is switched on" do
+    open_record(VARIANTS.fetch("several images, open"), "desktop")
+    find(".viewer-pill button[aria-label='Zoom in']").click
+    assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all
+    background = page.evaluate_script("getComputedStyle(document.querySelector('.viewer-media .deep-zoom__stage')).backgroundColor")
+    page_surface = page.evaluate_script("getComputedStyle(document.querySelector('.viewer-page')).backgroundColor")
+    assert_equal page_surface, background
+  end
+
+  test "linked values in the details rows are at least 24px high, so neighbours never crowd each other (WCAG 2.5.8)" do
+    open_record(VARIANTS.fetch("view-only"), "desktop")
+    assert_selector ".viewer-list__row dd a"
+    small = page.evaluate_script("[...document.querySelectorAll('.viewer-list__row dd a')].filter(e => e.getClientRects().length > 0 && e.getBoundingClientRect().height < 24).length")
+    assert_equal 0, small
+  end
+
   test "a thumbnail switches the picture and the counter, and the strip marks the current one" do
     open_record(VARIANTS.fetch("several images, open"), "desktop")
     assert_selector ".viewer-media__counter", text: "1 of 2"
