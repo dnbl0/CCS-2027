@@ -113,6 +113,7 @@
   --ccs-radius-sm: 4px;
   --ccs-radius-md: 6px;
   --ccs-radius-lg: 10px;
+  --ccs-radius-xl: 1.75rem; /* big cards and panels on the viewer layout */
   --ccs-radius-pill: 999px;
 
   /* Elevation */

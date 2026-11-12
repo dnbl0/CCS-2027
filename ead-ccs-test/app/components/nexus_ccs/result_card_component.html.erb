@@ -1,12 +1,12 @@
 <%= content_tag @component,
   id: @id,
-  data: { "document-id": document.id.to_s.parameterize, "document-counter": counter },
+  data: { "document-id": document.id.to_s.parameterize, "document-counter": counter }.merge(media? ? { controller: "image-fallback", image_fallback_remove_class_value: "result-card--media", image_fallback_add_class_value: "result-card--no-media" } : {}),
   itemscope: true,
   itemtype: document.itemtype,
   class: card_classes.join(" ") do %>
   <% if media? %>
-    <%= link_to document_path, class: "result-card__media", tabindex: -1, "aria-hidden": true do %>
-      <%= image_tag media_path, alt: "", loading: "lazy", decoding: "async", **media_size %>
+    <%= link_to document_path, class: "result-card__media", tabindex: -1, "aria-hidden": true, data: { image_fallback_target: "media" } do %>
+      <%= image_tag media_path, alt: "", loading: "lazy", decoding: "async", data: { action: "error->image-fallback#failed" }, **media_size %>
     <% end %>
   <% end %>
   <div class="result-card__content">

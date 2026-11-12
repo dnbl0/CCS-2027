@@ -1,0 +1,14 @@
+<section class="viewer-band viewer-files" id="viewer-files" aria-labelledby="viewer-files-heading">
+  <div class="viewer-band__inner">
+    <h2 id="viewer-files-heading" class="viewer-band__heading"><%= heading %></h2>
+    <div class="viewer-files__list">
+      <% media.each do |item| %>
+        <figure class="digital-assets__media viewer-files__card">
+          <%# Each kind of file has its viewer (MediaTypes): one that cannot be previewed says so %>
+          <%= helpers.render partial: MediaTypes.viewer_for(item[:kind]), locals: { item: item, title: media_title(item), downloadable: downloadable? } %>
+          <figcaption><%= media_title(item) %></figcaption>
+        </figure>
+      <% end %>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,914 @@
+/*
+ * The viewer layout of a record page (?layout=viewer, NexusCcs::RecordViewerComponent), styled as a product marketing page: a full-width
+ * hero with the picture as the hero object on a soft gradient, a local navigation that sticks once the hero is past (from 1024px), a
+ * headline block with a huge title and a pill card, then bands that alternate white and grey (highlights, details, rights, about,
+ * related). Off by default. Calm: whitespace is the design, large radii only on cards and pills, no motion beyond hover and focus.
+ * Colours are the University's tokens: navy for text and buttons, the pale navy tint fading to white for the hero, white and
+ * --ccs-surface-subtle for the bands, cyan-600 for the accent line. Behaviour: controllers/viewer_page_controller.js,
+ * media_viewer_controller.js, deep_zoom_controller.js.
+ */
+.viewer-page {
+  background: var(--ccs-white);
+}
+
+.viewer-page [hidden] {
+  display: none;
+}
+
+/* ---- The hero ---------------------------------------------------------------------------------------------------------------- */
+.viewer-hero {
+  background: linear-gradient(var(--ccs-navy-100), var(--ccs-white));
+}
+
+.viewer-media {
+  position: relative;
+  padding-bottom: var(--ccs-space-4);
+}
+
+.viewer-media__stage {
+  position: relative;
+  /* The hero's height is held from the start, so nothing moves when the picture arrives */
+  height: min(72vh, 46rem);
+  min-height: 20rem;
+}
+
+.viewer-media__picture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-4);
+  height: 100%;
+  padding: var(--ccs-space-5) var(--ccs-space-4);
+  overflow: hidden; /* only the picture and its notices are in here (video, audio and PDFs have their own band), so nothing scrolls inside the hero */
+}
+
+/* No picture to show (a record with only video or audio, say): the hero is as tall as its notices, not a held height */
+.viewer-media__stage--bare {
+  height: auto;
+  min-height: 0;
+}
+
+.viewer-media__stage--bare .viewer-media__picture {
+  height: auto;
+  padding-block: var(--ccs-space-3);
+}
+
+/* The one picture fills the hero whole, never cropped; the zoom viewer fills the same box and is transparent on the gradient */
+.viewer-media__figure {
+  position: relative;
+  display: block;
+  flex: 1 0 100%;
+  min-height: 0;
+  margin: 0;
+}
+
+.viewer-media__figure:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: -3px;
+}
+
+.viewer-media__figure .digital-assets__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+}
+
+.viewer-media__figure .deep-zoom {
+  position: absolute;
+  inset: 0;
+  overflow: hidden; /* the navigator's wrapper is as tall as the viewer and sits after it: without this the picture area scrolls over it */
+  pointer-events: none; /* it covers the whole hero: only its viewer (switched on) and its buttons take clicks */
+}
+
+.viewer-media__figure .deep-zoom.is-active,
+.viewer-media__figure .deep-zoom .viewer-pill__button,
+.viewer-media__figure .deep-zoom .viewer-pill {
+  pointer-events: auto;
+}
+
+.viewer-media .deep-zoom__stage {
+  height: 100%;
+  background: transparent;
+}
+
+.viewer-media.is-fullscreen {
+  background: var(--ccs-navy-1200);
+}
+
+.viewer-media.is-fullscreen .viewer-media__stage {
+  height: calc(100vh - 6rem);
+}
+
+.viewer-media.is-fullscreen .viewer-dots__thumb,
+.viewer-media.is-fullscreen .viewer-media__thumb {
+  background: var(--ccs-white);
+}
+
+/* Three round navy buttons at the hero's bottom right: zoom in, zoom out, full view */
+.viewer-pill {
+  position: absolute;
+  right: var(--ccs-space-3);
+  bottom: var(--ccs-space-3);
+  z-index: 3;
+  display: flex;
+  gap: var(--ccs-space-2);
+}
+
+.viewer-pill__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ccs-radius-circle);
+  background: var(--ccs-navy-1200);
+  color: var(--ccs-white);
+  cursor: pointer;
+}
+
+.viewer-pill__button:hover:not(:disabled) {
+  background: var(--ccs-navy-1100);
+}
+
+.viewer-pill__button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.viewer-pill__button:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+/* The navigator, a small map of the whole image, at the top right and only once the picture is zoomed; its region in cyan */
+.viewer-navigator {
+  position: absolute;
+  top: var(--ccs-space-3);
+  right: var(--ccs-space-3);
+  z-index: 3;
+  width: 7.5rem;
+  height: 5.625rem;
+  border: 1px solid var(--ccs-border-strong);
+  background: var(--ccs-white);
+  visibility: hidden; /* OpenSeadragon manages the element's display itself, so it is shown with visibility instead */
+}
+
+.deep-zoom.is-zoomed .viewer-navigator:not([hidden]) {
+  visibility: visible;
+}
+
+.viewer-navigator .displayregion {
+  border: 2px solid var(--ccs-cyan-400);
+}
+
+.viewer-message {
+  position: absolute;
+  right: var(--ccs-space-3);
+  bottom: 4.5rem;
+  left: var(--ccs-space-3);
+  z-index: 3;
+  margin: 0;
+  padding: var(--ccs-space-2) var(--ccs-space-3);
+  border-radius: var(--ccs-radius-md);
+  background: var(--ccs-white);
+  font-size: var(--ccs-font-size-sm);
+  color: var(--ccs-text-primary);
+}
+
+/* Previous and Next: round grey buttons, with the row of small thumbnails between them under the picture */
+.viewer-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ccs-space-3);
+  padding: 0 var(--ccs-space-4);
+}
+
+.viewer-dots__list {
+  display: flex;
+  gap: var(--ccs-space-2);
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: var(--ccs-space-1);
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none; /* Previous and Next scroll it, and every thumbnail is focusable */
+}
+
+.viewer-dots__list > li {
+  flex: none;
+}
+
+.viewer-dots__arrow {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ccs-radius-circle);
+  background: var(--ccs-neutral-200);
+  color: var(--ccs-navy-1100);
+  cursor: pointer;
+}
+
+.viewer-dots__arrow:hover:not(:disabled) {
+  background: var(--ccs-neutral-300);
+}
+
+.viewer-dots__arrow:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.viewer-dots__arrow:focus-visible,
+.viewer-media__thumb:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.viewer-media__thumb {
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: var(--ccs-radius-md);
+  background: var(--ccs-white);
+  cursor: pointer;
+}
+
+.viewer-media__thumb img {
+  display: block;
+  width: 2.75rem;
+  height: 2.75rem;
+  object-fit: contain;
+}
+
+.viewer-media__thumb:hover {
+  border-color: var(--ccs-border-strong);
+}
+
+.viewer-media__thumb.is-current {
+  border-color: var(--ccs-navy-1100);
+}
+
+.viewer-media__link {
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-navy-1100);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* From 1024px the arrows sit at the hero's left and right edges, level with the middle of the picture */
+@media (min-width: 64rem) {
+  .viewer-dots__arrow {
+    position: absolute;
+    top: calc(min(72vh, 46rem) / 2 - 1.375rem);
+  }
+
+  .viewer-dots__arrow--previous {
+    left: var(--ccs-space-5);
+  }
+
+  .viewer-dots__arrow--next {
+    right: var(--ccs-space-5);
+  }
+}
+
+/* No media: a short hero with the monogram and one plain sentence (NoImageComponent) */
+.viewer-hero .no-image {
+  background: none;
+}
+
+/* ---- The local navigation ----------------------------------------------------------------------------------------------------- */
+.viewer-nav {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  html:has(.viewer-nav) {
+    scroll-padding-top: 5rem; /* anchors and focused controls are never hidden under the sticky bar (WCAG 2.4.11) */
+  }
+
+  .viewer-nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: block;
+    border-bottom: 1px solid var(--ccs-border-default);
+    background: rgb(255 255 255 / 90%);
+  }
+
+  .viewer-nav__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--ccs-space-5);
+    max-width: calc(75rem + 2 * var(--record-gutter, var(--ccs-space-6)));
+    min-height: 3.5rem;
+    margin-inline: auto;
+    padding-inline: var(--record-gutter, var(--ccs-space-6));
+  }
+
+  .viewer-nav__title {
+    min-width: 0;
+    margin: 0 auto 0 0;
+    overflow: hidden;
+    font-family: var(--ccs-font-heading);
+    font-size: var(--ccs-font-size-lg);
+    font-weight: var(--ccs-heading-weight-strong);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ccs-navy-1100);
+  }
+
+  .viewer-nav__links {
+    display: flex;
+    gap: var(--ccs-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .viewer-nav__links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding-inline: var(--ccs-space-2);
+    font-size: var(--ccs-font-size-ui);
+    color: var(--ccs-text-secondary);
+    text-decoration: none;
+  }
+
+  .viewer-nav__links a:hover {
+    color: var(--ccs-navy-1100);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .viewer-nav__links a:focus-visible {
+    outline: 3px solid var(--ccs-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* The navy pill, in the navigation and in the pill card */
+.viewer-nav__button,
+.viewer-pillcard__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 var(--ccs-space-5);
+  border-radius: var(--ccs-radius-pill);
+  background: var(--ccs-navy-1100);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-white);
+  text-decoration: none;
+}
+
+.viewer-nav__button:hover,
+.viewer-pillcard__button:hover {
+  background: var(--ccs-navy-1200);
+  color: var(--ccs-white);
+}
+
+.viewer-nav__button:focus-visible,
+.viewer-pillcard__button:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ---- The headline block ------------------------------------------------------------------------------------------------------- */
+.viewer-headline__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ccs-space-5);
+  align-items: end;
+  max-width: calc(75rem + 2 * var(--record-gutter, var(--ccs-space-6)));
+  margin-inline: auto;
+  padding: var(--ccs-space-6) var(--record-gutter, var(--ccs-space-6)) var(--ccs-space-7);
+}
+
+.viewer-headline__inner > * {
+  min-width: 0;
+}
+
+@media (min-width: 64rem) {
+  .viewer-headline__inner {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    column-gap: var(--ccs-space-8);
+    padding-top: var(--ccs-space-7);
+  }
+
+  .viewer-quiet,
+  .viewer-headline__inner > .record-card {
+    grid-column: 2;
+  }
+}
+
+.viewer-headline .record-header {
+  margin: 0;
+}
+
+.viewer-headline .record-header__kicker {
+  margin-bottom: var(--ccs-space-3);
+  font-size: var(--ccs-font-size-md);
+  font-weight: var(--ccs-font-weight-regular);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ccs-text-secondary);
+}
+
+/* A huge headline with a subtle fill from navy to the link blue; a plain colour where the fill is not drawn */
+.viewer-headline .record-header__title {
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+  font-weight: var(--ccs-heading-weight-strong);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--ccs-navy-1100);
+}
+
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .viewer-headline .record-header__title {
+    background: linear-gradient(90deg, var(--ccs-navy-1100), var(--ccs-blue-800));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+@media (forced-colors: active), print {
+  .viewer-headline .record-header__title {
+    background: none;
+    -webkit-text-fill-color: currentcolor;
+    color: CanvasText;
+  }
+}
+
+.viewer-headline .record-summary__byline {
+  margin-top: var(--ccs-space-4);
+  font-size: var(--ccs-font-size-xl);
+  color: var(--ccs-cyan-600);
+}
+
+.viewer-headline .record-summary__byline a {
+  color: inherit;
+}
+
+.viewer-headline .record-header__place {
+  font-size: var(--ccs-font-size-md);
+}
+
+/* The pill card: soft grey, a large radius, what the visitor may do, the one navy pill and a quiet Save */
+.viewer-pillcard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-3);
+  padding: var(--ccs-space-5);
+  border-radius: var(--ccs-radius-xl);
+  background: var(--ccs-surface-subtle);
+}
+
+.viewer-pillcard__status {
+  margin: 0;
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-xl);
+  color: var(--ccs-navy-1100);
+}
+
+.viewer-pillcard__button {
+  min-height: 3rem;
+}
+
+.viewer-pillcard__save .save-control .toggle-bookmark .toggle-bookmark-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 var(--ccs-space-5);
+  border: 2px solid var(--ccs-navy-1100);
+  border-radius: var(--ccs-radius-pill);
+  background: var(--ccs-white);
+  color: var(--ccs-navy-1100);
+}
+
+.viewer-pillcard__save .save-control {
+  display: block;
+}
+
+/* Quiet round buttons with visible labels: Add to list, Compare, Cite, Share */
+.viewer-quiet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-2) var(--ccs-space-4);
+}
+
+.viewer-quiet__item > * {
+  margin: 0;
+}
+
+.viewer-quiet .list-menu__button,
+.viewer-quiet .cite__button,
+.viewer-quiet .share__button,
+.viewer-quiet .compare-actions__link,
+.viewer-quiet .compare-actions__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ccs-space-2);
+  min-height: 2.75rem;
+  padding: var(--ccs-space-1) var(--ccs-space-3);
+  border: 0;
+  border-radius: var(--ccs-radius-pill);
+  background: var(--ccs-surface-subtle);
+  font-size: var(--ccs-font-size-ui);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-navy-1100);
+}
+
+.viewer-quiet .compare-actions {
+  padding: 0;
+}
+
+.viewer-quiet .compare-actions,
+.viewer-quiet .compare-actions__form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-2);
+  margin: 0;
+}
+
+/* ---- The bands ---------------------------------------------------------------------------------------------------------------- */
+.viewer-band {
+  padding-block: var(--ccs-space-7);
+  background: var(--ccs-white);
+}
+
+.viewer-band--subtle {
+  background: var(--ccs-surface-subtle);
+}
+
+.viewer-band__inner {
+  max-width: calc(75rem + 2 * var(--record-gutter, var(--ccs-space-6)));
+  margin-inline: auto;
+  padding-inline: var(--record-gutter, var(--ccs-space-6));
+}
+
+.viewer-band__inner--narrow {
+  max-width: calc(60rem + 2 * var(--record-gutter, var(--ccs-space-6)));
+}
+
+@media (min-width: 64rem) {
+  .viewer-band {
+    padding-block: 6.5rem;
+  }
+}
+
+.viewer-band__label {
+  margin: 0 0 var(--ccs-space-2);
+  font-size: var(--ccs-font-size-ui);
+  font-weight: var(--ccs-font-weight-bold);
+  color: var(--ccs-text-secondary);
+}
+
+/* A big, quiet headline */
+.viewer-band__heading {
+  margin: 0 0 var(--ccs-space-5);
+  font-family: var(--ccs-font-heading);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: var(--ccs-heading-weight);
+  line-height: 1.1;
+  color: var(--ccs-navy-1100);
+}
+
+/* The description, one large paragraph */
+.viewer-lede {
+  max-width: 38rem;
+  margin-bottom: var(--ccs-space-6);
+  font-size: var(--ccs-font-size-2xl);
+  line-height: 1.4;
+  color: var(--ccs-text-primary);
+}
+
+/* The cards: one per picture, 4:3, the picture whole on white, in a scroller that shows the next one peeking */
+.viewer-cards {
+  display: flex;
+  gap: var(--ccs-space-4);
+  margin: 0;
+  padding: var(--ccs-space-1) 0 var(--ccs-space-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.viewer-cards__item {
+  flex: 0 0 min(78%, 28rem);
+  scroll-snap-align: start;
+}
+
+.viewer-cards--one {
+  justify-content: center;
+}
+
+.viewer-cards--one .viewer-cards__item {
+  flex-basis: min(100%, 36rem);
+}
+
+.viewer-card {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  padding: var(--ccs-space-4);
+  border: 0;
+  border-radius: var(--ccs-radius-xl);
+  background: var(--ccs-white);
+  cursor: pointer;
+}
+
+.viewer-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.viewer-card:hover {
+  box-shadow: 0 0 0 2px var(--ccs-navy-1100);
+}
+
+.viewer-card:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.viewer-chevrons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ccs-space-2);
+  margin-top: var(--ccs-space-4);
+}
+
+.viewer-chevrons[hidden] {
+  display: none;
+}
+
+.viewer-chevrons__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ccs-radius-circle);
+  background: var(--ccs-neutral-200);
+  color: var(--ccs-navy-1100);
+  cursor: pointer;
+}
+
+.viewer-chevrons__button:hover:not(:disabled) {
+  background: var(--ccs-neutral-300);
+}
+
+.viewer-chevrons__button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.viewer-chevrons__button:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Video, audio and PDF files: their own white band, each in a big rounded card, the players the full width of the column */
+.viewer-files__list {
+  display: grid;
+  gap: var(--ccs-space-5);
+  margin-top: var(--ccs-space-5);
+}
+
+.viewer-files__card {
+  margin: 0;
+  padding: var(--ccs-space-5);
+  border-radius: var(--ccs-radius-xl);
+  background: var(--ccs-surface-subtle);
+  text-align: left;
+}
+
+.viewer-files__card video,
+.viewer-files__card audio {
+  display: block;
+  width: 100%;
+  max-width: none;
+  max-height: 70vh;
+  border-radius: var(--ccs-radius-lg);
+}
+
+.viewer-files__card figcaption {
+  margin-top: var(--ccs-space-3);
+  font-size: var(--ccs-font-size-ui);
+  color: var(--ccs-text-secondary);
+}
+
+/* Details: a centred column, groups with their own heading, label and value rows with hairlines */
+.viewer-group__heading {
+  margin: var(--ccs-space-6) 0 var(--ccs-space-2);
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-2xl);
+  font-weight: var(--ccs-heading-weight-strong);
+  color: var(--ccs-navy-1100);
+}
+
+.viewer-list {
+  margin: 0;
+}
+
+.viewer-list__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ccs-space-1);
+  padding-block: var(--ccs-space-3);
+  border-top: 1px solid var(--ccs-border-default);
+  font-size: var(--ccs-font-size-md);
+  line-height: 1.5;
+}
+
+@media (min-width: 40rem) {
+  .viewer-list__row {
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: var(--ccs-space-5);
+  }
+}
+
+.viewer-list__row dt {
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-secondary);
+}
+
+.viewer-list__row dd {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Linked values: plain underlined links, each a 32px-high target, so neighbours never crowd each other (WCAG 2.5.8) */
+.viewer-list__row dd a {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: 2rem;
+}
+
+/* Rights: big rounded white cards */
+.viewer-rights {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ccs-space-4);
+}
+
+@media (min-width: 48rem) {
+  .viewer-rights {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.viewer-rights__card {
+  padding: var(--ccs-space-5);
+  border-radius: var(--ccs-radius-xl);
+  background: var(--ccs-white);
+}
+
+.viewer-rights__title {
+  margin: 0 0 var(--ccs-space-3);
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-xl);
+  font-weight: var(--ccs-heading-weight-strong);
+  color: var(--ccs-navy-1100);
+}
+
+.viewer-rights__text {
+  margin: 0 0 var(--ccs-space-3);
+  overflow-wrap: anywhere;
+}
+
+.viewer-rights__text a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+}
+
+/* About: the persistent link and the Collection ID in a soft card */
+.viewer-band .persistent-link,
+.viewer-band .record-summary__identifier {
+  padding: var(--ccs-space-4);
+  border: 0;
+  border-radius: var(--ccs-radius-xl);
+  background: var(--ccs-surface-subtle);
+}
+
+.viewer-band .record-summary__identifier {
+  margin-top: var(--ccs-space-4);
+}
+
+.viewer-about {
+  margin-top: var(--ccs-space-5);
+}
+
+/* Related: More like this, in a grey band, under a big headline */
+body:has(.viewer-page) .more-like-this {
+  background: var(--ccs-surface-subtle);
+}
+
+.more-like-this__heading {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+}
+
+/* The rows of More like this are scrollers from 1024px too, with bigger tiles, and round buttons under a row that overflows */
+body:has(.viewer-page) .more-like-this .viewer-chevrons--row {
+  display: none; /* below 1024px the row scrolls under a finger */
+}
+
+@media (min-width: 64rem) {
+  body:has(.viewer-page) .more-like-this .object-cards__list {
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    grid-auto-columns: 30%;
+    padding: var(--ccs-space-1) var(--ccs-space-1) var(--ccs-space-3);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  body:has(.viewer-page) .more-like-this .object-cards--compact .object-cards__list {
+    grid-auto-columns: 26%;
+  }
+
+  body:has(.viewer-page) .more-like-this .viewer-chevrons--row {
+    display: flex;
+  }
+
+  body:has(.viewer-page) .more-like-this .viewer-chevrons--row[hidden] {
+    display: none;
+  }
+}
+
+/* ---- Below 1024px: one column --------------------------------------------------------------------------------------------------- */
+@media (max-width: 63.99rem) {
+  .viewer-media__stage {
+    height: min(60vh, 46rem);
+  }
+
+  .viewer-band {
+    padding-block: var(--ccs-space-7);
+  }
+}
+
+@media (max-width: 47.99rem) {
+  /* The three round buttons get a band of their own under the picture, so nothing covers it */
+  .viewer-media__figure {
+    padding-bottom: 3.75rem;
+  }
+
+  .viewer-media__figure .deep-zoom__stage {
+    height: calc(100% - 3.75rem);
+  }
+
+  .viewer-pill {
+    right: 0;
+    bottom: var(--ccs-space-1);
+    left: 0;
+    justify-content: center;
+  }
+
+  .viewer-band {
+    padding-block: var(--ccs-space-7);
+  }
+
+  .viewer-lede {
+    font-size: var(--ccs-font-size-xl);
+  }
+}
+
+@media print {
+  .viewer-hero,
+  .viewer-nav,
+  .viewer-chevrons,
+  .viewer-cards {
+    display: none;
+  }
+}

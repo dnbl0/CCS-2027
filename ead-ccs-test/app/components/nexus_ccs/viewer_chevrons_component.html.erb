@@ -1,0 +1,4 @@
+<div class="<%= classes %>">
+  <button type="button" class="viewer-chevrons__button" <%= "disabled" if back_disabled? %> <%= tag.attributes(data: back_data) %> aria-label="<%= back_label %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7" /></svg></button>
+  <button type="button" class="viewer-chevrons__button" <%= tag.attributes(data: forward_data) %> aria-label="<%= forward_label %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg></button>
+</div>

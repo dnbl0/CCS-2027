@@ -27,17 +27,19 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
   test "a single asset is one large image named for the record" do
     render_for(assets(1))
 
-    assert_selector "section.digital-assets h2.visually-hidden", text: "Digital asset", exact_text: true
+    assert_selector "section.digital-assets[aria-labelledby=digital-assets-heading] #digital-assets-heading.visually-hidden", text: "Digital asset", exact_text: true
+    assert_no_selector "section.digital-assets h2, section.digital-assets h3" # nothing before the page's h1 is a heading
     assert_selector "figure.digital-assets__main img[src='/digital-assets/large/a1.jpg'][alt='Cary Pocket microscope']"
     assert_no_selector ".digital-assets__others"
   end
 
-  test "several assets: the first is large and the rest are thumbnails that open the large image" do
+  test "several assets: the first is large and every one is in the strip under it, the first as the current one, each opening the large image" do
     render_for(assets(3))
 
-    assert_selector "h2", text: "Digital assets"
+    assert_selector "#digital-assets-heading", text: "Digital assets"
     assert_selector "figure img[alt='Cary Pocket microscope, image 1 of 3']"
-    assert_selector ".digital-assets__others li", count: 2
+    assert_selector ".digital-assets__others li", count: 3
+    assert_selector ".digital-assets__others a.digital-assets__other.is-current[aria-current=true][href='/digital-assets/large/a1.jpg']"
     assert_selector "a.digital-assets__other[href='/digital-assets/large/a2.jpg'][target=_blank][rel=noopener] img[src='/digital-assets/thumbs/a2.jpg']"
     assert_selector "a img[alt='Cary Pocket microscope, image 3 of 3 (opens full size in a new tab)']"
   end
@@ -116,5 +118,14 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
 
     assert_no_selector ".sensitivity-gate"
     assert_selector "img.digital-assets__image"
+  end
+
+  test "the choice notice of a sensitive record is inside the picture area, above the band the controls sit in, so they never cover it" do
+    template = Rails.root.join("app/components/nexus_ccs/digital_assets_component.html.erb").read
+    area = template.index('class="digital-assets__media-area"')
+    gate = template.index("state: :viewing")
+    controls = template.index('class="digital-assets__overlay"')
+
+    assert area < gate && gate < controls
   end
 end

@@ -76,8 +76,15 @@ module NexusCcs
 
     def access_chip = t("nexus_ccs.record_page.access.#{tier}")
 
-    # The one primary action: the image of an open record, to download (never for a view-only or withheld one: no path is in the markup)
-    def download_href = (main&.first if downloadable? && assets_shown?)
+    # "3 images", "1 image and a video": what there is, said whether or not this visitor may see it now (only counts, no path)
+    def file_summary
+      images = Array(@document["digital_asset_large_paths_ssim"]).compact_blank.size
+      kinds = Array(@document["digital_media_ssim"]).map { |entry| Collections::DigitalMedia.parse(entry)[:kind].to_s }.compact_blank.uniq
+      parts = []
+      parts << t("nexus_ccs.record_page.media.images_count", count: images) if images.positive?
+      parts.concat(kinds.map { |kind| t("nexus_ccs.record_page.media.kind.#{kind}", default: kind.to_s.capitalize) })
+      parts.to_sentence(two_words_connector: " and ", last_word_connector: ", and ")
+    end
 
     # The image's width and height attributes (nothing when its size cannot be read), so the page holds its space while it loads
     def image_size(path)
@@ -90,6 +97,15 @@ module NexusCcs
       size = image_size(main.first)
       "#{size[:width]} / #{size[:height]}" if size[:width]
     end
+
+    # The same as a number (width over height), for the figure's width
+    def aspect
+      size = image_size(main.first)
+      (size[:width].to_f / size[:height]).round(4) if size[:width]
+    end
+
+    # With several images every one is in the strip under the stage (the current one outlined), the first included
+    def strip = count > 1 ? images : []
 
     def media_title(item) = item[:label].presence || title
     def others = images.drop(1)

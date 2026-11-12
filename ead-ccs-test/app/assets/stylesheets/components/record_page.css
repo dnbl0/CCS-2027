@@ -1,9 +1,11 @@
 /*
- * A record's page: one header block (kicker, h1, creator and date, Collection ID), then two columns from 1200px and one below.
- * Left: the media, or one plain sentence when the record has none, then the sections (Object details, Copyright and use, About this
- * record). Right: a plain column, not sticky, of the actions and the Key facts. The order in the markup is the order on the page.
- * Below 768px the sections are accordions (controllers/record_sections_controller.js); from 768px they are plain sections.
- * Markup: NexusCcs::RecordHeaderComponent, RecordDocumentComponent, RecordActionsComponent, KeyFactsComponent, RecordAboutComponent.
+ * A record's page, after Apple's product pages with the cues of a museum image viewer (the British Museum's): a slim sub-navigation
+ * under the site header (from 1200px), then two columns, the viewer on the left (digital_assets.css) and the record on the right
+ * (kicker, a very large title, the byline, the description, and the access card with its one primary button and its quiet text
+ * actions), then the specifications in a centred 960px column (Object details, Copyright and use, About this record) and More like
+ * this. Below 1200px it is one column in the same order. The order of the markup is the order on the page. Below 768px the sections
+ * are accordions (controllers/record_sections_controller.js); from 768px they are plain sections.
+ * Markup: NexusCcs::RecordSubnavComponent, RecordHeaderComponent, RecordDocumentComponent, RecordActionsComponent, RecordAboutComponent.
  */
 :root {
   --record-gutter: var(--ccs-space-6); /* 32px beside the 1200px column; 16px on a phone */
@@ -34,98 +36,192 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   display: none;
 }
 
-.record-page__inner {
-  max-width: calc(75rem + 2 * var(--record-gutter));
-  margin-inline: auto;
-  padding: var(--ccs-space-6) var(--record-gutter) var(--ccs-space-8);
+/* The sub-navigation: the title and anchors, under the site header, from 1200px. It sticks, so anchors scroll to a padded edge and a
+   focused control is never hidden under it (WCAG 2.4.11). */
+.record-subnav {
+  display: none;
 }
 
-/* The header block */
-.record-header {
-  max-width: 50rem;
-  margin-bottom: var(--ccs-space-5);
+@media (min-width: 1200px) {
+  html:has(.record-subnav) {
+    scroll-padding-top: 5rem;
+  }
+
+  .record-subnav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: block;
+    border-bottom: 1px solid var(--ccs-border-subtle);
+    background: var(--ccs-white);
+  }
+
+  .record-subnav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ccs-space-6);
+    max-width: calc(75rem + 2 * var(--record-gutter));
+    min-height: 3.5rem;
+    margin-inline: auto;
+    padding-inline: var(--record-gutter);
+  }
+
+  .record-subnav__title {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-family: var(--ccs-font-heading);
+    font-size: var(--ccs-font-size-xl);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ccs-navy-1100);
+  }
+
+  .record-subnav__links {
+    display: flex;
+    flex: none;
+    gap: var(--ccs-space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .record-subnav__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: var(--ccs-font-size-ui);
+    color: var(--ccs-text-secondary);
+    text-decoration: none;
+  }
+
+  .record-subnav__links a:hover {
+    color: var(--ccs-navy-1100);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .record-subnav__links a:focus-visible {
+    outline: 3px solid var(--ccs-focus-ring);
+    outline-offset: 2px;
+  }
 }
 
-.record-header__kicker {
-  margin: 0 0 var(--ccs-space-2);
-  font-size: var(--ccs-font-size-md);
-  line-height: var(--ccs-line-height-normal);
-  color: var(--ccs-text-secondary);
-}
-
-.record-header__title {
-  margin: 0;
-  font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-font-size-4xl);
-  font-weight: var(--ccs-heading-weight);
-  line-height: var(--ccs-line-height-tight);
-  text-wrap: balance;
-  overflow-wrap: anywhere;
-  color: var(--ccs-navy-1100);
-}
-
-.record-summary__byline {
-  margin: var(--ccs-space-3) 0 0;
-  font-size: var(--ccs-font-size-lg);
-  line-height: 1.5;
-  color: var(--ccs-text-primary);
-}
-
-/* The collection, accession number and UoM ID, with a Copy button (CCS-22) */
-.record-summary__identifier {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ccs-space-1) var(--ccs-space-2);
-  margin: var(--ccs-space-2) 0 0;
-  font-size: var(--ccs-font-size-sm);
-  line-height: 1.5;
-  color: var(--ccs-text-secondary);
-  overflow-wrap: anywhere;
-}
-
-.record-summary__identifier-label {
-  font-weight: var(--ccs-font-weight-semibold);
-}
-
-/* The layout: one column, then two from 1200px. The right column is a plain column that scrolls with the page. */
-.record-layout {
+/* The hero: one column, then the viewer (58) and the record (42) side by side from 1200px */
+.record-hero__inner {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--ccs-space-6);
+  gap: var(--ccs-space-5);
   align-items: start;
+  max-width: calc(75rem + 2 * var(--record-gutter));
+  margin-inline: auto;
+  padding: var(--ccs-space-5) var(--record-gutter) var(--ccs-space-7);
 }
 
-.record-layout__media,
-.record-layout__aside,
-.record-layout__sections {
+.record-hero__inner > * {
   min-width: 0;
 }
 
-.record-layout__aside,
-.record-layout__sections {
+.record-hero__buy {
   display: flex;
   flex-direction: column;
   gap: var(--ccs-space-5);
 }
 
 @media (min-width: 1200px) {
-  .record-layout {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    grid-template-areas:
-      "media aside"
-      "sections aside";
-    column-gap: var(--ccs-space-7);
+  .record-hero__inner {
+    grid-template-columns: minmax(0, 58fr) minmax(0, 42fr);
+    column-gap: 4rem;
+    padding-top: var(--ccs-space-6);
   }
 
-  .record-layout__media { grid-area: media; }
-  .record-layout__aside { grid-area: aside; grid-row: 1 / span 2; }
-  .record-layout__sections { grid-area: sections; }
+  /* No media: the record is one centred column */
+  .record-hero--single .record-hero__inner {
+    grid-template-columns: minmax(0, 40rem);
+    justify-content: center;
+  }
 }
 
-/* No image: one plain sentence, no box, no icon */
-.no-image {
+/* The specifications: a centred column, after Apple's Tech Specs */
+.record-specs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-6);
+  max-width: calc(60rem + 2 * var(--record-gutter));
+  margin-inline: auto;
+  padding: var(--ccs-space-7) var(--record-gutter) var(--ccs-space-8);
+}
+
+/* The header block */
+.record-header {
+  margin-bottom: var(--ccs-space-5);
+}
+
+.record-header__kicker {
+  margin: 0 0 var(--ccs-space-2);
+  font-size: var(--ccs-font-size-ui);
+  font-weight: var(--ccs-font-weight-semibold);
+  letter-spacing: 0.08em;
+  line-height: var(--ccs-line-height-normal);
+  text-transform: uppercase;
+  color: var(--ccs-text-brand);
+}
+
+.record-header__title {
   margin: 0;
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-4xl);
+  font-weight: var(--ccs-heading-weight-strong);
+  line-height: var(--ccs-line-height-tight);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  color: var(--ccs-navy-1100);
+}
+
+@media (min-width: 1200px) {
+  .record-header__title {
+    font-size: var(--ccs-font-size-5xl);
+  }
+}
+
+.record-summary__byline {
+  margin: var(--ccs-space-3) 0 0;
+  font-size: var(--ccs-font-size-xl);
+  line-height: 1.4;
+  color: var(--ccs-text-primary);
+}
+
+.record-header__place {
+  margin: var(--ccs-space-1) 0 0;
+  font-size: var(--ccs-font-size-md);
+  line-height: 1.5;
+  color: var(--ccs-text-secondary);
+}
+
+/* No image: a slim tinted band with the collection's monogram and one plain sentence, in place of the stage */
+.no-image {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ccs-space-4) var(--ccs-space-6);
+  min-height: 10rem;
+  padding: var(--ccs-space-5) var(--record-gutter);
+  background: var(--ccs-surface-subtle);
+}
+
+.no-image__monogram {
+  font-family: var(--ccs-font-heading);
+  font-size: 4.25rem;
+  line-height: 0.8;
+  letter-spacing: -0.03em;
+  color: var(--ccs-navy-700);
+}
+
+.no-image__text {
+  margin: 0;
+  max-width: 32rem;
   font-size: var(--ccs-font-size-md);
   line-height: var(--ccs-line-height-normal);
   color: var(--ccs-text-secondary);
@@ -137,10 +233,18 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 .record-copyright__title {
   margin: 0;
   font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-heading-panel-size);
+  font-size: var(--ccs-font-size-3xl);
   font-weight: var(--ccs-heading-weight);
   line-height: var(--ccs-line-height-tight);
   color: var(--ccs-navy-1100);
+}
+
+@media (min-width: 768px) {
+  .record-section__heading,
+  .record-details__title,
+  .record-copyright__title {
+    font-size: var(--ccs-font-size-4xl);
+  }
 }
 
 .record-accordion {
@@ -194,6 +298,19 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 /* Closed in the markup so a phone does not shift when the script collapses them; from 768px their content shows whether or not the
    script has opened them yet (::details-content), so that width does not shift either */
 @media (min-width: 768px) {
+  .record-specs {
+    gap: 5rem;
+  }
+
+  /* Whitespace, not rules, between the sections */
+  .record-accordion {
+    border-top: 0;
+  }
+
+  .record-accordion > summary {
+    padding-block: 0 var(--ccs-space-4);
+  }
+
   .record-accordion > summary::after {
     display: none;
   }
@@ -207,41 +324,6 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   padding-bottom: var(--ccs-space-3);
 }
 
-/* Key facts */
-.key-facts__list {
-  margin: var(--ccs-space-3) 0 0;
-}
-
-.key-facts__row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--ccs-space-1);
-  padding-block: var(--ccs-space-3);
-  border-top: 1px solid var(--ccs-border-subtle);
-  font-size: var(--ccs-font-size-md);
-  line-height: 1.5;
-}
-
-@media (min-width: 480px) {
-  .key-facts__row {
-    grid-template-columns: 9rem minmax(0, 1fr);
-    gap: var(--ccs-space-4);
-  }
-}
-
-.key-facts__row dt {
-  font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-text-secondary);
-}
-
-.key-facts__row dd {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
 /* Details: label above value on a phone; label left and value right from 768px */
 .record-details__list {
   margin: 0;
@@ -251,22 +333,29 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--ccs-space-1);
-  padding-block: var(--ccs-space-3);
+  padding-block: var(--ccs-space-4);
   border-top: 1px solid var(--ccs-border-subtle);
-  font-size: var(--ccs-font-size-md);
-  line-height: 1.5;
+  font-size: var(--ccs-font-size-lg);
+  line-height: 1.55;
   color: var(--ccs-text-primary);
+}
+
+.record-details__row:first-child {
+  border-top: 0;
 }
 
 @media (min-width: 768px) {
   .record-details__row {
-    grid-template-columns: 11rem minmax(0, 1fr);
-    gap: var(--ccs-space-4);
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: var(--ccs-space-5);
   }
 }
 
-.record-details__row dt {
-  font-weight: var(--ccs-font-weight-semibold);
+.record-details__row dt,
+.record-copyright__item dt {
+  font-size: var(--ccs-font-size-lg);
+  font-weight: var(--ccs-font-weight-regular, 400);
+  line-height: 1.55;
   color: var(--ccs-text-secondary);
 }
 
@@ -276,6 +365,37 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   margin: 0;
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+/* Terms that open the records sharing them: plain links, side by side, never boxed */
+.record-details__row dd.record-details__chips {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-1) var(--ccs-space-5);
+}
+
+.record-chip {
+  color: var(--ccs-text-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+}
+
+.record-chip:hover {
+  color: var(--ccs-text-link-hover);
+  text-decoration-thickness: 2px;
+}
+
+.record-chip:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+/* The description: read first, a few lines with a Read more */
+.record-description {
+  font-size: var(--ccs-font-size-lg);
+  line-height: 1.6;
+  color: var(--ccs-text-primary);
 }
 
 /* Description: collapsed to a few lines, with a Show more/Show less toggle (controllers/truncate_controller.js) */
@@ -450,29 +570,28 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 .record-copyright__list {
   display: flex;
   flex-direction: column;
-  margin: var(--ccs-space-3) 0 0;
+  margin: 0;
 }
 
 .record-copyright__item {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--ccs-space-1);
-  padding-block: var(--ccs-space-3);
+  padding-block: var(--ccs-space-4);
   border-top: 1px solid var(--ccs-border-subtle);
-  font-size: var(--ccs-font-size-md);
-  line-height: 1.5;
+  font-size: var(--ccs-font-size-lg);
+  line-height: 1.55;
+}
+
+.record-copyright__item:first-child {
+  border-top: 0;
 }
 
 @media (min-width: 768px) {
   .record-copyright__item {
-    grid-template-columns: 11rem minmax(0, 1fr);
-    gap: var(--ccs-space-4);
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: var(--ccs-space-5);
   }
-}
-
-.record-copyright__item dt {
-  font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-text-secondary);
 }
 
 .record-copyright__item dd {
@@ -482,105 +601,6 @@ body.blacklight-catalog-show #main-container .page-sidebar {
 
 .record-copyright__terms {
   margin: var(--ccs-space-3) 0 0;
-}
-
-/* The actions: one plain column beside the media, a wrapping strip below 1200px. Targets are 40px. */
-.record-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ccs-space-4);
-}
-
-.record-actions__row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ccs-space-3);
-}
-
-.record-actions__row > * {
-  margin: 0;
-}
-
-/* "More actions": below 768px Compare, Cite and Share sit in a disclosure (closed in the markup, so nothing shifts); from 768px the
-   strip is as it was, with the summary hidden and the content shown whether or not the disclosure is open (::details-content) */
-.record-actions__more > summary {
-  display: flex;
-  align-items: center;
-  min-height: 2.75rem;
-  list-style: none;
-  font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-text-link);
-  text-decoration: underline;
-  text-underline-position: from-font;
-  cursor: pointer;
-}
-
-.record-actions__more > summary::-webkit-details-marker {
-  display: none;
-}
-
-.record-actions__more > summary:focus-visible {
-  outline: 3px solid var(--ccs-focus-ring);
-  outline-offset: 2px;
-}
-
-.record-actions__more-body {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ccs-space-3);
-  padding-block: var(--ccs-space-2);
-}
-
-@media (min-width: 768px) {
-  .record-actions__more {
-    display: contents;
-  }
-
-  .record-actions__more > summary {
-    display: none;
-  }
-
-  .record-actions__more::details-content {
-    display: contents;
-    content-visibility: visible;
-  }
-
-  .record-actions__more-body {
-    display: contents;
-  }
-}
-
-.record-actions .access-notice {
-  margin: 0;
-  padding: var(--ccs-space-4);
-}
-
-.record-actions .access-notice__title {
-  font-family: var(--ccs-font-body);
-  font-size: var(--ccs-font-size-md);
-  font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-text-primary);
-}
-
-.record-actions .access-notice__action a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem;
-  padding-inline: var(--ccs-space-4);
-  background: var(--ccs-navy-1100);
-  color: var(--ccs-white);
-  text-decoration: none;
-}
-
-.record-actions .access-notice__action a:hover {
-  background: var(--ccs-navy-1200);
-}
-
-.record-actions .access-notice__action a:focus-visible {
-  outline: 3px solid var(--ccs-focus-ring);
-  outline-offset: 2px;
 }
 
 /* The notices (cultural protocols, de-bias): a bordered card with a coloured edge, its heading in the section heading's size */
@@ -612,9 +632,7 @@ body.blacklight-catalog-show #main-container .page-sidebar {
     padding-top: var(--ccs-space-5);
   }
 
-  .record-layout,
-  .record-layout__aside,
-  .record-layout__sections {
-    gap: var(--ccs-space-5);
+  .no-image__monogram {
+    font-size: 2.5rem;
   }
 }

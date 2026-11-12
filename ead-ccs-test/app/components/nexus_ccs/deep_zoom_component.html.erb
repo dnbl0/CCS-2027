@@ -1,11 +1,24 @@
 <div class="deep-zoom" data-controller="deep-zoom" data-deep-zoom-sources-value="<%= sources.to_json %>" data-deep-zoom-label-value="<%= label %>"
-     data-action="media-viewer:shown@window->deep-zoom#imageChanged">
+     data-deep-zoom-pill-value="<%= pill? %>" data-deep-zoom-autostart-value="<%= pill? %>" data-deep-zoom-described-by-value="<%= described_by %>" data-deep-zoom-navigator-id-value="viewer-navigator" data-action="media-viewer:shown@window->deep-zoom#imageChanged">
+  <% if pill? %>
+    <%# Hidden until the script has loaded: without JavaScript the buttons would do nothing. Icons only, each named. %>
+    <div class="viewer-pill" role="group" aria-label="<%= t("nexus_ccs.record_page.viewer.controls") %>" hidden data-deep-zoom-target="controls">
+      <button type="button" class="viewer-pill__button" data-deep-zoom-target="zoomIn" data-action="deep-zoom#zoomIn" aria-label="<%= t("nexus_ccs.record_page.viewer.zoom_in") %>" title="<%= t("nexus_ccs.record_page.viewer.zoom_in") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" /></svg></button>
+      <button type="button" class="viewer-pill__button" data-deep-zoom-target="zoomOut" disabled data-action="deep-zoom#zoomOut" aria-label="<%= t("nexus_ccs.record_page.viewer.zoom_out") %>" title="<%= t("nexus_ccs.record_page.viewer.zoom_out") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 12h14" /></svg></button>
+      <%= content %>
+    </div>
+    <%# A small map of the whole image while the viewer is on, its visible part outlined %>
+    <div class="viewer-navigator" id="viewer-navigator" hidden data-deep-zoom-target="navigator"></div>
+    <%# Placeholder wording, not yet approved %>
+    <p class="viewer-message" hidden role="status" data-deep-zoom-target="message"><%= t("nexus_ccs.record_page.viewer.failed") %></p>
+  <% else %>
   <%# Hidden until the script has loaded: without JavaScript the toggle would do nothing %>
-  <button type="button" class="deep-zoom__button deep-zoom__toggle" hidden aria-pressed="false" data-deep-zoom-target="toggle" data-action="deep-zoom#toggle">Zoom and pan</button>
+  <button type="button" class="deep-zoom__button deep-zoom__toggle" hidden aria-pressed="false" data-deep-zoom-target="toggle" data-action="deep-zoom#toggle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4M11 8v6M8 11h6" /></svg><span>Zoom and pan</span></button>
   <div class="deep-zoom__controls" role="group" aria-label="Zoom controls" hidden data-deep-zoom-target="controls">
     <button type="button" class="deep-zoom__button" data-action="deep-zoom#zoomIn">Zoom in</button>
     <button type="button" class="deep-zoom__button" data-action="deep-zoom#zoomOut">Zoom out</button>
     <button type="button" class="deep-zoom__button" data-action="deep-zoom#reset">Reset view</button>
   </div>
+  <% end %>
   <div class="deep-zoom__stage" hidden data-deep-zoom-target="stage"></div>
 </div>

@@ -47,9 +47,16 @@ module RobotsPolicy
     return join(NOINDEX_NOFOLLOW, ai) if !indexing || personal?(path) || stock?(path)
     return join(NOINDEX_FOLLOW, ai) if results?(path) && !indexable_results?(params)
     return join(NOINDEX_FOLLOW, ai) if document && withheld?(document)
+    return join(NOINDEX_FOLLOW, ai) if record_variant?(path, params)
     return join(NOINDEX_FOLLOW, ai) if thin
 
     join(nil, ai)
+  end
+
+  # A record page asked for in another layout (?layout=viewer): a way to look at the same page, never a page of its own. Its canonical
+  # link is the plain address (CanonicalUrl drops the parameter); search engines are told to keep it out as well.
+  def self.record_variant?(path, params)
+    path.match?(%r{\A/catalog/[^/]+\z}) && params.to_h.with_indifferent_access[:layout].present?
   end
 
   # A record whose title and description stay out of search results (see above)

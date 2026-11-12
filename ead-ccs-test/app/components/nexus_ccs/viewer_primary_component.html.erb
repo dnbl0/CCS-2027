@@ -1,0 +1,1 @@
+<a class="<%= css %>" href="<%= primary[:href] %>"<% if download? %> download data-viewer-use<% end %><% if new_tab? %> target="_blank" rel="noopener"<% end %>><%= t("nexus_ccs.record_page.viewer.primary.#{primary[:kind]}") %><% if new_tab? %><span class="visually-hidden"> <%= t("nexus_ccs.record_page.no_image.ask_new_tab") %></span><% end %></a>

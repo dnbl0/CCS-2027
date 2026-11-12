@@ -1,0 +1,63 @@
+<section id="digital-assets" class="viewer-media" data-controller="media-viewer" aria-labelledby="digital-assets-heading">
+  <span id="digital-assets-heading" class="visually-hidden">Digital <%= "asset".pluralize(count + media.size) %></span>
+
+  <div class="viewer-media__stage<%= ' viewer-media__stage--bare' unless main %>" data-media-viewer-target="stage">
+    <div class="viewer-media__picture">
+      <% if withheld? %>
+        <%= render NexusCcs::AccessNoticeComponent.new(document: @document) %>
+      <% end %>
+      <% if gated? %>
+        <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: sensitivity_state) %>
+      <% end %>
+      <% if main %>
+        <%# The hero has a fixed height, so the picture's room is held and nothing moves when it arrives %>
+        <figure class="digital-assets__main viewer-media__figure" tabindex="-1">
+          <%= image_tag main.first, alt: alt(1), class: "digital-assets__image", data: { media_viewer_target: "image" },
+                fetchpriority: "high", decoding: "async", **image_size(main.first) %>
+          <p id="viewer-description" class="visually-hidden"><%= long_description %></p>
+          <%= render NexusCcs::DeepZoomComponent.new(sources: zoom_sources, label: alt(1), pill: true, described_by: "viewer-description") do %>
+            <% if assets_shown? && main %>
+              <button type="button" class="viewer-pill__button" hidden data-media-viewer-target="fullscreenButton" data-action="media-viewer#toggleFullscreen"
+                      aria-label="<%= t("nexus_ccs.record_page.viewer.full_view") %>" title="<%= t("nexus_ccs.record_page.viewer.full_view") %>"
+                      data-label-on="<%= t("nexus_ccs.record_page.media.exit_full_screen") %>" data-label-off="<%= t("nexus_ccs.record_page.viewer.full_view") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg></button>
+            <% end %>
+          <% end %>
+        </figure>
+      <% end %>
+
+      <%# Inside the hero, above the dots, so nothing covers it %>
+      <% if sensitivity_state == :viewing %>
+        <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: :viewing) %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if strip? %>
+    <div class="viewer-dots">
+      <button type="button" class="viewer-dots__arrow viewer-dots__arrow--previous" disabled data-media-viewer-target="previous" data-action="media-viewer#previous"
+              aria-label="<%= t("nexus_ccs.record_page.viewer.previous") %>" title="<%= t("nexus_ccs.record_page.viewer.previous") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7" /></svg></button>
+      <ul class="viewer-dots__list" aria-label="<%= t("nexus_ccs.record_page.media.images") %>" data-media-viewer-target="strip">
+        <% images.each_with_index do |(large, thumbnail), index| %>
+          <li>
+            <% if downloadable? %>
+              <%= link_to large, class: "viewer-media__thumb#{' is-current' if index.zero?}", target: "_blank", rel: "noopener", aria: { current: (index.zero? ? "true" : nil), label: display_name(index + 1) },
+                    data: { action: "media-viewer#show", media_viewer_large: large, media_viewer_alt: alt(index + 1), media_viewer_counter: counter(index + 1), media_viewer_index: index } do %>
+                <%= image_tag thumbnail, alt: "", loading: "lazy", decoding: "async" %>
+              <% end %>
+            <% else %>
+              <%# No link to the file: the thumbnail only changes the image on show %>
+              <button type="button" class="viewer-media__thumb<%= ' is-current' if index.zero? %>" aria-current="<%= index.zero? ? "true" : "false" %>" aria-label="<%= display_name(index + 1) %>"
+                      data-action="media-viewer#show" data-media-viewer-large="<%= large %>" data-media-viewer-alt="<%= alt(index + 1) %>" data-media-viewer-counter="<%= counter(index + 1) %>" data-media-viewer-index="<%= index %>">
+                <%= image_tag thumbnail, alt: "", loading: "lazy", decoding: "async" %>
+              </button>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+      <button type="button" class="viewer-dots__arrow viewer-dots__arrow--next" data-media-viewer-target="next" data-action="media-viewer#next"
+              aria-label="<%= t("nexus_ccs.record_page.viewer.next") %>" title="<%= t("nexus_ccs.record_page.viewer.next") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg></button>
+    </div>
+  <% end %>
+  <p class="visually-hidden" role="status" data-media-viewer-target="counter"><%= counter(1) %></p>
+
+</section>

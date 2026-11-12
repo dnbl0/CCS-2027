@@ -1,13 +1,15 @@
-<article class="<%= classes %>">
-  <% if image_path %>
-    <div class="object-card__media">
+<article class="<%= classes %>"<%= tag.attributes(data: { controller: "image-fallback" }) if image_path %>>
+  <%# Every card has the same face: the image shown whole, or, for a record with no image the visitor may see, its object type on a tint %>
+  <div class="object-card__media" data-image-fallback-target="media">
+    <% if image_path %>
       <%# The title names the record, so the image adds nothing to the link %>
-      <%= image_tag image_path, alt: "", class: "object-card__image", loading: "lazy", decoding: "async" %>
-    </div>
-  <% end %>
+      <%= image_tag image_path, alt: "", class: "object-card__image", loading: "lazy", decoding: "async", data: { action: "error->image-fallback#failed" } %>
+      <span class="object-card__face" hidden data-image-fallback-target="face"><%= type_label %></span>
+    <% else %>
+      <span class="object-card__face"><%= type_label %></span>
+    <% end %>
+  </div>
   <div class="object-card__body">
-    <%# A record with no image the visitor may see is a card of text: a small kicker, the title, the creator and date. No grey box. %>
-    <% unless image_path %><p class="object-card__kicker"><%= kicker %></p><% end %>
     <%= content_tag heading_tag, class: "object-card__title" do %>
       <%= link_to title, path, class: "object-card__link" %>
     <% end %>
