@@ -88,6 +88,7 @@ class RecordDebiasTest < ActiveSupport::TestCase
     include NexusCcs::RecordDebias
     Row = RecordDebiasTest::Row
     attr_reader :rows
+    alias all_rows rows
 
     def heading = "blorp" # the title, shown in the header and scanned with the details
 

@@ -44,11 +44,21 @@ class MediaViewerTest < ApplicationSystemTestCase
     assert page.evaluate_script("document.activeElement === document.querySelector('.deep-zoom__toggle')"), "focus returns to the toggle"
   end
 
+  test "the mouse wheel over the zoom viewer is left to the page: no zoom, and no scroll trap" do
+    visit "/catalog/#{MULTI}"
+    click_button "Zoom and pan"
+    assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all
+
+    # dispatchEvent returns false when something called preventDefault on the event
+    not_prevented = page.evaluate_script("document.querySelector('.deep-zoom__stage .openseadragon-canvas').dispatchEvent(new WheelEvent('wheel', { deltaY: 200, bubbles: true, cancelable: true }))")
+    assert not_prevented, "the viewer swallows the mouse wheel over a zoomed picture"
+  end
+
   test "the thumbnail of another image opens it in the viewer when zoom is on" do
     visit "/catalog/#{MULTI}"
     click_button "Zoom and pan"
     assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all
-    first(".digital-assets__other").click
+    all(".digital-assets__other")[1].click # the strip lists every image, the current one first
     assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all
     assert_match(/image 2 of 2/, page.evaluate_script("document.querySelector('.deep-zoom__stage .openseadragon-canvas').getAttribute('aria-label')"))
   end

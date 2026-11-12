@@ -11,10 +11,11 @@
   min-width: 2.75rem;
   min-height: 2.75rem;
   padding: var(--ccs-space-2) var(--ccs-space-4);
-  border: 1px solid var(--ccs-white);
+  border: 0;
+  border-radius: 1.375rem;
   background: var(--ccs-navy-1200);
   font: inherit;
-  font-size: var(--ccs-font-size-md);
+  font-size: var(--ccs-font-size-ui);
   font-weight: var(--ccs-font-weight-semibold);
   line-height: var(--ccs-line-height-tight);
   color: var(--ccs-white);
@@ -33,7 +34,7 @@
 .deep-zoom__button[aria-pressed="true"] {
   background: var(--ccs-white);
   color: var(--ccs-navy-1200);
-  border-color: var(--ccs-navy-1200);
+  box-shadow: inset 0 0 0 2px var(--ccs-navy-1200);
 }
 
 .deep-zoom__button[hidden] {
@@ -45,22 +46,22 @@
 }
 
 /* On the record page: the toggle sits over the image's corner; switched on, the viewer fills the figure */
-.digital-assets__main {
+.digital-assets__main:not(.digital-assets__main--sized) {
   position: relative;
 }
 
 /* Above the viewer's canvas, so the toggle can still be pressed (mouse and keyboard) once the viewer is on */
 .deep-zoom__toggle {
   position: absolute;
-  left: var(--ccs-space-2);
-  bottom: var(--ccs-space-2);
+  left: var(--ccs-space-4);
+  bottom: var(--ccs-space-4);
   z-index: 3;
 }
 
 .deep-zoom__controls {
   position: absolute;
-  top: var(--ccs-space-2);
-  right: var(--ccs-space-2);
+  top: var(--ccs-space-4);
+  right: var(--ccs-space-4);
   z-index: 3;
   display: flex;
   flex-wrap: wrap;

@@ -10,6 +10,9 @@ module NexusCcs
       @url = url
     end
 
+    # The first letters of the collection's first two words, as the home page's collection tiles have them
+    def monogram = Array(@document["collection_ssim"]).first.to_s.split.first(2).map { |word| word[0].to_s.upcase }.join.presence || "·"
+
     def contact = @contact ||= CollectionContact.for(Array(@document["collection_ssim"]).first)
 
     def href

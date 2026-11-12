@@ -138,28 +138,40 @@ were removed on both sites). See `docs/styling-inventory.md`.
 
 ## The record page layout
 
-One header block, not a title band: `RecordHeaderComponent` has a kicker (object type and collection, plain text, not chips), the
-page's one h1, the creator (a browse link) and date, and the Collection ID with Copy. Under it, from 1200px, two columns (7/5):
-the media (or one plain sentence when the record has no digital asset, `NoImageComponent`) with the sections under it, and a
-plain column that scrolls with the page (nothing on the page is sticky, so focus is never covered) holding the actions
-(`RecordActionsComponent`: the access notice of a view-only record, Save, Add to list, Compare, Cite, Share and embed) and the Key
-facts (`KeyFactsComponent`, a `dl`). Below 1200px it is one column in the same order; the actions strip wraps and its targets are 40px.
-Below 768px Compare, Cite and Share sit in a "More actions" disclosure (a `details` closed in the markup, so nothing shifts); Save and
-Add to list stay visible. From 768px the disclosure is plain: its summary is hidden and its content shows (`::details-content`).
-Motion is guarded by `prefers-reduced-motion: no-preference` in the result card, browse hub and results toolbar styles.
+After Apple's product pages, with the cues of a museum image viewer (the British Museum's) and the quality of the museum record
+pages (V&A, Art Institute of Chicago, the Met, Europeana). Patterns only; nothing of those sites is copied.
 
-- **Media** (`DigitalAssetsComponent`, `digital_assets.css`): the image sits on the page surface, whole, at its own shape (at most
-  70vh high), on a flat tint that holds its room from the `width` and `height` attributes (no minimum height, no dark band). Dark
-  only in full screen and in the zoom viewer. One slim toolbar directly under the image: the access chip (Open, View only,
-  Available on request) and the licence on the left; "Media information" and "Full screen" (icon and text label) and, for an open
-  record only, "Download image" on the right. A view-only record has no download link in its markup; a request-only or
-  not-yet-chosen sensitive record has no asset path in it, and its notice sits where the media would, the same width.
-- **Sections** (`record_sections_controller.js`): Object details (the workbook fields not shown above), Copyright and use (licence,
-  copyright note, credit line, a DAM caption only when there is one, responsible collection, terms link) and About this record
-  (persistent link with Copy link, who to contact with the record ID, and a correction link to the same contact) are `<details>`.
-  From 768px they are open and plain; below it they are accordions with 44px summaries, Object details open.
-- **More like this** (`MoreLikeThisComponent`): one h2 and up to three h3 sub-sections (Related objects, Similar records in its lazy
-  frame, Recently viewed), up to four `RecordCardComponent`s each, no tabs. A record with no image the visitor may see is a text
-  card (kicker, title, creator and date), never a grey box.
-- Headings: h1 the title; h2 Key facts, Object details, Copyright and use, About this record, More like this; h3 the sub-sections.
-  Wording marked placeholder is in `config/locales/record_page.en.yml`.
+- **Sub-navigation** (`RecordSubnavComponent`, from 1200px): the record's title and anchors (Overview, Object details, Copyright and
+  use, About this record, More like this) under the site header. It is the one sticky element; `html:has(.record-subnav)` sets a scroll
+  padding, so anchors and focused controls are never hidden under it (WCAG 2.4.11). It is not drawn below 1200px.
+- **Two columns from 1200px** (58 / 42, 1200px content, 4rem gap; one column below, in the same order). Left, the viewer
+  (`DigitalAssetsComponent`): the image whole on a soft stage, at its own shape and at most min(78vh, 760px) tall (the width and
+  height attributes reserve it, so nothing moves), never a dark box; one band of pill buttons along the stage's bottom (Zoom and pan at the left, Media
+  information and Full screen at the right, icons only on a phone; the zoom buttons appear top right while zoom is on; mouse-wheel zoom
+  stays off), positioned against the stage so they line up and never cover the picture; a strip of every image under it
+  (the current one outlined, scrolling sideways, 44px targets; the strip is the gallery, there is no second row of tiles); and three
+  short lines under that, after Apple's: what the visitor may do, the licence, what there is to see. Dark only in full screen and
+  in the zoom viewer.
+- **Right, the record** (`RecordHeaderComponent`, `RecordActionsComponent`): an accent kicker (object type, collection), a very
+  large Fraunces title, the creator link and date, one quiet line of place or material, the description with Show more, then the
+  **access card** (`record_actions.css`): a line saying what the visitor can do, ONE full-width primary button where there is
+  something to do (Download image when open; Request access when withheld; none when view-only, which gets its plain reason and a
+  bordered link to ask), then Save as one full-width bar and Add to list, Compare, Cite this record and Share and embed as equal
+  tiles, an icon over a label (one grid; the same on a phone), and the Collection ID with Copy.
+- **No media**: no stage. `NoImageComponent` is a slim tinted band with the collection's monogram and one plain sentence
+  (placeholder wording), and the record is one centred column.
+- **Specifications**, after Apple's Tech Specs: a centred 960px column of label and value rows (a quiet sentence-case label, a hairline between rows,
+  whitespace and not rules between sections). Object details (the workbook fields except the description and the rights fields; terms
+  that link are plain underlined links, never boxed),
+  Copyright and use, About this record (persistent link with Copy link, contact, correction link). They are `<details>`
+  (`record_sections_controller.js`): accordions with Object details open below 768px, plain open sections from 768px.
+- **More like this** (`MoreLikeThisComponent`): a soft band, one h2, up to three h3 sub-sections (Related objects, Similar records in
+  a lazy frame, Recently viewed), up to four `RecordCardComponent` tiles each, no tabs. Every tile has the same 4:3 face: the image
+  shown whole, or, for a record with no viewable thumbnail (or one whose file fails to load, `image_fallback_controller.js`), its object
+  type on a tint; then a two-line title (the link of the whole tile) and a two-line creator and date. Four across from 1024px; below
+  that a row that scrolls sideways and snaps, the next tile peeking.
+- Headings: h1 the title; h2 Object details, Copyright and use, About this record, More like this; h3 the sub-sections. The viewer
+  has no heading before the h1. Wording marked placeholder is in `config/locales/record_page.en.yml`.
+- Not built from the brief, and why: the navigator mini-map (OpenSeadragon's own navigator is not styled to match; zoom and pan
+  are kept as they were) and thumbnail arrows (the strip scrolls; every thumbnail is focusable); the separate tile strip is the same
+  strip.

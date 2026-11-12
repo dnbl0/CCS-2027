@@ -37,17 +37,33 @@ module NexusCcs
       WHOLE_SET_FIELDS.include?(field) ? BrowseMenu.query(field, value) : { f: { field => [ value ] } }
     end
 
-    # The details list: every workbook field the record has a value for, except the ones shown elsewhere on the page: the Key facts
-    # (KeyFactsComponent), the Copyright and use section, and the header (the title and the Collection ID, which holds the UoM ID)
-    def rows
-      @rows ||= @presenter.configuration.show_fields.each_value.filter_map do |config|
+    DESCRIPTION_FIELD = "description_tsim"
+
+    # Fields whose values are outlined chips that open the records sharing them (the creator, place and subject go to their browse
+    # pages, the rest to the search filtered to the value)
+    CHIP_FIELDS = %w[creator_display_ssim production_place_ssim subject_ssim classification_ssim material_ssim object_type_ssim
+                     collection_ssim named_collection_ssim].freeze
+
+    # Every workbook field the record has a value for, except the Copyright and use fields (shown in their own section)
+    def all_rows
+      @all_rows ||= @presenter.configuration.show_fields.each_value.filter_map do |config|
         name = config.field
-        next if COPYRIGHT_FIELDS.include?(name) || KeyFactsComponent.fields.include?(name)
+        next if COPYRIGHT_FIELDS.include?(name)
 
         values = Array(document[name]).map(&:to_s).compact_blank
         Row.new(label: config.label, values: values, field: name) if values.any?
       end
     end
+
+    # The description is read first, under the header, with a Read more; Object details lists the rest, with no repeat of the title
+    # or the Collection ID (the header and the rail have them)
+    def description_row = all_rows.find { |row| row.field == DESCRIPTION_FIELD }
+    def rows = all_rows.reject { |row| row.field == DESCRIPTION_FIELD }
+
+    def chips?(row) = CHIP_FIELDS.include?(row.field)
+
+    # Where a chip goes: the browse page for a creator, place or subject, the search filtered to the value for the others
+    def chip_path(row, value) = browse_path(row, value) || value_path(row, value)
 
     # "Grainger Museum Collection, accession number 00.0001, UoM ID emu-umc-400329" (CCS-22)
     def identifier = CollectionIdentifier.new(document).to_s

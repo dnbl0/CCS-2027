@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # One record as a card, for the record page's Related objects, Similar records and Recently viewed. After the University
-  # design system's Card and Listings: a 16:9 frame, a title that is an h3 and the link of the whole card (a stretched link, so
-  # there is no nested link), and one quiet line (creator and date). The image is shown whole, never cropped (cultural material
-  # is not cropped); a record with no image the visitor may see is a text card (a small kicker with its object type and collection,
-  # the title, the creator and date), with no placeholder box.
+  # One record as a tile, for the record page's Related objects, Similar records and Recently viewed. After Apple's product tiles and
+  # the University design system's Card: a face, a title that is an h3 and the link of the whole tile (a stretched link, so there is
+  # no nested link), and one quiet line (creator and date). The face is the image, shown whole and never cropped (cultural material
+  # is not cropped), or, for a record with no image the visitor may see, its object type on a tint; every tile is the same size.
   # The image rule is the result cards' (AccessPolicy, Sensitivity): no asset path of a withheld or sensitive record is in the markup.
   class RecordCardComponent < ViewComponent::Base
     UNKNOWN_MAKER = "Unknown"
@@ -33,9 +32,6 @@ module NexusCcs
 
     # The object type, else "Record"
     def type_label = Array(document["object_type_ssim"]).first.presence&.to_s&.upcase_first || "Record"
-
-    # "Painting · University Art Collection"
-    def kicker = [ type_label, Array(document["collection_ssim"]).first.presence ].compact.join(" · ")
 
     # The first named creator and the first date, as the record page's byline
     def meta

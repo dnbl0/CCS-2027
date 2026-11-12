@@ -28,15 +28,15 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_equal "Kangaroo-pouch tone-tool", component(FIELDS).heading
   end
 
-  test "the details list leaves out what the header, the Key facts and Copyright and use show: no Title, UoM ID, Collection, date or materials" do
-    labels = component(FIELDS).rows.map(&:label)
+  test "the details list leaves out the title, the Collection ID and the rights fields (the header, the rail and Copyright and use have them)" do
+    fields = component(FIELDS).rows.map(&:field)
 
-    assert_not_includes labels, "Title"
-    assert_not_includes labels, "UoM ID"
-    assert_not_includes labels, "Collection"
-    assert_not_includes labels, "Date"
-    assert_not_includes labels, "Materials"
-    assert_includes labels, "Object Type"
+    assert_not_includes fields, "title_tsim"
+    assert_not_includes fields, "id"
+    assert_not_includes fields, "rights_ssim"
+    assert_not_includes fields, "credit_line_tsim"
+    assert_includes fields, "object_type_ssim"
+    assert_includes fields, "material_ssim"
   end
 
   test "the UoM ID names the EMu system: M&C's EMu records are emu-umc, Vernon ids are unchanged" do
@@ -66,11 +66,11 @@ class RecordLayoutTest < ActiveSupport::TestCase
     # (the card's markup is checked on real record pages: test/integration/rights_display_test.rb)
   end
 
-  test "the layout is one column, then 7/5 columns from 1200px, with a plain (not sticky) right column" do
+  test "the hero is one column, then the viewer (58) and the record (42) from 1200px; only the sub-navigation sticks" do
     css = Rails.root.join("app/assets/stylesheets/components/record_page.css").read
 
-    assert_match(/@media \(min-width: 1200px\) \{\s+\.record-layout \{\s+grid-template-columns: minmax\(0, 7fr\) minmax\(0, 5fr\);/, css)
-    assert_no_match(/position: sticky/, css)
+    assert_match(/@media \(min-width: 1200px\) \{\s+\.record-hero__inner \{\s+grid-template-columns: minmax\(0, 58fr\) minmax\(0, 42fr\);/, css)
+    assert_equal 1, css.scan(/position: sticky/).size, "only the sub-navigation is sticky"
   end
 
   test "the document component for a record is registered with Blacklight" do

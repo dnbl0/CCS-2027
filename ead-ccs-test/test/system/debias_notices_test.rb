@@ -66,9 +66,9 @@ class DebiasNoticesSystemTest < ApplicationSystemTestCase
   test "the notice does not move the page once it has loaded" do
     flagged_record do
       visit RECORD
-      top = page.evaluate_script("document.querySelector('.record-layout__sections').getBoundingClientRect().top")
+      top = page.evaluate_script("document.querySelector('.record-specs').getBoundingClientRect().top")
       sleep 0.5
-      assert_equal top, page.evaluate_script("document.querySelector('.record-layout__sections').getBoundingClientRect().top")
+      assert_equal top, page.evaluate_script("document.querySelector('.record-specs').getBoundingClientRect().top")
     end
   end
 end

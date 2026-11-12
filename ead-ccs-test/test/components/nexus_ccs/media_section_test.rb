@@ -26,7 +26,7 @@ class MediaSectionTest < ActiveSupport::TestCase
   test "the toolbar has the licence chip, the metadata button and the full screen button" do
     render_for(FIELDS)
 
-    assert_selector ".digital-assets__toolbar .digital-assets__licence", text: "In copyright"
+    assert_selector ".digital-assets__facts .digital-assets__licence", text: "In copyright"
     assert_selector "button[aria-controls=media-metadata][aria-expanded=false]", text: "Media information"
     assert_selector "button[hidden]", text: "Full screen", visible: :all
   end

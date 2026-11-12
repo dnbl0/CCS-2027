@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # The one header block of a record page: a kicker (object type and collection, plain text), the page's h1, the creator (a link
-  # to the maker's browse page where there is one) and date, and the Collection ID with a Copy button (CCS-22). It replaces the
-  # dark title band, so the title sits beside the creator and date it belongs to.
+  # The header block of a record page: a kicker (object type and collection, plain text), the page's h1, the creator (a link to the
+  # maker's browse page where there is one) and date, and one quiet line of place or material. The Collection ID with its Copy
+  # button (CCS-22) is in the actions rail (RecordActionsComponent).
   class RecordHeaderComponent < ViewComponent::Base
     def initialize(document:, title_markup: nil)
       @document = document
@@ -32,7 +32,10 @@ module NexusCcs
 
     def byline? = creators.any? || date.present?
 
-    # "Grainger Museum Collection, accession number 00.0001, UoM ID emu-umc-400001"
-    def identifier = CollectionIdentifier.new(document).to_s
+    # One quiet line under the byline: where it was made, else what it is made of
+    def place_line
+      Array(document["production_place_ssim"]).map(&:to_s).compact_blank.first(2).join(", ").presence ||
+        Array(document["material_ssim"]).map(&:to_s).compact_blank.first(3).join(", ").presence
+    end
   end
 end
