@@ -45,6 +45,24 @@ en:
         # PLACEHOLDER WORDING, NOT YET APPROVED
         correction: "Suggest a correction to this record"
         correction_note: "Records can hold outdated or incorrect information, and terms that are not appropriate today."
+      viewer:
+        controls: "Viewer controls"
+        zoom_in: "Zoom in"
+        zoom_out: "Zoom out"
+        reset: "Reset view"
+        counter: "%{position} of %{total}"
+        keys: "Drag to pan. With the viewer focused: + and - to zoom, 0 to reset."
+        download: "Download image"
+        contact: "Contact us"
+        provenance: "Collection and provenance"
+        rights: "Rights and access"
+        view_all: "View all in this collection"
+        # PLACEHOLDER WORDING, NOT YET APPROVED
+        failed: "This image could not be opened in the viewer. The picture above is still here; try again later."
+        access:
+          open: "You can view and download this image."
+          view_only: "You can view this image, but not download it."
+          request: "The image is not shown here. Ask the collection team for access."
       media:
         images: "Images of this record"
         images_count:

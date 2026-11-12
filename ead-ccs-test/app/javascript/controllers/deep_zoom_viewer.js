@@ -18,13 +18,16 @@ export function prefersReducedMotion() {
 }
 
 // element: an empty block with a height. Returns the viewer, whose canvas (the focusable part) is named for screen readers.
-export async function createViewer(element, source, { label } = {}) {
+// navigatorId: the id of an element to draw the navigator (a small map of the whole image, its visible part outlined) in; none, no
+// navigator. describedBy: the id of a visually hidden description the canvas points at.
+export async function createViewer(element, source, { label, navigatorId, describedBy } = {}) {
   const { default: OpenSeadragon } = await import("openseadragon")
   const viewer = OpenSeadragon({
     element,
     tileSources: tileSource(source),
     showNavigationControl: false,
-    showNavigator: false,
+    showNavigator: Boolean(navigatorId),
+    navigatorId,
     showRotationControl: false,
     gestureSettingsMouse: { scrollToZoom: false, clickToZoom: false, dblClickToZoom: true },
     animationTime: prefersReducedMotion() ? 0 : 0.8,
@@ -34,20 +37,27 @@ export async function createViewer(element, source, { label } = {}) {
     crossOriginPolicy: source.info ? "Anonymous" : false,
     tabIndex: 0
   })
-  nameCanvas(viewer, label || source.alt)
+  nameCanvas(viewer, label || source.alt, describedBy)
   return viewer
 }
 
 // The image is drawn on a canvas, which has no text of its own: the focusable area carries the name and how to use the keys.
-export function nameCanvas(viewer, label) {
+export function nameCanvas(viewer, label, describedBy) {
   const canvas = viewer.canvas
-  canvas.setAttribute("role", "group")
+  canvas.setAttribute("role", describedBy ? "application" : "group")
   canvas.setAttribute("aria-label", `${label}. ${KEYBOARD_HINT}`)
+  if (describedBy) canvas.setAttribute("aria-describedby", describedBy)
 }
 
-export function open(viewer, source, label) {
+export function open(viewer, source, label, describedBy) {
   viewer.open(tileSource(source))
-  nameCanvas(viewer, label || source.alt)
+  nameCanvas(viewer, label || source.alt, describedBy)
+}
+
+// Whether the view can still go in or out, for the buttons to be disabled at the limits
+export function limits(viewer) {
+  const zoom = viewer.viewport.getZoom()
+  return { canZoomIn: zoom < viewer.viewport.getMaxZoom() - 1e-6, canZoomOut: zoom > viewer.viewport.getMinZoom() + 1e-6 }
 }
 
 export function zoomIn(viewer) { viewer.viewport.zoomBy(1.5); viewer.viewport.applyConstraints() }

@@ -6,12 +6,16 @@ module NexusCcs
   # team (the collection's email address or its form; the Help page's Contact us section for any other), so it adds no new page.
   # Its wording is PLACEHOLDER wording (config/locales/record_page.en.yml).
   class RecordAboutComponent < ViewComponent::Base
-    def initialize(document:, url:)
+    # viewer: the viewer layout's accordion, without the persistent link (that layout has it in its own card)
+    def initialize(document:, url:, viewer: false)
       @document = document
       @url = url
+      @viewer = viewer
     end
 
     attr_reader :document, :url
+
+    def viewer? = @viewer
 
     def contact = @contact ||= CollectionContact.for(Array(document["collection_ssim"]).first)
 

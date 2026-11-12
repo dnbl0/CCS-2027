@@ -10,7 +10,7 @@ import { Controller } from "@hotwired/stimulus"
 // justify-content centring, jolting the large image. Opening and closing it only ever toggles the "is-open"
 // class (transform/visibility, both paint-only) and aria-hidden, which never touches that layout.
 export default class extends Controller {
-  static targets = [ "stage", "image", "panel", "infoButton", "fullscreenButton", "fullscreenLabel" ]
+  static targets = [ "stage", "image", "panel", "infoButton", "fullscreenButton", "fullscreenLabel", "counter" ]
 
   connect() {
     this.onKey = (event) => { if (event.key === "Escape" && this.isOpen) this.closePanel() }
@@ -60,6 +60,11 @@ export default class extends Controller {
     if (this.hasFullscreenButtonTarget) {
       const button = this.fullscreenButtonTarget
       if (this.hasFullscreenLabelTarget) this.fullscreenLabelTarget.textContent = on ? button.dataset.labelOn : button.dataset.labelOff
+      else if (button.dataset.labelOn) { // an icon-only button (the viewer layout): its name and tip change
+        const label = on ? button.dataset.labelOn : button.dataset.labelOff
+        button.setAttribute("aria-label", label)
+        button.title = label
+      }
     }
   }
 
@@ -68,10 +73,11 @@ export default class extends Controller {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.button) return
     event.preventDefault()
     const link = event.currentTarget
-    this.element.querySelectorAll(".digital-assets__other").forEach((other) => {
+    this.element.querySelectorAll(".digital-assets__other, .viewer-media__thumb").forEach((other) => {
       other.classList.toggle("is-current", other === link)
       if (other === link) other.setAttribute("aria-current", "true"); else other.removeAttribute("aria-current")
     })
+    if (this.hasCounterTarget && link.dataset.mediaViewerCounter) this.counterTarget.textContent = link.dataset.mediaViewerCounter
     this.imageTarget.src = link.dataset.mediaViewerLarge
     this.imageTarget.alt = link.dataset.mediaViewerAlt
     this.dispatch("shown", { detail: { src: this.imageTarget.getAttribute("src"), alt: this.imageTarget.alt } }) // the zoom viewer follows

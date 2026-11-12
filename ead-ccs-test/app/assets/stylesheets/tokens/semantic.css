@@ -24,6 +24,7 @@
   /* Surfaces */
   --ccs-surface-default: var(--ccs-white);
   --ccs-surface-subtle: var(--ccs-neutral-100);
+  --ccs-surface-paper: #faf9f6; /* the warm off-white of the viewer record layout's page */
   --ccs-surface-panel: var(--ccs-white);
   --ccs-surface-brand: var(--ccs-navy-1100);
   --ccs-surface-brand-strong: var(--ccs-navy-1200);

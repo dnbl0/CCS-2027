@@ -1,3 +1,16 @@
+<% if viewer? %>
+<details class="viewer-accordion" id="about-this-record">
+  <summary><h2 class="viewer-accordion__heading"><%= t("nexus_ccs.record_page.sections.about") %></h2></summary>
+  <div class="viewer-about">
+    <%= render NexusCcs::ContactCollectionComponent.new(document: document, url: url) %>
+    <div class="record-about__correction">
+      <p><%= t("nexus_ccs.record_page.about.correction_note") %>
+        <a href="<%= correction_href %>"<% if correction_new_tab? %> target="_blank" rel="noopener"<% end %>><%= t("nexus_ccs.record_page.about.correction") %><% if correction_new_tab? %><span class="visually-hidden"> <%= t("nexus_ccs.record_page.no_image.ask_new_tab") %></span><% end %></a>
+      </p>
+    </div>
+  </div>
+</details>
+<% else %>
 <details class="record-about record-section record-accordion" data-record-sections-target="section" id="about-this-record">
   <summary><h2 id="record-about-heading" class="record-section__heading"><%= t("nexus_ccs.record_page.sections.about") %></h2></summary>
   <div class="record-section__body">
@@ -10,3 +23,4 @@
   </div>
   </div>
 </details>
+<% end %>

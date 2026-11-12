@@ -7,16 +7,21 @@ module NexusCcs
   # when the visitor has a history). A sub-section with nothing to show is not drawn, and the whole block is not when none can be. The
   # records Related objects shows are left out of Similar.
   class MoreLikeThisComponent < ViewComponent::Base
-    def initialize(document:, related:, recent:)
+    # show_related: false where the page already lists the related records itself (the viewer layout's white band); they are still
+    # left out of Similar
+    def initialize(document:, related:, recent:, show_related: true)
       @document = document
       @related = related
       @recent = recent
+      @show_related = show_related
     end
 
     attr_reader :document, :related, :recent
 
     # Related and Recently viewed are known now; Similar is known when its frame loads, so it is counted as possible when the record may have one
-    def render? = related.any? || recent.any? || Discovery.listable?(document)
+    def render? = (show_related? && related.any?) || recent.any? || Discovery.listable?(document)
+
+    def show_related? = @show_related
 
     def excluded_ids = related.first(NexusCcs::RecordCardsComponent::MAX).map { |found| found.id.to_s }
   end

@@ -1,0 +1,568 @@
+/*
+ * The viewer layout of a record page (?layout=viewer, NexusCcs::RecordViewerComponent), after the user's Claude Design mockup: the
+ * viewer on the left (the picture whole, one grouped pill of icon controls at its bottom right, a counter, a strip of thumbnails, one
+ * quiet line under it) and the record on the right (kicker, a very large title, Save and a primary button, accordions, a tinted card
+ * with the persistent link), then a white band of Related objects across the page. Off by default. Below 1200px it is one column.
+ */
+.viewer-page {
+  background: var(--ccs-surface-paper);
+}
+
+.viewer-record__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ccs-space-6);
+  align-items: start;
+  max-width: calc(75rem + 2 * var(--record-gutter, var(--ccs-space-6)));
+  margin-inline: auto;
+  padding: var(--ccs-space-5) var(--record-gutter, var(--ccs-space-6)) var(--ccs-space-8);
+}
+
+.viewer-record__inner > * {
+  min-width: 0;
+}
+
+@media (min-width: 1200px) {
+  .viewer-record__inner {
+    grid-template-columns: minmax(0, 55fr) minmax(0, 40fr);
+    column-gap: 4rem;
+    padding-top: var(--ccs-space-6);
+  }
+
+  .viewer-record--single .viewer-record__inner {
+    grid-template-columns: minmax(0, 40rem);
+    justify-content: center;
+  }
+}
+
+.viewer-record__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-4);
+}
+
+/* The header block, here: small caps kicker, a very large title */
+.viewer-record .record-header {
+  margin-bottom: 0;
+}
+
+.viewer-record .record-header__kicker {
+  font-size: var(--ccs-font-size-2xs);
+  letter-spacing: 0.1em;
+  color: var(--ccs-navy-1100);
+}
+
+.viewer-record .record-header__title {
+  font-size: var(--ccs-font-size-4xl);
+}
+
+@media (min-width: 1200px) {
+  .viewer-record .record-header__title {
+    font-size: var(--ccs-font-size-5xl);
+  }
+}
+
+.viewer-record .record-summary__byline {
+  font-size: var(--ccs-font-size-lg);
+}
+
+/* ---- The viewer ------------------------------------------------------------------------------------------------------------ */
+.viewer-media {
+  min-width: 0;
+}
+
+.viewer-media__stage {
+  position: relative;
+}
+
+.viewer-media__picture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-4);
+}
+
+.viewer-media__picture .digital-assets__main {
+  position: relative;
+}
+
+/* The grouped controls: one navy pill, thin separators, icons only, at the picture's bottom right */
+.viewer-pill {
+  position: absolute;
+  right: var(--ccs-space-3);
+  bottom: var(--ccs-space-3);
+  z-index: 3;
+  display: flex;
+  overflow: hidden;
+  border-radius: var(--ccs-radius-lg);
+  background: var(--ccs-navy-1100);
+  pointer-events: auto;
+}
+
+.viewer-pill[hidden] {
+  display: none;
+}
+
+.viewer-pill__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-inline-start: 1px solid var(--ccs-navy-700);
+  background: none;
+  color: var(--ccs-white);
+  cursor: pointer;
+}
+
+.viewer-pill__button:first-child {
+  border-inline-start: 0;
+}
+
+.viewer-pill__button:hover:not(:disabled) {
+  background: var(--ccs-navy-700);
+}
+
+.viewer-pill__button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.viewer-pill__button:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: -3px;
+}
+
+.viewer-pill__button[hidden] {
+  display: none;
+}
+
+/* The counter badge, top right of the picture */
+.viewer-media__counter {
+  position: absolute;
+  top: var(--ccs-space-3);
+  right: var(--ccs-space-3);
+  z-index: 2;
+  padding: 0.125rem var(--ccs-space-2);
+  border-radius: var(--ccs-radius-sm);
+  background: var(--ccs-navy-1200);
+  font-size: var(--ccs-font-size-2xs);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-white);
+}
+
+/* A small map of the whole image while the viewer is on (OpenSeadragon draws it in this box); its outline in navy. It sits at the top
+   left so the counter keeps the top right. */
+.viewer-navigator {
+  position: absolute;
+  top: var(--ccs-space-3);
+  left: var(--ccs-space-3);
+  z-index: 3;
+  width: 7.5rem;
+  height: 5.625rem;
+  border: 1px solid var(--ccs-border-strong);
+  background: var(--ccs-white);
+}
+
+.viewer-navigator[hidden] {
+  display: none;
+}
+
+.viewer-navigator .displayregion {
+  border: 2px solid var(--ccs-navy-1100);
+}
+
+.viewer-message {
+  position: absolute;
+  right: var(--ccs-space-3);
+  bottom: 4.5rem;
+  left: var(--ccs-space-3);
+  z-index: 3;
+  margin: 0;
+  padding: var(--ccs-space-2) var(--ccs-space-3);
+  background: var(--ccs-white);
+  font-size: var(--ccs-font-size-sm);
+  color: var(--ccs-text-primary);
+}
+
+.viewer-message[hidden] {
+  display: none;
+}
+
+/* The strip of thumbnails, the current one outlined, with a slim scrollbar */
+.viewer-media__strip {
+  display: flex;
+  gap: var(--ccs-space-2);
+  margin: var(--ccs-space-3) 0 0;
+  padding: var(--ccs-space-1) var(--ccs-space-1) var(--ccs-space-2);
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: thin;
+}
+
+.viewer-media__strip > li {
+  flex: none;
+}
+
+.viewer-media__thumb {
+  display: block;
+  padding: 0;
+  border: 2px solid transparent;
+  background: var(--ccs-white);
+  cursor: pointer;
+}
+
+.viewer-media__thumb img {
+  display: block;
+  width: 3.75rem;
+  height: 3.75rem;
+  object-fit: contain;
+}
+
+.viewer-media__thumb:hover {
+  border-color: var(--ccs-border-strong);
+}
+
+.viewer-media__thumb.is-current {
+  border-color: var(--ccs-navy-1100);
+}
+
+.viewer-media__thumb:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+/* One quiet line: the keys the viewer takes, and the links at the right */
+.viewer-media__caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ccs-space-2) var(--ccs-space-4);
+  margin-top: var(--ccs-space-3);
+  font-size: var(--ccs-font-size-sm);
+  color: var(--ccs-text-secondary);
+}
+
+.viewer-media__keys {
+  flex: 1 1 18rem;
+  margin: 0;
+}
+
+.viewer-media__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-4);
+}
+
+.viewer-media__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-navy-1100);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.viewer-media__link:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Full screen: dark, and the image as large as it can be */
+.viewer-media.is-fullscreen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--ccs-space-4);
+  background: var(--ccs-navy-1200);
+  color: var(--ccs-white);
+}
+
+.viewer-media.is-fullscreen .digital-assets__image,
+.viewer-media.is-fullscreen .digital-assets__main--sized {
+  max-height: calc(100vh - 10rem);
+}
+
+.viewer-media.is-fullscreen .viewer-media__caption,
+.viewer-media.is-fullscreen .viewer-media__link {
+  color: var(--ccs-white);
+}
+
+@media print {
+  .viewer-media__stage,
+  .viewer-media__strip {
+    display: none;
+  }
+}
+
+/* ---- The record ------------------------------------------------------------------------------------------------------------ */
+.viewer-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ccs-space-3);
+}
+
+.viewer-buttons__save .save-control .toggle-bookmark .toggle-bookmark-label,
+.viewer-buttons__primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 var(--ccs-space-5);
+  border: 2px solid var(--ccs-navy-1100);
+  border-radius: var(--ccs-radius-sm);
+  font-size: var(--ccs-font-size-md);
+  font-weight: var(--ccs-font-weight-bold);
+  text-decoration: none;
+}
+
+.viewer-buttons__save .save-control .toggle-bookmark .toggle-bookmark-label {
+  background: var(--ccs-white);
+  color: var(--ccs-navy-1100);
+}
+
+.viewer-buttons__primary {
+  background: var(--ccs-navy-1100);
+  color: var(--ccs-white);
+}
+
+.viewer-buttons__primary:hover {
+  background: var(--ccs-navy-1200);
+  color: var(--ccs-white);
+}
+
+.viewer-buttons__primary:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.viewer-access {
+  margin: 0;
+  font-size: var(--ccs-font-size-sm);
+  color: var(--ccs-text-secondary);
+}
+
+/* The other actions, quiet: icon and label rows that wrap */
+.viewer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--ccs-space-5);
+}
+
+.viewer-actions > * {
+  margin: 0;
+}
+
+.viewer-actions .cite__button,
+.viewer-actions .share__button,
+.viewer-actions .compare-actions__link,
+.viewer-actions .compare-actions__button {
+  min-height: 2.75rem;
+  padding: var(--ccs-space-1) 0;
+  border: 0;
+  background: none;
+  font-size: var(--ccs-font-size-ui);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-navy-1100);
+}
+
+.viewer-actions .cite__button:hover,
+.viewer-actions .share__button:hover,
+.viewer-actions .compare-actions__link:hover,
+.viewer-actions .compare-actions__button:hover {
+  background: none;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.viewer-actions .compare-actions {
+  padding: 0;
+}
+
+/* Accordions: hairline rules, Fraunces headings, a + that becomes a x when open */
+.viewer-accordions {
+  border-bottom: 1px solid var(--ccs-border-default);
+}
+
+.viewer-accordion {
+  border-top: 1px solid var(--ccs-border-default);
+}
+
+.viewer-accordion > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ccs-space-3);
+  min-height: 3.5rem;
+  list-style: none;
+  cursor: pointer;
+}
+
+.viewer-accordion > summary::-webkit-details-marker {
+  display: none;
+}
+
+.viewer-accordion > summary::after {
+  content: "+";
+  flex: none;
+  font-size: var(--ccs-font-size-2xl);
+  line-height: 1;
+  color: var(--ccs-navy-1100);
+}
+
+.viewer-accordion[open] > summary::after {
+  content: "\00d7";
+}
+
+.viewer-accordion > summary:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.viewer-accordion__heading {
+  margin: 0;
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-xl);
+  font-weight: var(--ccs-heading-weight-strong);
+  line-height: var(--ccs-line-height-tight);
+  color: var(--ccs-navy-1100);
+}
+
+.viewer-list {
+  margin: 0 0 var(--ccs-space-4);
+}
+
+.viewer-list__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ccs-space-1);
+  padding-block: var(--ccs-space-2);
+  font-size: var(--ccs-font-size-ui);
+  line-height: 1.5;
+}
+
+@media (min-width: 480px) {
+  .viewer-list__row {
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: var(--ccs-space-4);
+  }
+}
+
+.viewer-list__row dt {
+  font-weight: var(--ccs-font-weight-bold);
+  color: var(--ccs-text-secondary);
+}
+
+.viewer-list__row dd {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.viewer-accordion .record-copyright__terms,
+.viewer-accordion .record-copyright__none,
+.viewer-about {
+  margin: 0 0 var(--ccs-space-4);
+}
+
+/* The persistent link: a bordered, slightly tinted card */
+.viewer-link {
+  padding: var(--ccs-space-4);
+  border: 1px solid var(--ccs-border-default);
+  border-radius: var(--ccs-radius-sm);
+  background: var(--ccs-white);
+}
+
+.viewer-link .persistent-link,
+.viewer-link .record-summary__identifier {
+  padding-block: 0;
+}
+
+.viewer-link .record-summary__identifier {
+  margin-top: var(--ccs-space-3);
+}
+
+/* ---- Related objects: a white band across the page, ruled off from the record ---------------------------------------------- */
+.viewer-band {
+  border-top: 1px solid var(--ccs-border-default);
+  background: var(--ccs-white);
+}
+
+.viewer-band__inner {
+  max-width: calc(75rem + 2 * var(--record-gutter, var(--ccs-space-6)));
+  margin-inline: auto;
+  padding: var(--ccs-space-7) var(--record-gutter, var(--ccs-space-6));
+}
+
+.viewer-band__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ccs-space-2) var(--ccs-space-4);
+}
+
+.viewer-band__heading {
+  margin: 0;
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-3xl);
+  font-weight: var(--ccs-heading-weight);
+  color: var(--ccs-navy-1100);
+}
+
+.viewer-band__all {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  font-size: var(--ccs-font-size-ui);
+  color: var(--ccs-navy-1100);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.viewer-band__cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ccs-space-5);
+  margin: var(--ccs-space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .viewer-band__cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.viewer-band__cards > li {
+  display: flex;
+  min-width: 0;
+}
+
+.viewer-band .object-card__media {
+  aspect-ratio: 4 / 3;
+  background: var(--ccs-white);
+}
+
+.viewer-band .object-card__title {
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-xl);
+}
+
+/* More like this under the band keeps its own look, on the white */
+.viewer-page ~ .more-like-this,
+.viewer-page + .more-like-this {
+  background: var(--ccs-white);
+}

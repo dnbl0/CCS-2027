@@ -175,3 +175,35 @@ pages (V&A, Art Institute of Chicago, the Met, Europeana). Patterns only; nothin
 - Not built from the brief, and why: the navigator mini-map (OpenSeadragon's own navigator is not styled to match; zoom and pan
   are kept as they were) and thumbnail arrows (the strip scrolls; every thumbnail is focusable); the separate tile strip is the same
   strip.
+
+## The viewer layout (`?layout=viewer`)
+
+An opt-in variant of the record page, built after the user's Claude Design mockup, on the same address (`catalog#show`; no new route, page
+type or sitemap entry). Off unless the address has `?layout=viewer`; any other value is the plain page. The canonical link stays the
+plain address (`CanonicalUrl` drops the parameter) and `RobotsPolicy` tells search engines to keep the variant out (`noindex, follow`).
+It is meant for trying the layout on one record; if it wins, the default is flipped.
+
+- **Components**: `RecordViewerComponent` (a `RecordDocumentComponent` with its own markup: the same fields, rights, contact and access
+  rules; Object details, Collection and provenance, Rights and access and About this record are plain `<details>` accordions at every
+  width, Object details open) and `ViewerMediaComponent` (a `DigitalAssetsComponent` with its own markup, so AccessPolicy and
+  Sensitivity are the same code). `show.html.erb` picks the component; `RecordAboutComponent(viewer: true)` and
+  `MoreLikeThisComponent(show_related: false)` adapt two shared parts. Styles: `components/record_viewer.css`; the page surface is the
+  token `--ccs-surface-paper`.
+- **Left, the viewer**: the picture whole (the sized figure, so nothing shifts), a counter badge ("1 of 10") top right, ONE grouped navy
+  pill of four icon buttons at the bottom right (zoom in, zoom out, reset, full screen; each has an accessible name and a tooltip, 44px),
+  a strip of thumbnails (the current one outlined, a slim scrollbar), and one quiet line: the keys the viewer takes ("+ and - to zoom,
+  0 to reset"; there is no mouse-wheel zoom, it would take the page's scroll away), "Media information" and, for an open record only,
+  "Download image". The sensitivity choice and the withheld notice stay inside the picture area, above the controls.
+- **Viewer behaviour** (`deep_zoom_controller.js`, `deep_zoom_viewer.js`; the pill is `DeepZoomComponent(pill: true)`), after a museum
+  viewer: one OpenSeadragon viewer for the whole record, switched to the chosen thumbnail; a press on a zoom button starts it; zoom in
+  and zoom out are disabled where the view cannot go further that way; the canvas has the role "application", the name of the current
+  image and a visually hidden long description (the record's description); a small navigator map shows while the viewer is on; on a
+  screen 500px high or less (not full screen) it stops capturing touches and goes home so a phone held sideways can scroll past it
+  (checked on resize, after 300ms); if an image cannot open, a plain sentence says so (placeholder wording); the viewer is hidden when
+  printing. Not built: previous and next buttons (the strip does it) and a focus trap, because nothing here is an overlay.
+- **Right, the record**: small caps kicker, a very large title, the byline, Save and a primary navy button ("Contact us" for the
+  collection's team; "Request access" for a withheld record), one quiet line on what the visitor may do with the picture, then Add to
+  list, Compare, Cite and Share as quiet text, the accordions, and the persistent link and Collection ID in a bordered card.
+- **Below**: a white band across the page, ruled off, with Related objects as three large cards (4:3 pictures) and "View all in this
+  collection"; More like this (Similar, Recently viewed) follows.
+- The sensitivity choice and Compare redirect to the plain record address, so a visitor who makes one leaves the variant.
