@@ -157,6 +157,13 @@ class RecordViewerLayoutSystemTest < ApplicationSystemTestCase
     assert_selector ".viewer-pill button[aria-label='Zoom out'][disabled]", wait: 8
   end
 
+  test "the picture area holds the picture and does not scroll inside itself, so the wheel over it goes to the page" do
+    open_record(VARIANTS.fetch("several images, open"), "desktop")
+    assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all, wait: 8
+    extra = page.evaluate_script("(function () { var e = document.querySelector('.viewer-media__picture'); return e.scrollHeight - e.clientHeight })()")
+    assert_operator extra, :<=, 1, "the picture area scrolls inside itself by #{extra}px"
+  end
+
   test "the mouse wheel is left to the page over the picture: no zoom, and no scroll trap" do
     open_record(VARIANTS.fetch("several images, open"), "desktop")
     assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all, wait: 10

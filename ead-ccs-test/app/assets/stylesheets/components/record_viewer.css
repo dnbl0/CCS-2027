@@ -330,6 +330,7 @@
 .viewer-media__figure .deep-zoom {
   position: absolute;
   inset: 0;
+  overflow: hidden; /* the navigator's wrapper is as tall as the viewer and sits after it: without this the picture area scrolls over it */
   pointer-events: none; /* it covers the whole stage: only its viewer (switched on) and its buttons take clicks */
 }
 
