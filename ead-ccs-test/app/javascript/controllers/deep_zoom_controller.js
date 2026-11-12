@@ -6,7 +6,7 @@ import { Controller } from "@hotwired/stimulus"
 // A thumbnail that changes the large image (media_viewer.js) tells this controller, which opens the new image in the viewer.
 export default class extends Controller {
   static targets = [ "toggle", "stage", "controls", "navigator", "zoomIn", "zoomOut", "message" ]
-  static values = { sources: Array, label: String, pill: Boolean, describedBy: String, navigatorId: String }
+  static values = { sources: Array, label: String, pill: Boolean, describedBy: String, navigatorId: String, autostart: Boolean }
 
   connect() {
     this.viewer = null
@@ -15,7 +15,15 @@ export default class extends Controller {
       this.controlsTarget.hidden = false
       this.syncLimits()
     } else this.toggleTarget.hidden = false
+    // The viewer layout's picture is the page's main thing: the viewer starts once the page has settled, without taking focus
+    if (this.autostartValue) {
+      const go = () => this.ensure(false)
+      if ("requestIdleCallback" in window) requestIdleCallback(go, { timeout: 1500 }); else setTimeout(go, 300)
+    }
     this.onFullscreen = () => { this.viewer?.forceResize(); this.applyTouchMode() }
+    // The page's split layout resized the stage (the data panel opened or closed, or the view changed): the viewer follows
+    this.onResized = () => requestAnimationFrame(() => this.viewer?.forceResize())
+    window.addEventListener("viewer-split:resized", this.onResized)
     document.addEventListener("fullscreenchange", this.onFullscreen)
     // On a short screen (a phone held sideways) the viewer stops capturing touches and goes home, so the page can scroll past it;
     // full screen gives them back. Checked on resize, once it settles.
@@ -26,6 +34,7 @@ export default class extends Controller {
   disconnect() {
     document.removeEventListener("fullscreenchange", this.onFullscreen)
     window.removeEventListener("resize", this.onResize)
+    window.removeEventListener("viewer-split:resized", this.onResized)
     clearTimeout(this.resizeTimer)
     this.destroy()
   }
@@ -39,6 +48,9 @@ export default class extends Controller {
 
   // Zoom in and zoom out are disabled where the view cannot go further that way (and zoom out before the viewer is on)
   syncLimits() {
+    // The navigator map matters only once the picture is zoomed past its home view
+    if (this.viewer) this.element.classList.toggle("is-zoomed", this.viewer.viewport.getZoom() > this.viewer.viewport.getHomeZoom() * 1.05)
+    else this.element.classList.remove("is-zoomed")
     if (!this.hasZoomInTarget) return
     const { canZoomIn, canZoomOut } = this.viewer ? this.tools.limits(this.viewer) : { canZoomIn: true, canZoomOut: false }
     this.zoomInTarget.disabled = !canZoomIn
@@ -57,37 +69,40 @@ export default class extends Controller {
   toggle() { this.active ? this.close() : this.start() }
 
   // The pill's buttons act on a viewer that may not be on yet: start it first, once however fast the presses come
-  async ensure() {
+  async ensure(focus = true) {
     if (!this.active) {
-      this.starting ||= this.start().finally(() => { this.starting = null })
+      this.starting ||= this.start(focus).finally(() => { this.starting = null })
       await this.starting
     }
     return this.active
   }
 
-  async start() {
+  async start(focus = true) {
     if (this.hasToggleTarget) this.toggleTarget.disabled = true
     try {
       this.tools = await import("controllers/deep_zoom_viewer")
       const source = this.sourceFor(this.image?.getAttribute("src"))
       if (this.hasMessageTarget) this.messageTarget.hidden = true
       if (this.hasNavigatorTarget) this.navigatorTarget.hidden = false
+      this.stageTarget.hidden = false // shown first: the viewer measures the box it is drawn in
       this.viewer = await this.tools.createViewer(this.stageTarget, source, {
         label: this.image?.alt, describedBy: this.describedByValue || undefined, navigatorId: this.hasNavigatorTarget ? this.navigatorIdValue : undefined
       })
       this.viewer.addHandler("open-failed", () => this.fail())
       this.viewer.addHandler("animation", () => this.syncLimits())
       this.viewer.addHandler("zoom", () => this.syncLimits())
+      this.viewer.addHandler("animation-finish", () => this.syncLimits())
       this.applyTouchMode()
       this.syncLimits()
       this.element.classList.add("is-active")
       this.stageTarget.hidden = false
       if (!this.pillValue) this.controlsTarget.hidden = false
       if (this.hasToggleTarget) this.toggleTarget.setAttribute("aria-pressed", "true")
-      this.viewer.canvas.focus()
+      if (focus) this.viewer.canvas.focus()
     } catch (_) {
       this.viewer = null // the viewer could not load: the plain image stays, and a sentence says so
       this.element.classList.remove("is-active")
+      this.stageTarget.hidden = true
       if (this.hasNavigatorTarget) this.navigatorTarget.hidden = true
       if (this.hasMessageTarget) this.messageTarget.hidden = false
     } finally {

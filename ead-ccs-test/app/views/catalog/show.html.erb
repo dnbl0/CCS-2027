@@ -9,7 +9,7 @@
 <% viewer_layout = params[:layout] == "viewer" %>
 <% related = RelatedObjects.for(@document) %>
 <% document_args = { id: 'document', document: presenter, component: :div, show: true, partials: presenter.view_config.partials } %>
-<% document_component = viewer_layout ? NexusCcs::RecordViewerComponent.new(related: related, **document_args) : presenter.view_config.document_component.new(**document_args) %>
+<% document_component = viewer_layout ? NexusCcs::RecordViewerComponent.new(**document_args) : presenter.view_config.document_component.new(**document_args) %>
 <%= render document_component do |component| %>
   <% component.with_footer do %>
     <% if @document.respond_to?(:export_as_openurl_ctx_kev) %>
@@ -19,4 +19,4 @@
   <% end %>
 <% end %>
 
-<%= render NexusCcs::MoreLikeThisComponent.new(document: @document, related: related, recent: RecentlyViewed.new(session).documents(except: @document.id), show_related: !viewer_layout) %>
+<%= render NexusCcs::MoreLikeThisComponent.new(document: @document, related: related, recent: RecentlyViewed.new(session).documents(except: @document.id)) %>

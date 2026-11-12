@@ -1,11 +1,10 @@
 <div class="deep-zoom" data-controller="deep-zoom" data-deep-zoom-sources-value="<%= sources.to_json %>" data-deep-zoom-label-value="<%= label %>"
-     data-deep-zoom-pill-value="<%= pill? %>" data-deep-zoom-described-by-value="<%= described_by %>" data-deep-zoom-navigator-id-value="viewer-navigator" data-action="media-viewer:shown@window->deep-zoom#imageChanged">
+     data-deep-zoom-pill-value="<%= pill? %>" data-deep-zoom-autostart-value="<%= pill? %>" data-deep-zoom-described-by-value="<%= described_by %>" data-deep-zoom-navigator-id-value="viewer-navigator" data-action="media-viewer:shown@window->deep-zoom#imageChanged">
   <% if pill? %>
     <%# Hidden until the script has loaded: without JavaScript the buttons would do nothing. Icons only, each named. %>
     <div class="viewer-pill" role="group" aria-label="<%= t("nexus_ccs.record_page.viewer.controls") %>" hidden data-deep-zoom-target="controls">
       <button type="button" class="viewer-pill__button" data-deep-zoom-target="zoomIn" data-action="deep-zoom#zoomIn" aria-label="<%= t("nexus_ccs.record_page.viewer.zoom_in") %>" title="<%= t("nexus_ccs.record_page.viewer.zoom_in") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" /></svg></button>
       <button type="button" class="viewer-pill__button" data-deep-zoom-target="zoomOut" disabled data-action="deep-zoom#zoomOut" aria-label="<%= t("nexus_ccs.record_page.viewer.zoom_out") %>" title="<%= t("nexus_ccs.record_page.viewer.zoom_out") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 12h14" /></svg></button>
-      <button type="button" class="viewer-pill__button" data-action="deep-zoom#reset" aria-label="<%= t("nexus_ccs.record_page.viewer.reset") %>" title="<%= t("nexus_ccs.record_page.viewer.reset") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" /></svg></button>
       <%= content %>
     </div>
     <%# A small map of the whole image while the viewer is on, its visible part outlined %>

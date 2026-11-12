@@ -31,7 +31,8 @@ export async function createViewer(element, source, { label, navigatorId, descri
     showRotationControl: false,
     gestureSettingsMouse: { scrollToZoom: false, clickToZoom: false, dblClickToZoom: true },
     animationTime: prefersReducedMotion() ? 0 : 0.8,
-    visibilityRatio: 1,
+    minZoomImageRatio: 1, // zoom out stops at the picture fitting its stage
+    visibilityRatio: 0.5, // the whole picture shows at home whatever the stage's shape; it can be moved until half of it is in view
     constrainDuringPan: true,
     maxZoomPixelRatio: 3,
     crossOriginPolicy: source.info ? "Anonymous" : false,
@@ -59,7 +60,7 @@ export function open(viewer, source, label, describedBy) {
 // Whether the view can still go in or out, for the buttons to be disabled at the limits
 export function limits(viewer) {
   const zoom = viewer.viewport.getZoom()
-  return { canZoomIn: zoom < viewer.viewport.getMaxZoom() - 1e-6, canZoomOut: zoom > viewer.viewport.getMinZoom() + 1e-6 }
+  return { canZoomIn: zoom < viewer.viewport.getMaxZoom() - 1e-6, canZoomOut: zoom > viewer.viewport.getMinZoom() * 1.001 }
 }
 
 export function zoomIn(viewer) { viewer.viewport.zoomBy(1.5); viewer.viewport.applyConstraints() }

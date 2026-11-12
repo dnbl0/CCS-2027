@@ -10,7 +10,7 @@ import { Controller } from "@hotwired/stimulus"
 // justify-content centring, jolting the large image. Opening and closing it only ever toggles the "is-open"
 // class (transform/visibility, both paint-only) and aria-hidden, which never touches that layout.
 export default class extends Controller {
-  static targets = [ "stage", "image", "panel", "infoButton", "fullscreenButton", "fullscreenLabel", "counter" ]
+  static targets = [ "stage", "image", "panel", "infoButton", "fullscreenButton", "fullscreenLabel", "counter", "previous", "next", "strip", "use" ]
 
   connect() {
     this.onKey = (event) => { if (event.key === "Escape" && this.isOpen) this.closePanel() }
@@ -68,6 +68,32 @@ export default class extends Controller {
     }
   }
 
+  // Previous and next change the current image as a thumbnail does: one viewer, in sequence
+  previous() { this.step(-1) }
+  next() { this.step(1) }
+
+  get thumbs() { return this.hasStripTarget ? [ ...this.stripTarget.querySelectorAll(".viewer-media__thumb") ] : [] }
+
+  step(by) {
+    const thumbs = this.thumbs
+    const at = thumbs.findIndex((thumb) => thumb.classList.contains("is-current"))
+    const target = thumbs[at + by]
+    if (target) target.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }))
+  }
+
+  // The arrows are disabled at the ends, "Use this image" follows the current image (an open record's download), and the strip keeps
+  // the current thumbnail in view
+  syncStrip(link) {
+    const thumbs = this.thumbs
+    const at = thumbs.indexOf(link)
+    if (at < 0) return
+    if (this.hasPreviousTarget) this.previousTarget.disabled = at === 0
+    if (this.hasNextTarget) this.nextTarget.disabled = at === thumbs.length - 1
+    if (this.hasUseTarget && link.dataset.mediaViewerLarge) this.useTarget.href = link.dataset.mediaViewerLarge
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    link.scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduced ? "auto" : "smooth" })
+  }
+
   // a thumbnail shows its large image in the band (a modified click still opens it in a new tab)
   show(event) {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.button) return
@@ -78,6 +104,7 @@ export default class extends Controller {
       if (other === link) other.setAttribute("aria-current", "true"); else other.removeAttribute("aria-current")
     })
     if (this.hasCounterTarget && link.dataset.mediaViewerCounter) this.counterTarget.textContent = link.dataset.mediaViewerCounter
+    this.syncStrip(link)
     this.imageTarget.src = link.dataset.mediaViewerLarge
     this.imageTarget.alt = link.dataset.mediaViewerAlt
     this.dispatch("shown", { detail: { src: this.imageTarget.getAttribute("src"), alt: this.imageTarget.alt } }) // the zoom viewer follows

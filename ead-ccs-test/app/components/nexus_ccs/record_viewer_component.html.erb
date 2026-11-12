@@ -4,113 +4,105 @@
   itemscope: true,
   itemtype: document.itemtype,
   class: "record" do %>
-  <div class="viewer-page">
-    <%# A record with no media has no picture area: a slim tinted band with the collection's monogram and one plain sentence %>
-    <% unless assets? %>
-      <%= render NexusCcs::NoImageComponent.new(document: document, url: helpers.solr_document_url(document)) %>
+  <div class="viewer-page" data-controller="viewer-split" data-viewer-split-single-value="<%= !assets? %>">
+    <%# Below 1024px the panel and the viewer are two views, chosen here (shown by the script; without it both are shown, one above the other) %>
+    <% if assets? %>
+    <div class="viewer-switch" role="group" aria-label="<%= t("nexus_ccs.record_page.viewer.views") %>" hidden data-viewer-split-target="switch">
+      <button type="button" class="viewer-switch__button" aria-pressed="true" data-viewer-split-target="imagesButton" data-action="viewer-split#showImages"><%= t("nexus_ccs.record_page.viewer.show_images") %></button>
+      <button type="button" class="viewer-switch__button" aria-pressed="false" data-viewer-split-target="dataButton" data-action="viewer-split#showData"><%= t("nexus_ccs.record_page.viewer.show_data") %></button>
+    </div>
     <% end %>
 
-    <div class="viewer-record<%= ' viewer-record--single' unless assets? %>">
-      <div class="viewer-record__inner">
-        <% if assets? %>
-          <div class="viewer-record__media">
-            <%= render NexusCcs::ViewerMediaComponent.new(presenter: @presenter) %>
-          </div>
-        <% end %>
-
-        <div class="viewer-record__info">
+    <div class="viewer-app<%= ' viewer-app--single' unless assets? %>">
+      <% unless assets? %>
+        <%# A record with no media has no stage: the panel is the page, with one plain sentence above it %>
+        <div class="viewer-stage viewer-stage--none" data-viewer-split-target="stage">
+          <%= render NexusCcs::NoImageComponent.new(document: document, url: helpers.solr_document_url(document)) %>
+        </div>
+      <% end %>
+      <section class="viewer-data" id="viewer-data" aria-label="<%= t("nexus_ccs.record_page.viewer.data_label") %>" data-viewer-split-target="panel">
+        <div class="viewer-data__scroll">
+          <%# The title is on both views of a phone; the rest of the data is the "Show data" view %>
           <%= render NexusCcs::RecordHeaderComponent.new(document: document, title_markup: title_markup) %>
 
-          <div class="viewer-buttons">
-            <% if Rails.configuration.x.saved_records %><div class="viewer-buttons__save"><%= render NexusCcs::SaveControlComponent.new(document: document) %></div><% end %>
-            <a class="viewer-buttons__primary" href="<%= primary_href %>"<% if primary_new_tab? %> target="_blank" rel="noopener"<% end %>><%= primary_label %><% if primary_new_tab? %><span class="visually-hidden"> <%= t("nexus_ccs.record_page.no_image.ask_new_tab") %></span><% end %></a>
-          </div>
-
-          <% if access_line %>
-            <p class="viewer-access"><%= access_line %><% if access_link? %> <a href="<%= AccessPolicy.request_path(document) %>"><%= t("nexus_ccs.access_notice.#{AccessPolicy.tier(document)}.link") %></a><% end %></p>
-          <% end %>
-
+          <div class="viewer-data__sections" data-viewer-split-target="sections">
           <div class="viewer-actions">
-            <% if Rails.configuration.x.saved_records %><%= render NexusCcs::AddToListComponent.new(document: document) %><% end %>
-            <%= render NexusCcs::CompareActionsComponent.new(document: document, images: compare_images) %>
-            <div class="record-summary__cite"><%= render NexusCcs::CiteComponent.new(document: document) %></div>
-            <div class="record-summary__share"><%= render NexusCcs::ShareDialogComponent.new(kind: :record, document: document) %></div>
+            <% if Rails.configuration.x.saved_records %>
+              <div class="viewer-actions__item"><%= render NexusCcs::SaveControlComponent.new(document: document) %></div>
+              <div class="viewer-actions__item"><%= render NexusCcs::AddToListComponent.new(document: document) %></div>
+            <% end %>
+            <div class="viewer-actions__item"><%= render NexusCcs::CompareActionsComponent.new(document: document, images: compare_images) %></div>
+            <div class="viewer-actions__item record-summary__cite"><%= render NexusCcs::CiteComponent.new(document: document) %></div>
           </div>
 
           <%= render NexusCcs::CulturalProtocolsNoticeComponent.new(document: document) %>
           <%= render NexusCcs::DebiasNoticeComponent.new(matches: debias_matches, labels: debias_labels) %>
 
-          <div class="viewer-accordions">
-            <details class="viewer-accordion" id="record-details" open>
-              <summary><h2 class="viewer-accordion__heading"><%= t("nexus_ccs.record_page.sections.object_details") %></h2></summary>
+          <section class="viewer-section" aria-labelledby="viewer-details-heading">
+            <h2 id="viewer-details-heading" class="viewer-section__heading"><%= t("nexus_ccs.record_page.sections.object_details") %></h2>
+            <dl class="viewer-list">
+              <% detail_rows.each do |row| %>
+                <div class="viewer-list__row">
+                  <dt><%= row.label %></dt>
+                  <dd>
+                    <% if row.field == DESCRIPTION_FIELD %>
+                      <% row.values.each_with_index do |value, index| %>
+                        <div class="record-details__truncate" data-controller="truncate">
+                          <span class="record-details__value" data-truncate-target="text"><%= flagged(row, value, index) %></span>
+                          <button type="button" class="record-details__truncate-toggle" data-truncate-target="toggle" data-action="truncate#toggle" hidden>Show more</button>
+                        </div>
+                      <% end %>
+                    <% else %>
+                      <% row.values.each_with_index do |value, index| %>
+                        <span class="record-details__value"><% if chips?(row) %><%= link_to flagged(row, value, index), chip_path(row, value) %><% else %><%= flagged(row, value, index) %><% end %></span>
+                      <% end %>
+                    <% end %>
+                  </dd>
+                </div>
+              <% end %>
+            </dl>
+          </section>
+
+          <% if provenance_rows.any? || credit_line %>
+            <section class="viewer-section" aria-labelledby="viewer-provenance-heading">
+              <h2 id="viewer-provenance-heading" class="viewer-section__heading"><%= t("nexus_ccs.record_page.viewer.provenance") %></h2>
               <dl class="viewer-list">
-                <% detail_rows.each do |row| %>
+                <% provenance_rows.each do |row| %>
                   <div class="viewer-list__row">
                     <dt><%= row.label %></dt>
-                    <dd>
-                      <% if row.field == DESCRIPTION_FIELD %>
-                        <% row.values.each_with_index do |value, index| %>
-                          <div class="record-details__truncate" data-controller="truncate">
-                            <span class="record-details__value" data-truncate-target="text"><%= flagged(row, value, index) %></span>
-                            <button type="button" class="record-details__truncate-toggle" data-truncate-target="toggle" data-action="truncate#toggle" hidden>Show more</button>
-                          </div>
-                        <% end %>
-                      <% else %>
-                        <% row.values.each_with_index do |value, index| %>
-                          <span class="record-details__value">
-                            <% if chips?(row) %><%= link_to flagged(row, value, index), chip_path(row, value) %><% else %><%= flagged(row, value, index) %><% end %>
-                          </span>
-                        <% end %>
-                      <% end %>
-                    </dd>
+                    <dd><% row.values.each_with_index do |value, index| %><span class="record-details__value"><% if chips?(row) %><%= link_to flagged(row, value, index), chip_path(row, value) %><% else %><%= flagged(row, value, index) %><% end %></span><% end %></dd>
                   </div>
                 <% end %>
+                <% if credit_line %>
+                  <div class="viewer-list__row"><dt><%= t("nexus_ccs.record_page.copyright.credit_line") %></dt><dd><span class="record-details__value"><%= credit_line %></span></dd></div>
+                <% end %>
               </dl>
-              <%= render NexusCcs::MetadataExportComponent.new(document: document) %>
-            </details>
+            </section>
+          <% end %>
 
-            <% if provenance_rows.any? || credit_line %>
-              <details class="viewer-accordion" id="record-provenance">
-                <summary><h2 class="viewer-accordion__heading"><%= t("nexus_ccs.record_page.viewer.provenance") %></h2></summary>
-                <dl class="viewer-list">
-                  <% provenance_rows.each do |row| %>
-                    <div class="viewer-list__row">
-                      <dt><%= row.label %></dt>
-                      <dd><% row.values.each_with_index do |value, index| %><span class="record-details__value"><% if chips?(row) %><%= link_to flagged(row, value, index), chip_path(row, value) %><% else %><%= flagged(row, value, index) %><% end %></span><% end %></dd>
-                    </div>
-                  <% end %>
-                  <% if credit_line %>
-                    <div class="viewer-list__row"><dt><%= t("nexus_ccs.record_page.copyright.credit_line") %></dt><dd><span class="record-details__value"><%= credit_line %></span></dd></div>
-                  <% end %>
-                </dl>
-              </details>
+          <section class="viewer-section" aria-labelledby="viewer-rights">
+            <h2 id="viewer-rights" class="viewer-section__heading" tabindex="-1"><%= t("nexus_ccs.record_page.viewer.rights") %></h2>
+            <% unless rights_recorded? %>
+              <p class="record-copyright__none"><%= t("nexus_ccs.rights.none_recorded") %></p>
             <% end %>
-
-            <details class="viewer-accordion" id="record-copyright">
-              <summary><h2 class="viewer-accordion__heading"><%= t("nexus_ccs.record_page.viewer.rights") %></h2></summary>
-              <% unless rights_recorded? %>
-                <p class="record-copyright__none"><%= t("nexus_ccs.rights.none_recorded") %></p>
+            <dl class="viewer-list">
+              <% { t("nexus_ccs.record_page.copyright.licence") => licence, t("nexus_ccs.record_page.copyright.copyright") => copyright,
+                   t("nexus_ccs.record_page.copyright.caption") => dam_caption }.each do |label, value| %>
+                <% next if value.blank? %>
+                <div class="viewer-list__row"><dt><%= label %></dt><dd><span class="record-details__value"><%= value %></span></dd></div>
               <% end %>
-              <dl class="viewer-list">
-                <% { t("nexus_ccs.record_page.copyright.licence") => licence, t("nexus_ccs.record_page.copyright.copyright") => copyright,
-                     t("nexus_ccs.record_page.copyright.caption") => dam_caption }.each do |label, value| %>
-                  <% next if value.blank? %>
-                  <div class="viewer-list__row"><dt><%= label %></dt><dd><span class="record-details__value"><%= value %></span></dd></div>
-                <% end %>
-                <% if responsible_collection %>
-                  <div class="viewer-list__row">
-                    <dt><%= t("nexus_ccs.record_page.copyright.responsible_collection") %></dt>
-                    <dd><span class="record-details__value"><%= link_to responsible_collection, helpers.search_action_path(responsible_collection_query) %></span></dd>
-                  </div>
-                <% end %>
-              </dl>
-              <p class="record-copyright__terms"><%= link_to t("nexus_ccs.record_page.copyright.terms"), terms_path %> <%= render NexusCcs::HelpTipComponent.new(topic: :copyright) %></p>
-            </details>
+              <% if responsible_collection %>
+                <div class="viewer-list__row">
+                  <dt><%= t("nexus_ccs.record_page.copyright.responsible_collection") %></dt>
+                  <dd><span class="record-details__value"><%= link_to responsible_collection, helpers.search_action_path(responsible_collection_query) %></span></dd>
+                </div>
+              <% end %>
+            </dl>
+            <p class="viewer-section__note"><%= link_to t("nexus_ccs.record_page.copyright.terms"), terms_path %> <%= render NexusCcs::HelpTipComponent.new(topic: :copyright) %></p>
+          </section>
 
-            <%= render NexusCcs::RecordAboutComponent.new(document: document, url: helpers.solr_document_url(document), viewer: true) %>
-          </div>
-
-          <div class="viewer-link">
+          <section class="viewer-section" aria-labelledby="viewer-about-heading">
+            <h2 id="viewer-about-heading" class="viewer-section__heading"><%= t("nexus_ccs.record_page.sections.about") %></h2>
             <%= render NexusCcs::PersistentLinkComponent.new(url: helpers.solr_document_url(document), document: document) %>
             <p class="record-summary__identifier" data-testid="record-identifier" data-controller="clipboard">
               <span class="record-summary__identifier-label"><%= t("nexus_ccs.record_page.header.collection_id") %></span>
@@ -121,29 +113,34 @@
               </button>
               <span class="visually-hidden" role="status" data-clipboard-target="status"></span>
             </p>
-          </div>
+            <%= render NexusCcs::RecordAboutComponent.new(document: document, url: helpers.solr_document_url(document), viewer: true) %>
+          </section>
 
+          <%= render NexusCcs::MetadataExportComponent.new(document: document) %>
           <% partials.each do |partial| %><%= partial %><% end %>
-        </div>
-      </div>
-    </div>
-
-    <%# A white band across the page, ruled off from the record: Related objects as large cards. More like this (Similar, Recently viewed) follows it. %>
-    <% if related.any? %>
-      <section class="viewer-band" aria-labelledby="viewer-related-heading">
-        <div class="viewer-band__inner">
-          <div class="viewer-band__head">
-            <h2 id="viewer-related-heading" class="viewer-band__heading"><%= t("nexus_ccs.related.heading") %></h2>
-            <% if responsible_collection %><a class="viewer-band__all" href="<%= helpers.search_action_path(responsible_collection_query) %>"><%= t("nexus_ccs.record_page.viewer.view_all") %></a><% end %>
           </div>
-          <ul class="viewer-band__cards">
-            <% related.first(3).each do |found| %>
-              <li><%= render NexusCcs::RecordCardComponent.new(document: found) %></li>
-            <% end %>
-          </ul>
+        </div>
+
+        <%# The teal bar under the panel: back to a new search, and round Share and Print %>
+        <div class="viewer-bar" data-viewer-split-target="bar">
+          <a class="viewer-bar__search" href="<%= helpers.search_catalog_path %>"><%= t("nexus_ccs.record_page.viewer.new_search") %></a>
+          <div class="viewer-bar__round viewer-bar__share"><%= render NexusCcs::ShareDialogComponent.new(kind: :record, document: document) %></div>
+          <button type="button" class="viewer-bar__round viewer-bar__print" data-action="viewer-split#print" hidden data-viewer-split-target="print"
+                  aria-label="<%= t("nexus_ccs.record_page.viewer.print") %>" title="<%= t("nexus_ccs.record_page.viewer.print") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2" /><path d="M6 14h12v7H6z" /></svg></button>
         </div>
       </section>
-    <% end %>
+
+      <% if assets? %>
+        <%# The round toggle on the dividing line: collapses and expands the data panel (shown by the script; from 1024px) %>
+        <button type="button" class="viewer-toggle" hidden aria-expanded="true" aria-controls="viewer-data" data-viewer-split-target="toggle" data-action="viewer-split#toggle"
+                data-label-open="<%= t("nexus_ccs.record_page.viewer.larger_image") %>" data-label-closed="<%= t("nexus_ccs.record_page.viewer.show_data") %>"
+                aria-label="<%= t("nexus_ccs.record_page.viewer.larger_image") %>" title="<%= t("nexus_ccs.record_page.viewer.larger_image") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7" /></svg></button>
+
+        <div class="viewer-stage" data-viewer-split-target="stage">
+          <%= render NexusCcs::ViewerMediaComponent.new(presenter: @presenter) %>
+        </div>
+      <% end %>
+    </div>
   </div>
 
   <%= footer %>

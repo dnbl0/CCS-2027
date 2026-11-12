@@ -1,83 +1,346 @@
 /*
- * The viewer layout of a record page (?layout=viewer, NexusCcs::RecordViewerComponent), after the user's Claude Design mockup: the
- * viewer on the left (the picture whole, one grouped pill of icon controls at its bottom right, a counter, a strip of thumbnails, one
- * quiet line under it) and the record on the right (kicker, a very large title, Save and a primary button, accordions, a tinted card
- * with the persistent link), then a white band of Related objects across the page. Off by default. Below 1200px it is one column.
+ * The viewer layout of a record page (?layout=viewer, NexusCcs::RecordViewerComponent), after a museum object page: a split screen under
+ * the site header, the data panel on the left and one big viewer on the right, a round toggle on the dividing line that collapses the
+ * panel, a dark strip of thumbnails under the viewer, and a teal bar under the panel (New search, Share, Print). Below 1024px the two
+ * are two views (Show images, Show data). Off by default. Related objects and More like this follow below, full width.
+ * Colours are the University's: navy-1200 for the dark controls and the strip, cyan-900 (the breadcrumb bar's teal) for the bottom
+ * bar, cyan-400 for focus and the navigator on dark, the paper and subtle surfaces for the stage, white for the panel.
+ * Behaviour: controllers/viewer_split_controller.js, media_viewer_controller.js, deep_zoom_controller.js.
  */
 .viewer-page {
   background: var(--ccs-surface-paper);
 }
 
-.viewer-record__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--ccs-space-6);
-  align-items: start;
-  max-width: calc(75rem + 2 * var(--record-gutter, var(--ccs-space-6)));
-  margin-inline: auto;
-  padding: var(--ccs-space-5) var(--record-gutter, var(--ccs-space-6)) var(--ccs-space-8);
+/* ---- Below 1024px: two views ----------------------------------------------------------------------------------------------- */
+.viewer-switch {
+  display: flex;
+  gap: var(--ccs-space-2);
+  padding: var(--ccs-space-3) var(--ccs-space-4);
+  background: var(--ccs-white);
+  border-bottom: 1px solid var(--ccs-border-default);
 }
 
-.viewer-record__inner > * {
-  min-width: 0;
+.viewer-switch[hidden] {
+  display: none;
 }
 
-@media (min-width: 1200px) {
-  .viewer-record__inner {
-    grid-template-columns: minmax(0, 55fr) minmax(0, 40fr);
-    column-gap: 4rem;
-    padding-top: var(--ccs-space-6);
-  }
-
-  .viewer-record--single .viewer-record__inner {
-    grid-template-columns: minmax(0, 40rem);
-    justify-content: center;
-  }
+.viewer-switch__button {
+  flex: 1 1 0;
+  min-height: 2.75rem;
+  padding: 0 var(--ccs-space-4);
+  border: 2px solid var(--ccs-navy-1100);
+  border-radius: var(--ccs-radius-sm);
+  background: var(--ccs-white);
+  font: inherit;
+  font-weight: var(--ccs-font-weight-bold);
+  color: var(--ccs-navy-1100);
+  cursor: pointer;
 }
 
-.viewer-record__info {
+.viewer-switch__button[aria-pressed="true"] {
+  background: var(--ccs-navy-1100);
+  color: var(--ccs-white);
+}
+
+.viewer-switch__button:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.viewer-app {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--ccs-space-4);
 }
 
-/* The header block, here: small caps kicker, a very large title */
-.viewer-record .record-header {
-  margin-bottom: 0;
+.viewer-app [hidden] {
+  display: none;
 }
 
-.viewer-record .record-header__kicker {
+/* ---- The data panel -------------------------------------------------------------------------------------------------------- */
+.viewer-data {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--ccs-white);
+}
+
+.viewer-data__scroll {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-5);
+  min-height: 0;
+  padding: var(--ccs-space-5) var(--ccs-space-4);
+}
+
+.viewer-data .record-header {
+  margin: 0;
+}
+
+.viewer-data .record-header__kicker {
   font-size: var(--ccs-font-size-2xs);
   letter-spacing: 0.1em;
   color: var(--ccs-navy-1100);
 }
 
-.viewer-record .record-header__title {
-  font-size: var(--ccs-font-size-4xl);
+.viewer-data .record-header__title {
+  font-size: var(--ccs-font-size-3xl);
 }
 
-@media (min-width: 1200px) {
-  .viewer-record .record-header__title {
-    font-size: var(--ccs-font-size-5xl);
-  }
+.viewer-data .record-summary__byline {
+  font-size: var(--ccs-font-size-md);
 }
 
-.viewer-record .record-summary__byline {
-  font-size: var(--ccs-font-size-lg);
+/* The actions: quiet icon and label rows, 44px high */
+.viewer-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-/* ---- The viewer ------------------------------------------------------------------------------------------------------------ */
-.viewer-media {
+.viewer-actions__item > * {
+  margin: 0;
+}
+
+.viewer-actions .cite__button,
+.viewer-actions .compare-actions__link,
+.viewer-actions .compare-actions__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ccs-space-2);
+  min-height: 2.75rem;
+  padding: var(--ccs-space-1) 0;
+  border: 0;
+  background: none;
+  font-size: var(--ccs-font-size-ui);
+  font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-navy-1100);
+}
+
+.viewer-actions .cite__button:hover,
+.viewer-actions .compare-actions__link:hover,
+.viewer-actions .compare-actions__button:hover {
+  background: none;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.viewer-actions .compare-actions {
+  padding: 0;
+}
+
+.viewer-actions .compare-actions,
+.viewer-actions .compare-actions__form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0;
+}
+
+/* Sections, with a real h2 each; rows are label above value, labels bold, a hairline between */
+.viewer-section__heading {
+  margin: 0 0 var(--ccs-space-2);
+  padding-top: var(--ccs-space-4);
+  border-top: 1px solid var(--ccs-border-default);
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-xl);
+  font-weight: var(--ccs-heading-weight-strong);
+  line-height: var(--ccs-line-height-tight);
+  color: var(--ccs-navy-1100);
+}
+
+.viewer-section__heading:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 2px;
+}
+
+.viewer-list {
+  margin: 0;
+}
+
+.viewer-list__row {
+  padding-block: var(--ccs-space-3);
+  border-top: 1px solid var(--ccs-border-subtle);
+  font-size: var(--ccs-font-size-ui);
+  line-height: 1.5;
+}
+
+.viewer-list__row:first-child {
+  border-top: 0;
+}
+
+.viewer-list__row dt {
+  margin-bottom: var(--ccs-space-1);
+  font-weight: var(--ccs-font-weight-bold);
+  color: var(--ccs-text-primary);
+}
+
+.viewer-list__row dd {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
   min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Linked values: plain underlined links, each a 32px-high target, so neighbours never crowd each other (WCAG 2.5.8) */
+.viewer-list__row dd a {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: 2rem;
+}
+
+.viewer-section__note {
+  margin: var(--ccs-space-2) 0 0;
+}
+
+.viewer-section__note a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+}
+
+/* The persistent link and the Collection ID, in the panel's own width */
+.viewer-section .persistent-link__row {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.viewer-section .record-summary__identifier {
+  margin-top: var(--ccs-space-3);
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* ---- The teal bar under the panel ------------------------------------------------------------------------------------------ */
+.viewer-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--ccs-space-3);
+  padding: var(--ccs-space-2) var(--ccs-space-4);
+  background: var(--ccs-cyan-900);
+  color: var(--ccs-white);
+}
+
+.viewer-bar__search {
+  display: inline-flex;
+  align-items: center;
+  margin-right: auto;
+  min-height: 2.75rem;
+  font-weight: var(--ccs-font-weight-bold);
+  color: var(--ccs-white);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.viewer-bar a:focus-visible,
+.viewer-bar button:focus-visible {
+  outline: 3px solid var(--ccs-cyan-400);
+  outline-offset: 2px;
+}
+
+/* Round Share and Print: icon only, each named (the Share component's own button, its label read but not drawn) */
+.viewer-bar__round,
+.viewer-bar__share .share__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 2px solid var(--ccs-white);
+  border-radius: var(--ccs-radius-circle);
+  background: none;
+  color: var(--ccs-white);
+  cursor: pointer;
+}
+
+.viewer-bar__share {
+  display: inline-flex;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+}
+
+.viewer-bar__share .share__button span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.viewer-bar__round:hover,
+.viewer-bar__share .share__button:hover {
+  background: var(--ccs-navy-1100);
+}
+
+/* ---- The stage and the viewer ----------------------------------------------------------------------------------------------- */
+.viewer-stage {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--ccs-surface-paper);
+}
+
+.viewer-media {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .viewer-media__stage {
   position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
-/* The zoom viewer keeps the page's own surface (the dark stage of the older viewer made a fitted picture jump to dark bars the moment zoom
-   was switched on); only full screen is dark */
+.viewer-media__picture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-4);
+  height: 100%;
+  padding: var(--ccs-space-4);
+  overflow-y: auto; /* a record with video, audio or a PDF besides its pictures: those follow the picture and scroll */
+}
+
+/* The one picture fills the stage whole, never cropped; the zoom viewer fills the same box on the page's own surface */
+.viewer-media__figure {
+  position: relative;
+  display: block;
+  flex: 1 0 100%;
+  min-height: 0;
+  margin: 0;
+}
+
+.viewer-media__figure .digital-assets__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+}
+
+.viewer-media__figure .deep-zoom {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* it covers the whole stage: only its viewer (switched on) and its buttons take clicks */
+}
+
+.viewer-media__figure .deep-zoom.is-active,
+.viewer-media__figure .deep-zoom .viewer-pill__button,
+.viewer-media__figure .deep-zoom .viewer-pill {
+  pointer-events: auto;
+}
+
 .viewer-media .deep-zoom__stage {
+  height: 100%;
   background: var(--ccs-surface-paper);
 }
 
@@ -85,27 +348,14 @@
   background: var(--ccs-navy-1200);
 }
 
-.viewer-media__picture {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ccs-space-4);
-}
-
-.viewer-media__picture .digital-assets__main {
-  position: relative;
-}
-
-/* The grouped controls: one navy pill, thin separators, icons only, at the picture's bottom right */
+/* Three round dark buttons at the stage's bottom right: zoom in, zoom out, full view */
 .viewer-pill {
   position: absolute;
   right: var(--ccs-space-3);
   bottom: var(--ccs-space-3);
   z-index: 3;
   display: flex;
-  overflow: hidden;
-  border-radius: var(--ccs-radius-lg);
-  background: var(--ccs-navy-1100);
-  pointer-events: auto;
+  gap: var(--ccs-space-2);
 }
 
 .viewer-pill[hidden] {
@@ -120,67 +370,49 @@
   height: 2.75rem;
   padding: 0;
   border: 0;
-  border-inline-start: 1px solid var(--ccs-navy-700);
-  background: none;
+  border-radius: var(--ccs-radius-circle);
+  background: var(--ccs-navy-1200);
   color: var(--ccs-white);
   cursor: pointer;
 }
 
-.viewer-pill__button:first-child {
-  border-inline-start: 0;
-}
-
 .viewer-pill__button:hover:not(:disabled) {
-  background: var(--ccs-navy-700);
+  background: var(--ccs-navy-1100);
 }
 
 .viewer-pill__button:disabled {
-  opacity: 0.45;
+  opacity: 0.5;
   cursor: default;
 }
 
 .viewer-pill__button:focus-visible {
   outline: 3px solid var(--ccs-focus-ring);
-  outline-offset: -3px;
+  outline-offset: 2px;
 }
 
 .viewer-pill__button[hidden] {
   display: none;
 }
 
-/* The counter badge, top right of the picture */
-.viewer-media__counter {
-  position: absolute;
-  top: var(--ccs-space-3);
-  right: var(--ccs-space-3);
-  z-index: 2;
-  padding: 0.125rem var(--ccs-space-2);
-  border-radius: var(--ccs-radius-sm);
-  background: var(--ccs-navy-1200);
-  font-size: var(--ccs-font-size-2xs);
-  font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-white);
-}
-
-/* A small map of the whole image while the viewer is on (OpenSeadragon draws it in this box); its outline in navy. It sits at the top
-   left so the counter keeps the top right. */
+/* The navigator, a small map of the whole image, at the top right and only once the picture is zoomed; its region in cyan */
 .viewer-navigator {
   position: absolute;
   top: var(--ccs-space-3);
-  left: var(--ccs-space-3);
+  right: var(--ccs-space-3);
   z-index: 3;
   width: 7.5rem;
   height: 5.625rem;
   border: 1px solid var(--ccs-border-strong);
   background: var(--ccs-white);
+  visibility: hidden; /* OpenSeadragon manages the element's display itself, so it is shown with visibility instead */
 }
 
-.viewer-navigator[hidden] {
-  display: none;
+.deep-zoom.is-zoomed .viewer-navigator:not([hidden]) {
+  visibility: visible;
 }
 
 .viewer-navigator .displayregion {
-  border: 2px solid var(--ccs-navy-1100);
+  border: 2px solid var(--ccs-cyan-400);
 }
 
 .viewer-message {
@@ -200,18 +432,55 @@
   display: none;
 }
 
-/* The strip of thumbnails, the current one outlined, with a slim scrollbar */
-.viewer-media__strip {
+/* ---- The dark strip under the viewer ---------------------------------------------------------------------------------------- */
+.viewer-strip {
   display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--ccs-space-3);
+  min-height: 4rem;
+  padding: var(--ccs-space-2) var(--ccs-space-4);
+  background: var(--ccs-navy-1200);
+  color: var(--ccs-white);
+}
+
+.viewer-strip__spacer {
+  flex: 1 1 auto;
+}
+
+.viewer-strip__arrow {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 2px solid var(--ccs-white);
+  border-radius: var(--ccs-radius-circle);
+  background: none;
+  color: var(--ccs-white);
+  cursor: pointer;
+}
+
+.viewer-strip__arrow:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.viewer-strip__thumbs {
+  display: flex;
+  flex: 1 1 auto;
   gap: var(--ccs-space-2);
-  margin: var(--ccs-space-3) 0 0;
-  padding: var(--ccs-space-1) var(--ccs-space-1) var(--ccs-space-2);
+  min-width: 0;
+  margin: 0;
+  padding: var(--ccs-space-1);
   overflow-x: auto;
   list-style: none;
   scrollbar-width: thin;
 }
 
-.viewer-media__strip > li {
+.viewer-strip__thumbs > li {
   flex: none;
 }
 
@@ -225,50 +494,38 @@
 
 .viewer-media__thumb img {
   display: block;
-  width: 3.75rem;
-  height: 3.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
   object-fit: contain;
 }
 
 .viewer-media__thumb:hover {
-  border-color: var(--ccs-border-strong);
+  border-color: var(--ccs-neutral-300);
 }
 
 .viewer-media__thumb.is-current {
-  border-color: var(--ccs-navy-1100);
+  border-color: var(--ccs-white);
 }
 
-.viewer-media__thumb:focus-visible {
-  outline: 3px solid var(--ccs-focus-ring);
+.viewer-strip__use {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  min-height: 2.75rem;
+  margin-left: auto;
+  font-weight: var(--ccs-font-weight-bold);
+  color: var(--ccs-white);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.viewer-strip a:focus-visible,
+.viewer-strip button:focus-visible {
+  outline: 3px solid var(--ccs-cyan-400);
   outline-offset: 2px;
 }
 
-/* One quiet line: the keys the viewer takes, and the links at the right */
-.viewer-media__caption {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ccs-space-2) var(--ccs-space-4);
-  margin-top: var(--ccs-space-3);
-  font-size: var(--ccs-font-size-sm);
-  color: var(--ccs-text-secondary);
-}
-
-.viewer-media__keys {
-  flex: 1 1 18rem;
-  margin: 0;
-}
-
-.viewer-media__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ccs-space-4);
-}
-
 .viewer-media__link {
-  display: inline-flex;
-  align-items: center;
   min-height: 2.75rem;
   padding: 0;
   border: 0;
@@ -281,325 +538,147 @@
   cursor: pointer;
 }
 
-.viewer-media__link:focus-visible {
-  outline: 3px solid var(--ccs-focus-ring);
-  outline-offset: 2px;
-}
-
-/* Full screen: dark, and the image as large as it can be */
+/* Full screen: the stage, its controls and the strip fill the screen, dark */
 .viewer-media.is-fullscreen {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: var(--ccs-space-4);
   background: var(--ccs-navy-1200);
-  color: var(--ccs-white);
 }
 
-.viewer-media.is-fullscreen .digital-assets__image,
-.viewer-media.is-fullscreen .digital-assets__main--sized {
-  max-height: calc(100vh - 10rem);
+.viewer-media.is-fullscreen .viewer-media__picture {
+  background: var(--ccs-navy-1200);
 }
 
-.viewer-media.is-fullscreen .viewer-media__caption,
-.viewer-media.is-fullscreen .viewer-media__link {
-  color: var(--ccs-white);
-}
+/* ---- Desktop: the split screen ----------------------------------------------------------------------------------------------- */
+@media (min-width: 64rem) {
+  .viewer-switch {
+    display: none;
+  }
 
-@media print {
-  .viewer-media__stage,
-  .viewer-media__strip {
+  .viewer-app {
+    display: grid;
+    grid-template-columns: var(--viewer-panel, 22rem) minmax(0, 1fr);
+    /* The whole viewer and its strip on one screen: the window's height less the site header and breadcrumb above it */
+    height: max(36rem, calc(100dvh - 9.75rem));
+  }
+
+  .viewer-app.is-collapsed {
+    grid-template-columns: 0 minmax(0, 1fr);
+  }
+
+  .viewer-data {
+    grid-column: 1;
+    min-height: 0;
+    border-right: 1px solid var(--ccs-border-default);
+  }
+
+  .viewer-data__scroll {
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+
+  .viewer-stage {
+    grid-column: 2;
+    min-height: 0;
+  }
+
+  .viewer-app--single {
+    display: block;
+    height: auto;
+  }
+
+  .viewer-app--single .viewer-data {
+    max-width: 40rem;
+    margin-inline: auto;
+    border-right: 0;
+  }
+
+  /* The round toggle sits on the dividing line */
+  .viewer-toggle {
+    position: absolute;
+    top: 50%;
+    left: calc(var(--viewer-panel, 22rem) - 1.375rem);
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 2px solid var(--ccs-navy-1100);
+    border-radius: var(--ccs-radius-circle);
+    background: var(--ccs-white);
+    color: var(--ccs-navy-1100);
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+
+  .viewer-app.is-collapsed .viewer-toggle {
+    left: var(--ccs-space-2);
+  }
+
+  .viewer-app.is-collapsed .viewer-toggle svg {
+    transform: rotate(180deg);
+  }
+
+  .viewer-toggle:hover {
+    background: var(--ccs-surface-subtle);
+  }
+
+  .viewer-toggle:focus-visible {
+    outline: 3px solid var(--ccs-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .viewer-toggle[hidden] {
     display: none;
   }
 }
 
-/* ---- The record ------------------------------------------------------------------------------------------------------------ */
-.viewer-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ccs-space-3);
-}
-
-.viewer-buttons__save .save-control .toggle-bookmark .toggle-bookmark-label,
-.viewer-buttons__primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.75rem;
-  padding: 0 var(--ccs-space-5);
-  border: 2px solid var(--ccs-navy-1100);
-  border-radius: var(--ccs-radius-sm);
-  font-size: var(--ccs-font-size-md);
-  font-weight: var(--ccs-font-weight-bold);
-  text-decoration: none;
-}
-
-.viewer-buttons__save .save-control .toggle-bookmark .toggle-bookmark-label {
-  background: var(--ccs-white);
-  color: var(--ccs-navy-1100);
-}
-
-.viewer-buttons__primary {
-  background: var(--ccs-navy-1100);
-  color: var(--ccs-white);
-}
-
-.viewer-buttons__primary:hover {
-  background: var(--ccs-navy-1200);
-  color: var(--ccs-white);
-}
-
-.viewer-buttons__primary:focus-visible {
-  outline: 3px solid var(--ccs-focus-ring);
-  outline-offset: 2px;
-}
-
-.viewer-access {
-  margin: 0;
-  font-size: var(--ccs-font-size-sm);
-  color: var(--ccs-text-secondary);
-}
-
-/* The other actions, quiet: icon and label rows that wrap */
-.viewer-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9.5rem, max-content));
-  align-items: center;
-  gap: 0 var(--ccs-space-6);
-}
-
-.viewer-actions .compare-actions,
-.viewer-actions .compare-actions__form,
-.viewer-actions .cite,
-.viewer-actions .share,
-.viewer-actions .record-summary__cite,
-.viewer-actions .record-summary__share {
-  display: contents;
-}
-
-.viewer-actions .list-menu__button,
-.viewer-actions .cite__button,
-.viewer-actions .share__button,
-.viewer-actions .compare-actions__button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ccs-space-2);
-}
-
-.viewer-actions > * {
-  margin: 0;
-}
-
-.viewer-actions .cite__button,
-.viewer-actions .share__button,
-.viewer-actions .compare-actions__link,
-.viewer-actions .compare-actions__button {
-  min-height: 2.75rem;
-  padding: var(--ccs-space-1) 0;
-  border: 0;
-  background: none;
-  font-size: var(--ccs-font-size-ui);
-  font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-navy-1100);
-}
-
-.viewer-actions .cite__button:hover,
-.viewer-actions .share__button:hover,
-.viewer-actions .compare-actions__link:hover,
-.viewer-actions .compare-actions__button:hover {
-  background: none;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-
-.viewer-actions .compare-actions {
-  padding: 0;
-}
-
-/* Accordions: hairline rules, Fraunces headings, a + that becomes a x when open */
-.viewer-accordions {
-  border-bottom: 1px solid var(--ccs-border-default);
-}
-
-.viewer-accordion {
-  border-top: 1px solid var(--ccs-border-default);
-}
-
-.viewer-accordion > summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ccs-space-3);
-  min-height: 3.5rem;
-  list-style: none;
-  cursor: pointer;
-}
-
-.viewer-accordion > summary::-webkit-details-marker {
-  display: none;
-}
-
-.viewer-accordion > summary::after {
-  content: "+";
-  flex: none;
-  font-size: var(--ccs-font-size-2xl);
-  line-height: 1;
-  color: var(--ccs-navy-1100);
-}
-
-.viewer-accordion[open] > summary::after {
-  content: "\00d7";
-}
-
-.viewer-accordion > summary:focus-visible {
-  outline: 3px solid var(--ccs-focus-ring);
-  outline-offset: 2px;
-}
-
-.viewer-accordion__heading {
-  margin: 0;
-  font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-font-size-xl);
-  font-weight: var(--ccs-heading-weight-strong);
-  line-height: var(--ccs-line-height-tight);
-  color: var(--ccs-navy-1100);
-}
-
-.viewer-list {
-  margin: 0 0 var(--ccs-space-4);
-}
-
-.viewer-list__row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--ccs-space-1);
-  padding-block: var(--ccs-space-2);
-  font-size: var(--ccs-font-size-ui);
-  line-height: 1.5;
-}
-
-@media (min-width: 480px) {
-  .viewer-list__row {
-    grid-template-columns: 9rem minmax(0, 1fr);
-    gap: var(--ccs-space-4);
+@media (min-width: 75rem) {
+  .viewer-app {
+    --viewer-panel: 26rem;
   }
 }
 
-.viewer-list__row dt {
-  font-weight: var(--ccs-font-weight-bold);
-  color: var(--ccs-text-secondary);
-}
+/* ---- Below 1024px: the views are stacked blocks, the stage a fixed height ---------------------------------------------------- */
+@media (max-width: 63.99rem) {
+  .viewer-toggle {
+    display: none;
+  }
 
-.viewer-list__row dd {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
+  .viewer-stage {
+    height: 60dvh;
+    min-height: 22rem;
+  }
 
-/* Linked values stacked in a row: each link is a 32px-high target, so neighbours never crowd each other (WCAG 2.5.8) */
-.viewer-list__row dd a {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
-  min-height: 2rem;
-}
-
-.viewer-accordion .record-copyright__terms,
-.viewer-accordion .record-copyright__none,
-.viewer-about {
-  margin: 0 0 var(--ccs-space-4);
-}
-
-/* The persistent link: a bordered, slightly tinted card */
-.viewer-link {
-  padding: var(--ccs-space-4);
-  border: 1px solid var(--ccs-border-default);
-  border-radius: var(--ccs-radius-sm);
-  background: var(--ccs-white);
-}
-
-.viewer-link .persistent-link,
-.viewer-link .record-summary__identifier {
-  padding-block: 0;
-}
-
-.viewer-link .record-summary__identifier {
-  margin-top: var(--ccs-space-3);
-}
-
-/* ---- Related objects: a white band across the page, ruled off from the record ---------------------------------------------- */
-.viewer-band {
-  border-top: 1px solid var(--ccs-border-default);
-  background: var(--ccs-white);
-}
-
-.viewer-band__inner {
-  max-width: calc(75rem + 2 * var(--record-gutter, var(--ccs-space-6)));
-  margin-inline: auto;
-  padding: var(--ccs-space-7) var(--record-gutter, var(--ccs-space-6));
-}
-
-.viewer-band__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--ccs-space-2) var(--ccs-space-4);
-}
-
-.viewer-band__heading {
-  margin: 0;
-  font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-font-size-3xl);
-  font-weight: var(--ccs-heading-weight);
-  color: var(--ccs-navy-1100);
-}
-
-.viewer-band__all {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem;
-  font-size: var(--ccs-font-size-ui);
-  color: var(--ccs-navy-1100);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-
-.viewer-band__cards {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--ccs-space-5);
-  margin: var(--ccs-space-5) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-@media (min-width: 768px) {
-  .viewer-band__cards {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .viewer-stage--none {
+    height: auto;
+    min-height: 0;
   }
 }
 
-.viewer-band__cards > li {
-  display: flex;
-  min-width: 0;
+/* With no scripting both views are shown, one above the other */
+@media (scripting: none) {
+  .viewer-switch,
+  .viewer-toggle {
+    display: none;
+  }
 }
 
-.viewer-band .object-card__media {
-  aspect-ratio: 4 / 3;
-  border: 1px solid var(--ccs-border-subtle);
-  background: var(--ccs-surface-subtle);
-}
+/* ---- Print: the data panel only ---------------------------------------------------------------------------------------------- */
+@media print {
+  .viewer-switch,
+  .viewer-stage,
+  .viewer-toggle,
+  .viewer-bar {
+    display: none;
+  }
 
-.viewer-band .object-card__title {
-  font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-font-size-xl);
-}
+  .viewer-app {
+    display: block;
+    height: auto;
+  }
 
-/* More like this under the band keeps its own look, on the white */
-.viewer-page ~ .more-like-this,
-.viewer-page + .more-like-this {
-  background: var(--ccs-white);
+  .viewer-data__scroll {
+    overflow: visible;
+  }
 }

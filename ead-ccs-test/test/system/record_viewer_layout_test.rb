@@ -36,7 +36,7 @@ class RecordViewerLayoutSystemTest < ApplicationSystemTestCase
                      "digital_asset_large_paths_ssim" => LARGE, "digital_asset_paths_ssim" => THUMBS }
   }.freeze
 
-  SIZES = { "desktop" => [ 1440, 900 ], "phone" => [ 390, 844 ], "narrow" => [ 320, 800 ] }.freeze
+  SIZES = { "desktop" => [ 1440, 900 ], "tablet" => [ 900, 768 ], "phone" => [ 390, 844 ], "narrow" => [ 320, 800 ] }.freeze
 
   teardown do
     ViewerSolr.documents = nil
@@ -47,8 +47,14 @@ class RecordViewerLayoutSystemTest < ApplicationSystemTestCase
     ViewerSolr.documents = { "emu-9044" => SolrDocument.new(BASE.merge("id" => "emu-9044").merge(extra)).tap { |doc| doc.instance_variable_set(:@response, Blacklight::Solr::Response.new({ "response" => { "docs" => [] } }, {})) } }
     page.current_window.resize_to(*SIZES.fetch(size))
     visit "/catalog/emu-9044#{"?layout=#{layout}" if layout}"
-    assert_selector "h1"
+    assert_selector "h1", visible: :all
     assert_no_selector "html[aria-busy]"
+  end
+
+  # Whether a phone-sized layout shows the data view: the panel's content is only in the page then
+  def show_data
+    click_button "Show data"
+    assert_selector ".viewer-data__sections", visible: true
   end
 
   VARIANTS.each do |name, extra|
@@ -58,74 +64,160 @@ class RecordViewerLayoutSystemTest < ApplicationSystemTestCase
 
         assert_selector ".viewer-page"
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ]) unless size == "narrow"
-        assert_selector "h1", count: 1
+        if size.in?(%w[phone tablet narrow]) && name != "imageless"
+          show_data
+          assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ]) unless size == "narrow"
+        end
+        assert_selector "h1", count: 1, visible: :all
         assert_equal false, page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
         outline = page.evaluate_script("[...document.querySelectorAll('#main-container h1, #main-container h2, #main-container h3')].filter(e => e.getClientRects().length > 0).map(e => e.tagName + ' ' + e.textContent.trim())")
         levels = outline.map { |heading| heading[1].to_i }
         assert levels.each_cons(2).all? { |a, b| b <= a + 1 }, "headings skip a level: #{outline.inspect}"
-        small = page.evaluate_script("[...document.querySelectorAll('.viewer-pill button, .viewer-media__thumb, .viewer-buttons a, .viewer-accordion > summary')].filter(e => e.getClientRects().length > 0).map(e => e.getBoundingClientRect()).filter(r => r.height < 44 || r.width < 44).length")
+        small = page.evaluate_script("[...document.querySelectorAll('.viewer-pill button, .viewer-strip button, .viewer-strip a, .viewer-media__thumb, .viewer-toggle, .viewer-switch button, .viewer-bar a, .viewer-bar button')].filter(e => e.getClientRects().length > 0).map(e => e.getBoundingClientRect()).filter(r => r.height < 44 || r.width < 44).length")
         assert_equal 0, small, "a control is smaller than 44px"
+        links = page.evaluate_script("[...document.querySelectorAll('.viewer-list__row dd a')].filter(e => e.getClientRects().length > 0 && e.getBoundingClientRect().height < 24).length")
+        assert_equal 0, links, "a linked value is under 24px high"
       end
     end
   end
 
-  test "the pill zooms: a first zoom in starts the viewer and enables zoom out, reset goes home, and the keys line says what the keys do" do
-    open_record(VARIANTS.fetch("several images, open"), "desktop")
-    assert_selector ".viewer-pill", visible: true
-    assert_selector ".viewer-pill button[aria-label='Zoom out'][disabled]"
-    assert_selector ".viewer-media__keys", text: "+ and - to zoom, 0 to reset"
+  test "controls never cover each other or the sensitivity notice, at every width" do
+    SIZES.each_key do |size|
+      open_record(VARIANTS.fetch("several images, open"), size)
+      boxes = page.evaluate_script("[...document.querySelectorAll('.viewer-pill button, .viewer-strip button, .viewer-strip a, .viewer-toggle')].filter(e => { if (e.getClientRects().length === 0) return false; const r = e.getBoundingClientRect(); const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return hit && (e === hit || e.contains(hit)) }).map(e => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom] })")
+      boxes.combination(2).each do |a, b|
+        overlap = a[0] < b[2] - 1 && b[0] < a[2] - 1 && a[1] < b[3] - 1 && b[1] < a[3] - 1
+        assert_not overlap, "two controls overlap at #{size}: #{a} #{b}"
+      end
+    end
 
-    find(".viewer-pill button[aria-label='Zoom in']").click
-    assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all
+    open_record(VARIANTS.fetch("sensitive"), "desktop")
+    gate = page.evaluate_script("document.querySelector('.viewer-media .sensitivity-gate').getBoundingClientRect().toJSON()")
+    strip = page.evaluate_script("document.querySelector('.viewer-strip').getBoundingClientRect().toJSON()")
+    assert_operator gate["bottom"], :<=, strip["top"] + 1, "the notice sits inside the stage, above the strip"
+  end
+
+  test "the page is a split from 1024px wide, the panel scrolls on its own, and below that the viewer and the data are two views" do
+    open_record(VARIANTS.fetch("several images, open"), "desktop")
+    assert_selector ".viewer-app .viewer-data h1"
+    panel, stage = %w[.viewer-data .viewer-stage].map { |selector| page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
+    assert_operator stage["left"], :>=, panel["right"] - 1
+    assert_in_delta panel["top"], stage["top"], 2
+    assert_equal "auto", page.evaluate_script("getComputedStyle(document.querySelector('.viewer-data__scroll')).overflowY")
+    assert_equal [ "Object details", "Collection and provenance", "Rights and access", "About this record" ], page.all(".viewer-data h2").map(&:text)
+    assert_no_selector "details"
+    assert_no_selector ".viewer-switch", visible: true
+
+    open_record(VARIANTS.fetch("several images, open"), "phone")
+    assert_selector ".viewer-switch button[aria-pressed=true]", text: "Show images"
+    assert_selector ".viewer-stage", visible: true
+    assert_no_selector ".viewer-data__sections", visible: true
+    assert_selector ".viewer-data h1", visible: true # the title shows on both views
+    assert_no_selector ".viewer-toggle", visible: true
+    show_data
+    assert_no_selector ".viewer-stage", visible: true
+    assert_selector ".viewer-switch button[aria-pressed=true]", text: "Show data"
+    assert_selector ".viewer-bar a", text: "New search"
+    click_button "Show images"
+    assert_selector ".viewer-stage", visible: true
+    assert_no_selector ".viewer-data__sections", visible: true
+  end
+
+  test "the round toggle on the dividing line collapses and expands the panel; focus stays on it and the hidden panel is out of the tab order" do
+    open_record(VARIANTS.fetch("several images, open"), "desktop")
+    assert_selector ".viewer-toggle[aria-expanded=true][aria-label='Show larger image']"
+    before = page.evaluate_script("document.querySelector('.viewer-stage').getBoundingClientRect().width")
+
+    find(".viewer-toggle").click
+    assert_selector ".viewer-toggle[aria-expanded=false][aria-label='Show data']"
+    assert_no_selector ".viewer-data", visible: true
+    assert_equal "viewer-toggle", page.evaluate_script("document.activeElement.className")
+    assert_operator page.evaluate_script("document.querySelector('.viewer-stage').getBoundingClientRect().width"), :>, before + 200
+
+    find(".viewer-toggle").click
+    assert_selector ".viewer-toggle[aria-expanded=true]"
+    assert_selector ".viewer-data", visible: true
+    assert_selector ".viewer-data__sections", visible: true
+  end
+
+  test "the viewer starts on its own, without taking focus, and the buttons zoom with limits; the key 0 resets" do
+    open_record(VARIANTS.fetch("several images, open"), "desktop")
+    assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all, wait: 10
+    assert_not_equal "application", page.evaluate_script("document.activeElement.getAttribute('role')"), "the viewer took focus on load"
     assert_equal "application", page.evaluate_script("document.querySelector('.deep-zoom__stage .openseadragon-canvas').getAttribute('role')")
     assert_equal "viewer-description", page.evaluate_script("document.querySelector('.deep-zoom__stage .openseadragon-canvas').getAttribute('aria-describedby')")
+    assert_selector ".viewer-pill button[aria-label='Zoom out'][disabled]" # at home there is nothing to zoom out of
+
+    find(".viewer-pill button[aria-label='Zoom in']").click
     assert_selector ".viewer-pill button[aria-label='Zoom out']:not([disabled])", wait: 8
-    assert_selector "#viewer-navigator", visible: true
-    find(".viewer-pill button[aria-label='Reset view']").click
-    assert_selector ".viewer-pill button[aria-label='Zoom in']"
+    assert_selector ".deep-zoom.is-zoomed #viewer-navigator", visible: true, wait: 8
+    assert_equal "hidden", page.evaluate_script("document.querySelector('.deep-zoom').classList.remove('is-zoomed'), getComputedStyle(document.querySelector('#viewer-navigator')).visibility"), "the navigator is only for a zoomed picture"
+    page.evaluate_script("document.querySelector('.deep-zoom__stage .openseadragon-canvas').focus()")
+    page.driver.browser.keyboard.type("0")
+    assert_selector ".viewer-pill button[aria-label='Zoom out'][disabled]", wait: 8
   end
 
-  test "the mouse wheel is left to the page over the picture, switched on or not: no zoom, and no scroll trap" do
+  test "the mouse wheel is left to the page over the picture: no zoom, and no scroll trap" do
     open_record(VARIANTS.fetch("several images, open"), "desktop")
-    find(".viewer-pill button[aria-label='Zoom in']").click
-    assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all
-    assert_selector ".viewer-pill button[aria-label='Zoom out']:not([disabled])", wait: 8
-
-    # dispatchEvent returns false when something called preventDefault on the event
+    assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all, wait: 10
     not_prevented = page.evaluate_script("document.querySelector('.deep-zoom__stage .openseadragon-canvas').dispatchEvent(new WheelEvent('wheel', { deltaY: 200, bubbles: true, cancelable: true }))")
-    assert not_prevented, "the viewer swallows the mouse wheel over a zoomed picture"
+    assert not_prevented, "the viewer swallows the mouse wheel"
+    assert_selector ".viewer-pill button[aria-label='Zoom out'][disabled]" # and it did not zoom
   end
 
-  test "the viewer stage keeps the page's light surface when zoom is switched on" do
+  test "the stage is light, never dark, except in full screen" do
     open_record(VARIANTS.fetch("several images, open"), "desktop")
-    find(".viewer-pill button[aria-label='Zoom in']").click
-    assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all
-    background = page.evaluate_script("getComputedStyle(document.querySelector('.viewer-media .deep-zoom__stage')).backgroundColor")
-    page_surface = page.evaluate_script("getComputedStyle(document.querySelector('.viewer-page')).backgroundColor")
-    assert_equal page_surface, background
+    assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all, wait: 10
+    stage = page.evaluate_script("getComputedStyle(document.querySelector('.viewer-stage')).backgroundColor").scan(/\d+/).first(3).map(&:to_i)
+    assert_operator stage.min, :>=, 230
+    zoom = page.evaluate_script("getComputedStyle(document.querySelector('.viewer-media .deep-zoom__stage')).backgroundColor").scan(/\d+/).first(3).map(&:to_i)
+    assert_operator zoom.min, :>=, 230
   end
 
-  test "linked values in the details rows are at least 24px high, so neighbours never crowd each other (WCAG 2.5.8)" do
-    open_record(VARIANTS.fetch("view-only"), "desktop")
-    assert_selector ".viewer-list__row dd a"
-    small = page.evaluate_script("[...document.querySelectorAll('.viewer-list__row dd a')].filter(e => e.getClientRects().length > 0 && e.getBoundingClientRect().height < 24).length")
-    assert_equal 0, small
-  end
-
-  test "a thumbnail switches the picture and the counter, and the strip marks the current one" do
+  test "thumbnails, Previous and Next change the picture in sequence; the arrows stop at the ends and the change is announced" do
     open_record(VARIANTS.fetch("several images, open"), "desktop")
-    assert_selector ".viewer-media__counter", text: "1 of 2"
-    page.evaluate_script("document.querySelector('.viewer-media__strip li:last-child .viewer-media__thumb').click()")
-    assert_selector ".viewer-media__counter", text: "2 of 2"
-    assert_selector ".viewer-media__thumb.is-current[aria-current=true]", count: 1
+    assert_selector ".viewer-strip button[aria-label='Previous image'][disabled]"
+    assert_selector "[data-media-viewer-target=counter]", text: "Image 1 of 2", visible: :all
+
+    find(".viewer-strip button[aria-label='Next image']").click
+    assert_selector "[data-media-viewer-target=counter]", text: "Image 2 of 2", visible: :all
+    assert_selector ".viewer-media__thumb.is-current[aria-label='Display image 2 of 2'][aria-current=true]", count: 1
+    assert_selector ".viewer-strip button[aria-label='Next image'][disabled]"
     assert_equal LARGE.last, page.evaluate_script("document.querySelector('.digital-assets__image').getAttribute('src')").split("?").first
+    assert_equal LARGE.last, page.evaluate_script("document.querySelector('.viewer-strip__use').getAttribute('href')").split("?").first, "Use this image follows the current image"
+
+    find(".viewer-strip button[aria-label='Previous image']").click
+    assert_selector "[data-media-viewer-target=counter]", text: "Image 1 of 2", visible: :all
+    find(".viewer-media__thumb[aria-label='Display image 2 of 2']").click
+    assert_selector ".viewer-media__thumb.is-current[aria-label='Display image 2 of 2']"
   end
 
-  test "the full screen button is in the pill and the default address is not the viewer layout" do
-    open_record(VARIANTS.fetch("view-only"), "desktop")
-    assert_selector ".viewer-pill button[aria-label='Full screen']", visible: :all
+  test "Use this image: an open record downloads, a view-only record opens its rights in the panel, a request-only record asks" do
+    open_record(VARIANTS.fetch("several images, open"), "desktop")
+    assert_selector ".viewer-strip a.viewer-strip__use[download]", text: "Use this image"
+
+    open_record(VARIANTS.fetch("view-only"), "phone")
+    find(".viewer-strip__use").click
+    assert_selector ".viewer-data__sections", visible: true
+    assert_selector "#viewer-rights", visible: true
     assert_no_selector "a[download]"
 
+    open_record(VARIANTS.fetch("request-only"), "desktop")
+    assert_selector ".viewer-strip__use[href*=access_requests]"
+    assert_no_selector ".viewer-pill", visible: :all
+  end
+
+  test "Share opens the Share and embed dialog and Print calls the browser's print" do
+    open_record(VARIANTS.fetch("several images, open"), "desktop")
+    page.execute_script("window.__printed = 0; window.print = function () { window.__printed += 1 }")
+    find(".viewer-bar button[aria-label='Print']").click
+    assert_equal 1, page.evaluate_script("window.__printed")
+
+    find(".viewer-bar .share__button").click
+    assert_selector "dialog[open]"
+  end
+
+  test "the default address is not the viewer layout" do
     open_record(VARIANTS.fetch("view-only"), "desktop", layout: nil)
     assert_no_selector ".viewer-page"
     assert_selector ".record-hero"
