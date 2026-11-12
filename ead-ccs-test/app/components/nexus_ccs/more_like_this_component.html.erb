@@ -1,7 +1,7 @@
 <section id="more-like-this" class="more-like-this" aria-labelledby="more-like-this-heading">
   <div class="more-like-this__inner">
-    <h2 id="more-like-this-heading" class="more-like-this__heading"><%= t("nexus_ccs.record_page.more_like_this.heading") %></h2>
-    <% if show_related? %><%= render NexusCcs::RecordCardsComponent.new(id: "related-objects", heading: t("nexus_ccs.related.heading"), documents: related, nested: true) %><% end %>
+    <h2 id="more-like-this-heading" class="more-like-this__heading"><%= heading %></h2>
+    <%= render NexusCcs::RecordCardsComponent.new(id: "related-objects", heading: t("nexus_ccs.related.heading"), documents: related, nested: true) %>
     <%# Lazy: its cards load when it nears the screen. It is told which records Related objects shows, so none is listed twice %>
     <%= render NexusCcs::SimilarRecordsComponent.new(document: document, exclude: excluded_ids) %>
     <%= render NexusCcs::RecordCardsComponent.new(id: "recently-viewed", heading: t("nexus_ccs.recently_viewed.heading"), compact: true, documents: recent, nested: true) %>

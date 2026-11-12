@@ -3,7 +3,7 @@ require "view_component/test_helpers"
 require "capybara/minitest"
 
 # The viewer layout of a record page (?layout=viewer): the viewer (three round controls, a dark strip with Previous, thumbnails, Next and
-# "Use this image"), the access rules in markup (no asset path for a withheld or not-yet-chosen sensitive record, no download link for a
+# "Use this image" is now the pill button), the access rules in markup (no asset path for a withheld or not-yet-chosen sensitive record, no download link for a
 # view-only one), and the data panel and its bar.
 class RecordViewerLayoutTest < ActiveSupport::TestCase
   include ViewComponent::TestHelpers
@@ -21,15 +21,15 @@ class RecordViewerLayoutTest < ActiveSupport::TestCase
 
   def render_media(extra = {}) = render_inline(NexusCcs::ViewerMediaComponent.new(presenter: Presenter.new(doc(extra))))
 
-  test "the viewer has three round buttons, each named (zoom in, zoom out, full view), a dark strip with Previous, a named thumbnail each and Next" do
+  test "the hero has three round buttons (zoom in, zoom out, full view), round Previous and Next, and a named thumbnail each" do
     render_media(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ]))
 
     assert_selector ".viewer-pill[role=group] button.viewer-pill__button", count: 3, visible: :all
     [ "Zoom in", "Zoom out", "Full view" ].each { |name| assert_selector ".viewer-pill button[aria-label='#{name}']", visible: :all }
     assert_selector ".viewer-pill button[disabled][aria-label='Zoom out']", visible: :all # nothing to zoom out of until the viewer is on
-    assert_selector ".viewer-strip button[aria-label='Previous image'][disabled]"
-    assert_selector ".viewer-strip button[aria-label='Next image']:not([disabled])"
-    assert_selector ".viewer-strip__thumbs li", count: 3
+    assert_selector ".viewer-dots button[aria-label='Previous image'][disabled]"
+    assert_selector ".viewer-dots button[aria-label='Next image']:not([disabled])"
+    assert_selector ".viewer-dots__list li", count: 3
     assert_selector ".viewer-media__thumb[aria-label='Display image 2 of 3']"
     assert_selector ".viewer-media__thumb.is-current[aria-current=true]", count: 1
     assert_selector "[role=status][data-media-viewer-target=counter]", text: "Image 1 of 3", visible: :all
@@ -37,17 +37,11 @@ class RecordViewerLayoutTest < ActiveSupport::TestCase
     assert_selector "#viewer-description.visually-hidden", text: "A tool for tone.", visible: :all
   end
 
-  test "Use this image: an open record downloads the current image, a view-only record goes to its rights, a withheld one asks, and none has another path" do
-    render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
-    assert_selector ".viewer-strip a.viewer-strip__use[download][href='/digital-assets/large/a.jpg'][data-media-viewer-target=use]", text: "Use this image"
-
+  test "a view-only record's hero has no download link and no asset address but its thumbnails' buttons" do
     render_media(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ]))
-    assert_selector ".viewer-strip a.viewer-strip__use[href='#viewer-rights']", text: "Use this image"
-    assert_no_selector "a[download], a[href*='/digital-assets/']"
 
-    render_media(IMAGES.merge("licence_type_ssim" => [ "ICIP Rights" ]))
-    assert_selector ".viewer-strip a.viewer-strip__use[href='/access_requests/new?document_id=emu-1']"
-    assert_not_includes rendered_content, "/digital-assets/"
+    assert_no_selector "a[download], a[href*='/digital-assets/']"
+    assert_selector "button.viewer-media__thumb[data-media-viewer-large]", count: 3
   end
 
   test "a request-only or not-yet-chosen sensitive record has no asset address in the viewer, and the notice is inside the stage" do
@@ -61,12 +55,11 @@ class RecordViewerLayoutTest < ActiveSupport::TestCase
     assert_no_selector ".viewer-pill", visible: :all
   end
 
-  test "a record with one image has no arrows and no thumbnails, and keeps the strip for Use this image" do
+  test "a record with one image has no arrows and no thumbnails" do
     render_media("digital_asset_paths_ssim" => [ "/digital-assets/thumbs/a.jpg" ], "digital_asset_large_paths_ssim" => [ "/digital-assets/large/a.jpg" ],
                  "licence_type_ssim" => [ "Public domain - Copyright expired" ])
 
-    assert_no_selector ".viewer-strip__arrow, .viewer-strip__thumbs"
-    assert_selector ".viewer-strip .viewer-strip__use"
+    assert_no_selector ".viewer-dots"
     assert_selector ".viewer-pill", visible: :all
   end
 

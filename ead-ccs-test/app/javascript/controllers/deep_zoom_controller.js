@@ -21,9 +21,7 @@ export default class extends Controller {
       if ("requestIdleCallback" in window) requestIdleCallback(go, { timeout: 1500 }); else setTimeout(go, 300)
     }
     this.onFullscreen = () => { this.viewer?.forceResize(); this.applyTouchMode() }
-    // The page's split layout resized the stage (the data panel opened or closed, or the view changed): the viewer follows
-    this.onResized = () => requestAnimationFrame(() => this.viewer?.forceResize())
-    window.addEventListener("viewer-split:resized", this.onResized)
+
     document.addEventListener("fullscreenchange", this.onFullscreen)
     // On a short screen (a phone held sideways) the viewer stops capturing touches and goes home, so the page can scroll past it;
     // full screen gives them back. Checked on resize, once it settles.
@@ -34,7 +32,6 @@ export default class extends Controller {
   disconnect() {
     document.removeEventListener("fullscreenchange", this.onFullscreen)
     window.removeEventListener("resize", this.onResize)
-    window.removeEventListener("viewer-split:resized", this.onResized)
     clearTimeout(this.resizeTimer)
     this.destroy()
   }

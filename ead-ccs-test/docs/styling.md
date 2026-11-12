@@ -178,48 +178,46 @@ pages (V&A, Art Institute of Chicago, the Met, Europeana). Patterns only; nothin
 
 ## The viewer layout (`?layout=viewer`)
 
-An opt-in variant of the record page, after a museum object page (the British Museum's: a split screen with the data on the left and one
-big viewer on the right). Patterns only; nothing of that site is copied (its code, styles, images and button sprites are its own, and the
-icons here are drawn inline). Same address (`catalog#show`; no new route, page type or sitemap entry). Off unless the address has
-`?layout=viewer`; any other value is the plain page. The canonical link stays the plain address (`CanonicalUrl` drops the parameter) and
-`RobotsPolicy` tells search engines to keep the variant out (`noindex, follow`). It is for trying on one record; if it wins, the default
-is flipped. Keeps the University's header, breadcrumb and footer.
+An opt-in variant of the record page, styled as a product marketing page (the calm, whitespace-led pages of a consumer product, with the
+British Museum's viewer controls). Patterns only; none of their text, images, icons, code or fonts is used, and the icons here are drawn
+inline. Same address (`catalog#show`; no new route, page type or sitemap entry). Off unless the address has `?layout=viewer`; any other
+value is the plain page. The canonical link stays the plain address (`CanonicalUrl` drops the parameter) and `RobotsPolicy` tells search
+engines to keep the variant out (`noindex, follow`). It is for trying on one record; if it wins, the default is flipped. Keeps the
+University's header, breadcrumb and footer.
 
-- **Components**: `RecordViewerComponent` (a `RecordDocumentComponent` with its own markup: the same fields, rights, contact and
-  access rules) and `ViewerMediaComponent` (a `DigitalAssetsComponent` with its own markup, so AccessPolicy and Sensitivity are the same
-  code). `show.html.erb` picks the component; `RecordAboutComponent(viewer: true)` and `DeepZoomComponent(pill: true)` adapt shared
-  parts. Styles: `components/record_viewer.css`. Behaviour: `viewer_split_controller.js` (new), `media_viewer_controller.js`,
-  `deep_zoom_controller.js`, `deep_zoom_viewer.js`.
-- **From 1024px, a split screen** under the header and breadcrumb, `max(36rem, 100dvh - 9.75rem)` high, so the whole viewer and its strip
-  fit one screen. Left, the data panel (26rem from 1200px, 22rem below): the title block, the actions (Save, Add to list, Compare, Cite as
-  quiet rows), then plain sections with real h2s: Object details, Collection and provenance, Rights and access (`#viewer-rights`),
-  About this record. Rows are label above value, labels bold, a hairline between; linked values are plain underlined links, 32px high
-  at least (WCAG 2.5.8). The panel scrolls on its own; there are no accordions. Under it, a teal bar (`--ccs-cyan-900`, the
-  breadcrumb strip's teal) with "New search" and round Share (the existing Share and embed dialog) and Print buttons (print shows
-  the data panel only). Right, the stage.
-- **The round toggle** on the dividing line (44px, a chevron) collapses and expands the panel. It is a button with `aria-expanded`,
-  `aria-controls` and a name that says what it does ("Show larger image" when open, "Show data" when closed; placeholder wording). A
-  collapsed panel is hidden, so it leaves the tab order and the accessibility tree, and focus stays on the toggle. The choice is kept
-  in `sessionStorage` as a convenience only. The viewer is told to resize (`viewer-split:resized`).
-- **The viewer**: one OpenSeadragon viewer that starts on load (without taking focus), on the page's light surface (`--ccs-surface-paper`;
-  dark only in full screen), the picture whole at home (`minZoomImageRatio: 1`, `visibilityRatio: 0.5`). Three round navy buttons at the
-  stage's bottom right: zoom in, zoom out (each disabled where the view cannot go further that way) and full view (full screen). A
-  navigator map (region outlined in `--ccs-cyan-400`) shows at the top right only once the picture is zoomed. Keys: + and - zoom, 0
-  resets, arrows pan; double click zooms. The mouse wheel scrolls the page (not zoom, not swallowed). The canvas has the role
-  "application", the current image's name and a visually hidden long description (the record's description). A short window (500px or
-  less, not full screen) stops capturing touch. If an image cannot open, a plain sentence says so (placeholder wording). The sensitivity
-  choice and the withheld notice sit inside the stage, above the strip, so nothing covers them.
-- **The strip** (`--ccs-navy-1200`, 4rem): Previous, a thumbnail each named "Display image N of M" (the current one outlined in white and
-  `aria-current`), Next (disabled at the ends) and "Use this image". Previous, Next and the thumbnails change the one viewer's image in
-  sequence and announce "Image N of M" politely. "Use this image" downloads the current image for an open record, goes to Rights and
-  access for a view-only record, and asks for access for a withheld one; no other tier has an asset path.
-- **Below 1024px** the panel and the stage are two views, chosen by "Show images" (default) and "Show data" buttons (`aria-pressed`).
-  The title shows on both; the rest of the data and the teal bar only in the data view; the viewer only in the images view. Without
-  scripting both are shown, one above the other. The round toggle is not drawn.
-- **A record with no media**: no stage; the plain no-image sentence, then the panel, one centred column.
-- **Colours** (all `--ccs-*` tokens, no hex): stage `--ccs-surface-paper`; panel `--ccs-white`; hairlines `--ccs-border-default` and
-  `--ccs-border-subtle`; links `--ccs-text-link` (the page's link style); headings Fraunces; round buttons and strip `--ccs-navy-1200`
-  with white icons; teal bar `--ccs-cyan-900` with white text; focus `--ccs-focus-ring` on light and `--ccs-cyan-400` on the dark
-  strip and the teal bar; navigator region `--ccs-cyan-400`.
-- Related objects and More like this follow below the split, full width, as on the plain page. The sensitivity choice and Compare
-  redirect to the plain record address, so a visitor who makes one leaves the variant.
+- **Components**: `RecordViewerComponent` (a `RecordDocumentComponent` with its own markup: the same fields, rights, contact and access
+  rules), `ViewerMediaComponent` (a `DigitalAssetsComponent` with its own markup, so AccessPolicy and Sensitivity are the same code) and
+  `ViewerPrimaryComponent` (the one navy pill). `show.html.erb` picks the component; `RecordAboutComponent(viewer: true)`,
+  `DeepZoomComponent(pill: true)` and `MoreLikeThisComponent(heading:)` adapt shared parts. Styles: `components/record_viewer.css`.
+  Behaviour: `viewer_page_controller.js` (new), `media_viewer_controller.js`, `deep_zoom_controller.js`, `deep_zoom_viewer.js`.
+- **Order of the page**: hero, local navigation, headline block, then bands that alternate white and `--ccs-surface-subtle`: highlights,
+  details, rights, about, related (More like this under the heading "Explore related."), then the University footer. Band padding is
+  6.5rem from 1024px and 3rem below; headlines are big and quiet (Fraunces, `clamp(2rem, 4vw, 3.5rem)`).
+- **Hero**: full width on a soft gradient (`--ccs-navy-100` fading to `--ccs-white`), the picture as the hero object, whole, never cropped,
+  at most `min(72vh, 46rem)` tall (60vh below 1024px; the height is held from the start, so nothing shifts). One OpenSeadragon viewer that
+  starts on load without taking focus; three round navy buttons at the bottom right (zoom in, zoom out, full view; each disabled where the
+  view cannot go further that way); a navigator map (region in `--ccs-cyan-400`) at the top right only once zoomed; keys + and - zoom, 0
+  resets, arrows pan; the mouse wheel scrolls the page (not zoom, not swallowed), and nothing scrolls inside the hero. Round grey Previous and
+  Next buttons at the hero's edges (from 1024px; in the row of thumbnails below that) and a row of small thumbnails ("Display image N of M",
+  the current one outlined and `aria-current`) change the one viewer's picture in sequence and announce "Image N of M". The sensitivity
+  choice and the withheld notice sit inside the hero, above the thumbnails, so nothing covers them. Dark only in full screen. A record
+  with no media has a short hero: the collection's monogram and the plain no-image sentence.
+- **Local navigation** (from 1024px; not drawn below): the title, Overview, Details, Rights and Related anchors, and ONE navy pill: Download
+  image (open; it follows the picture shown), Request access (withheld) or Contact us (any other, the collection team's link). It sticks
+  once the hero is past; `html:has(.viewer-nav)` sets a scroll padding so anchors and focused controls are never hidden under it (WCAG
+  2.4.11). White at 90%, a hairline under it.
+- **Headline block**: the object type and collection as a small regular line, the title as a huge Fraunces headline with a subtle fill from
+  `--ccs-navy-1100` to `--ccs-blue-800` (`background-clip: text`, with a plain colour in forced colours and print), creator and date as an
+  accent line in `--ccs-cyan-600`; a pill card (`--ccs-surface-subtle`, `--ccs-radius-xl`, new token 1.75rem) with what the visitor may do
+  ("Open for download", "View only", "Access by request"), the same navy pill and a quiet Save; under it quiet round-cornered buttons with
+  visible labels: Add to list, Compare, Cite, Share.
+- **Bands**: Highlights ("Take a closer look."; the description as one large paragraph with Show more, and a scroller of 4:3 cards, one per
+  picture shown whole on white, with round chevron buttons that stop at the ends; a card opens its picture in the hero, scrolls to it and
+  moves focus there); Details (a centred 960px column, "Object details." and "Collection and provenance" groups, label and value rows with
+  hairlines, linked values 32px high); Rights ("Rights and access."; three big rounded cards: copyright and licence, credit and collection,
+  how to use this image per tier, with the request link for a view-only or withheld record); About (persistent link, Collection ID with
+  Copy, the collection team and the correction link). The headings are h2 with h3 inside cards and groups. Headline wording is placeholder.
+- **Colours** (all `--ccs-*` tokens, no hex): navy for text and buttons; cyan-600 for the accent line; neutral-200/300 for the grey round
+  buttons; focus `--ccs-focus-ring`. No pure black and none of another brand's colours.
+- Without scripting the hero shows the picture and the page reads in the same order; the chevrons and the thumbnails need the script. The
+  sensitivity choice and Compare redirect to the plain record address, so a visitor who makes one leaves the variant.

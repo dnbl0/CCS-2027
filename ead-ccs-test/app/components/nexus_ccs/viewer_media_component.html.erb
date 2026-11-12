@@ -10,8 +10,8 @@
         <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: sensitivity_state) %>
       <% end %>
       <% if main %>
-        <%# The stage has a fixed height from the page, so the picture's room is held and nothing moves when it arrives %>
-        <figure class="digital-assets__main viewer-media__figure">
+        <%# The hero has a fixed height, so the picture's room is held and nothing moves when it arrives %>
+        <figure class="digital-assets__main viewer-media__figure" tabindex="-1">
           <%= image_tag main.first, alt: alt(1), class: "digital-assets__image", data: { media_viewer_target: "image" },
                 fetchpriority: "high", decoding: "async", **image_size(main.first) %>
           <p id="viewer-description" class="visually-hidden"><%= long_description %></p>
@@ -33,18 +33,18 @@
         </figure>
       <% end %>
 
-      <%# Inside the stage, above the strip, so nothing covers it %>
+      <%# Inside the hero, above the dots, so nothing covers it %>
       <% if sensitivity_state == :viewing %>
         <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: :viewing) %>
       <% end %>
     </div>
   </div>
 
-  <div class="viewer-strip">
-    <% if strip? %>
-      <button type="button" class="viewer-strip__arrow" disabled data-media-viewer-target="previous" data-action="media-viewer#previous"
+  <% if strip? %>
+    <div class="viewer-dots">
+      <button type="button" class="viewer-dots__arrow viewer-dots__arrow--previous" disabled data-media-viewer-target="previous" data-action="media-viewer#previous"
               aria-label="<%= t("nexus_ccs.record_page.viewer.previous") %>" title="<%= t("nexus_ccs.record_page.viewer.previous") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7" /></svg></button>
-      <ul class="viewer-strip__thumbs" aria-label="<%= t("nexus_ccs.record_page.media.images") %>" data-media-viewer-target="strip">
+      <ul class="viewer-dots__list" aria-label="<%= t("nexus_ccs.record_page.media.images") %>" data-media-viewer-target="strip">
         <% images.each_with_index do |(large, thumbnail), index| %>
           <li>
             <% if downloadable? %>
@@ -62,36 +62,10 @@
           </li>
         <% end %>
       </ul>
-      <button type="button" class="viewer-strip__arrow" data-media-viewer-target="next" data-action="media-viewer#next"
+      <button type="button" class="viewer-dots__arrow viewer-dots__arrow--next" data-media-viewer-target="next" data-action="media-viewer#next"
               aria-label="<%= t("nexus_ccs.record_page.viewer.next") %>" title="<%= t("nexus_ccs.record_page.viewer.next") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg></button>
-    <% else %>
-      <span class="viewer-strip__spacer"></span>
-    <% end %>
-    <% kind, target = use_image %>
-    <% if kind == :download %>
-      <a class="viewer-strip__use" href="<%= target %>" download data-media-viewer-target="use"><%= t("nexus_ccs.record_page.viewer.use_image") %></a>
-    <% elsif kind == :rights %>
-      <a class="viewer-strip__use" href="<%= target %>" data-action="viewer-split#showRights"><%= t("nexus_ccs.record_page.viewer.use_image") %></a>
-    <% elsif kind == :request %>
-      <a class="viewer-strip__use" href="<%= target %>"><%= t("nexus_ccs.record_page.viewer.use_image") %></a>
-    <% end %>
-    <p class="visually-hidden" role="status" data-media-viewer-target="counter"><%= counter(1) %></p>
-  </div>
-
-  <% if metadata? %>
-    <aside id="media-metadata" class="digital-assets__panel" aria-labelledby="media-metadata-heading" aria-hidden="true" data-media-viewer-target="panel">
-      <div class="digital-assets__panel-head">
-        <p id="media-metadata-heading" class="digital-assets__panel-title">Media metadata</p>
-        <button type="button" class="viewer-media__link" data-action="media-viewer#closePanel"><%= t("nexus_ccs.record_page.media.close_information") %></button>
-      </div>
-      <dl class="digital-assets__list">
-        <% metadata.each do |label, text| %>
-          <div class="digital-assets__item">
-            <dt><%= label %></dt>
-            <dd><%= text %></dd>
-          </div>
-        <% end %>
-      </dl>
-    </aside>
+    </div>
   <% end %>
+  <p class="visually-hidden" role="status" data-media-viewer-target="counter"><%= counter(1) %></p>
+
 </section>
