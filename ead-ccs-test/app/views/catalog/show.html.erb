@@ -19,4 +19,4 @@
   <% end %>
 <% end %>
 
-<%= render NexusCcs::MoreLikeThisComponent.new(document: @document, related: related, recent: RecentlyViewed.new(session).documents(except: @document.id), heading: (t("nexus_ccs.record_page.viewer.explore") if viewer_layout)) %>
+<%= render NexusCcs::MoreLikeThisComponent.new(document: @document, related: related, recent: RecentlyViewed.new(session).documents(except: @document.id), heading: (t("nexus_ccs.record_page.viewer.explore") if viewer_layout), viewer: viewer_layout) %>

@@ -49,6 +49,9 @@
       </div>
     </section>
 
+    <%# Video, audio and PDF files: a band of their own, never inside the hero (nothing may scroll in there) %>
+    <%= render NexusCcs::ViewerFilesComponent.new(presenter: @presenter) if assets? %>
+
     <% if description_row || card_images.any? %>
       <section class="viewer-band viewer-band--subtle" id="viewer-highlights" aria-labelledby="viewer-highlights-heading">
         <div class="viewer-band__inner">
@@ -75,10 +78,8 @@
               <% end %>
             </ul>
             <% unless card_images.one? %>
-              <div class="viewer-chevrons">
-                <button type="button" class="viewer-chevrons__button" disabled data-viewer-page-target="back" data-action="viewer-page#back" aria-label="<%= t("nexus_ccs.record_page.viewer.cards_back") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7" /></svg></button>
-                <button type="button" class="viewer-chevrons__button" data-viewer-page-target="forward" data-action="viewer-page#forward" aria-label="<%= t("nexus_ccs.record_page.viewer.cards_forward") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg></button>
-              </div>
+              <%= render NexusCcs::ViewerChevronsComponent.new(back_label: t("nexus_ccs.record_page.viewer.cards_back"), forward_label: t("nexus_ccs.record_page.viewer.cards_forward"), back_disabled: true,
+                                                               back_data: { viewer_page_target: "back", action: "viewer-page#back" }, forward_data: { viewer_page_target: "forward", action: "viewer-page#forward" }) %>
             <% end %>
           <% end %>
         </div>
@@ -89,7 +90,7 @@
       <div class="viewer-band__inner viewer-band__inner--narrow">
         <p class="viewer-band__label"><%= t("nexus_ccs.record_page.viewer.details_label") %></p>
         <h2 id="viewer-details-heading" class="viewer-band__heading"><%= t("nexus_ccs.record_page.viewer.object_details") %></h2>
-        <h3 class="viewer-group__heading"><%= t("nexus_ccs.record_page.sections.object_details") %></h3>
+        <h3 class="viewer-group__heading"><%= t("nexus_ccs.record_page.viewer.object_group") %></h3>
         <dl class="viewer-list">
           <% detail_rows.each do |row| %>
             <div class="viewer-list__row">

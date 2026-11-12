@@ -30,6 +30,8 @@ class RecordViewerLayoutSystemTest < ApplicationSystemTestCase
   VARIANTS = {
     "imageless" => {},
     "several images, open" => { "licence_type_ssim" => [ "Public domain - Copyright expired" ], "digital_asset_large_paths_ssim" => LARGE, "digital_asset_paths_ssim" => THUMBS },
+    "images with video and audio" => { "licence_type_ssim" => [ "Public domain - Copyright expired" ], "digital_asset_large_paths_ssim" => LARGE, "digital_asset_paths_ssim" => THUMBS,
+                                       "digital_media_ssim" => [ "video|video/mp4|/digital-assets/media/v.mp4|Test video", "audio|audio/mpeg|/digital-assets/media/a.mp3|Test audio" ] },
     "view-only" => { "licence_type_ssim" => [ "Copyright - Current" ], "digital_asset_large_paths_ssim" => LARGE, "digital_asset_paths_ssim" => THUMBS },
     "request-only" => { "licence_type_ssim" => [ "ICIP Rights" ], "digital_asset_large_paths_ssim" => LARGE, "digital_asset_paths_ssim" => THUMBS },
     "sensitive" => { "licence_type_ssim" => [ "Copyright - Current" ], "restrictions_tsi" => [ "Culturally sensitive images" ],
@@ -99,6 +101,72 @@ class RecordViewerLayoutSystemTest < ApplicationSystemTestCase
     assert_no_selector ".viewer-data, .viewer-toggle, .viewer-switch, .viewer-bar"
     surfaces = page.evaluate_script("[...document.querySelectorAll('.viewer-band')].map(e => getComputedStyle(e).backgroundColor)")
     assert_equal surfaces.each_cons(2).count { |a, b| a != b }, surfaces.size - 1, "the bands alternate white and grey: #{surfaces.inspect}"
+  end
+
+  test "video and audio are in their own band after the headline, never in the hero, and nothing scrolls inside the hero" do
+    SIZES.each_key do |size|
+      open_record(VARIANTS.fetch("images with video and audio"), size)
+      assert_selector "#viewer-files h2", text: "Watch and listen."
+      assert_selector "#viewer-files .viewer-files__card video", visible: :all
+      assert_selector "#viewer-files .viewer-files__card audio", visible: :all
+      assert_no_selector ".viewer-hero video, .viewer-hero audio", visible: :all
+      order = page.evaluate_script("[...document.querySelectorAll('.viewer-headline, .viewer-band')].map(e => e.id || e.className.split(' ')[0])")
+      assert_equal [ "viewer-headline", "viewer-files", "viewer-highlights" ], order.first(3)
+      %w[.viewer-media__picture .viewer-media__stage .viewer-hero].each do |selector|
+        inner = page.evaluate_script("(() => { const p = document.querySelector('#{selector}'); return p.scrollHeight - p.clientHeight })()")
+        assert_operator inner, :<=, 1, "#{selector} scrolls inside the hero at #{size}"
+      end
+      assert_equal "hidden", page.evaluate_script("getComputedStyle(document.querySelector('.viewer-media__picture')).overflowY")
+    end
+  end
+
+  test "the round zoom buttons never cover the picture on a phone" do
+    %w[phone narrow].each do |size|
+      open_record(VARIANTS.fetch("several images, open"), size)
+      assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all, wait: 10
+      stage = page.evaluate_script("document.querySelector('.viewer-media .deep-zoom__stage').getBoundingClientRect().toJSON()")
+      image = page.evaluate_script("document.querySelector('.viewer-media__figure .digital-assets__image').getBoundingClientRect().toJSON()")
+      buttons = page.evaluate_script("[...document.querySelectorAll('.viewer-pill button')].filter(e => e.getClientRects().length > 0).map(e => e.getBoundingClientRect().toJSON())")
+      assert_operator buttons.size, :>=, 3
+      { "zoom stage" => stage, "picture" => image }.each do |name, box|
+        buttons.each do |button|
+          overlap = button["left"] < box["right"] - 1 && box["left"] < button["right"] - 1 && button["top"] < box["bottom"] - 1 && box["top"] < button["bottom"] - 1
+          assert_not overlap, "a zoom button covers the #{name} at #{size}"
+        end
+      end
+    end
+  end
+
+  test "Related objects, Similar records and Recently viewed have round buttons from 1024px when a row overflows, and none below" do
+    open_record(VARIANTS.fetch("several images, open"), "desktop")
+    assert_selector "#more-like-this[data-controller=viewer-page]", visible: :all
+    page.execute_script(<<~JS)
+      const inner = document.querySelector('#more-like-this .more-like-this__inner')
+      const card = (n) => '<li class="object-cards__item"><div class="object-card"><div class="object-card__media"></div><div class="object-card__body"><h4><a href="#c' + n + '">Card ' + n + '</a></h4></div></div></li>'
+      const section = (id, title, cls) => '<section id="' + id + '" class="object-cards object-cards--nested ' + cls + '"><div class="object-cards__inner"><h3 class="object-cards__heading">' + title + '</h3><ul class="object-cards__list">' + [1,2,3,4].map(card).join('') + '</ul></div></section>'
+      inner.insertAdjacentHTML('beforeend', section('t-related', 'Related objects', '') + section('t-recent', 'Recently viewed', 'object-cards--compact'))
+    JS
+    assert_selector "#t-related .viewer-chevrons button[aria-label='Previous in Related objects'][disabled]", wait: 5
+    assert_selector "#t-related .viewer-chevrons button[aria-label='Next in Related objects']:not([disabled])"
+    assert_selector "#t-recent .viewer-chevrons button[aria-label='Next in Recently viewed']"
+    small = page.evaluate_script("[...document.querySelectorAll('.viewer-chevrons--row button')].filter(e => e.getClientRects().length > 0).filter(e => e.getBoundingClientRect().width < 44).length")
+    assert_equal 0, small
+
+    find("#t-related .viewer-chevrons button[aria-label='Next in Related objects']").click
+    assert_selector "#t-related .viewer-chevrons button[aria-label='Previous in Related objects']:not([disabled])", wait: 5
+
+    open_record(VARIANTS.fetch("several images, open"), "phone")
+    page.execute_script("document.querySelector('#more-like-this .more-like-this__inner').insertAdjacentHTML('beforeend', '<section class=\"object-cards\"><div class=\"object-cards__inner\"><h3 class=\"object-cards__heading\">Related objects</h3><ul class=\"object-cards__list\"><li class=\"object-cards__item\">A</li><li class=\"object-cards__item\">B</li><li class=\"object-cards__item\">C</li></ul></div></section>')")
+    assert_selector ".viewer-chevrons--row", visible: :all, wait: 5
+    assert_no_selector ".viewer-chevrons--row", visible: true
+  end
+
+  test "the details group is not named as its headline, and Compare images has the compare icon" do
+    open_record(VARIANTS.fetch("several images, open"), "desktop")
+    headings = page.evaluate_script("[...document.querySelectorAll('#viewer-details h2, #viewer-details h3')].map(e => e.textContent.trim())")
+    assert_equal [ "Object details.", "The object" ], headings.first(2)
+    assert_selector ".viewer-quiet .compare-actions__link svg", visible: :all
+    assert_selector ".viewer-quiet .compare-actions__link", text: "Compare images"
   end
 
   test "the hero is a light gradient with the picture whole, and no dark box, except in full screen" do

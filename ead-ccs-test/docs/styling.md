@@ -187,17 +187,20 @@ University's header, breadcrumb and footer.
 
 - **Components**: `RecordViewerComponent` (a `RecordDocumentComponent` with its own markup: the same fields, rights, contact and access
   rules), `ViewerMediaComponent` (a `DigitalAssetsComponent` with its own markup, so AccessPolicy and Sensitivity are the same code) and
-  `ViewerPrimaryComponent` (the one navy pill). `show.html.erb` picks the component; `RecordAboutComponent(viewer: true)`,
-  `DeepZoomComponent(pill: true)` and `MoreLikeThisComponent(heading:)` adapt shared parts. Styles: `components/record_viewer.css`.
+  `ViewerPrimaryComponent` (the one navy pill), `ViewerFilesComponent` (the video, audio and PDF band) and `ViewerChevronsComponent` (the round
+  previous / next buttons). `show.html.erb` picks the component; `RecordAboutComponent(viewer: true)`,
+  `DeepZoomComponent(pill: true)` and `MoreLikeThisComponent(heading:, viewer:)` adapt shared parts. Styles: `components/record_viewer.css`.
   Behaviour: `viewer_page_controller.js` (new), `media_viewer_controller.js`, `deep_zoom_controller.js`, `deep_zoom_viewer.js`.
-- **Order of the page**: hero, local navigation, headline block, then bands that alternate white and `--ccs-surface-subtle`: highlights,
+- **Order of the page**: hero, local navigation, headline block, the files band (only for a record with video, audio or a PDF), then bands that alternate white and `--ccs-surface-subtle`: highlights,
   details, rights, about, related (More like this under the heading "Explore related."), then the University footer. Band padding is
   6.5rem from 1024px and 3rem below; headlines are big and quiet (Fraunces, `clamp(2rem, 4vw, 3.5rem)`).
 - **Hero**: full width on a soft gradient (`--ccs-navy-100` fading to `--ccs-white`), the picture as the hero object, whole, never cropped,
   at most `min(72vh, 46rem)` tall (60vh below 1024px; the height is held from the start, so nothing shifts). One OpenSeadragon viewer that
   starts on load without taking focus; three round navy buttons at the bottom right (zoom in, zoom out, full view; each disabled where the
   view cannot go further that way); a navigator map (region in `--ccs-cyan-400`) at the top right only once zoomed; keys + and - zoom, 0
-  resets, arrows pan; the mouse wheel scrolls the page (not zoom, not swallowed), and nothing scrolls inside the hero. Round grey Previous and
+  resets, arrows pan; the mouse wheel scrolls the page (not zoom, not swallowed), and nothing scrolls inside the hero (the picture area is
+  `overflow: hidden` and holds only the picture and its notices; a test fails if `scrollHeight` exceeds `clientHeight`). On a phone (under
+  48rem) the three round buttons sit in a band of their own under the picture, so they never cover it. Round grey Previous and
   Next buttons at the hero's edges (from 1024px; in the row of thumbnails below that) and a row of small thumbnails ("Display image N of M",
   the current one outlined and `aria-current`) change the one viewer's picture in sequence and announce "Image N of M". The sensitivity
   choice and the withheld notice sit inside the hero, above the thumbnails, so nothing covers them. Dark only in full screen. A record
@@ -211,12 +214,21 @@ University's header, breadcrumb and footer.
   accent line in `--ccs-cyan-600`; a pill card (`--ccs-surface-subtle`, `--ccs-radius-xl`, new token 1.75rem) with what the visitor may do
   ("Open for download", "View only", "Access by request"), the same navy pill and a quiet Save; under it quiet round-cornered buttons with
   visible labels: Add to list, Compare, Cite, Share.
+- **Files band** ("Watch and listen." for video and audio, "Read the document." for PDFs only, "Watch, listen and read." for both; a white
+  band right after the headline): each file in a big rounded card (`--ccs-surface-subtle`, `--ccs-radius-xl`), players the full width of
+  the column, a PDF with its open link. What shows follows AccessPolicy as before: nothing for a withheld record or one waiting for the
+  sensitivity choice, a PDF only for an open record, the players' download button only when open. A record with video or audio but no
+  picture has a hero as tall as its notices.
 - **Bands**: Highlights ("Take a closer look."; the description as one large paragraph with Show more, and a scroller of 4:3 cards, one per
   picture shown whole on white, with round chevron buttons that stop at the ends; a card opens its picture in the hero, scrolls to it and
-  moves focus there); Details (a centred 960px column, "Object details." and "Collection and provenance" groups, label and value rows with
+  moves focus there); Details (a centred 960px column, "Object details." with a group called "The object" and one "Collection and provenance", label and value rows with
   hairlines, linked values 32px high); Rights ("Rights and access."; three big rounded cards: copyright and licence, credit and collection,
   how to use this image per tier, with the request link for a view-only or withheld record); About (persistent link, Collection ID with
-  Copy, the collection team and the correction link). The headings are h2 with h3 inside cards and groups. Headline wording is placeholder.
+  Copy, the collection team and the correction link); Related (More like this under "Explore related."): from 1024px Related objects,
+  Similar records and Recently viewed are scrollers with larger tiles (30%, compact 26%) and, when a row overflows, the same round
+  chevrons as Highlights under it (named "Previous in <row>" / "Next in <row>"; Similar records arrives in a lazy frame, so
+  `viewer_page_controller.js` watches for new rows). Below 1024px the row scrolls under a finger and has no buttons. The headings are h2
+  with h3 inside cards and groups. Headline wording is placeholder. The Compare images link carries the same compare icon as Add to compare.
 - **Colours** (all `--ccs-*` tokens, no hex): navy for text and buttons; cyan-600 for the accent line; neutral-200/300 for the grey round
   buttons; focus `--ccs-focus-ring`. No pure black and none of another brand's colours.
 - Without scripting the hero shows the picture and the page reads in the same order; the chevrons and the thumbnails need the script. The

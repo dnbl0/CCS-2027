@@ -1,4 +1,8 @@
-<section id="more-like-this" class="more-like-this" aria-labelledby="more-like-this-heading">
+<section id="more-like-this" class="more-like-this" aria-labelledby="more-like-this-heading" <%= tag.attributes(data: viewer_data) if viewer? %>>
+  <% if viewer? %>
+    <%# Copied under every row once it is drawn, Similar records' too (it arrives in a lazy frame) %>
+    <template data-viewer-page-target="template"><%= render NexusCcs::ViewerChevronsComponent.new(back_label: t("nexus_ccs.record_page.viewer.rows_back", row: "%{row}"), forward_label: t("nexus_ccs.record_page.viewer.rows_forward", row: "%{row}"), extra_class: "viewer-chevrons--row") %></template>
+  <% end %>
   <div class="more-like-this__inner">
     <h2 id="more-like-this-heading" class="more-like-this__heading"><%= heading %></h2>
     <%= render NexusCcs::RecordCardsComponent.new(id: "related-objects", heading: t("nexus_ccs.related.heading"), documents: related, nested: true) %>

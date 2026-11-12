@@ -1,7 +1,7 @@
 <section id="digital-assets" class="viewer-media" data-controller="media-viewer" aria-labelledby="digital-assets-heading">
   <span id="digital-assets-heading" class="visually-hidden">Digital <%= "asset".pluralize(count + media.size) %></span>
 
-  <div class="viewer-media__stage" data-media-viewer-target="stage">
+  <div class="viewer-media__stage<%= ' viewer-media__stage--bare' unless main %>" data-media-viewer-target="stage">
     <div class="viewer-media__picture">
       <% if withheld? %>
         <%= render NexusCcs::AccessNoticeComponent.new(document: @document) %>
@@ -22,14 +22,6 @@
                       data-label-on="<%= t("nexus_ccs.record_page.media.exit_full_screen") %>" data-label-off="<%= t("nexus_ccs.record_page.viewer.full_view") %>"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg></button>
             <% end %>
           <% end %>
-        </figure>
-      <% end %>
-
-      <% media.each do |item| %>
-        <figure class="digital-assets__media">
-          <%# Each kind of file has its viewer (MediaTypes): one that cannot be previewed says so %>
-          <%= helpers.render partial: MediaTypes.viewer_for(item[:kind]), locals: { item: item, title: media_title(item), downloadable: downloadable? } %>
-          <figcaption><%= media_title(item) %></figcaption>
         </figure>
       <% end %>
 

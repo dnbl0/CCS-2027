@@ -1,6 +1,8 @@
 <div class="compare-actions">
   <% if several_images? %>
-    <%= link_to "Compare images", compare_path(record: id), class: "compare-actions__link", rel: "nofollow" %>
+    <%= link_to compare_path(record: id), class: "compare-actions__link", rel: "nofollow" do %>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4" width="8" height="16" rx="1" /><rect x="13" y="4" width="8" height="16" rx="1" /></svg><span>Compare images</span>
+    <% end %>
   <% end %>
   <% if in_comparison? %>
     <%= button_to compare_item_path(id), method: :delete, class: "compare-actions__button", form: { class: "compare-actions__form" },
