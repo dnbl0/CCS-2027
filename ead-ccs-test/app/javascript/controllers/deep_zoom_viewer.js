@@ -35,6 +35,8 @@ export async function createViewer(element, source, { label } = {}) {
     tabIndex: 0
   })
   nameCanvas(viewer, label || source.alt)
+  // The wheel is not used to zoom here, so it must not be swallowed either: leave it to the page, so scrolling over the picture scrolls the page
+  viewer.addHandler("canvas-scroll", (event) => { event.preventDefaultAction = true; event.preventDefault = false })
   return viewer
 }
 
