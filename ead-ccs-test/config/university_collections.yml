@@ -1,7 +1,7 @@
 # Every University cultural collection listed at https://museumsandcollections.unimelb.edu.au/collections (read 2026-11-16), by name and
 # the address of its own site. UniversityCollections matches a name to the collection_ssim facet (config/pages.yml): those with records in
 # the index are searched here, the rest link out. Add a collection here when it joins the list; its records follow when the data does
-# (docs/collection-directory.md). Names and addresses only: nothing else is copied from those sites.
+# (docs/collection-directory.md). Optional `facet_value:` when the index spells the collection differently from `name`. Names and addresses only: nothing else is copied from those sites.
 - name: University Art Collection
   url: https://museumsandcollections.unimelb.edu.au/collections#university-of-melbourne-art-collection
 - name: Architecture, Building and Planning Library Rare Material Collection
