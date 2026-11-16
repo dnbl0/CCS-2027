@@ -1,5 +1,6 @@
 namespace :collections do
   # Override with EMU_CSV / VERNON_CSV. Either may be omitted to load just one.
+  # The harvested records are not loaded here (the system tests' data is the two exports): run collections:index_harvested.
   def configured_sources
     {
       Collections::EmuSource   => ENV.fetch("EMU_CSV", Rails.root.join("data", "emu.csv").to_s),
@@ -28,6 +29,15 @@ namespace :collections do
 
     result = indexer.index(sources)
     puts "Indexed #{result[:indexed]} documents (#{result[:duplicate_ids]} duplicate ids)."
+  end
+
+  def harvested_csv = ENV.fetch("HARVESTED_CSV", Rails.root.join("data", "harvested.csv").to_s)
+
+  # Adds (or replaces) only the harvested records, so a core that already holds the EMu and Vernon records keeps them as they are.
+  desc "Index data/harvested.csv into Solr alongside what the core already holds"
+  task index_harvested: :environment do
+    result = Collections::Indexer.new.index([ Collections::HarvestedSource.new(harvested_csv) ])
+    puts "Indexed #{result[:indexed]} harvested documents (#{result[:duplicate_ids]} duplicate ids)."
   end
 
   desc "Print the first mapped document from each source without touching Solr"
