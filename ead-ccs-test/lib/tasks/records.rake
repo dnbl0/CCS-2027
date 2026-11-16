@@ -40,4 +40,42 @@ namespace :records do
       puts CSV.generate_line([ record.record_id, record.suppressed_at.iso8601, record.suppressed_by, record.reason ].map { |value| CsvCell.safe(value) })
     end
   end
+
+  # --- Metadata from a CSV (CCS-31; docs/csv-upload.md). Neither task posts to Solr unless INDEX=1 and SOLR_URL is set to a writable core. ---
+
+  def csv_path_from(args)
+    path = args[:path].to_s
+    abort "Give the CSV file: bin/rails 'records:validate_csv[path/to/file.csv]'" if path.empty?
+    abort "#{path} is not a file." unless File.file?(path)
+
+    path
+  end
+
+  desc "Check a metadata CSV row by row and print the problems and a summary (nothing is indexed): bin/rails 'records:validate_csv[file.csv]'"
+  task :validate_csv, [ :path ] => :environment do |_task, args|
+    report = Collections::CsvSource.new(csv_path_from(args)).check
+    puts CSV.generate_line(%w[line id problem])
+    report.problems.each { |problem| puts CSV.generate_line([ problem.line, problem.id, problem.message ].map { |value| CsvCell.safe(value) }) }
+    warn "Missing required columns: #{report.missing_columns.join(', ')}" if report.missing_columns.any?
+    warn "Unknown columns (ignored, not indexed): #{report.unknown_columns.join(', ')}" if report.unknown_columns.any?
+    warn "#{report.rows} rows, #{report.problems.map(&:line).uniq.size} with problems, #{report.problems.size} problems. #{report.ok? ? 'Ready to convert.' : 'Fix these first.'}"
+    exit(1) unless report.ok?
+  end
+
+  desc "Print the Solr JSON for a metadata CSV (OUT=file.json to write a file; INDEX=1 SOLR_URL=<writable core> to index it): bin/rails 'records:csv_to_documents[file.csv]'"
+  task :csv_to_documents, [ :path ] => :environment do |_task, args|
+    source = Collections::CsvSource.new(csv_path_from(args))
+    report = source.check(documents: true)
+    abort "Not converted: #{report.problems.size} problems, #{report.unknown_columns.size} unknown and #{report.missing_columns.size} missing columns. Run records:validate_csv first." unless report.ok?
+
+    json = JSON.pretty_generate(report.documents)
+    ENV["OUT"].present? ? File.write(ENV["OUT"], json) : puts(json)
+    warn "#{report.documents.size} documents#{" written to #{ENV['OUT']}" if ENV['OUT'].present?}."
+    next unless ENV["INDEX"] == "1"
+
+    url = ENV["SOLR_URL"].to_s
+    abort "INDEX=1 needs SOLR_URL set to the core to write to." if url.empty?
+    abort "Refusing to index into #{url}: port 8984 is the shared, read-only Solr." if URI(url).port == 8984
+    Collections::Indexer.new(solr_url: url).index(source)
+  end
 end
