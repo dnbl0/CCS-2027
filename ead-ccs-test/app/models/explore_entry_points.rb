@@ -189,14 +189,14 @@ module ExploreEntryPoints
   # thumbnails supplied for the film. No record counts are shown, as most of these collections have no records in this index yet.
   FILM_COLLECTIONS = [
     [ "University Art Collection", "/film-thumbs/00-university-art-collection.jpg", 1200, 600 ],
-    [ "Architecture, Building and Planning Library Rare Materials Collection", "/film-thumbs/01-architecture-building-and-planning-library-rare-material-collection.jpg", 220, 165 ],
+    [ "Architecture, Building and Planning Library Rare Material Collection", "/film-thumbs/01-architecture-building-and-planning-library-rare-material-collection.jpg", 220, 165 ],
     [ "Archives and Special Collections", "/film-thumbs/02-archives-and-special-collections.jpg", 600, 368 ],
     [ "Burnley Campus Archives", "/film-thumbs/03-burnley-campus-archives.png", 672, 417 ],
     [ "Creswick Campus Historical Collection", "/film-thumbs/04-creswick-campus-historical-collection.jpg", 570, 564 ],
     [ "Dookie Campus Historical Collection", "/film-thumbs/05-dookie-campus-historical-collection.png", 220, 165 ],
     [ "Ed Muirhead Physics Museum", "/film-thumbs/06-ed-muirhead-physics-museum.jpg", 600, 400 ],
     [ "F.A. Singleton Earth Sciences Collection", "/film-thumbs/07-f-a-singleton-earth-sciences-collection.jpg", 600, 389 ],
-    [ "Faculty of Engineering and IT Collections", "/film-thumbs/08-engineering-and-information-technology-collection.jpg", 600, 400 ],
+    [ "Engineering and Information Technology Collection", "/film-thumbs/08-engineering-and-information-technology-collection.jpg", 600, 400 ],
     [ "Godfrey Howitt Entomology Collection", "/film-thumbs/09-godfrey-howitt-entomology-collection.png", 277, 179 ],
     [ "Grainger Museum Collection", "/film-thumbs/10-grainger-museum-collection.jpg", 600, 401 ],
     [ "Harry Brookes Allen Museum of Anatomy and Pathology", "/film-thumbs/11-harry-brookes-allen-museum-of-anatomy-and-pathology.jpg", 600, 300 ],
