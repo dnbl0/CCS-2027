@@ -272,6 +272,15 @@
     <field name="all_text_timv" type="text" stored="false" indexed="true" multiValued="true" termVectors="true" termPositions="true" termOffsets="true"/>
     <field name="all_text_stemmed" type="textStemmed" stored="false" indexed="true" multiValued="true"/>
 
+    <!-- Chinese, Japanese and Korean text (CCS-56): the same words again, kept only where they are CJK characters and indexed as
+         single characters and pairs, so a search finds any run of characters inside a title or description (no word list needed).
+         Latin text is dropped from these fields, so the English analysis and ranking are unchanged. -->
+    <field name="all_text_cjk" type="text_cjk" stored="false" indexed="true" multiValued="true"/>
+    <field name="title_cjk" type="text_cjk" stored="false" indexed="true" multiValued="true"/>
+    <field name="creator_cjk" type="text_cjk" stored="false" indexed="true" multiValued="true"/>
+    <field name="subject_cjk" type="text_cjk" stored="false" indexed="true" multiValued="true"/>
+    <field name="description_cjk" type="text_cjk" stored="false" indexed="true" multiValued="true"/>
+
   </fields>
 
   <!-- Dynamic fields for mapping multiple source fields -->
@@ -284,6 +293,17 @@
   <copyField source="*_tesim" dest="all_text_stemmed" maxChars="3000"/>
   <copyField source="*_ssim"  dest="all_text_stemmed" maxChars="3000"/>
   <copyField source="*_si"    dest="all_text_stemmed" maxChars="3000"/>
+
+  <!-- CJK twins (CCS-56) -->
+  <copyField source="*_tsim" dest="all_text_cjk" maxChars="3000"/>
+  <copyField source="*_tesim" dest="all_text_cjk" maxChars="3000"/>
+  <copyField source="*_ssim" dest="all_text_cjk" maxChars="3000"/>
+  <copyField source="*_si" dest="all_text_cjk" maxChars="3000"/>
+  <copyField source="title_tsim" dest="title_cjk"/>
+  <copyField source="alternative_title_tsim" dest="title_cjk"/>
+  <copyField source="creator_tsim" dest="creator_cjk"/>
+  <copyField source="subject_tsim" dest="subject_cjk"/>
+  <copyField source="description_tsim" dest="description_cjk"/>
 
   <copyField source="*_tsim" dest="suggest"/>
   <copyField source="*_tesim" dest="suggest"/>
@@ -372,6 +392,19 @@
     </fieldType>
 
     <!-- A text field that only splits on whitespace for exact matching of words -->
+    <!-- CJK (CCS-56): only Han, Hiragana, Katakana and Hangul characters are kept (everything else becomes a space), halfwidth and
+         fullwidth forms are made the same (CJKWidth), and the characters are indexed singly and in overlapping pairs (CJKBigram), so
+         a query of one or more characters matches wherever that run of characters occurs. -->
+    <fieldType name="text_cjk" class="solr.TextField" positionIncrementGap="1000" omitNorms="false">
+      <analyzer>
+        <charFilter class="solr.PatternReplaceCharFilterFactory" pattern="[^\p{IsHan}\p{IsHiragana}\p{IsKatakana}\p{IsHangul}\u3005\u30FC]+" replacement=" "/>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.CJKWidthFilterFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.CJKBigramFilterFactory" outputUnigrams="true"/>
+      </analyzer>
+    </fieldType>
+
     <fieldType name="text_ws" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>

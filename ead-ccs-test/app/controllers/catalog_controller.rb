@@ -157,6 +157,8 @@ class CatalogController < ApplicationController
 
   # Home page, the Advanced search form again, or the default Digital asset filter: the rules are SearchDefaults'
   before_action :apply_search_defaults, only: :index
+  # Does the core have the CJK fields (CCS-56)? Asked on a results page only, at most every ten minutes (CjkIndex)
+  before_action(only: :index) { CjkIndex.refresh! }
 
   # The record page lists the records the visitor opened before (RecentlyViewed); this one is added once the page is drawn,
   # so it is not listed beside itself
