@@ -30,7 +30,10 @@
 #
 # A record with several licences gets the most restrictive tier.
 #
-# Swapping in the DAM: the ingest keeps each asset's full DAM metadata in the Solr field assets_json. The fields likely to
+# DAM usage rights now decide the tier (TIER_BY_DAM_LICENCE, .tier); the EMu licence table is the fallback and a tightening
+# gate. FreeReuse (the "open licence" filter) still reads the EMu field until the index has an indexed DAM licence field.
+#
+# (Earlier note) Swapping in the DAM: the ingest keeps each asset's full DAM metadata in the Solr field assets_json. The fields likely to
 # carry the real classification are metadata.dAUseStatus (fixture value "Requires Action"; real values not yet known),
 # dAAdvisory1, dAShareWithCMS, and security.release_date / expiration_date / asset_groups (released_and_not_expired).
 # The rules to replace are TIER_BY_LICENCE, WITHHELD and .tier (the "licence rules"); .view?, .download? and
@@ -56,15 +59,56 @@ module AccessPolicy
   # Access conditions (access_condition_ssi, compared in lower case) that withhold the asset whatever the licence
   WITHHELD_ACCESS_CONDITIONS = [ "community restricted" ].freeze
 
+  # The DAM's usage rights are the source of truth (digital_asset_metadata_ssm: one JSON object per asset, with a "licence").
+  # Compared in lower case. A blank licence (the DAM has none, or "None") is not cleared for display, so it is :request.
+  TIER_BY_DAM_LICENCE = {
+    "cc by" => :open,
+    "all rights reserved (uom)" => :view_only,
+    "copyright agency limited" => :view_only,
+    "individual" => :view_only
+  }.freeze
+  DAM_NO_LICENCE = [ "", "none" ].freeze
+
   # document: a SolrDocument. Returns one of TIERS.
+  # With DAM usage rights on the record they decide the tier (the most restrictive across its assets); the EMu licence and
+  # access condition below can only tighten that to :request (ICIP, restricted, community restricted), never open it up.
+  # A record whose index has no DAM usage rights at all falls back to the EMu licence rules.
   def self.tier(document)
     return :request if withheld_by_access_condition?(document)
 
+    dam = dam_licences(document)
+    return emu_tier(document) if dam.nil?
+
+    dam_tier = dam.map { |licence| dam_tier_of(licence) }.max_by { |tier| TIERS.index(tier) }
+    [ dam_tier, (:request if emu_tier(document) == :request) ].compact.max_by { |tier| TIERS.index(tier) }
+  end
+
+  def self.emu_tier(document)
     licences = Array(document["licence_type_ssim"]).map { |value| value.to_s.strip.downcase }.compact_blank
     return :view_only if licences.empty?
 
     licences.map { |licence| tier_of(licence) }.max_by { |tier| TIERS.index(tier) }
   end
+  private_class_method :emu_tier
+
+  # The DAM licence of each asset (lower case, "" when blank), or nil when the record carries no DAM usage rights
+  def self.dam_licences(document)
+    values = Array(document["digital_asset_metadata_ssm"]).filter_map do |json|
+      parsed = JSON.parse(json.to_s)
+      parsed.is_a?(Hash) ? parsed["licence"].to_s.strip.downcase : nil
+    rescue JSON::ParserError
+      nil
+    end
+    values.presence
+  end
+  private_class_method :dam_licences
+
+  def self.dam_tier_of(licence)
+    return :request if DAM_NO_LICENCE.include?(licence)
+
+    TIER_BY_DAM_LICENCE.fetch(licence) { licence.match?(WITHHELD) ? :request : :view_only }
+  end
+  private_class_method :dam_tier_of
 
   def self.tier_of(licence)
     TIER_BY_LICENCE.fetch(licence) { licence.match?(WITHHELD) ? :request : :view_only }

@@ -21,6 +21,51 @@ class AccessPolicyTest < ActiveSupport::TestCase
     end
   end
 
+  def dam_doc(*licences, **extra)
+    SolrDocument.new({ "id" => "d", "digital_asset_metadata_ssm" => licences.map { |l| { "licence" => l }.to_json } }.merge(extra.stringify_keys))
+  end
+
+  test "the DAM licence decides the tier" do
+    assert_equal :open, AccessPolicy.tier(dam_doc("CC BY"))
+    assert_equal :view_only, AccessPolicy.tier(dam_doc("All Rights reserved (UoM)"))
+    assert_equal :view_only, AccessPolicy.tier(dam_doc("Copyright Agency Limited"))
+    assert_equal :view_only, AccessPolicy.tier(dam_doc("Individual"))
+  end
+
+  test "a DAM licence overrides a more open EMu licence" do
+    doc = dam_doc("All Rights reserved (UoM)", licence_type_ssim: [ "Public domain - Copyright expired" ])
+    assert_equal :view_only, AccessPolicy.tier(doc)
+  end
+
+  test "a DAM licence overrides a more restrictive EMu copyright licence" do
+    assert_equal :open, AccessPolicy.tier(dam_doc("CC BY", licence_type_ssim: [ "Copyright - Current" ]))
+  end
+
+  test "an asset with no DAM licence is not shown" do
+    assert_equal :request, AccessPolicy.tier(dam_doc("None"))
+    assert_equal :request, AccessPolicy.tier(dam_doc(""))
+    assert_equal :request, AccessPolicy.tier(SolrDocument.new("id" => "d", "digital_asset_metadata_ssm" => [ { "producer" => "x" }.to_json ]))
+  end
+
+  test "with several assets the most restrictive DAM licence wins" do
+    assert_equal :view_only, AccessPolicy.tier(dam_doc("CC BY", "Individual"))
+    assert_equal :request, AccessPolicy.tier(dam_doc("CC BY", "None"))
+  end
+
+  test "EMu restrictions still withhold whatever the DAM says" do
+    assert_equal :request, AccessPolicy.tier(dam_doc("CC BY", licence_type_ssim: [ "ICIP Rights" ]))
+    assert_equal :request, AccessPolicy.tier(dam_doc("CC BY", access_condition_ssi: "Community Restricted"))
+  end
+
+  test "a DAM licence that says restricted is withheld" do
+    assert_equal :request, AccessPolicy.tier(dam_doc("Restricted - Elders"))
+  end
+
+  test "unreadable DAM metadata falls back to the EMu licence" do
+    doc = SolrDocument.new("id" => "d", "digital_asset_metadata_ssm" => [ "not json" ], "licence_type_ssim" => [ "Copyright" ])
+    assert_equal :view_only, AccessPolicy.tier(doc)
+  end
+
   test "every tier is one of TIERS" do
     assert_empty EXPECTED.values.uniq - AccessPolicy::TIERS
     assert_equal AccessPolicy::TIERS.sort, EXPECTED.values.uniq.sort

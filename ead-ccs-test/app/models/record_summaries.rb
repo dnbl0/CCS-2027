@@ -6,7 +6,7 @@ module RecordSummaries
   # What a card shows (RecordCardComponent), and what AccessPolicy and Sensitivity read to decide whether its image may show
   FIELDS = %w[
     id title_tsim creator_ssim production_date_ssim object_type_ssim collection_ssim thumbnail_path_ssi has_digital_asset_bsi
-    licence_type_ssim access_condition_ssi restrictions_tsi
+    licence_type_ssim digital_asset_metadata_ssm access_condition_ssi restrictions_tsi
   ].freeze
 
   # A Solr phrase: the value in quotes, with any quote or backslash escaped so it cannot change the query
