@@ -1,10 +1,10 @@
 namespace :collections do
-  # Override with EMU_CSV / VERNON_CSV / HARVESTED_CSV. Any may be omitted to load just the others.
+  # Override with EMU_CSV / VERNON_CSV. Either may be omitted to load just one.
+  # The harvested records are not loaded here (the system tests' data is the two exports): run collections:index_harvested.
   def configured_sources
     {
       Collections::EmuSource   => ENV.fetch("EMU_CSV", Rails.root.join("data", "emu.csv").to_s),
-      Collections::VernonSource => ENV.fetch("VERNON_CSV", Rails.root.join("data", "vernon.csv").to_s),
-      Collections::HarvestedSource => harvested_csv
+      Collections::VernonSource => ENV.fetch("VERNON_CSV", Rails.root.join("data", "vernon.csv").to_s)
     }.filter_map do |klass, path|
       if File.exist?(path)
         klass.new(path)
