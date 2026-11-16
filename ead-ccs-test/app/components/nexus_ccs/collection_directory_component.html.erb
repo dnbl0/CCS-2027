@@ -1,0 +1,27 @@
+<section class="ccs-section collection-directory" id="all-collections" aria-labelledby="collection-directory-title">
+  <div class="ccs-section__inner collection-directory__inner">
+    <header class="collection-directory__header">
+      <h2 id="collection-directory-title" class="ccs-section__heading"><%= t("collection_directory.title") %></h2>
+      <p class="collection-directory__intro"><%= t("collection_directory.intro", count: count) %></p>
+    </header>
+
+    <div class="collection-directory__group">
+      <h3 class="collection-directory__heading"><%= t("collection_directory.here.heading") %></h3>
+      <ul class="collection-directory__list">
+        <% here.each do |entry| %>
+          <li><%= link_to entry.name, helpers.collection_results_path(entry.slug), class: "collection-directory__link" %></li>
+        <% end %>
+      </ul>
+    </div>
+
+    <div class="collection-directory__group">
+      <h3 class="collection-directory__heading"><%= t("collection_directory.elsewhere.heading") %></h3>
+      <p class="collection-directory__note"><%= t("collection_directory.elsewhere.note") %></p>
+      <ul class="collection-directory__list">
+        <% elsewhere.each do |entry| %>
+          <li><%= link_to entry.name, entry.url, class: "collection-directory__link" %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</section>

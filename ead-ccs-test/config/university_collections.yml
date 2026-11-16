@@ -1,0 +1,54 @@
+# Every University cultural collection listed at https://museumsandcollections.unimelb.edu.au/collections (read 2026-11-16), by name and
+# the address of its own site. UniversityCollections matches a name to the collection_ssim facet (config/pages.yml): those with records in
+# the index are searched here, the rest link out. Add a collection here when it joins the list; its records follow when the data does
+# (docs/collection-directory.md). Names and addresses only: nothing else is copied from those sites.
+- name: University Art Collection
+  url: https://museumsandcollections.unimelb.edu.au/collections#university-of-melbourne-art-collection
+- name: Architecture, Building and Planning Library Rare Material Collection
+  url: https://library.unimelb.edu.au/collections/architecture-collection/architecture,_building_and_planning_library_rare_materials_collection
+- name: Archives and Special Collections
+  url: https://library.unimelb.edu.au/asc/archives-special-collections
+- name: Burnley Campus Archives
+  url: https://museumsandcollections.unimelb.edu.au/collections/collections/burnley-campus-archives
+- name: Creswick Campus Historical Collection
+  url: https://museumsandcollections.unimelb.edu.au/collections/collections-subpages/creswick-campus-collection
+- name: Dookie Campus Historical Collection
+  url: https://museumsandcollections.unimelb.edu.au/collections/science/sciences/veterinary_and_agricultural/dookie_campus_historical_collection
+- name: Ed Muirhead Physics Museum
+  url: https://physics.unimelb.edu.au/engage/ed-muirhead-physics-museum
+- name: F.A. Singleton Earth Sciences Collection
+  url: https://museumsandcollections.unimelb.edu.au/collections/collections-subpages/science/sciences/earth,_physics_and_chemistry/f.a._singleton_earth_sciences_collection
+- name: Engineering and Information Technology Collection
+  url: https://collections.eng.unimelb.edu.au/
+- name: Godfrey Howitt Entomology Collection
+  url: https://museumsandcollections.unimelb.edu.au/collections/collections/godfrey-howitt-entomology-collection/godfrey-howitt-entomology-collection
+- name: Grainger Museum Collection
+  url: https://grainger.unimelb.edu.au/collection
+- name: Harry Brookes Allen Museum of Anatomy and Pathology
+  url: https://harrybrookesallenmuseum.mdhs.unimelb.edu.au/home
+- name: Henry Forman Atkinson Dental Museum
+  url: https://henryformanatkinsondentalmuseum.mdhs.unimelb.edu.au/home
+- name: International House Collection
+  url: https://blogs.unimelb.edu.au/international-house-melbourne/
+- name: Law Rare Books Collection
+  url: https://law.unimelb.edu.au/law-library/collections/rare-books-collection
+- name: Medical History Museum
+  url: https://medicalhistorymuseum.mdhs.unimelb.edu.au/home
+- name: MONIAC Economics Model Machine
+  url: https://museumsandcollections.unimelb.edu.au/collections
+- name: "Musical Instruments Collection: Rare and Historic Examples"
+  url: https://museumsandcollections.unimelb.edu.au/collections/collections-subpages/music/melbourne_conservatorium
+- name: School of Chemistry Collection
+  url: http://museum.chemistry.unimelb.edu.au/
+- name: Southbank Library Special Collections
+  url: https://library.unimelb.edu.au/southbank-library/collections/special-collections
+- name: Tiegs Zoology Museum
+  url: https://biosciences.unimelb.edu.au/engage/tiegs-museum
+- name: University of Melbourne Herbarium
+  url: https://biosciences.unimelb.edu.au/engage/herbarium
+- name: Veterinary Science Anatomy Collection
+  url: https://museumsandcollections.unimelb.edu.au/collections/collections-subpages/science/sciences/veterinary_and_agricultural/veterinary_anatomy_collection
+- name: Victorian College of the Arts Film and Television Archives
+  url: https://museumsandcollections.unimelb.edu.au/collections/collections-subpages/visual_arts/vca-film-and-television-archive
+- name: Visual Cultures Resource Centre
+  url: https://museumsandcollections.unimelb.edu.au/collections
