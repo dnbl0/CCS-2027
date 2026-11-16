@@ -17,6 +17,8 @@ bundle exec rails server -p 3002
 `config/blacklight.yml` and the indexer both read `SOLR_URL`, defaulting to
 `http://127.0.0.1:8983/solr/blacklight-core`.
 
+Chinese, Japanese and Korean search needs the CJK fields in `solr/conf` (see [multilingual-search.md](multilingual-search.md)); a core made before that needs the configuration applied and a reindex.
+
 After changing `solr/conf` or the indexers, recreate the core (or `rails collections:clear`) and
 reindex. The index is stale if a facet defined in `CatalogController` does not render: compare the
 fields the indexers emit with the controller's fields before changing the controller.

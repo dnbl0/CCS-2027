@@ -44,6 +44,7 @@
           description_tsim
           all_text_timv
           all_text_stemmed^0.5
+          all_text_cjk^0.5
         </str>
         <str name="pf">
           all_text_timv^10
@@ -60,17 +61,36 @@
 
        <str name="creator_qf">
           creator_tsim
+          creator_cjk
        </str>
        <str name="creator_pf">
        </str>
        <str name="title_qf">
           title_tsim
           alternative_title_tsim
+          title_cjk
        </str>
        <str name="title_pf">
        </str>
        <str name="subject_qf">
           subject_tsim
+          subject_cjk
+       </str>
+       <!-- Chinese, Japanese, Korean search (CCS-56): the CJK fields only -->
+       <str name="cjk_qf">
+          title_cjk^5
+          creator_cjk^3
+          subject_cjk^2
+          description_cjk
+          all_text_cjk^0.5
+       </str>
+       <str name="cjk_pf">
+       </str>
+       <str name="description_qf">
+          description_tsim
+          description_cjk
+       </str>
+       <str name="description_pf">
        </str>
        <str name="subject_pf">
        </str>
@@ -105,6 +125,7 @@
           description_tsim
           all_text_timv
           all_text_stemmed^0.5
+          all_text_cjk^0.5
         </str>
 
      </lst>

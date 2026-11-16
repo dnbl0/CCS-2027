@@ -1,0 +1,7 @@
+[
+  { "id": "cjk-zh-1", "title_tsim": ["山水畫卷 Landscape scroll"], "creator_tsim": ["齊白石"], "creator_ssim": ["齊白石"], "description_tsim": ["清代山水畫，紙本設色"], "subject_tsim": ["山水"], "subject_ssim": ["山水"], "language_ssim": ["zh"], "format": ["Object"] },
+  { "id": "cjk-ja-1", "title_tsim": ["富嶽三十六景 神奈川沖浪裏"], "creator_tsim": ["葛飾北斎"], "creator_ssim": ["葛飾北斎"], "description_tsim": ["浮世絵版画。カタカナのテスト、ひらがなも。"], "language_ssim": ["ja"], "format": ["Object"] },
+  { "id": "cjk-ko-1", "title_tsim": ["조선시대 백자 달항아리"], "description_tsim": ["한국 도자기"], "language_ssim": ["ko"], "format": ["Object"] },
+  { "id": "en-1", "title_tsim": ["Violin with a paper label"], "creator_tsim": ["Stradivari"], "description_tsim": ["A violin made in Cremona"], "format": ["Object"] },
+  { "id": "en-2", "title_tsim": ["Landscape painting"], "description_tsim": ["Mountains and water, a landscape"], "format": ["Object"] }
+]

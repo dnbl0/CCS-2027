@@ -12,7 +12,7 @@ class SearchBuilder < Blacklight::SearchBuilder
 
   # Appending puts this after Blacklight's own add_query_to_solr, so
   # solr_parameters[:q] is the query string Solr will receive.
-  self.default_processor_chain += [ :add_minimum_should_match_to_solr, :limit_deep_paging, :add_highlighting_to_solr ]
+  self.default_processor_chain += [ :add_minimum_should_match_to_solr, :limit_deep_paging, :add_highlighting_to_solr, :add_cjk_to_description ]
 
   # Solr's cost grows with how deep a page starts, and nobody reads past page 250: a request deeper than this many records is answered
   # with the last page inside it (the ranking is unchanged). RESULTS_MAX_START overrides it.
@@ -36,6 +36,14 @@ class SearchBuilder < Blacklight::SearchBuilder
     return if solr_parameters[:rows].to_i.zero?
 
     solr_parameters.merge!(SearchHighlighting.parameters(search_state))
+  end
+
+  # CCS-56: the Description search also looks in the CJK description field, when the core has it (CjkIndex)
+  def add_cjk_to_description(solr_parameters)
+    return unless search_state.params[:search_field] == "description" && CjkIndex.available?
+
+    solr_parameters[:qf] = "${description_qf}"
+    solr_parameters[:pf] = "${description_pf}"
   end
 
   private
