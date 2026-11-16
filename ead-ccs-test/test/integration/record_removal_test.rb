@@ -167,7 +167,8 @@ class RecordRemovalTest < ActionDispatch::IntegrationTest
   # --- A new way of asking Solr that skips the filter would be a way to show a removed record ---
 
   test "the app asks Solr only through the client that carries the filter" do
-    allowed = { "app/indexers/collections/indexer.rb" => "writes the index (update), reads nothing to show", "app/models/readiness.rb" => "admin/ping only" }
+    allowed = { "app/indexers/collections/indexer.rb" => "writes the index (update), reads nothing to show", "app/models/readiness.rb" => "admin/ping only",
+                "lib/tasks/records.rake" => "records:csv_to_documents writes (INDEX=1) to an explicit, non-shared core through the indexer" }
     offenders = Dir[Rails.root.join("{app,lib}/**/*.{rb,erb,rake}")].filter_map do |file|
       relative = Pathname(file).relative_path_from(Rails.root).to_s
       next if allowed.key?(relative) || relative == "lib/suppressed_solr_filter.rb"
