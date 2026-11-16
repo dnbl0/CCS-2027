@@ -44,6 +44,7 @@ module SearchHighlighting
   def self.parameters(search_state)
     clauses = included_clauses(search_state)
     return {} if search_state.query_param.blank? && clauses.empty?
+    return {} if full_text?(search_state) # the PDF text is not stored, so there is nothing to highlight (the card says "Found in PDF")
 
     params = {
       "hl" => true,
@@ -63,6 +64,9 @@ module SearchHighlighting
     end
     params
   end
+
+  # Is this the Full text (PDF) search (CCS-36)?
+  def self.full_text?(search_state) = search_state.params[:search_field].to_s == "full_text" && search_state.query_param.present?
 
   # The Advanced search rows that include records (not "Does not contain", "has a value" or "is empty"), as [fields, text] pairs
   def self.included_clauses(search_state)

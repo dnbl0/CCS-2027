@@ -35,6 +35,14 @@ module CatalogConfig
         }
       end
 
+      # Full text (CCS-36): the text inside PDFs. Offered only when the core has the field (PdfTextIndex); not in the advanced form.
+      config.add_search_field("full_text") do |field|
+        field.label = "Full text (PDF)"
+        field.if = ->(_context, _field) { PdfTextIndex.available? }
+        field.include_in_advanced_search = false
+        field.solr_parameters = { qf: "${pdf_qf}", pf: "${pdf_pf}" }
+      end
+
       # Chinese, Japanese and Korean (CCS-56): the CJK fields only, found by any run of characters. Offered only when the core has the
       # fields (CjkIndex); the qf is in the /select handler. Not in the advanced form, which lists the fields without asking.
       config.add_search_field("cjk") do |field|

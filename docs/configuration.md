@@ -47,6 +47,11 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `SUPPRESSED_RECORDS_CACHE_SECONDS` | `30` | `SuppressedRecord` | How long a running server keeps the list of removed records in memory before reading the database again: a removal reaches every instance within this time. See [remove-a-record.md](../ead-ccs-test/docs/remove-a-record.md) |
 | `INDEX` | unset | `records:csv_to_documents` | `1` also indexes the converted CSV into the core at `SOLR_URL` (never port 8984, the shared Solr). See [csv-upload.md](../ead-ccs-test/docs/csv-upload.md) |
 | `SUPPRESSED_BY` | the server's user name | `records:suppress` | Who is removing the record (free text, kept with the reason) |
+| `PDF_TEXT` | `on` | `Collections::DigitalMedia.pdf_text?` | `off` reads no PDF text at indexing. See [pdf-full-text.md](../ead-ccs-test/docs/pdf-full-text.md) |
+| `PDF_MEDIA_DIR` | `public/digital-assets/media` | `Collections::DigitalMedia.pdf_dir` | Where the PDF files are on the machine that indexes |
+| `PDF_TEXT_MAX_MB` | `50` | `Collections::PdfText` | A larger PDF is skipped |
+| `PDF_TEXT_TIMEOUT` | `30` | `Collections::PdfText` | Seconds a PDF may take to read |
+| `PDF_TEXT_MAX_CHARS` | `1000000` | `Collections::PdfText` | Text kept per PDF |
 | `SEO_SITEMAP_CACHE_HOURS` | `12` | `BotControls.sitemap_cache_hours` | How long the list of record ids for the sitemap is kept |
 | `TRENDING_ENABLED` | `on` | `RecordView.enabled?` | `off` stops counting record views and hides the Trending section (Featured and Pick of the day stay). See [similar-and-trending.md](../ead-ccs-test/docs/similar-and-trending.md) |
 | `TRENDING_DAYS` | `7` | `RecordView.window_days` | The window of "most viewed in the last N days" (1 to 90) |

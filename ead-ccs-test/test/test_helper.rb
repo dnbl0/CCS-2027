@@ -16,6 +16,8 @@ module ActiveSupport
     # Nor the list of suppressed records (CCS-112): a test's rolled-back rows must not leave their ids behind
     setup { SuppressedRecord.forget! }
 
+    # The Full text (PDF) search is offered only when the core is known to have its field; tests start with it off, and never ask Solr
+    setup { PdfTextIndex.force(nil) }
     # The CJK search (CCS-56) is offered only when the core is known to have its fields; tests start with it off, and never ask Solr
     setup { CjkIndex.force(nil) }
     teardown { SuppressedRecord.forget! }

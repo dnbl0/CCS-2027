@@ -272,6 +272,10 @@
     <field name="all_text_timv" type="text" stored="false" indexed="true" multiValued="true" termVectors="true" termPositions="true" termOffsets="true"/>
     <field name="all_text_stemmed" type="textStemmed" stored="false" indexed="true" multiValued="true"/>
 
+    <!-- The text inside a record's PDF files (CCS-36), read at indexing (Collections::PdfText). Indexed, not stored (it can be
+         large, and is not shown), and named *_tim on purpose: no copyField rule matches that, so it never reaches the suggester,
+         the spelling dictionary or the default search. Only the "Full text" search looks in it. -->
+    <field name="pdf_text_tim" type="text" stored="false" indexed="true" multiValued="true"/>
     <!-- Chinese, Japanese and Korean text (CCS-56): the same words again, kept only where they are CJK characters and indexed as
          single characters and pairs, so a search finds any run of characters inside a title or description (no word list needed).
          Latin text is dropped from these fields, so the English analysis and ranking are unchanged. -->

@@ -352,6 +352,7 @@ en:
     rationale:
       matched_in: "Matched in: %{fields}"
       other: "Matched on a related word or in other details of the record"
+      pdf: "Found in PDF" # placeholder wording (CCS-36): the University approves it
       fields:
         title: "Title"
         alternative_title: "Alternative title"
