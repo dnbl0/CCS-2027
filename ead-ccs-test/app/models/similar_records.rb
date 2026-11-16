@@ -32,6 +32,8 @@ class SimilarRecords
   DATE_WINDOW = 25          # years either side
   CANDIDATES = 30           # asked for, so that dropping unlistable and weak ones still leaves enough
   SHOWN = 4                 # cards in the section (one row of the record cards)
+  # FILM COPY: the section is "Similar objects" and shows only records with an image this visitor may see (record_card_component.rb's rule)
+  ASSET_FILTERS = [ "has_digital_asset_bsi:true", "thumbnail_path_ssi:[* TO *]", "-restrictions_tsi:sensitive" ].freeze
   MINIMUM = 2               # fewer than this and the section is not shown
   MIN_SCORE_RATIO = 0.35
   MAX_PER_CREATOR = 3       # so a prolific creator's series does not fill the section
@@ -58,14 +60,14 @@ class SimilarRecords
   def documents
     candidates = Discovery.search(params).documents.reject { |candidate| @skip.include?(candidate.id.to_s) }
     best = candidates.filter_map { |candidate| candidate["score"] }.max.to_f
-    kept = candidates.select { |candidate| Discovery.listable?(candidate) && strong?(candidate, best) }
+    kept = candidates.select { |candidate| Discovery.listable?(candidate) && shows_image?(candidate) && strong?(candidate, best) }
     varied(kept)
   end
 
   # The request (the parameters are named sim_*: a parameter called mlt would switch on Solr's MoreLikeThis component): q is a Boolean query (the MLT clause must match; the image and date clauses only add score)
   def params
     request = {
-      q: "{!bool must=$sim_mlt should=$sim_image#{' should=$sim_near' if year}}", fq: "-{!term f=id v=$src}", rows: CANDIDATES,
+      q: "{!bool must=$sim_mlt should=$sim_image#{' should=$sim_near' if year}}", fq: [ "-{!term f=id v=$src}", *ASSET_FILTERS ], rows: CANDIDATES,
       fl: "#{Discovery::FIELDS.join(',')},score", src: @document.id.to_s, sim_mlt: mlt_clause, sim_image: "has_digital_asset_bsi:true^#{IMAGE_BOOST}"
     }
     request[:sim_near] = "date_start_isi:[#{year - DATE_WINDOW} TO #{year + DATE_WINDOW}]^#{DATE_BOOST}" if year
@@ -91,6 +93,10 @@ class SimilarRecords
       creator = Array(candidate["creator_ssim"]).first
       creator.blank? || (seen[creator] += 1) <= MAX_PER_CREATOR
     end
+  end
+
+  def shows_image?(candidate)
+    candidate["thumbnail_path_ssi"].present? && AccessPolicy.view?(candidate) && !Sensitivity.sensitive?(candidate)
   end
 
   def strong?(candidate, best)
