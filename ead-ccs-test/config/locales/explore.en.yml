@@ -3,18 +3,18 @@ en:
   # Placeholder wording: the collections team has not approved it.
   explore:
     title: "Explore the collections"
-    intro: "No search term needed. Start from a collection, a kind of record, or a place and a time."
+    intro: "No search term needed. Start from a collection, a record type, a place or a time."
     collections:
       label: "Browse by collection"
     count:
       one: "%{number} record"
       other: "%{number} records"
     kinds:
-      heading: "Kinds of records"
+      heading: "Record types"
       see_all: "See all object types"
     place_time:
       heading: "Place and time"
       places: "Places"
-      periods: "Periods"
+      periods: "Time"
       see_all_places: "See all places"
       see_all_periods: "See all periods"

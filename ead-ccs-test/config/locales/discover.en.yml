@@ -22,8 +22,8 @@ en:
           heading: "Trending records"
           description: "The records most viewed in the last %{days} days. The count is of page views only: the site does not record who looked."
     similar:
-      heading: "Similar records"
-      description: "Records that share a creator, subject, type of object or place with this one."
+      heading: "Similar objects"
+      description: "Objects that share a creator, subject, type of object or place with this one."
     related:
       heading: "Related objects"
     recently_viewed:

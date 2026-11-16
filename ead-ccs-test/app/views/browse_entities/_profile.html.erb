@@ -25,7 +25,7 @@
           <div><dt><%= t("browse.entity.collections") %></dt>
             <dd><ul class="browse-facts__links">
               <% result.facets["collection_ssim"].first(4).each do |value, count| %>
-                <li><%= link_to value, search_catalog_path(refine(@search_query, "collection_ssim", value)) %> <span class="browse-list__count">(<%= number_with_delimiter(count) %>)</span></li>
+                <li><%= link_to value, search_catalog_path(refine(@search_query, "collection_ssim", value)) %></li>
               <% end %>
             </ul></dd></div>
         <% end %>

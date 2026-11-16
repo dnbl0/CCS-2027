@@ -14,4 +14,5 @@
   <% end %>
 <% end %>
 
-<%= render NexusCcs::MoreLikeThisComponent.new(document: @document, related: RelatedObjects.for(@document), recent: RecentlyViewed.new(session).documents(except: @document.id)) %>
+<%# FILM COPY: one section, "Similar objects", in place of More like this; it fills a lazy frame and is not drawn when nothing is found %>
+<%= render NexusCcs::SimilarRecordsComponent.new(document: @document) %>

@@ -6,7 +6,7 @@
     </header>
 
     <% if overview.collections.any? %>
-      <ul class="explore__tiles" aria-label="<%= t("explore.collections.label") %>">
+      <ul class="explore__tiles<%= " explore__tiles--all" if overview.collections.size > 6 %>" aria-label="<%= t("explore.collections.label") %>">
         <% overview.collections.each do |tile| %>
           <li class="explore__tile explore__tile--tint-<%= tile.tint %>">
             <%= link_to helpers.search_action_path(tile.query), class: "explore__tile-link" do %>
@@ -18,7 +18,7 @@
               <% end %>
               <span class="explore__tile-body">
                 <h3 class="explore__tile-title"><%= tile.label %></h3>
-                <span class="explore__tile-count"><%= count_label(tile.count) %></span>
+                
               </span>
             <% end %>
           </li>
@@ -26,36 +26,34 @@
       </ul>
     <% end %>
 
-    <div class="explore__more">
-      <% if overview.kinds.any? %>
-        <div class="explore__group">
-          <h3 id="explore-kinds" class="explore__heading"><%= t("explore.kinds.heading") %></h3>
-          <ul class="explore__links explore__links--columns" aria-labelledby="explore-kinds">
-            <% overview.kinds.each do |kind| %>
-              <li><%= link_to kind.label, helpers.search_action_path(kind.query), class: "explore__link" %></li>
-            <% end %>
-          </ul>
-          <%= link_to t("explore.kinds.see_all"), helpers.browse_hub_path("object-types"), class: "arrow-link arrow-link--icon explore__all" %>
+    <%# FILM COPY: Record types, Places and Time, each its own section: a row of four tiles (the collection tiles' design) and a See all link %>
+    <% [ [ :kinds, overview.kind_tiles, t("explore.kinds.heading"), t("explore.kinds.see_all"), "object-types" ],
+         [ :places, overview.place_tiles, t("explore.place_time.places"), t("explore.place_time.see_all_places"), "places" ],
+         [ :periods, overview.period_tiles, t("explore.place_time.periods"), t("explore.place_time.see_all_periods"), "periods" ] ].each do |key, tiles, heading, see_all, slug| %>
+      <% next if tiles.empty? %>
+      <div class="explore__group explore__group--row" aria-labelledby="explore-<%= key %>">
+        <div class="explore__row-head">
+          <h3 id="explore-<%= key %>" class="explore__heading"><%= heading %></h3>
+          <%= link_to see_all, helpers.browse_hub_path(slug), class: "arrow-link arrow-link--icon explore__all" %>
         </div>
-      <% end %>
-
-      <% if overview.places.any? || overview.periods.any? %>
-        <div class="explore__group explore__group--time">
-          <h3 class="explore__heading"><%= t("explore.place_time.heading") %></h3>
-          <% [ [ :places, overview.places, "places", "see_all_places" ], [ :periods, overview.periods, "periods", "see_all_periods" ] ].each do |key, links, slug, see_all| %>
-            <% next if links.empty? %>
-            <details class="explore__disclosure" data-controller="explore-disclosure">
-              <summary class="explore__summary"><%= t("explore.place_time.#{key}") %></summary>
-              <ul class="explore__links">
-                <% links.each do |link| %>
-                  <li><%= link_to link.label, helpers.search_action_path(link.query), class: "explore__link" %></li>
+        <ul class="explore__tiles explore__tiles--row" aria-labelledby="explore-<%= key %>">
+          <% tiles.each do |tile| %>
+            <li class="explore__tile explore__tile--tint-<%= tile.tint %>">
+              <%= link_to helpers.search_action_path(tile.query), class: "explore__tile-link" do %>
+                <% if image?(tile) %>
+                  <span class="explore__face explore__face--image"><%= image_tag image_path(tile), alt: "", width: tile.image.width, height: tile.image.height, loading: "lazy", decoding: "async", class: "explore__image" %></span>
+                <% else %>
+                  <span class="explore__face" aria-hidden="true"><span class="explore__monogram"><%= monogram(tile) %></span></span>
                 <% end %>
-              </ul>
-              <%= link_to t("explore.place_time.#{see_all}"), helpers.browse_hub_path(slug), class: "arrow-link arrow-link--icon explore__all" %>
-            </details>
+                <span class="explore__tile-body">
+                  <h4 class="explore__tile-title"><%= tile.label %></h4>
+                  
+                </span>
+              <% end %>
+            </li>
           <% end %>
-        </div>
-      <% end %>
-    </div>
+        </ul>
+      </div>
+    <% end %>
   </div>
 </section>

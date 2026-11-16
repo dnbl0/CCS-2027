@@ -73,6 +73,13 @@
 
 .explore__tile-link:hover .explore__tile-title { color: var(--ccs-text-link-hover); text-decoration: underline; }
 
+/* FILM ONLY: every collection, five per row, the collection picture filling its face */
+.explore__tiles--all { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--ccs-space-4); }
+.explore__tiles--all .explore__image { object-fit: cover; }
+.explore__tiles--all .explore__tile-body { padding: var(--ccs-space-3) var(--ccs-space-7) var(--ccs-space-3) var(--ccs-space-3); }
+.explore__tiles--all .explore__tile-title { font-size: var(--ccs-font-size-md); }
+.explore__tiles--all .explore__tile-body::after { right: var(--ccs-space-3); bottom: var(--ccs-space-3); width: 1.25rem; height: 1.25rem; }
+
 /* --- Kinds of records, and place and time --- */
 .explore__more { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ccs-space-7) var(--ccs-space-6); align-items: start; }
 
@@ -197,3 +204,12 @@
 
   .explore__tile-link:hover .explore__tile-body::after { translate: var(--ccs-space-1) 0; }
 }
+
+/* FILM COPY: Record types, Places and Time, each a row of four tiles with its See all link beside the heading; the picture fills its face */
+.explore__group--row { gap: var(--ccs-space-4); }
+.explore__row-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--ccs-space-2) var(--ccs-space-5); }
+.explore__tiles--row { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--ccs-space-4); }
+.explore__tiles--row .explore__image { object-fit: cover; }
+.explore__tiles--row .explore__tile-title { display: block; }
+@media (max-width: 1023px) { .explore__tiles--row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 599px) { .explore__tiles--row { grid-template-columns: 1fr; } }
