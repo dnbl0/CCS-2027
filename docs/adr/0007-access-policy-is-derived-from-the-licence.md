@@ -13,3 +13,13 @@ download, metadata export, structured data and sitemap only ask for the tier. Wh
 those rules and nothing else changes. Until then a blank licence (about three quarters of the records) is `:view_only`, so it
 is never downloadable, but its images are not hidden for a gap in the data. `Sensitivity` is the same kind of stand-in for the
 DAM's advisory. Both are tested directly (`test/models/access_policy_test.rb`, `sensitivity_test.rb`).
+
+## Update 2026-11-16: the DAM usage rights decide
+
+The index now carries each asset's DAM licence (`digital_asset_metadata_ssm`). `AccessPolicy.tier` reads it first: CC BY is
+`:open`; All Rights reserved (UoM), Copyright Agency Limited and Individual are `:view_only`; a blank or "None" licence is
+`:request` (the DAM has not cleared the asset, so it is not shown); a wording that says restricted or ICIP is `:request`. A record
+with several assets gets the most restrictive. The EMu licence can only tighten the result to `:request`, never open it up, and
+is the fallback when a record has no DAM usage rights at all. Open question for the University: confirm the mapping, in
+particular that a blank DAM licence withholds the asset. The "open licence" filter (`FreeReuse`) still reads the EMu field until
+the ingest indexes the DAM licence.

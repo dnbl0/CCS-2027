@@ -13,7 +13,7 @@ module Browse
     FACET_LIMIT = 14
     # The fields the result card, the save control and the access checks read; not the whole record (assets_json is large)
     FIELDS = %w[id title_tsim creator_ssim creator_display_ssim object_type_ssim collection_ssim thumbnail_path_ssi has_digital_asset_bsi
-                licence_type_ssim access_condition_ssi restrictions_tsi date_start_isi production_date_ssim].freeze
+                licence_type_ssim digital_asset_metadata_ssm access_condition_ssi restrictions_tsi date_start_isi production_date_ssim].freeze
     # Records the collection staff mark as culturally protected (AccessPolicy, Sensitivity and CulturalProtocolsNoticeComponent
     # read the same signs; this counts them in one facet query)
     CULTURAL_QUERY = '{!key=cultural}licence_type_ssim:"ICIP Rights" OR access_condition_ssi:"Community Restricted" OR restrictions_tsi:cultur*'

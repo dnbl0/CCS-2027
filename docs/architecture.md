@@ -81,8 +81,9 @@ What is known from this repository and the index (the University dev team's own 
   and posts it. `bin/rails collections:index` runs it (it skips a core that already holds records unless `FORCE=1`). It is
   how development, CI and the Azure demo fill Solr (`AUTO_INDEX=true` does it on start where Solr has no disk of its own).
 - The University's real ingest also writes the digital asset metadata from the DAM into the Solr field `assets_json`. The
-  app does not read it yet: `AccessPolicy` and `Sensitivity` use the licence and restriction notes as stand-ins, and each says
-  in its header which rules to replace when the DAM's own classification arrives.
+  app reads the DAM's usage rights from the stored field `digital_asset_metadata_ssm` (one JSON object per asset, with a
+  `licence`): they decide what `AccessPolicy` shows. The EMu licence is only a fallback and a tightening gate (ICIP, restricted,
+  community restricted). `Sensitivity` still uses the restriction notes as a stand-in for the DAM's advisory.
 - Asset addresses come from `config/digital_assets.yml` and `config/digital_media.yml`, by `Collections::DigitalAssets` and
   `DigitalMedia`; the files themselves are under `public/digital-assets`.
 - The record ids start with the source system (`emu-9044`, `vernon-MHM00394`), which is how the code tells them apart.
