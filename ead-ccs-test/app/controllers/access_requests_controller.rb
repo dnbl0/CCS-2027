@@ -54,6 +54,7 @@ class AccessRequestsController < ApplicationController
     id = params[:document_id].to_s
     raise ActionController::RoutingError, "Not Found" if id.blank? || id.length > 200
 
+    SuppressedRecord.guard!(id) # a record taken out of the site (CCS-112): 410 Gone
     config = CatalogController.blacklight_config
     service = SearchService.new(config: config, search_state: Blacklight::SearchState.new({}, config), user_params: {})
     @document = service.fetch(id)

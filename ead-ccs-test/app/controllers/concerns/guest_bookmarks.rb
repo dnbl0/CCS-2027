@@ -13,7 +13,7 @@ module GuestBookmarks
   # (The header asks on every page: a database that is down must not take the pages that do not need it down too, so it says 0.)
   def saved_records_count
     id = session[:blacklight_guest_user_id]
-    id ? Bookmark.where(user_id: id, user_type: "User").count : 0
+    id ? Bookmark.where(user_id: id, user_type: "User").where.not(document_id: SuppressedRecord.ids.to_a).count : 0
   rescue ActiveRecord::ActiveRecordError, PG::Error => e
     Rails.logger.warn("Saved records count unavailable: #{e.class}")
     0

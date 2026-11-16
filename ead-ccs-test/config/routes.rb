@@ -103,7 +103,7 @@ Rails.application.routes.draw do
   get "llms.txt", to: "seo#llms", format: false
 
   # What the visitor sees for an error: Rails sends the failed request to /<status> (config.exceptions_app)
-  %w[400 404 406 422 429 500 503].each { |code| match code, to: "errors#show", via: :all, defaults: { code: code }, as: "error_#{code}" }
+  %w[400 404 406 410 422 429 500 503].each { |code| match code, to: "errors#show", via: :all, defaults: { code: code }, as: "error_#{code}" }
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

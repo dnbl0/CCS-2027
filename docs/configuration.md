@@ -44,6 +44,8 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `REDIS_URL` | `redis://localhost:6379/1` | `config/cable.yml` | Action Cable; unused, the app has no cable channel |
 | `CCS_MEDIA_BASE_URL` | `/digital-assets/media` | `Collections::DigitalMedia` | Where the audio, video and PDF files are served from |
 | `SEO_CANONICAL_BASE_URL` | the request's own address | `BotControls.base_url` | The site's address in canonical links, the sitemap and structured data, when a proxy hides the real host |
+| `SUPPRESSED_RECORDS_CACHE_SECONDS` | `30` | `SuppressedRecord` | How long a running server keeps the list of removed records in memory before reading the database again: a removal reaches every instance within this time. See [remove-a-record.md](../ead-ccs-test/docs/remove-a-record.md) |
+| `SUPPRESSED_BY` | the server's user name | `records:suppress` | Who is removing the record (free text, kept with the reason) |
 | `SEO_SITEMAP_CACHE_HOURS` | `12` | `BotControls.sitemap_cache_hours` | How long the list of record ids for the sitemap is kept |
 | `TRENDING_ENABLED` | `on` | `RecordView.enabled?` | `off` stops counting record views and hides the Trending section (Featured and Pick of the day stay). See [similar-and-trending.md](../ead-ccs-test/docs/similar-and-trending.md) |
 | `TRENDING_DAYS` | `7` | `RecordView.window_days` | The window of "most viewed in the last N days" (1 to 90) |

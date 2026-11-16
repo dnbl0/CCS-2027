@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_16_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -100,6 +100,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_000001) do
     t.index ["byte_size"], name: "index_solid_cache_entries_on_byte_size"
     t.index ["key_hash", "byte_size"], name: "index_solid_cache_entries_on_key_hash_and_byte_size"
     t.index ["key_hash"], name: "index_solid_cache_entries_on_key_hash", unique: true
+  end
+
+  create_table "suppressed_records", force: :cascade do |t|
+    t.string "record_id", null: false
+    t.text "reason", null: false
+    t.datetime "suppressed_at", null: false
+    t.string "suppressed_by"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["record_id"], name: "index_suppressed_records_on_record_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|

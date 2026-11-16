@@ -83,11 +83,11 @@ module BrowseHubs
   end
 
   def self.cached(slug)
-    Rails.cache.fetch("browse_hubs/v1/#{slug}", expires_in: 1.day, skip_nil: true) do
+    Rails.cache.fetch(SuppressedRecord.cache_key("browse_hubs/v1/#{slug}"), expires_in: 1.day, skip_nil: true) do
       fetched = yield
-      Rails.cache.write("browse_hubs/last_good/v1/#{slug}", fetched, expires_in: 30.days) if fetched
+      Rails.cache.write(SuppressedRecord.cache_key("browse_hubs/last_good/v1/#{slug}"), fetched, expires_in: 30.days) if fetched
       fetched
-    end || Rails.cache.read("browse_hubs/last_good/v1/#{slug}")
+    end || Rails.cache.read(SuppressedRecord.cache_key("browse_hubs/last_good/v1/#{slug}"))
   end
 
   def self.facet_pairs(hub, connection)

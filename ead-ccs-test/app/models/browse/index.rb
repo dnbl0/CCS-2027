@@ -29,7 +29,7 @@ module Browse
     # keeps the last good copy for a month (CCS-147). The grouping is cached too, as folding some 8,000 names costs tens of milliseconds.
     def self.for(kind, connection: nil)
       kind = Kind.find(kind) unless kind.is_a?(Kind)
-      entries = Rails.cache.fetch("browse/index/v2/#{kind.key}", expires_in: CACHE_TTL, skip_nil: true) do
+      entries = Rails.cache.fetch(SuppressedRecord.cache_key("browse/index/v2/#{kind.key}"), expires_in: CACHE_TTL, skip_nil: true) do
         rows = BrowseHubs.values(BrowseHubs.find(kind.key), connection)
         rows && group(kind, rows)
       end
