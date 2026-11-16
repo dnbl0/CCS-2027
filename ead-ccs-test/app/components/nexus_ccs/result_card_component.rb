@@ -39,6 +39,11 @@ module NexusCcs
       marked if marked.include?(SearchHighlighting::OPEN)
     end
 
+    # The Full text (PDF) search finds a record only through its PDF's text, so the card says so (CCS-36)
+    def found_in_pdf?
+      helpers.controller_name == "catalog" && helpers.action_name == "index" && helpers.params[:search_field].to_s == "full_text" && helpers.params[:q].present?
+    end
+
     # The snippet is a piece of the description and the like, so it is not shown for a record whose description is withheld
     def show_snippet?
       !RobotsPolicy.withheld?(document)

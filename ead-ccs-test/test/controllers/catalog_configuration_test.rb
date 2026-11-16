@@ -23,8 +23,8 @@ class CatalogConfigurationTest < ActiveSupport::TestCase
     assert_equal "title_si desc", config.sort_fields["title-desc"].sort
   end
 
-  test "search fields: all, title, creator, subject and description" do
-    assert_equal %w[all_fields creator description subject title], config.search_fields.keys.sort
+  test "search fields: all, title, creator, subject, description and Full text (shown only when the core has it)" do
+    assert_equal %w[all_fields creator description full_text subject title], config.search_fields.keys.sort
   end
 
   test "advanced search is on and carries the facets" do

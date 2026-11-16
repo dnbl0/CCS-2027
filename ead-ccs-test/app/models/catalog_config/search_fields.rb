@@ -35,6 +35,14 @@ module CatalogConfig
         }
       end
 
+      # Full text (CCS-36): the text inside PDFs. Offered only when the core has the field (PdfTextIndex); not in the advanced form.
+      config.add_search_field("full_text") do |field|
+        field.label = "Full text (PDF)"
+        field.if = ->(_context, _field) { PdfTextIndex.available? }
+        field.include_in_advanced_search = false
+        field.solr_parameters = { qf: "${pdf_qf}", pf: "${pdf_pf}" }
+      end
+
       # Vernon records only (the EMu export has no description column)
       config.add_search_field("description") do |field|
         field.solr_parameters = {

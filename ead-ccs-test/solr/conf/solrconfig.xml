@@ -69,6 +69,12 @@
        </str>
        <str name="title_pf">
        </str>
+       <!-- "Full text" search (CCS-36): the text inside PDFs only -->
+       <str name="pdf_qf">
+          pdf_text_tim
+       </str>
+       <str name="pdf_pf">
+       </str>
        <str name="subject_qf">
           subject_tsim
        </str>

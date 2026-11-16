@@ -16,7 +16,7 @@
         <% line_fields.each do |field, line| %><li><%= line_html(field, line) %></li><% end %>
       </ul>
     <% end %>
-    <%= render NexusCcs::MatchRationaleComponent.new(match: match, show_snippet: show_snippet?) %>
+    <%= render NexusCcs::MatchRationaleComponent.new(match: match, show_snippet: show_snippet?, pdf: found_in_pdf?) %>
     <%= render NexusCcs::SelectBoxComponent.new(document_id: document.id, title: title_text) if selectable? %>
     <% if Rails.configuration.x.saved_records %>
       <div class="result-card__save">

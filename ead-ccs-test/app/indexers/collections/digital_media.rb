@@ -33,11 +33,30 @@ module Collections
     end
     private :entry
 
+    # PDF_TEXT=off stops the text of PDFs being read at indexing (CCS-36); PDF_MEDIA_DIR is where the PDF files are on this machine
+    def self.pdf_text? = ENV["PDF_TEXT"].to_s.downcase != "off"
+
+    def self.pdf_dir = Pathname.new(ENV.fetch("PDF_MEDIA_DIR") { Rails.root.join("public/digital-assets/media").to_s })
+
+    def pdf_text?(files) = self.class.pdf_text? && files.any? { |file| file["kind"] == "pdf" }
+    private :pdf_text?
+
+    # The text of the record's PDFs, one value each. None for a record whose assets are withheld or sensitive (AccessPolicy,
+    # Sensitivity): its PDF is not searchable, as it is not shown. A file that cannot be read adds nothing.
+    def pdf_text(document, files)
+      return [] if RobotsPolicy.withheld?(SolrDocument.new(document))
+
+      files.select { |file| file["kind"] == "pdf" }.filter_map { |file| PdfText.extract(self.class.pdf_dir.join(file["file"].to_s)) }
+    end
+    private :pdf_text
+
     def attach(document)
       files = Array(document["accession_number_ssim"]).filter_map { |accession| @files_by_accession[accession] }.first
       return document if files.blank?
 
       formats = files.map { |f| FORMATS.fetch(f["kind"]) }
+      texts = pdf_text?(files) ? pdf_text(document, files) : []
+      document = document.merge("pdf_text_tim" => texts) if texts.any?
       document.merge(
         "digital_media_ssim" => files.map { |f| entry(f) },
         "has_digital_asset_bsi" => true,
