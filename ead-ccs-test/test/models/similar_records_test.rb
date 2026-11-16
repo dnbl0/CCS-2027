@@ -16,7 +16,8 @@ class SimilarRecordsTest < ActiveSupport::TestCase
     assert_includes params[:sim_mlt], "{!mlt qf="
     assert_includes params[:sim_mlt], "v=$src"
     assert_equal 'emu-"1" or *:*', params[:src]
-    assert_equal "-{!term f=id v=$src}", params[:fq]
+    assert_equal "-{!term f=id v=$src}", params[:fq].first
+    assert_includes params[:fq], "has_digital_asset_bsi:true" # "Similar objects" shows only records with an image
     assert_no_match(/or \*:\*/, params[:q] + params[:sim_mlt])
     assert_includes params[:q], "should=$sim_image"
     assert_includes params[:sim_mlt], "creator_ssim^3.0"

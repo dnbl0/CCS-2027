@@ -33,8 +33,9 @@ class DynamicFiltersTest < ActionDispatch::IntegrationTest
     assert_operator after["Object Type"].values.sum, :<, before["Object Type"].values.sum
     # (each list shows only its top 20, so a value that was below the line before can appear after)
     assert after["Object Type"].all? { |value, count| count <= before["Object Type"].fetch(value, count) }, "a count grew after narrowing"
-    assert_equal 1, after["Collection Title"].size, "other collections have no records in this one"
-    assert after["Collection Title"].keys.first.start_with?("Medical History Museum")
+    # Collection Title is multi-select: it keeps listing the other collections, so one more can be added
+    assert_operator after["Collection Title"].size, :>, 1
+    assert after["Collection Title"].keys.any? { |value| value.start_with?("Medical History Museum") }
   end
 
   test "a filter left with no values is not offered" do

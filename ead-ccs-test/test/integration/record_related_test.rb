@@ -20,32 +20,18 @@ class RecordRelatedTest < ActionDispatch::IntegrationTest
 
   def path_for(doc) = "/catalog/#{ERB::Util.url_encode(doc['id'])}"
 
-  test "a record page lists other records of the same kind, never the record itself" do
-    first, = records_of_one_type
+  # The showcase record page has one "Similar objects" section (a lazy frame, image-only) in place of Related objects and Recently
+  # viewed; the recently viewed list is still kept for My data.
+  test "a record page has the Similar objects frame, and no Related objects or Recently viewed sections" do
+    first, second = records_of_one_type
 
     get path_for(first)
+    get path_for(second)
 
     assert_response :success
-    assert_select "section#related-objects h3", text: "Related objects"
-    assert_select "section#related-objects h3.object-card__title a.object-card__link"
-    assert_operator css_select("section#related-objects article.object-card").size, :<=, 4
-    assert_select "section#related-objects a.object-card__link[href='#{path_for(first)}']", count: 0
-  end
-
-  test "the first record a visitor opens has no recently viewed list; later ones list the earlier ones, newest first" do
-    first, second, third = records_of_one_type
-
-    get path_for(first)
+    assert_select "turbo-frame#similar-records[src][loading=lazy]"
+    assert_select "section#related-objects", count: 0
     assert_select "section#recently-viewed", count: 0
-
-    get path_for(second)
-    assert_select "section#recently-viewed h3", text: "Recently viewed"
-    assert_select "section#recently-viewed a.object-card__link[href='#{path_for(first)}']"
-    assert_select "section#recently-viewed a.object-card__link[href='#{path_for(second)}']", count: 0
-
-    get path_for(third)
-    links = css_select("section#recently-viewed a.object-card__link").pluck("href")
-    assert_equal [ path_for(second), path_for(first) ], links
   end
 
   test "reloading a record does not list it beside itself" do

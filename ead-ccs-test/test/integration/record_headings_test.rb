@@ -18,7 +18,7 @@ class RecordHeadingsTest < ActionDispatch::IntegrationTest
     assert_select "h1", count: 1
     assert_select "h1.record-summary__title", count: 1
     assert_select "h1.visually-hidden", count: 0
-    assert_select ".record-banner", count: 0
+    assert_select ".record-banner h1", count: 0 # the 2026 layout's banner is the breadcrumb band; the title is the header block's
     assert_select "header.record-header h1", count: 1
     assert_select "section.record-summary[aria-label]", count: 0
     assert_select "main[aria-label]", count: 0

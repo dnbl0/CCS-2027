@@ -21,18 +21,19 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
 
   teardown { Rails.cache = @cache }
 
-  test "the home page offers a tile for each collection, kinds of records, and places and periods" do
+  test "the home page offers a tile for each collection (no counts), and rows of tiles for record types, places and periods" do
     Rails.cache.write(ExploreEntryPoints::CACHE_KEY, COUNTS, expires_in: 1.day)
 
     get "/"
 
     assert_response :success
     assert_select "section[aria-labelledby=explore-title] h2#explore-title", text: "Explore the collections"
-    assert_select "a.explore__tile-link[href*='f%5Bcollection_ssim%5D%5B%5D=University+Art+Collection'] .explore__tile-count", text: "14,537 records"
+    assert_select "a.explore__tile-link[href*='f%5Bcollection_ssim%5D%5B%5D=University+Art+Collection'] h3", text: "University Art Collection"
+    assert_select ".explore__tile-count", count: 0
     assert_select "a.explore__tile-link h3", count: 2
-    assert_select "a.explore__link[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints']", text: "Prints and drawings"
-    assert_select "a.explore__link[href*='f%5Bproduction_place_ssim%5D%5B%5D=Japan']"
-    assert_select "a.explore__link[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999']", text: "1900s"
+    assert_select "a.explore__tile-link[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'] h4", text: "Prints and drawings"
+    assert_select "a.explore__tile-link[href*='f%5Bproduction_place_ssim%5D%5B%5D=Japan']"
+    assert_select "a.explore__tile-link[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999'] h4", text: "1900s"
   end
 
   test "the section has no picture unless one was kept for a tile, and the Indigenous Collections tile never has one" do

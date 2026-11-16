@@ -25,7 +25,7 @@
 
     <div class="record-main">
       <div class="record-main__inner">
-        <section class="record-summary" aria-label="Summary">
+        <section class="record-summary">
           <%= render NexusCcs::RecordHeaderComponent.new(document: document, title_markup: title_markup) %>
           <% if tags.any? %>
             <ul class="record-summary__tags" aria-label="Tags">

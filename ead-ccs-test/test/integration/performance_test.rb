@@ -119,7 +119,8 @@ class PerformanceTest < ActionDispatch::IntegrationTest
   # and by about 0.5 kB with the "Featured and trending" heading, link and lazy frame (its records load later, not in this HTML)
   # CCS-471: the cookie notice adds about 1.7 kB to a page a visitor has not answered it on (the test's first visit), so the home budget rose from 62 to 64 kB
   # All University collections (25 links with their addresses) add about 5 kB to the home page, so the home budget rose from 64 to 70 kB
-  { "/" => 70_000, "/help" => 56_000, "/about" => 50_000 }.each do |path, budget|
+  # The showcase's Record types, Places and Time rows of tiles add about 2 kB, so it rose from 70 to 74 kB (compressed stays 14 kB)
+  { "/" => 74_000, "/help" => 56_000, "/about" => 50_000 }.each do |path, budget|
     test "#{path} stays within its HTML size budget (#{budget / 1000} kB, #{14} kB compressed)" do
       get path, headers: { "Accept-Encoding" => "identity" }
       assert_operator response.body.bytesize, :<=, budget

@@ -8,23 +8,26 @@ class ExploreComponentTest < ViewComponent::TestCase
   def tile(label, count, tint, image: nil) = ExploreEntryPoints::Tile.new(label: label, count: count, query: BrowseHubs.query("collection_ssim", label), image: image, tint: tint)
 
   def overview(image: nil, indigenous_image: nil)
+    kinds = [ ExploreEntryPoints::Link.new("Paintings", 2555, Browse.search_query("classification_ssim", [ "paintings" ])),
+              ExploreEntryPoints::Link.new("Prints and drawings", 7192, Browse.search_query("classification_ssim", %w[prints drawings])) ]
+    places = [ ExploreEntryPoints::Link.new("Australia", 8056, BrowseHubs.query("production_place_ssim", "Australia")) ]
+    periods = [ ExploreEntryPoints::Link.new("1900s", 5000, BrowseHubs.period_query(1900, 1999)) ]
     ExploreEntryPoints::Overview.new(
       [ tile("University Art Collection", 14_537, 1, image: image), tile("Indigenous Collections", 1540, 2, image: indigenous_image), tile("Medical History Museum", 1, 3) ],
-      [ ExploreEntryPoints::Link.new("Paintings", 2555, Browse.search_query("classification_ssim", [ "paintings" ])),
-        ExploreEntryPoints::Link.new("Prints and drawings", 7192, Browse.search_query("classification_ssim", %w[prints drawings])) ],
-      [ ExploreEntryPoints::Link.new("Australia", 8056, BrowseHubs.query("production_place_ssim", "Australia")) ],
-      [ ExploreEntryPoints::Link.new("1900s", 5000, BrowseHubs.period_query(1900, 1999)) ]
+      kinds, places, periods,
+      ExploreEntryPoints.send(:link_tiles, kinds, {}), ExploreEntryPoints.send(:link_tiles, places, {}), ExploreEntryPoints.send(:link_tiles, periods, {})
     )
   end
 
-  test "an h2, then a tile for each collection: the whole tile is one link with the h3 and the exact count inside it" do
+  def empty_overview(collections = []) = ExploreEntryPoints::Overview.new(collections, [], [], [], [], [], [])
+
+  test "an h2, then a tile for each collection: the whole tile is one link with the h3, and no record count" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
     assert_selector "section.explore[aria-labelledby=explore-title] h2#explore-title", text: "Explore the collections"
     assert_selector "ul.explore__tiles[aria-label='Browse by collection'] li.explore__tile", count: 3
     assert_selector "li.explore__tile > a.explore__tile-link h3.explore__tile-title", text: "University Art Collection"
-    assert_selector "a.explore__tile-link .explore__tile-count", text: "14,537 records"
-    assert_selector "a.explore__tile-link .explore__tile-count", text: "1 record", exact_text: true
+    assert_no_selector ".explore__tile-count"
     assert_selector "a.explore__tile-link[href*='f%5Bcollection_ssim%5D%5B%5D=University+Art+Collection'][href*='any_assets=1']"
     assert_selector "li.explore__tile--tint-2"
   end
@@ -59,40 +62,33 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_no_selector "img"
   end
 
-  test "kinds of records are a plain list of links to the catalogue filters; a kind with several values is an any-of filter" do
+  test "Record types, Places and Time are each a row of tiles with a See all link; a type with several values is an any-of filter" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
-    assert_selector "h3#explore-kinds", text: "Kinds of records"
-    assert_selector "ul[aria-labelledby=explore-kinds] a.explore__link", count: 2
-    assert_selector "a.explore__link[href*='f%5Bclassification_ssim%5D%5B%5D=paintings']", text: "Paintings"
-    assert_selector "a.explore__link[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings']", text: "Prints and drawings"
-    assert_selector ".explore__links--columns a", text: /\A[^0-9]+\z/ # no counts in the secondary lists
+    assert_selector "h3#explore-kinds", text: "Record types"
+    assert_selector "ul.explore__tiles--row[aria-labelledby=explore-kinds] li.explore__tile", count: 2
+    assert_selector "a.explore__tile-link[href*='f%5Bclassification_ssim%5D%5B%5D=paintings'] h4", text: "Paintings"
+    assert_selector "a.explore__tile-link[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings'] h4", text: "Prints and drawings"
     assert_selector "a.explore__all[href='/browse/object-types']", text: "See all object types"
-  end
-
-  test "place and time are two disclosures, closed in the markup, each with a link to its browse page" do
-    render_inline NexusCcs::ExploreComponent.new(overview: overview)
-
-    assert_selector "h3", text: "Place and time"
-    assert_selector "details.explore__disclosure[data-controller=explore-disclosure]:not([open])", count: 2
-    assert_selector "details summary.explore__summary", text: "Places"
-    assert_selector "details a.explore__link[href*='f%5Bproduction_place_ssim%5D%5B%5D=Australia']", text: "Australia", visible: :all
-    assert_selector "details a.explore__link[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900']", text: "1900s", visible: :all
-    assert_selector "a.explore__all[href='/browse/places']", text: "See all places", visible: :all
-    assert_selector "a.explore__all[href='/browse/periods']", text: "See all periods", visible: :all
+    assert_selector "h3#explore-places", text: "Places"
+    assert_selector "a.explore__tile-link[href*='f%5Bproduction_place_ssim%5D%5B%5D=Australia'] h4", text: "Australia"
+    assert_selector "a.explore__all[href='/browse/places']", text: "See all places"
+    assert_selector "h3#explore-periods", text: "Time"
+    assert_selector "a.explore__tile-link[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'] h4", text: "1900s"
+    assert_selector "a.explore__all[href='/browse/periods']", text: "See all periods"
   end
 
   test "nothing renders without anything to show" do
-    render_inline NexusCcs::ExploreComponent.new(overview: ExploreEntryPoints::Overview.new([], [], [], []))
+    render_inline NexusCcs::ExploreComponent.new(overview: empty_overview)
 
     assert_no_selector "section"
   end
 
   test "with only some groups, the others are left out without leaving a heading behind" do
-    render_inline NexusCcs::ExploreComponent.new(overview: ExploreEntryPoints::Overview.new(overview.collections, [], [], []))
+    render_inline NexusCcs::ExploreComponent.new(overview: empty_overview(overview.collections))
 
     assert_selector "li.explore__tile", count: 3
-    assert_no_selector "h3", text: "Kinds of records"
-    assert_no_selector "h3", text: "Place and time"
+    assert_no_selector "h3", text: "Record types"
+    assert_no_selector "h3", text: "Places"
   end
 end
