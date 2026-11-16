@@ -4,9 +4,16 @@ The home page lists every University cultural collection, not only the ones whos
 `config/university_collections.yml` (25 collections: the University Art Collection and the 24 on
 museumsandcollections.unimelb.edu.au/collections, read 2026-11-16). Only names and web addresses are kept.
 
-- A collection whose name is in `config/pages.yml` (the five with records in the index) is searched in place.
-- The others link to their own website, under "Not in Collections Navigator yet" (placeholder wording).
-- `UniversityCollections` does the matching, so a collection moves to the first group by itself once it is added to `config/pages.yml`.
+- A collection is searched in place when it has a landing page in `config/pages.yml` OR the index holds records whose `collection_ssim`
+  is its name. The others link to their own website, under "Not in Collections Navigator yet" (placeholder wording).
+- So when a collection's records are loaded, it moves to "search here" by itself within an hour (the counts are cached; a Solr outage
+  is not cached, and then only the landing-page collections are searchable). No code change is needed.
+- Its search is the `collection_ssim` filter, with the default "with images" filter off, so every record shows, with or without images.
+  A search typed on that results page stays inside the collection (the search form carries the filter), and the collection also appears
+  in the Collection facet.
+- **The loaded records must carry the collection's name exactly as written in `config/university_collections.yml`** in `collection_ssim`
+  (the CSV column `collection`; EMu and DAM loads use their own field). If the data spells it differently, add `facet_value: <spelling>`
+  to that entry. A landing page (banner, blurb, named collections) is optional and is added in `config/pages.yml`.
 - To add a collection: add it to the YAML (name and address). To make its records searchable: its records have to be in the index
   with that name in `collection_ssim`. That needs the data (an EMu, DAM or CSV load: see `docs/csv-upload.md`) and is the dev team's and the
   collection owner's work.
