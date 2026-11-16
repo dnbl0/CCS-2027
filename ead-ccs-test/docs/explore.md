@@ -60,5 +60,5 @@ overview is empty and the home page leaves the section out (CI has no Solr). Ima
 - Headings: `h2` for the section; each tile title, "Kinds of records" and "Place and time" are `h3`. The tile list is labelled "Browse by collection".
 - Every link and summary is at least 44px tall; focus is a 3px ring (on the whole tile for tiles). No sideways scroll at 320 or 390px.
 - On a phone, with the disclosures closed, the section is about 1.5 screens (a system test checks it stays under 1.6).
-- The home page HTML stays under 64 kB (`PerformanceTest`, docs/performance.md); one more small controller is preloaded (57 allowed).
+- The home page HTML stays under 70 kB (`PerformanceTest`, docs/performance.md); one more small controller is preloaded (57 allowed).
 - No motion except a 4px arrow nudge on hover, off for reduced motion.
