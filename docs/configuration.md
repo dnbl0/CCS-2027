@@ -45,6 +45,7 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `CCS_MEDIA_BASE_URL` | `/digital-assets/media` | `Collections::DigitalMedia` | Where the audio, video and PDF files are served from |
 | `SEO_CANONICAL_BASE_URL` | the request's own address | `BotControls.base_url` | The site's address in canonical links, the sitemap and structured data, when a proxy hides the real host |
 | `SUPPRESSED_RECORDS_CACHE_SECONDS` | `30` | `SuppressedRecord` | How long a running server keeps the list of removed records in memory before reading the database again: a removal reaches every instance within this time. See [remove-a-record.md](../ead-ccs-test/docs/remove-a-record.md) |
+| `INDEX` | unset | `records:csv_to_documents` | `1` also indexes the converted CSV into the core at `SOLR_URL` (never port 8984, the shared Solr). See [csv-upload.md](../ead-ccs-test/docs/csv-upload.md) |
 | `SUPPRESSED_BY` | the server's user name | `records:suppress` | Who is removing the record (free text, kept with the reason) |
 | `PDF_TEXT` | `on` | `Collections::DigitalMedia.pdf_text?` | `off` reads no PDF text at indexing. See [pdf-full-text.md](../ead-ccs-test/docs/pdf-full-text.md) |
 | `PDF_MEDIA_DIR` | `public/digital-assets/media` | `Collections::DigitalMedia.pdf_dir` | Where the PDF files are on the machine that indexes |

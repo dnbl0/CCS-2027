@@ -18,6 +18,8 @@ module ActiveSupport
 
     # The Full text (PDF) search is offered only when the core is known to have its field; tests start with it off, and never ask Solr
     setup { PdfTextIndex.force(nil) }
+    # The CJK search (CCS-56) is offered only when the core is known to have its fields; tests start with it off, and never ask Solr
+    setup { CjkIndex.force(nil) }
     teardown { SuppressedRecord.forget! }
 
     # Add more helper methods to be used by all tests here...

@@ -43,6 +43,15 @@ module CatalogConfig
         field.solr_parameters = { qf: "${pdf_qf}", pf: "${pdf_pf}" }
       end
 
+      # Chinese, Japanese and Korean (CCS-56): the CJK fields only, found by any run of characters. Offered only when the core has the
+      # fields (CjkIndex); the qf is in the /select handler. Not in the advanced form, which lists the fields without asking.
+      config.add_search_field("cjk") do |field|
+        field.label = "Chinese, Japanese, Korean"
+        field.if = ->(_context, _field) { CjkIndex.available? }
+        field.include_in_advanced_search = false
+        field.solr_parameters = { qf: "${cjk_qf}", pf: "${cjk_pf}" }
+      end
+
       # Vernon records only (the EMu export has no description column)
       config.add_search_field("description") do |field|
         field.solr_parameters = {

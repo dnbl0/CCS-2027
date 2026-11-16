@@ -159,6 +159,8 @@ class CatalogController < ApplicationController
   before_action :apply_search_defaults, only: :index
   # Does the core have the PDF text field (CCS-36)? Asked on a results page only, at most every ten minutes (PdfTextIndex)
   before_action(only: :index) { PdfTextIndex.refresh! }
+  # Does the core have the CJK fields (CCS-56)? Asked on a results page only, at most every ten minutes (CjkIndex)
+  before_action(only: :index) { CjkIndex.refresh! }
 
   # The record page lists the records the visitor opened before (RecentlyViewed); this one is added once the page is drawn,
   # so it is not listed beside itself
