@@ -27,11 +27,11 @@ module BrowseMenu
 
   # connection: the Solr connection to ask (the tests pass their own)
   def self.counts(connection = nil)
-    Rails.cache.fetch(CACHE_KEY, expires_in: 1.day, skip_nil: true) do
+    Rails.cache.fetch(SuppressedRecord.cache_key(CACHE_KEY), expires_in: 1.day, skip_nil: true) do
       fetched = fetch_counts(connection || Blacklight.default_index.connection)
-      Rails.cache.write(LAST_GOOD_KEY, fetched, expires_in: 30.days) if fetched
+      Rails.cache.write(SuppressedRecord.cache_key(LAST_GOOD_KEY), fetched, expires_in: 30.days) if fetched
       fetched
-    end || Rails.cache.read(LAST_GOOD_KEY) || {}
+    end || Rails.cache.read(SuppressedRecord.cache_key(LAST_GOOD_KEY)) || {}
   end
 
   def self.fetch_counts(connection)

@@ -80,6 +80,8 @@ en:
       no_image: "No image shown"
       not_found_title: "Not available"
       not_found_body: "This record or gallery is not available. It may have been removed, or its link may have changed."
+      removed_title: "This record has been removed" # placeholder wording until the University approves it (CCS-112)
+      removed_body: "This record is no longer part of the Collections Navigator."
       unavailable_title: "Temporarily unavailable"
       unavailable_body: "The collection could not be reached. Try again in a few minutes."
     my_data:

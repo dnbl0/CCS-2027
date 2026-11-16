@@ -12,6 +12,7 @@ class PerformanceTest < ActionDispatch::IntegrationTest
   setup do
     @cache = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
+    SuppressedRecord.ids # the list of removed records (CCS-112) is in memory in a running server: one query in half a minute, not one a page
     Rails.cache.write(BrowseMenu::CACHE_KEY, { BrowseMenu::WITH_IMAGES => 1 }, expires_in: 1.day) # as if already fetched, so no Solr is needed
     # The home page's Explore section, full-sized (six collection tiles, every kind, five places, every period), so the budget below covers it
     Rails.cache.write(ExploreEntryPoints::CACHE_KEY, {

@@ -13,6 +13,10 @@ module ActiveSupport
     # What the circuit breaker learnt in one test (a Solr that was down) must not reach the next
     setup { SolrGuard.reset! }
 
+    # Nor the list of suppressed records (CCS-112): a test's rolled-back rows must not leave their ids behind
+    setup { SuppressedRecord.forget! }
+    teardown { SuppressedRecord.forget! }
+
     # Add more helper methods to be used by all tests here...
 
     # The "rails" CI job has no Solr (the system job does): a test that reads the Solr core at SOLR_URL skips itself when it

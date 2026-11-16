@@ -35,7 +35,7 @@ class BulkDownloadsController < ApplicationController
 
   def load_selection
     @return_to = return_path
-    @ids = Array(params[:ids]).map(&:to_s).compact_blank.uniq
+    @ids = Array(params[:ids]).map(&:to_s).compact_blank.uniq.reject { |id| SuppressedRecord.suppressed?(id) } # a record taken out of the site (CCS-112) is left out
     if @ids.empty?
       redirect_to @return_to, alert: t("nexus_ccs.bulk_download.none_chosen"), status: :see_other
     elsif @ids.size > BulkDownload::MAX_RECORDS

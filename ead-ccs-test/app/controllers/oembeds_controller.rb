@@ -13,6 +13,9 @@ class OembedsController < ActionController::Base
   rescue_from ActionController::RoutingError do
     head :not_found
   end
+  rescue_from SuppressedRecord::Removed do # CCS-112
+    head :gone
+  end
   rescue_from Blacklight::Exceptions::ECONNREFUSED, Blacklight::Exceptions::InvalidRequest, Faraday::TimeoutError,
               Faraday::ConnectionFailed do
     head :service_unavailable

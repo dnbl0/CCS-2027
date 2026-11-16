@@ -105,7 +105,7 @@ class ErrorPagesTest < ActionDispatch::IntegrationTest
     assert_equal "30", response.headers["Retry-After"]
   end
 
-  %w[400 404 422 429 500 503].each do |code|
+  %w[400 404 410 422 429 500 503].each do |code|
     test "the stock public/#{code}.html is a complete page: language, title, landmark, noindex, a way home" do
       html = Rails.public_path.join("#{code}.html").read
 

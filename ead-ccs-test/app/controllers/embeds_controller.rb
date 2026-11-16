@@ -15,6 +15,7 @@ class EmbedsController < ActionController::Base
 
   before_action :allow_framing
   rescue_from ActionController::RoutingError, with: :not_found
+  rescue_from SuppressedRecord::Removed, with: :removed # CCS-112: no record, no image, no title inside the frame
   rescue_from Blacklight::Exceptions::ECONNREFUSED, Blacklight::Exceptions::InvalidRequest, Faraday::TimeoutError,
               Faraday::ConnectionFailed, with: :unavailable
 
@@ -51,6 +52,11 @@ class EmbedsController < ActionController::Base
   def not_found
     @message = :not_found
     render "embeds/message", status: :not_found
+  end
+
+  def removed
+    @message = :removed
+    render "embeds/message", status: :gone
   end
 
   def unavailable

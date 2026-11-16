@@ -77,7 +77,7 @@ class Sitemap
 
     # The cached list (Rails.cache: see docs/seo-and-bot-controls.md for what that is in each environment)
     def self.cached
-      Rails.cache.fetch("sitemap/records/v1", expires_in: BotControls.sitemap_cache_hours.hours, race_condition_ttl: 30.seconds) { call }
+      Rails.cache.fetch(SuppressedRecord.cache_key("sitemap/records/v1"), expires_in: BotControls.sitemap_cache_hours.hours, race_condition_ttl: 30.seconds) { call }
     end
   end
 end

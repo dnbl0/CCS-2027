@@ -9,6 +9,9 @@ class StockCatalogController < ActionController::Base
 
   layout "stock_blacklight"
 
+  # A record taken out of the site (CCS-112) is a 410 Gone page
+  before_action(only: %i[show citation]) { SuppressedRecord.guard!(params[:id]) }
+
   # openseadragon_picture_tag, used by blacklight-gallery's OpenSeadragon viewer
   helper Openseadragon::OpenseadragonHelper
 

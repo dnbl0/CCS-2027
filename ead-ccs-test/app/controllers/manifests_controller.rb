@@ -13,6 +13,8 @@
 class ManifestsController < ActionController::Base
   include RecordLookup
 
+  rescue_from(SuppressedRecord::Removed) { head :gone } # CCS-112: no manifest, so no image address
+
   CONTENT_TYPE = %(application/ld+json;profile="#{IiifManifest::CONTEXT}").freeze
 
   def show

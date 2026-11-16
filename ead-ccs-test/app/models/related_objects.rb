@@ -16,7 +16,7 @@ module RelatedObjects
     clauses = SIGNALS.flat_map { |field, boost| values(document, field).map { |value| [ field, value, boost ] } }
     return [] if clauses.empty?
 
-    Rails.cache.fetch("related_objects/v2/#{document.id}", expires_in: 1.day, skip_nil: true) do
+    Rails.cache.fetch(SuppressedRecord.cache_key("related_objects/v2/#{document.id}"), expires_in: 1.day, skip_nil: true) do
       RecordSummaries.fetch(params(document, clauses, limit), connection)
     end.to_a.map { |fields| SolrDocument.new(fields) }
   end

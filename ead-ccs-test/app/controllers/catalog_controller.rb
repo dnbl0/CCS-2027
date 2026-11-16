@@ -27,6 +27,9 @@ class CatalogController < ApplicationController
   # Retries a zero-result search using Solr's spelling collation
   self.search_service_class = ::SearchService
 
+  # A record taken out of the site (CCS-112) is a 410 Gone page, before anything else is asked of Solr (SimilarController inherits this)
+  before_action :refuse_removed_record, only: %i[show citation track]
+
   configure_blacklight do |config|
     # One design, the light one, whatever the browser or device is set to: no colour mode switching (see layouts/_light_theme)
     config.dark_mode_support = false
@@ -164,6 +167,8 @@ class CatalogController < ApplicationController
   def remember_viewed_record
     RecentlyViewed.new(session).record(@document.id) if @document && response.successful?
   end
+
+  def refuse_removed_record = SuppressedRecord.guard!(params[:id])
 
   def apply_search_defaults
     outcome, detail = SearchDefaults.decide(request.query_parameters, html: request.format.html?, get: request.get?,

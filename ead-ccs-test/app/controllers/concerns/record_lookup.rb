@@ -11,14 +11,15 @@ module RecordLookup
     id = id.to_s
     raise ActionController::RoutingError, "Not Found" if id.blank? || id.length > 200
 
+    SuppressedRecord.guard!(id) # a record taken out of the site (CCS-112): 410 Gone
     record_service.fetch(id) || raise(ActionController::RoutingError, "Not Found")
   rescue Blacklight::Exceptions::RecordNotFound
     raise ActionController::RoutingError, "Not Found"
   end
 
-  # Records in the order asked for; an id that is not in the index is left out
+  # Records in the order asked for; an id that is not in the index, or that was taken out of the site (CCS-112), is left out
   def find_records(ids)
-    ids = Array(ids).map(&:to_s).uniq
+    ids = Array(ids).map(&:to_s).uniq.reject { |id| SuppressedRecord.suppressed?(id) }
     return [] if ids.empty?
 
     by_id = record_service.fetch(ids).index_by { |document| document.id.to_s }

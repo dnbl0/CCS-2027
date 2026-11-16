@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-# The page for an error (config.exceptions_app sends the failed request here as /400, /404, /406, /422, /429, /500 or /503): the site header
+# The page for an error (config.exceptions_app sends the failed request here as /400, /404, /406, /410, /422, /429, /500 or /503): the site header
 # and footer, a banner naming what happened and what to do next, in the University's patterns (page banner, arrow links).
 # If this page cannot be drawn either (the database or the layout is what failed), the stock file in public/ is sent instead.
 class ErrorsController < ApplicationController
   layout "pages"
 
-  CODES = %w[400 404 406 422 429 500 503].freeze
+  CODES = %w[400 404 406 410 422 429 500 503].freeze
   # Seconds a visitor (or a polite client) is asked to wait before trying again
   RETRY_AFTER = { "429" => 60, "503" => 30 }.freeze
 
