@@ -67,3 +67,5 @@
 @import url("components/debias.css");
 @import url("components/responsive.css");
 @import url("components/film_polish.css");
+/* Last: the card tiles restyle the cards and the home collections, over card_layout.css, explore.css and film_polish.css's masonry */
+@import url("components/card_tiles.css");
