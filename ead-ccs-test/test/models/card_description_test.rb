@@ -2,9 +2,11 @@
 
 require "test_helper"
 require_relative "../support/canned_search"
+require_relative "../support/outages"
 
 class CardDescriptionTest < ActiveSupport::TestCase
   include CannedSearch
+  include Outages
 
   def answer(classification: [ "prints", 3, "drawings", 2, "paintings", 1 ], collections: [ "University Art Collection", 4, "Grainger Museum Collection", 2, "[other]", 1 ])
     canned_response([]).tap { |body| body["facet_counts"]["facet_fields"] = { "classification_ssim" => classification, "collection_ssim" => collections } }
@@ -30,6 +32,6 @@ class CardDescriptionTest < ActiveSupport::TestCase
   end
 
   test "when the index cannot answer the description is empty" do
-    assert_equal "", CardDescription.for(filter: "x:y")
+    with_solr_down { assert_equal "", CardDescription.for(filter: "x:y") }
   end
 end
