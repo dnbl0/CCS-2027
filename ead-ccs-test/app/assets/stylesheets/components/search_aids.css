@@ -8,7 +8,7 @@
 .quick-filters__list { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2); margin: 0; padding: 0; list-style: none; }
 .quick-filters__chip {
   display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: 2rem; max-width: 100%; padding: 0.125rem var(--ccs-space-3);
-  border: 1px solid var(--ccs-border-strong); border-radius: var(--ccs-radius-circle); background: var(--ccs-surface-default);
+  border: 1px solid var(--ccs-border-brand); border-radius: var(--ccs-radius-circle); background: var(--ccs-surface-default);
   color: var(--ccs-text-brand); font-size: var(--ccs-font-size-sm); line-height: 1.3; text-decoration: none; overflow-wrap: anywhere;
 }
 .quick-filters__chip:hover { background: var(--ccs-surface-subtle); text-decoration: underline; }
@@ -32,3 +32,9 @@
 .search-suggestion__kind { color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); white-space: nowrap; }
 [aria-selected="true"] .search-suggestion__kind,
 .search-suggestion[aria-selected="true"] .search-suggestion__kind { color: inherit; }
+/* The option the arrow keys are on (aria-selected, aria-activedescendant on the box) is marked by an outline and a tint, not colour alone */
+.search-autocomplete-wrapper [role="option"][aria-selected="true"] {
+  outline: 3px solid var(--ccs-focus-ring); outline-offset: -3px; background: var(--ccs-surface-subtle); color: var(--ccs-text-primary);
+}
+.search-autocomplete-wrapper a[role="option"] { color: var(--ccs-text-primary); text-decoration: none; }
+.search-autocomplete-wrapper a[role="option"]:hover .search-suggestion__value { text-decoration: underline; }
