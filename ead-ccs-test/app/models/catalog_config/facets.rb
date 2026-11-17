@@ -26,9 +26,12 @@ module CatalogConfig
         options = { label: filter.name, group: filter.group }
         case filter.type
         when :year then options.merge!(range: true, advanced_search_component: NexusCcs::AdvancedYearRangeComponent) # the range limit plugin's own form and histogram; From and To years in Advanced search
-        when :checkbox then options.merge!(limit: nil, filter_class: InclusiveFilterField)
-        else options.merge!(limit: 20, index_range: "A".."Z", filter_class: InclusiveFilterField)   # browse, with "search within this filter" in the modal
+        when :checkbox then options.merge!(limit: nil, **MULTI_SELECT.call(filter.solr))
+        else options.merge!(limit: 20, index_range: "A".."Z", **MULTI_SELECT.call(filter.solr))   # browse, with "search within this filter" in the modal
         end
+        # FILM COPY: every collection title is listed (config/initializers/film_all_collections.rb); the sidebar shows the first ten and
+        # Blacklight's own "More Collection Title" modal the rest, on one page
+        options.merge!(limit: 10, more_limit: 40) if filter.solr == "collection_ssim" && ENV["FILM_ALL_COLLECTIONS"].present?
         config.add_facet_field filter.solr, **options
       end
 
@@ -48,6 +51,10 @@ module CatalogConfig
     end
 
     DIGITAL_ASSET_FORMAT_FILTER = "Digital Asset Format Type"
+
+    # FILM COPY (as CCS-2026 #221): multi-select. The values are alternatives (InclusiveFilterField), the filter query is tagged
+    # with the field, and Solr leaves that tag out when it counts the facet's own values, so a chosen collection keeps the others listed.
+    MULTI_SELECT = ->(field) { { filter_class: InclusiveFilterField, tag: field, ex: field } }
 
     # CCS-41: show results with or without digital assets. Not in the workbook's filter list, so it is
     # an addition from the Jira story; it sits with the Media type filters.

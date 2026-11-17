@@ -1,91 +1,108 @@
+<%# The record page in the CCS 2026 layout (CCS UI "Record-detail", Figma 258:25075): a navy title band, the media on a full-width
+    dark band, a summary (title, creator and date, tags, and the record's actions), then the details as a ruled list in a card with
+    the persistent link card under it, and a Copyright card beside them. The 2027 parts (actions, de-bias and cultural notices,
+    metadata export, browse links) sit in the same places. Private film copy: see docs/handoff-2027.md. %>
 <%= content_tag @component,
   id: @id,
   data: { "document-id": document.id.to_s.parameterize },
   itemscope: true,
   itemtype: document.itemtype,
-  class: "record" do %>
+  class: "record record--classic" do %>
   <div class="record-page" data-controller="record-sections">
-    <div class="record-page__inner">
-      <%= render NexusCcs::RecordHeaderComponent.new(document: document, title_markup: title_markup) %>
+    <section class="record-banner" aria-hidden="true">
+      <div class="record-banner__inner"><p class="record-banner__title"><%= heading %></p></div>
+    </section>
 
-      <div class="record-layout">
-        <%# Reading order is visual order: the media, the column beside it (actions, Key facts), then the sections %>
-        <div class="record-layout__media">
-          <% if assets? %>
-            <%= render NexusCcs::DigitalAssetsComponent.new(presenter: @presenter) %>
-          <% else %>
-            <%= render NexusCcs::NoImageComponent.new(document: document, url: helpers.solr_document_url(document)) %>
+    <div class="record-band<%= ' record-band--empty' unless assets? %>">
+      <div class="record-band__inner">
+        <% if assets? %>
+          <%= render NexusCcs::DigitalAssetsComponent.new(presenter: @presenter) %>
+        <% else %>
+          <%= render NexusCcs::NoImageComponent.new(document: document, url: helpers.solr_document_url(document)) %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="record-main">
+      <div class="record-main__inner">
+        <section class="record-summary">
+          <%= render NexusCcs::RecordHeaderComponent.new(document: document, title_markup: title_markup) %>
+          <% if tags.any? %>
+            <ul class="record-summary__tags" aria-label="Tags">
+              <% tags.each do |tag| %>
+                <li><%= link_to tag.value, helpers.search_action_path(filter_query(tag.field, tag.value)), class: "record-tag" %></li>
+              <% end %>
+            </ul>
           <% end %>
-        </div>
+        </section>
 
-        <div class="record-layout__aside">
+        <div class="record-main__details">
           <%= render NexusCcs::CulturalProtocolsNoticeComponent.new(document: document) %>
-          <%= render NexusCcs::RecordActionsComponent.new(document: document) %>
-          <%= render NexusCcs::KeyFactsComponent.new(document: document) %>
-        </div>
-
-        <div class="record-layout__sections">
           <%= render NexusCcs::DebiasNoticeComponent.new(matches: debias_matches, labels: debias_labels) %>
-          <% if rows.any? %>
-            <details class="record-section record-accordion" open data-open-on-phone data-record-sections-target="section">
-              <summary><h2 class="record-section__heading record-details__title" id="record-details-title"><%= t("nexus_ccs.record_page.sections.object_details") %></h2></summary>
-              <div class="record-section__body">
-                <dl class="record-details__list">
-                  <% rows.each do |row| %>
-                    <div class="record-details__row">
-                      <dt><%= row.label %></dt>
-                      <dd>
-                        <% if row.field == "description_tsim" %>
-                          <% row.values.each_with_index do |value, index| %>
-                            <div class="record-details__truncate" data-controller="truncate">
-                              <span class="record-details__value" data-truncate-target="text"><%= flagged(row, value, index) %></span>
-                              <button type="button" class="record-details__truncate-toggle" data-truncate-target="toggle" data-action="truncate#toggle" hidden>Show more</button>
-                            </div>
-                          <% end %>
-                        <% else %>
-                          <% row.values.each_with_index do |value, index| %>
-                            <span class="record-details__value">
-                              <% if link_to_value?(row) %><%= link_to value, value_path(row, value) %><% elsif (browse = browse_path(row, value)) %><%= link_to flagged(row, value, index), browse %><% else %><%= flagged(row, value, index) %><% end %>
-                            </span>
-                          <% end %>
-                        <% end %>
-                      </dd>
-                    </div>
-                  <% end %>
-                </dl>
-                <%= render NexusCcs::MetadataExportComponent.new(document: document) %>
-              </div>
-            </details>
-          <% end %>
-
-          <details class="record-section record-accordion record-copyright" data-record-sections-target="section">
-            <summary><h2 class="record-section__heading record-copyright__title" id="record-copyright-title"><%= t("nexus_ccs.record_page.sections.copyright") %></h2></summary>
-            <div class="record-section__body">
-              <% unless rights_recorded? %>
-                <p class="record-copyright__none"><%= t("nexus_ccs.rights.none_recorded") %></p>
+          <section class="record-card record-details" aria-labelledby="record-details-title">
+            <h2 class="record-details__title" id="record-details-title"><%= t("nexus_ccs.record_page.sections.object_details") %></h2>
+            <dl class="record-details__list">
+              <% classic_rows.each do |row| %>
+                <div class="record-details__row">
+                  <dt><%= row.label %></dt>
+                  <dd>
+                    <% if row.field == "description_tsim" %>
+                      <% row.values.each_with_index do |value, index| %>
+                        <div class="record-details__truncate" data-controller="truncate">
+                          <span class="record-details__value" data-truncate-target="text"><%= flagged(row, value, index) %></span>
+                          <button type="button" class="record-details__truncate-toggle" data-truncate-target="toggle" data-action="truncate#toggle" hidden>Show more</button>
+                        </div>
+                      <% end %>
+                    <% else %>
+                      <% row.values.each_with_index do |value, index| %>
+                        <span class="record-details__value">
+                          <% if link_to_value?(row) %><%= link_to value, value_path(row, value) %><% elsif (browse = browse_path(row, value)) %><%= link_to flagged(row, value, index), browse %><% else %><%= flagged(row, value, index) %><% end %>
+                        </span>
+                      <% end %>
+                    <% end %>
+                  </dd>
+                </div>
               <% end %>
-              <% if rights_recorded? || dam_caption || responsible_collection %>
-                <dl class="record-copyright__list">
-                  <% { t("nexus_ccs.record_page.copyright.licence") => licence, t("nexus_ccs.record_page.copyright.copyright") => copyright,
-                       t("nexus_ccs.record_page.copyright.credit_line") => credit_line, t("nexus_ccs.record_page.copyright.caption") => dam_caption }.each do |label, value| %>
-                    <% next if value.blank? %>
-                    <div class="record-copyright__item"><dt><%= label %></dt><dd><%= value %></dd></div>
-                  <% end %>
-                  <% if responsible_collection %>
-                    <div class="record-copyright__item">
-                      <dt><%= t("nexus_ccs.record_page.copyright.responsible_collection") %></dt>
-                      <dd><%= link_to responsible_collection, helpers.search_action_path(responsible_collection_query) %></dd>
-                    </div>
-                  <% end %>
-                </dl>
-              <% end %>
-              <p class="record-copyright__terms"><%= link_to t("nexus_ccs.record_page.copyright.terms"), terms_path %> <%= render NexusCcs::HelpTipComponent.new(topic: :copyright) %></p>
-            </div>
-          </details>
+            </dl>
+            <div class="record-details__export"><%= render NexusCcs::MetadataExportComponent.new(document: document) %></div>
+          </section>
 
-          <%= render NexusCcs::RecordAboutComponent.new(document: document, url: helpers.solr_document_url(document)) %>
+          <section class="record-card record-persistent" aria-labelledby="persistent-link-heading">
+            <%= render NexusCcs::PersistentLinkComponent.new(url: helpers.solr_document_url(document), document: document) %>
+          </section>
 
           <% partials.each do |partial| %><%= partial %><% end %>
+        </div>
+
+        <div class="record-main__side">
+        <div class="record-summary__actions">
+          <%= render NexusCcs::RecordActionsComponent.new(document: document) %>
+        </div>
+        <aside class="record-card record-copyright" aria-labelledby="record-copyright-title">
+          <h2 class="record-copyright__title" id="record-copyright-title"><%= t("nexus_ccs.record_page.sections.copyright") %></h2>
+          <% unless rights_recorded? %>
+            <p class="record-copyright__none"><%= t("nexus_ccs.rights.none_recorded") %></p>
+          <% end %>
+          <% if rights_recorded? || dam_caption || responsible_collection %>
+            <dl class="record-copyright__list">
+              <% { t("nexus_ccs.record_page.copyright.credit_line") => credit_line, t("nexus_ccs.record_page.copyright.copyright") => copyright,
+                   t("nexus_ccs.record_page.copyright.licence") => licence, t("nexus_ccs.record_page.copyright.caption") => dam_caption }.each do |label, value| %>
+                <% next if value.blank? %>
+                <div class="record-copyright__item"><dt><%= label %></dt><dd><%= value %></dd></div>
+              <% end %>
+              <% if responsible_collection %>
+                <div class="record-copyright__item">
+                  <dt><%= t("nexus_ccs.record_page.copyright.responsible_collection") %></dt>
+                  <dd><%= link_to responsible_collection, helpers.search_action_path(responsible_collection_query) %></dd>
+                </div>
+              <% end %>
+            </dl>
+          <% end %>
+          <p class="record-copyright__terms"><%= link_to t("nexus_ccs.record_page.copyright.terms"), terms_path %></p>
+          <div class="record-copyright__contact">
+            <%= render NexusCcs::ContactCollectionComponent.new(document: document, url: helpers.solr_document_url(document)) %>
+          </div>
+        </aside>
         </div>
       </div>
     </div>

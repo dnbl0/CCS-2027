@@ -11,13 +11,13 @@ class DiscoverTest < ApplicationSystemTestCase
   end
 
   [ [ "desktop", 1440 ], [ "320px", 320 ] ].each do |name, width|
-    test "a record page loads its Similar records, with no axe violations, at #{name}" do
+    test "a record page loads its Similar objects, with no axe violations, at #{name}" do
       page.current_window.resize_to(width, 900)
       visit "/catalog/emu-10247"
       page.execute_script("document.getElementById('similar-records').scrollIntoView()")
 
-      assert_selector "#similar-records h3", text: "Similar records"
-      assert_selector "#similar-records article.object-card", minimum: 2
+      assert_selector "#similar-records h2", text: "Similar objects"
+      assert_selector "#similar-records li.discover-cards__item", minimum: 2
       page.execute_script("window.scrollTo(0, 0)") # the sticky search bar that appears on scrolling has a known landmark finding of its own
       assert_accessible tags: AXE_TAGS + WCAG22_TAGS
     end
@@ -45,21 +45,20 @@ class DiscoverTest < ApplicationSystemTestCase
     end
   end
 
-  test "the record page's card sections are whole-card links, in order, and do not scroll sideways at 390px" do
+  test "the record page's Similar objects are cards linking to their records, and do not scroll sideways at 390px" do
     page.current_window.resize_to(390, 900)
     visit "/catalog/#{first_id('id:(emu-10247 OR emu_mc-10247)')}"
     page.execute_script("document.getElementById('similar-records').scrollIntoView()")
 
-    assert_selector "#similar-records article.object-card", minimum: 2
-    headings = page.all("h2, h3", visible: :all).map(&:text)
-    assert_operator headings.index("Related objects") || 0, :<, headings.index("Similar records")
-    assert_selector "article.object-card h3.object-card__title a.object-card__link", minimum: 2
+    assert_selector "#similar-records li.discover-cards__item", minimum: 2
+    assert_no_selector "#related-objects"
+    assert_selector "#similar-records li.discover-cards__item h3 a[href^='/catalog/']", minimum: 2
     assert page.evaluate_script("document.documentElement.scrollWidth <= window.innerWidth"), "the page scrolls sideways"
     page.execute_script("window.scrollTo(0, 0)")
     assert_accessible tags: AXE_TAGS + WCAG22_TAGS
   end
 
-  test "a record with a withheld asset has no Similar records section" do
+  test "a record with a withheld asset has no Similar objects section" do
     visit "/catalog/#{first_id('licence_type_ssim:"ICIP Rights"')}"
 
     assert_selector "h1", visible: :all

@@ -98,4 +98,10 @@ class ExploreEntryPointsTest < ActiveSupport::TestCase
   ensure
     Rails.cache = original_cache
   end
+
+  test "the all-collections tiles are named exactly as config/university_collections.yml, so each one opens its records" do
+    directory = UniversityCollections.send(:configured).map { |row| row["facet_value"] || row.fetch("name") }
+
+    assert_equal directory.sort, ExploreEntryPoints::FILM_COLLECTIONS.map(&:first).sort
+  end
 end

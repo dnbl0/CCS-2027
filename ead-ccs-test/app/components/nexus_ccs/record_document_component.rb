@@ -96,5 +96,28 @@ module NexusCcs
     end
 
     def terms_path = "/help#copyright"
+
+    # The 2026 layout has no Key facts: its details list is the whole record, title first (the header keeps the Collection ID)
+    def classic_rows
+      @classic_rows ||= begin
+        list = [ Row.new(label: "Title", values: [ heading ], field: "title_tsim") ]
+        @presenter.configuration.show_fields.each_value do |config|
+          name = config.field
+          next if COPYRIGHT_FIELDS.include?(name)
+
+          values = Array(document[name]).map(&:to_s).compact_blank
+          list << Row.new(label: config.label, values: values, field: name) if values.any?
+        end
+        list
+      end
+    end
+
+    Tag = Struct.new(:field, :value)
+
+    # Chips under the byline, as in 2026: the record's format and its collection, each a link to that filter
+    def tags
+      [ Tag.new("format", Array(document["format"]).first), Tag.new(BrowseMenu::COLLECTION_FIELD, Array(document["collection_ssim"]).first) ]
+        .select { |tag| tag.value.present? }
+    end
   end
 end

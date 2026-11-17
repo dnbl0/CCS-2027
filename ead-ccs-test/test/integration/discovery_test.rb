@@ -37,15 +37,15 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
 
   # --- Similar records ---
 
-  test "a record's similar records come as a Turbo frame of the site's result cards, without the record, a withheld or a sensitive one" do
+  test "a record's similar objects come as a Turbo frame of the site's result cards, without the record, a withheld or a sensitive one" do
     solr { get "/catalog/emu-source/similar" }
 
     assert_response :success
-    assert_select "turbo-frame#similar-records section[aria-labelledby=similar-records-heading]" do
-      assert_select "h3#similar-records-heading", text: "Similar records"
-      assert_select "article.object-card", count: 2
-      assert_select "h3.object-card__title a[href='/catalog/emu-a']"
-      assert_select "h3.object-card__title a[href='/catalog/emu-b']"
+    assert_select "turbo-frame#similar-records[target=_top] section#similar-objects[aria-labelledby=similar-objects-heading]" do
+      assert_select "h2#similar-objects-heading", text: "Similar objects"
+      assert_select "li.discover-cards__item", count: 2
+      assert_select "h3 a[href='/catalog/emu-a']"
+      assert_select "h3 a[href='/catalog/emu-b']"
     end
     assert_select "a[href='/catalog/emu-source']", count: 0
     assert_no_match(/withheld-asset|sensitive-asset/, response.body)

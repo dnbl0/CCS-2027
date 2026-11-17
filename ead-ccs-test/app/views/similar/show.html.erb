@@ -1,5 +1,12 @@
-<%# The record page's Similar records section (SimilarController), the content of its lazy frame (NexusCcs::SimilarRecordsComponent): the same cards as Related objects %>
-<turbo-frame id="similar-records" class="similar-frame">
-  <%= render NexusCcs::RecordCardsComponent.new(id: "similar-records-section", heading_id: "similar-records-heading", heading: t("nexus_ccs.similar.heading"),
-                                                description: t("nexus_ccs.similar.description"), documents: @documents, nested: true) %>
+<%# The record page's one "Similar objects" section. FILM COPY: the site's result cards in the mosaic layout (images whole, never cropped); every card has an image. %>
+<turbo-frame id="similar-records" class="similar-frame" target="_top">
+  <div class="more-like-this similar-objects" data-turbo="false">
+    <div class="more-like-this__inner">
+      <section id="similar-objects" aria-labelledby="similar-objects-heading">
+        <h2 id="similar-objects-heading" class="more-like-this__heading"><%= t("nexus_ccs.similar.heading") %></h2>
+        <p class="object-cards__description"><%= t("nexus_ccs.similar.description") %></p>
+        <div class="ccs-mosaic ccs-mosaic--4"><%= render "discover/cards", entries: @entries, title_tag: :h3 %></div>
+      </section>
+    </div>
+  </div>
 </turbo-frame>

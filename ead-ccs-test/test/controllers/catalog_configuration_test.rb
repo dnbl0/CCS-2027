@@ -43,12 +43,17 @@ class CatalogConfigurationTest < ActiveSupport::TestCase
     assert_operator shapes.uniq.size, :>, 1
   end
 
-  test "facets use Blacklight's default filter handling (no custom builder, no tag/exclude)" do
+  # Multi-select: a filter's chosen values are alternatives, and its own value list ignores its own choice (tag = ex = the field), so
+  # choosing one collection keeps the others listed to add.
+  test "facets use Blacklight's filter handling, multi-select ones tagged and excluding their own tag" do
     config.facet_fields.each_value do |facet|
       assert_nil facet.filter_query_builder, "#{facet.key} has a custom filter query builder"
-      assert_nil facet.tag, "#{facet.key} is tagged"
-      assert_nil facet.ex, "#{facet.key} excludes a tag"
+      next if facet.tag.nil?
+
+      assert_equal facet.key, facet.tag, "#{facet.key} is tagged with another name"
+      assert_equal facet.key, facet.ex, "#{facet.key} excludes another tag"
     end
+    assert_equal "collection_ssim", config.facet_fields["collection_ssim"].tag
   end
 
   test "the advanced search form asks Solr for at most the 100 most common values of a filter, not every value" do

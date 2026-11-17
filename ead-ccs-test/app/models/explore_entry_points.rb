@@ -25,9 +25,11 @@ module ExploreEntryPoints
   Tile = Data.define(:label, :count, :query, :image, :tint)
   # A plain link: a kind of record, a place or a period
   Link = Data.define(:label, :count, :query)
-  Overview = Data.define(:collections, :kinds, :places, :periods) do
+  Overview = Data.define(:collections, :kinds, :places, :periods, :kind_tiles, :place_tiles, :period_tiles) do
     def any? = [ collections, kinds, places, periods ].any?(&:present?)
   end
+  # FILM COPY: Record types, Places and Time are each a row of this many tiles
+  ROW = 4
 
   COLLECTION_FIELD = "collection_ssim"
   CLASSIFICATION_FIELD = "classification_ssim"
@@ -35,12 +37,12 @@ module ExploreEntryPoints
   PLACE_FIELD = "production_place_ssim"
   DATE_FIELD = "date_start_isi"
   CONFIG_PATH = Rails.root.join("config/explore_kinds.yml")
-  CACHE_KEY = "explore_entry_points/v2"
-  LAST_GOOD_KEY = "explore_entry_points/last_good/v2"
+  CACHE_KEY = "explore_entry_points/v4"
+  LAST_GOOD_KEY = "explore_entry_points/last_good/v4"
   # The tints of the collection tiles (--ccs-explore-tint-1 to -6 in tokens/semantic.css)
   TINTS = 6
   # Records looked at, in id order, for each collection's example image
-  IMAGE_CANDIDATES = 12
+  IMAGE_CANDIDATES = 40
   THUMBNAIL_DIRECTORY = "/digital-assets/thumbs/"
   # BC dates are real (negative years), so the first period has no lower bound worth showing
   EARLIEST_YEAR = -10_000
@@ -59,9 +61,11 @@ module ExploreEntryPoints
 
   # counts: as ExploreEntryPoints.counts returns them (empty when Solr is unavailable)
   def self.overview(counts = self.counts)
-    return Overview.new([], [], [], []) if counts.blank?
+    return Overview.new([], [], [], [], [], [], []) if counts.blank?
 
-    Overview.new(collection_tiles(counts), kind_links(counts), place_links(counts), period_links(counts["periods"] || {}))
+    kinds = kind_links(counts); places = place_links(counts); periods = period_links(counts["periods"] || {})
+    Overview.new(collection_tiles(counts), kinds, places, periods,
+                 link_tiles(kinds, counts["kind_images"], prefer_images: true), link_tiles(places, counts["place_images"]), link_tiles(periods, counts["period_images"]))
   end
 
   def self.counts(connection = nil)
@@ -82,7 +86,8 @@ module ExploreEntryPoints
       })
     end
     fetched = parse(response)
-    fetched.merge("images" => fetch_images(fetched["collections"]))
+    fetched = fetched.merge("images" => fetch_images(fetched["collections"]))
+    fetched.merge(fetch_link_images(fetched))
   rescue RSolr::Error::Http, RSolr::Error::ConnectionRefused, RSolr::Error::Timeout, Faraday::Error, SystemCallError, Timeout::Error => e
     Rails.logger.warn("Explore entry points unavailable: #{e.class}")
     nil
@@ -126,17 +131,47 @@ module ExploreEntryPoints
     {}
   end
 
+  # FILM COPY: one example picture for each record type, place and period (the same rule as the collection tiles' pictures)
+  def self.fetch_link_images(fetched)
+    kinds = fetched["kinds"].to_a.to_h { |label, _count, values| [ label, values.any? ? Browse.field_query(CLASSIFICATION_FIELD, values) : nil ] }
+    places = fetched["places"].to_a.to_h { |value, _count| [ value, "#{PLACE_FIELD}:#{Browse.phrase(value)}" ] }
+    periods = periods().to_h { |label, first, last| [ label, period_query(first, last) ] }
+    used = fetched.fetch("images", {}).values.map { |image| image[:id].to_s } # no picture is shown twice on the page
+    { "kind_images" => kinds, "place_images" => places, "period_images" => periods }.transform_values do |filters|
+      filters.filter_map do |label, filter|
+        image = filter && example_image(filter, skip: used)
+        next unless image
+
+        used << image[:id].to_s
+        [ label, image ]
+      end.to_h
+    end
+  rescue StandardError => e
+    Rails.logger.warn("Explore link images unavailable: #{e.class}")
+    {}
+  end
+
+  # Links as tiles: the first ROW (record types: those with a picture first, in the list's order), each with its picture if it has one
+  def self.link_tiles(links, images, prefer_images: false)
+    images ||= {}
+    chosen = prefer_images ? links.select { |link| images[link.label] } + links.reject { |link| images[link.label] } : links
+    chosen.first(ROW).each_with_index.map do |link, index|
+      Tile.new(label: link.label, count: link.count, query: link.query, image: build_image(images[link.label]), tint: ((index + 2) % TINTS) + 1)
+    end
+  end
+
   def self.text_only?(name) = config.dig("collections", "text_only").include?(name)
 
   # The first record, in id order, that Discovery.pickable? allows (AccessPolicy :open, not Sensitivity.sensitive?) and whose thumbnail
   # is a file this server holds. The Solr filters narrow the search; the Ruby checks decide.
-  def self.example_image(group_filter)
+  def self.example_image(group_filter, skip: [])
     response = Discovery.search(
       q: "*:*", sort: "id asc", rows: IMAGE_CANDIDATES,
       fq: [ FreeReuse.filter_query, "has_digital_asset_bsi:true", "-restrictions_tsi:sensitive", "{!prefix f=thumbnail_path_ssi}#{THUMBNAIL_DIRECTORY}", group_filter ]
     )
     response.documents.each do |document|
       next unless Discovery.pickable?(document)
+      next if skip.include?(document.id.to_s)
 
       path = document["thumbnail_path_ssi"].to_s
       width, height = ImageDimensions.for_path(path)
@@ -150,7 +185,46 @@ module ExploreEntryPoints
 
   def self.period_query(first, last) = "#{DATE_FIELD}:[#{first} TO #{last}]"
 
+  # FILM ONLY (private copy for the 2027 showcase clip; never pushed): every University collection as a tile, with the collection
+  # thumbnails supplied for the film. No record counts are shown, as most of these collections have no records in this index yet.
+  FILM_COLLECTIONS = [
+    [ "University Art Collection", "/film-thumbs/00-university-art-collection.jpg", 1200, 600 ],
+    [ "Architecture, Building and Planning Library Rare Material Collection", "/film-thumbs/01-architecture-building-and-planning-library-rare-material-collection.jpg", 220, 165 ],
+    [ "Archives and Special Collections", "/film-thumbs/02-archives-and-special-collections.jpg", 600, 368 ],
+    [ "Burnley Campus Archives", "/film-thumbs/03-burnley-campus-archives.png", 672, 417 ],
+    [ "Creswick Campus Historical Collection", "/film-thumbs/04-creswick-campus-historical-collection.jpg", 570, 564 ],
+    [ "Dookie Campus Historical Collection", "/film-thumbs/05-dookie-campus-historical-collection.png", 220, 165 ],
+    [ "Ed Muirhead Physics Museum", "/film-thumbs/06-ed-muirhead-physics-museum.jpg", 600, 400 ],
+    [ "F.A. Singleton Earth Sciences Collection", "/film-thumbs/07-f-a-singleton-earth-sciences-collection.jpg", 600, 389 ],
+    [ "Engineering and Information Technology Collection", "/film-thumbs/08-engineering-and-information-technology-collection.jpg", 600, 400 ],
+    [ "Godfrey Howitt Entomology Collection", "/film-thumbs/09-godfrey-howitt-entomology-collection.png", 277, 179 ],
+    [ "Grainger Museum Collection", "/film-thumbs/10-grainger-museum-collection.jpg", 600, 401 ],
+    [ "Harry Brookes Allen Museum of Anatomy and Pathology", "/film-thumbs/11-harry-brookes-allen-museum-of-anatomy-and-pathology.jpg", 600, 300 ],
+    [ "Henry Forman Atkinson Dental Museum", "/film-thumbs/12-henry-forman-atkinson-dental-museum.jpg", 600, 300 ],
+    [ "International House Collection", "/film-thumbs/13-international-house-collection.jpg", 600, 403 ],
+    [ "Law Rare Books Collection", "/film-thumbs/14-law-rare-books-collection.jpg", 400, 300 ],
+    [ "Medical History Museum", "/film-thumbs/15-medical-history-museum.jpg", 600, 300 ],
+    [ "MONIAC Economics Model Machine", "/film-thumbs/16-moniac-economics-model-machine.png", 343, 216 ],
+    [ "Musical Instruments Collection: Rare and Historic Examples", "/film-thumbs/17-musical-instruments-collection-rare-and-historic-examples.jpg", 220, 165 ],
+    [ "School of Chemistry Collection", "/film-thumbs/18-school-of-chemistry-collection.jpg", 500, 312 ],
+    [ "Southbank Library Special Collections", "/film-thumbs/19-southbank-library-special-collections.png", 457, 354 ],
+    [ "Tiegs Zoology Museum", "/film-thumbs/20-tiegs-zoology-museum.jpg", 400, 300 ],
+    [ "University of Melbourne Herbarium", "/film-thumbs/21-university-of-melbourne-herbarium.jpg", 600, 215 ],
+    [ "Veterinary Science Anatomy Collection", "/film-thumbs/22-veterinary-science-anatomy-collection.png", 220, 165 ],
+    [ "Victorian College of the Arts Film and Television Archives", "/film-thumbs/23-victorian-college-of-the-arts-film-and-television-archives.png", 260, 173 ],
+    [ "Visual Cultures Resource Centre", "/film-thumbs/24-visual-cultures-resource-centre.jpg", 1200, 403 ]
+  ].freeze
+
+  def self.film_tiles
+    FILM_COLLECTIONS.each_with_index.map do |(name, path, width, height), index|
+      Tile.new(label: name, count: nil, query: BrowseHubs.query(COLLECTION_FIELD, name),
+               image: Image.new(id: "film-#{index}", title: name, path: path, width: width, height: height), tint: (index % TINTS) + 1)
+    end
+  end
+
   def self.collection_tiles(counts)
+    return film_tiles if ENV["FILM_ALL_COLLECTIONS"].present?
+
     images = counts["images"] || {}
     counts["collections"].to_a.each_with_index.map do |(name, count), index|
       image = build_image(images[name]) unless text_only?(name)
@@ -183,5 +257,5 @@ module ExploreEntryPoints
     nil
   end
 
-  private_class_method :fetch_counts, :fetch_images, :example_image, :collection_pairs, :collection_tiles, :kind_links, :place_links, :period_links, :build_image
+  private_class_method :fetch_counts, :fetch_images, :fetch_link_images, :link_tiles, :example_image, :collection_pairs, :collection_tiles, :kind_links, :place_links, :period_links, :build_image
 end

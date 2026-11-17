@@ -15,14 +15,26 @@
 
 @media (min-width: 640px) {
   .discover-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 1024px) {
   .discover-cards {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, 1fr);
   }
+}
+
+/* Mosaic, as the results' mosaic view: each card keeps its own height and the next one packs under the shortest column
+   (blacklight-gallery's grid-lanes polyfill reads the marker and plain repeat(N, 1fr) columns) */
+@media (min-width: 640px) {
+  .discover-section:not(.discover-section--pick) .discover-cards {
+    --grid-lanes-polyfill: 1;
+    display: grid-lanes;
+    align-items: start;
+  }
+
+  .discover-section:not(.discover-section--pick) .discover-cards__item .result-card { flex: 0 0 auto; }
 }
 
 .discover-cards__item {

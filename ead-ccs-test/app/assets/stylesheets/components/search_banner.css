@@ -257,3 +257,30 @@
     border-left: 0;
   }
 }
+
+/* FILM COPY: the live suggestions are exactly as wide as the search bar (the box, the field menu and the button), never wider: the
+   list is placed against the whole bar rather than the text box, and a long suggestion wraps instead of widening it */
+:is(.search-banner, .ccs-hero__search, .sticky-search) .input-group { position: relative; }
+:is(.search-banner, .ccs-hero__search, .sticky-search) .search-autocomplete-wrapper { position: static; }
+:is(.search-banner, .ccs-hero__search, .sticky-search) .search-autocomplete-wrapper > .dropdown-menu {
+  position: absolute;
+  inset: 100% 0 auto 0;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  height: auto;
+  margin: 2px 0 0;
+  border: 1px solid var(--ccs-border-default);
+  border-radius: var(--ccs-radius-none);
+  box-shadow: 0 6px 16px rgb(0 15 70 / 18%);
+  z-index: 1060;
+}
+:is(.search-banner, .ccs-hero__search, .sticky-search) .search-autocomplete-wrapper > .dropdown-menu .dropdown-item {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+  padding-block: 0.5rem;
+}
+/* the open list sits above whatever follows the bar (the hero image and its saved-records tab on a phone) */
+:is(.search-banner, .ccs-hero__search) .search-banner__search { position: relative; z-index: 5; }
+.ccs-hero__content:focus-within { z-index: 3; } /* its open suggestion list covers the photo beside or below it */

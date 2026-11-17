@@ -49,40 +49,36 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     JS
   end
 
-  test "on a desktop: no axe violations (WCAG 2.2 AA), three tiles in a row, targets of 44px, the lists open" do
+  test "on a desktop: no axe violations (WCAG 2.2 AA), three collection tiles in a row, targets of 44px, then rows of four tiles" do
     keep(counts)
     page.current_window.resize_to(1440, 900)
     visit "/"
 
-    assert_selector "section.explore li.explore__tile", count: 6
+    assert_selector "section.explore ul.explore__tiles:not(.explore__tiles--row) > li.explore__tile", count: 6
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
     assert_empty small_targets
     assert_not sideways_scroll?
-    tops = page.evaluate_script("[...document.querySelectorAll('.explore__tile')].map(t => Math.round(t.getBoundingClientRect().top))")
+    tops = page.evaluate_script("[...document.querySelectorAll('ul.explore__tiles:not(.explore__tiles--row) > .explore__tile')].map(t => Math.round(t.getBoundingClientRect().top))")
     assert_equal 1, tops.first(3).uniq.size, "the first three tiles are in one row"
     assert_operator tops[3], :>, tops[0]
-    assert_selector "details.explore__disclosure[open]", count: 2
-    assert_selector ".explore__disclosure a.explore__link", text: "Australia"
+    assert_selector "ul.explore__tiles--row", count: 3
+    assert_selector "ul.explore__tiles--row a.explore__tile-link h4", text: "Australia"
+    row = page.evaluate_script("[...document.querySelectorAll('ul.explore__tiles--row')[1].children].map(t => Math.round(t.getBoundingClientRect().top))")
+    assert_equal 1, row.uniq.size, "a row's tiles sit side by side"
     assert_no_selector "section.explore img"
   end
 
-  test "on a phone: no axe violations, rows of 44px or more, no sideways scroll, the section about a screen and a half, the disclosures closed until opened" do
+  test "on a phone: no axe violations, targets of 44px or more, no sideways scroll, every row of tiles shown" do
     keep(counts)
     page.current_window.resize_to(390, PHONE_HEIGHT)
     visit "/"
 
-    assert_selector "section.explore li.explore__tile", count: 6
+    assert_selector "section.explore ul.explore__tiles:not(.explore__tiles--row) > li.explore__tile", count: 6
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
     assert_empty small_targets
     assert_not sideways_scroll?
-    assert_no_selector "details.explore__disclosure[open]"
-    assert_no_selector ".explore__disclosure a.explore__link", text: "Australia"
-    height = page.evaluate_script("document.querySelector('section.explore').getBoundingClientRect().height")
-    assert_operator height, :<=, PHONE_HEIGHT * 1.6, "the Explore section is #{height.round}px tall on a phone"
-
-    find("summary", text: "Places").click
-    assert_selector ".explore__disclosure a.explore__link", text: "Australia"
-    assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
+    assert_selector "ul.explore__tiles--row", count: 3
+    assert_selector "ul.explore__tiles--row a.explore__tile-link h4", text: "Australia"
   end
 
   test "with example images the section has no axe violations, the picture is whole and the Indigenous Collections tile is still text only" do
