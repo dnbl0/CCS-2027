@@ -30,6 +30,8 @@ module ExploreEntryPoints
   end
   # FILM COPY: Record types, Places and Time are each a row of this many tiles
   ROW = 4
+  # The Places section is a row that scrolls sideways, so it holds more than a row of tiles
+  PLACES_SHOWN = 8
 
   COLLECTION_FIELD = "collection_ssim"
   CLASSIFICATION_FIELD = "classification_ssim"
@@ -65,7 +67,7 @@ module ExploreEntryPoints
 
     kinds = kind_links(counts); places = place_links(counts); periods = period_links(counts["periods"] || {})
     Overview.new(collection_tiles(counts), kinds, places, periods,
-                 link_tiles(kinds, counts["kind_images"], prefer_images: true), link_tiles(places, counts["place_images"], prefer_images: true), link_tiles(periods, counts["period_images"]))
+                 link_tiles(kinds, counts["kind_images"], prefer_images: true), link_tiles(places, counts["place_images"], prefer_images: true, limit: PLACES_SHOWN), link_tiles(periods, counts["period_images"]))
   end
 
   def self.counts(connection = nil)
@@ -152,10 +154,10 @@ module ExploreEntryPoints
   end
 
   # Links as tiles: the first ROW (record types: those with a picture first, in the list's order), each with its picture if it has one
-  def self.link_tiles(links, images, prefer_images: false)
+  def self.link_tiles(links, images, prefer_images: false, limit: ROW)
     images ||= {}
     chosen = prefer_images ? links.select { |link| images[link.label] } + links.reject { |link| images[link.label] } : links
-    chosen.first(ROW).each_with_index.map do |link, index|
+    chosen.first(limit).each_with_index.map do |link, index|
       Tile.new(label: link.label, count: link.count, query: link.query, image: build_image(images[link.label]), tint: ((index + 2) % TINTS) + 1)
     end
   end

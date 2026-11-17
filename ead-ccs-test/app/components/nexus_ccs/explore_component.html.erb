@@ -27,10 +27,10 @@
   </div>
 </section>
 
-<%# Record types, Places and Time: each its own section (the page's sections alternate white and grey), its tiles the site's result cards in the mosaic %>
-<% [ [ :kinds, overview.kind_tiles, t("explore.kinds.heading"), t("explore.kinds.see_all"), "object-types" ],
-     [ :places, overview.place_tiles, t("explore.place_time.places"), t("explore.place_time.see_all_places"), "places" ],
-     [ :periods, overview.period_tiles, t("explore.place_time.periods"), t("explore.place_time.see_all_periods"), "periods" ] ].each do |key, tiles, heading, see_all, slug| %>
+<%# Record types, Places and Time: each its own section (the page's sections alternate white and grey), each cards in its own layout (NexusCcs::CardLayoutComponent) %>
+<% [ [ :kinds, overview.kind_tiles, t("explore.kinds.heading"), t("explore.kinds.see_all"), "object-types", :bento ],
+     [ :places, overview.place_tiles, t("explore.place_time.places"), t("explore.place_time.see_all_places"), "places", :rail ],
+     [ :periods, overview.period_tiles, t("explore.place_time.periods"), t("explore.place_time.see_all_periods"), "periods", :strip ] ].each do |key, tiles, heading, see_all, slug, layout| %>
   <% next if tiles.empty? %>
   <section class="ccs-section explore-<%= key %>" aria-labelledby="explore-<%= key %>">
     <div class="ccs-section__inner explore__inner">
@@ -38,13 +38,7 @@
         <h2 id="explore-<%= key %>" class="ccs-section__heading"><%= heading %></h2>
         <%= link_to see_all, helpers.browse_hub_path(slug), class: "arrow-link arrow-link--icon explore__all" %>
       </header>
-      <div class="ccs-mosaic ccs-mosaic--4">
-        <ul class="discover-cards">
-          <% tiles.each do |tile| %>
-            <li class="discover-cards__item"><%= render NexusCcs::ExploreCardComponent.new(tile: tile, remote: true) %></li>
-          <% end %>
-        </ul>
-      </div>
+      <%= render NexusCcs::CardLayoutComponent.new(cards: tiles, layout: layout, label: heading) %>
     </div>
   </section>
 <% end %>
