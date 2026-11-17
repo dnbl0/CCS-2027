@@ -12,6 +12,7 @@ en:
       other: "%{count} records"
     cards:
       see_all: "See all %{kind}"
+      panel_title: "All %{kind}, A to Z"
       before: "The earliest objects."
       includes: "Includes %{kinds}."
       held_in: "Held in %{collections}."
