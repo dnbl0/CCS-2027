@@ -15,6 +15,11 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
   def seed(slug, values) = Rails.cache.write("browse_hubs/v1/#{slug}", values, expires_in: 1.day)
 
+  # The cards of a hub as Browse::Cards keeps them (label, count, a picture, the description; a period has its years)
+  def seed_cards(slug, entries) = Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v2/#{slug}"), entries, expires_in: 1.day)
+
+  def entry(label, **extra) = { "label" => label, "count" => 5, "intro" => "Includes prints. Held in University Art Collection.", "image" => nil }.merge(extra.transform_keys(&:to_s))
+
   test "the browse page is one section for each way in, with its heading and a link to every value" do
     get "/browse"
 
@@ -27,19 +32,22 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "each section shows at most eight cards, each opening the results with its filter applied" do
-    seed("object-types", [ [ "Medical device", 500 ] ] + (1..12).map { |number| [ "type #{number}", 100 - number ] })
+  test "each section shows its cards, each with its description and opening the results with its filter applied" do
+    image = { id: "r1", title: "A print", path: "https://dam.example.org/a.jpg", width: nil, height: nil }
+    seed_cards("object-types", [ entry("Medical device", "image" => image) ] + (1..7).map { |number| entry("Type #{number}") })
 
     get "/browse"
 
     assert_select "section.browse-object-types article.explore-card", count: 8
-    assert_select "section.browse-object-types h3.document-title-heading a[href*='f%5Bobject_type_ssim%5D%5B%5D=Medical+device'][href*='any_assets=1']", text: "Medical device"
-    assert_select "section.browse-object-types .explore-card__intro", text: "500 records of this object type"
+    assert_select "section.browse-object-types h3.document-title-heading a[href*='f%5Bclassification_ssim%5D%5B%5D=Medical+device'][href*='any_assets=1']", text: "Medical device"
+    assert_select "section.browse-object-types .explore-card__intro", text: "Includes prints. Held in University Art Collection.", count: 8
+    assert_select "section.browse-object-types article.explore-card img[src*='dam.example.org']", count: 1
     assert_select "section.browse-object-types article.explore-card svg", count: 0 # no arrow
+    assert_select "section.browse-object-types .explore-card__intro", text: /records/, count: 0 # a description, not a count
   end
 
   test "the periods section opens the results with that period's range" do
-    Rails.cache.write("browse_hubs/v1/periods", [ [ "1950–1959", 12, 1950, 1959 ] ], expires_in: 1.day)
+    seed_cards("periods", [ entry("1950–1959", "first" => 1950, "last" => 1959) ])
 
     get "/browse"
 
