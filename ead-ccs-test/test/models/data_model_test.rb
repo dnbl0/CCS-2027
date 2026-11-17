@@ -21,9 +21,18 @@ class DataModelTest < ActiveSupport::TestCase
     end
   end
 
-  test "every Solr field the model uses is written by an indexer" do
+  # Fields this app's indexers do not write: the dev team's ingest fills them in the shared index (seen 2026-11-17), so a core
+  # built only by `collections:index` lacks them and their filters show no values there
+  DEV_TEAM_INGEST = %w[nationality_ssim date_era_ssim region_ssim subject_agent_ssim digital_asset_advisory_classification_ssim
+                       object_access_condition_ssim].freeze
+
+  test "every Solr field the model uses is written by an indexer, the DAM sync, or (listed) the dev team's ingest" do
+    dam_writer = Rails.root.join("app/models/dam/solr_writer.rb").read
     (DataModel.fields + DataModel.filters).select(&:available?).each do |item|
-      assert_includes indexer_source, %("#{item.solr}"), "#{item.solr} is not written by any indexer"
+      next if DEV_TEAM_INGEST.include?(item.solr)
+
+      assert indexer_source.include?(%("#{item.solr}")) || dam_writer.include?(%("#{item.solr}")),
+             "#{item.solr} is not written by any indexer or the DAM sync"
     end
   end
 
@@ -46,7 +55,7 @@ class DataModelTest < ActiveSupport::TestCase
 
   test "a filter with no data yet is still shown, with a note, on the results and in Advanced search, and is never asked of Solr" do
     gaps = DataModel.filter_gaps
-    assert_includes gaps.map(&:name), "Film & Gaming Classification"
+    assert_equal [ "Language", "Subject Event" ], gaps.map(&:name)
     advanced_request = config.advanced_search.form_solr_parameters
 
     gaps.each do |filter|

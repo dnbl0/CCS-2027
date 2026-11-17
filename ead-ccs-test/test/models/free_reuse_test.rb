@@ -9,6 +9,7 @@ class FreeReuseTest < ActiveSupport::TestCase
   test "the filter asks for an open licence, no licence that is not an open one, and no withheld access condition" do
     query = FreeReuse.filter_query
 
+    assert query.start_with?("dam_access_tier_ssi:open OR (-dam_access_tier_ssi:[* TO *] "), "a record with DAM data is judged by its DAM tier"
     assert_includes query, '"Public domain - Copyright expired"'
     assert_includes query, '-licence_type_ssim:([* TO "PUBLIC DOMAIN - COPYRIGHT EXPIRED"}'
     assert_match(/ TO \*\]\)/, query)
@@ -26,12 +27,12 @@ class FreeReuseTest < ActiveSupport::TestCase
     AccessPolicy.const_set(:TIER_BY_LICENCE, original)
   end
 
-  test "with no open licence it matches nothing" do
+  test "with no open EMu licence only the DAM tier is asked" do
     original = AccessPolicy::TIER_BY_LICENCE
     AccessPolicy.send(:remove_const, :TIER_BY_LICENCE)
     AccessPolicy.const_set(:TIER_BY_LICENCE, {}.freeze)
 
-    assert_equal "-*:*", FreeReuse.filter_query
+    assert_equal "dam_access_tier_ssi:open", FreeReuse.filter_query
   ensure
     AccessPolicy.send(:remove_const, :TIER_BY_LICENCE)
     AccessPolicy.const_set(:TIER_BY_LICENCE, original)
@@ -46,7 +47,7 @@ class FreeReuseTest < ActiveSupport::TestCase
 
   test "against the core, every record it matches is :open, and every :open licence value is matched" do
     needs_solr
-    response = Blacklight.default_index.connection.get("select", params: { q: "*:*", fq: FreeReuse.filter_query, rows: 5000, fl: "id,licence_type_ssim,access_condition_ssi" })["response"]
+    response = Blacklight.default_index.connection.get("select", params: { q: "*:*", fq: FreeReuse.filter_query, rows: 5000, fl: "id,licence_type_ssim,access_condition_ssi,digital_asset_metadata_ssm" })["response"]
     documents = response["docs"].map { |doc| SolrDocument.new(doc) }
 
     assert_operator response["numFound"], :>, 0
@@ -54,14 +55,17 @@ class FreeReuseTest < ActiveSupport::TestCase
 
     facets = Blacklight.default_index.connection.get("select", params: { q: "*:*", rows: 0, facet: true, "facet.field": "licence_type_ssim", "facet.limit": -1 })["facet_counts"]["facet_fields"]["licence_type_ssim"]
     open_values = facets.each_slice(2).select { |value, _| AccessPolicy.licences_with_tier(:open).include?(value.downcase) }.map(&:first)
-    only_open = count([ "licence_type_ssim:(#{open_values.map { |v| %("#{v}") }.join(' ')})" ]) # documents with an open licence (some also have another)
-    assert_operator response["numFound"], :<=, only_open
+    dam_open = count([ "dam_access_tier_ssi:open" ])
+    # documents with an open EMu licence (some also have another); the index of 2026-11 has none
+    emu_open = open_values.empty? ? 0 : count([ "licence_type_ssim:(#{open_values.map { |v| %("#{v}") }.join(' ')})", "-dam_access_tier_ssi:[* TO *]" ])
+    assert_operator response["numFound"], :<=, dam_open + emu_open
   end
 
   test "against the core, a record with an open and a restricted licence, or none, or Community Restricted, is left out" do
     needs_solr
-    assert_equal 0, count([ FreeReuse.filter_query, "-licence_type_ssim:[* TO *]" ])
+    assert_equal 0, count([ FreeReuse.filter_query, "-licence_type_ssim:[* TO *]", "-dam_access_tier_ssi:[* TO *]" ])
     assert_equal 0, count([ FreeReuse.filter_query, 'access_condition_ssi:"Community Restricted"' ])
-    assert_equal 0, count([ FreeReuse.filter_query, 'licence_type_ssim:"Copyright - Current"' ])
+    assert_equal 0, count([ FreeReuse.filter_query, 'licence_type_ssim:"Copyright - Current"', "-dam_access_tier_ssi:[* TO *]" ])
+    assert_equal 0, count([ FreeReuse.filter_query, "dam_access_tier_ssi:(view_only request)" ])
   end
 end
