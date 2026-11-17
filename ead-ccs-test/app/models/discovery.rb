@@ -25,11 +25,12 @@ module Discovery
   end
 
   # The records with these ids, in the order given; an id not in the index is left out. One Solr request.
-  def self.fetch(ids)
+  # fields: what to ask for (FIELDS by default; SimilarRows needs a few more of the record's own)
+  def self.fetch(ids, fields: FIELDS)
     ids = Array(ids).map(&:to_s).uniq.first(100)
     return [] if ids.empty?
 
-    response = search(q: "{!terms f=id v=$ids}", ids: ids.join(","), rows: ids.size)
+    response = search(q: "{!terms f=id v=$ids}", ids: ids.join(","), rows: ids.size, fl: fields.join(","))
     by_id = response.documents.index_by { |document| document.id.to_s }
     ids.filter_map { |id| by_id[id] }
   end

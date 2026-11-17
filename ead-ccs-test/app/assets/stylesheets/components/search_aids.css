@@ -1,0 +1,34 @@
+/* Ways sideways from a search or a record: the one-tap filters above the results (QuickFiltersComponent), the labelled rows under a
+   record (similar/row), the extra help on an empty results page (catalog/_zero_results) and the kind of each suggestion as you
+   type (catalog/suggest). Design tokens only; every link is at least 24px high and wraps rather than widening the page. */
+
+/* ---- one-tap filters ---- */
+.quick-filters { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-2) var(--ccs-space-3); margin-block: var(--ccs-space-3) var(--ccs-space-4); }
+.quick-filters__heading { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-secondary); }
+.quick-filters__list { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2); margin: 0; padding: 0; list-style: none; }
+.quick-filters__chip {
+  display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: 2rem; max-width: 100%; padding: 0.125rem var(--ccs-space-3);
+  border: 1px solid var(--ccs-border-strong); border-radius: var(--ccs-radius-circle); background: var(--ccs-surface-default);
+  color: var(--ccs-text-brand); font-size: var(--ccs-font-size-sm); line-height: 1.3; text-decoration: none; overflow-wrap: anywhere;
+}
+.quick-filters__chip:hover { background: var(--ccs-surface-subtle); text-decoration: underline; }
+.quick-filters__chip:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.quick-filters__count { color: var(--ccs-text-secondary); font-variant-numeric: tabular-nums; }
+
+/* ---- labelled rows under a record ---- */
+.similar-row__more { margin: var(--ccs-space-4) 0 0; }
+.similar-row__all { display: inline-block; min-height: 1.5rem; color: var(--ccs-text-link); font-weight: var(--ccs-font-weight-semibold); }
+.similar-row__all:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+/* ---- an empty results page ---- */
+.results-empty__help { margin-block-start: var(--ccs-space-5); }
+.results-empty__help h4 { margin: 0 0 var(--ccs-space-2); font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-semibold); }
+.results-empty__list { display: flex; flex-direction: column; gap: var(--ccs-space-2); margin: 0 0 var(--ccs-space-4); padding: 0; list-style: none; }
+.results-empty__list a { display: inline-block; min-height: 1.5rem; overflow-wrap: anywhere; }
+
+/* ---- what each suggestion is ---- */
+.search-suggestion { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 var(--ccs-space-3); min-height: 1.5rem; }
+.search-suggestion__value { overflow-wrap: anywhere; }
+.search-suggestion__kind { color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); white-space: nowrap; }
+[aria-selected="true"] .search-suggestion__kind,
+.search-suggestion[aria-selected="true"] .search-suggestion__kind { color: inherit; }
