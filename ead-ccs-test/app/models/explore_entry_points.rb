@@ -37,8 +37,8 @@ module ExploreEntryPoints
   PLACE_FIELD = "production_place_ssim"
   DATE_FIELD = "date_start_isi"
   CONFIG_PATH = Rails.root.join("config/explore_kinds.yml")
-  CACHE_KEY = "explore_entry_points/v4"
-  LAST_GOOD_KEY = "explore_entry_points/last_good/v4"
+  CACHE_KEY = "explore_entry_points/v5"
+  LAST_GOOD_KEY = "explore_entry_points/last_good/v5"
   # The tints of the collection tiles (--ccs-explore-tint-1 to -6 in tokens/semantic.css)
   TINTS = 6
   # Records looked at, in id order, for each collection's example image
@@ -65,7 +65,7 @@ module ExploreEntryPoints
 
     kinds = kind_links(counts); places = place_links(counts); periods = period_links(counts["periods"] || {})
     Overview.new(collection_tiles(counts), kinds, places, periods,
-                 link_tiles(kinds, counts["kind_images"], prefer_images: true), link_tiles(places, counts["place_images"]), link_tiles(periods, counts["period_images"]))
+                 link_tiles(kinds, counts["kind_images"], prefer_images: true), link_tiles(places, counts["place_images"], prefer_images: true), link_tiles(periods, counts["period_images"]))
   end
 
   def self.counts(connection = nil)
@@ -139,7 +139,7 @@ module ExploreEntryPoints
     used = fetched.fetch("images", {}).values.map { |image| image[:id].to_s } # no picture is shown twice on the page
     { "kind_images" => kinds, "place_images" => places, "period_images" => periods }.transform_values do |filters|
       filters.filter_map do |label, filter|
-        image = filter && example_image(filter, skip: used)
+        image = filter && example_image(filter, skip: used, viewable: true)
         next unless image
 
         used << image[:id].to_s
@@ -164,21 +164,21 @@ module ExploreEntryPoints
 
   # The first record, in id order, that Discovery.pickable? allows (AccessPolicy :open, not Sensitivity.sensitive?) and whose thumbnail
   # is a file this server holds. The Solr filters narrow the search; the Ruby checks decide.
-  def self.example_image(group_filter, skip: [])
-    response = Discovery.search(
-      q: "*:*", sort: "id asc", rows: IMAGE_CANDIDATES,
-      fq: [ FreeReuse.filter_query, "has_digital_asset_bsi:true", "-restrictions_tsi:sensitive", "{!prefix f=thumbnail_path_ssi}#{THUMBNAIL_DIRECTORY}", group_filter ]
-    )
+  #
+  # viewable: true (the record types, places and periods) takes any record whose thumbnail a result card would show instead (its asset
+  # may be seen, AccessPolicy.view?, and it is not sensitive), the thumbnail being the DAM's own (a full address) or a file held here.
+  def self.example_image(group_filter, skip: [], viewable: false)
+    fq = viewable ? [ "thumbnail_path_ssi:*", "-restrictions_tsi:sensitive", group_filter ] : [ FreeReuse.filter_query, "has_digital_asset_bsi:true", "-restrictions_tsi:sensitive", "{!prefix f=thumbnail_path_ssi}#{THUMBNAIL_DIRECTORY}", group_filter ]
+    response = Discovery.search(q: "*:*", sort: "id asc", rows: IMAGE_CANDIDATES, fq: fq)
     response.documents.each do |document|
-      next unless Discovery.pickable?(document)
       next if skip.include?(document.id.to_s)
+      next unless viewable ? (AccessPolicy.view?(document) && !Sensitivity.sensitive?(document)) : Discovery.pickable?(document)
 
       path = document["thumbnail_path_ssi"].to_s
       width, height = ImageDimensions.for_path(path)
-      next unless width
-
-      title = Array(document["title_tsim"]).first.to_s.strip
-      return { id: document.id.to_s, title: title.presence || "Untitled record", path: path, width: width, height: height } if path.start_with?(THUMBNAIL_DIRECTORY)
+      title = Array(document["title_tsim"]).first.to_s.strip.presence || "Untitled record"
+      return { id: document.id.to_s, title: title, path: path, width: width, height: height } if viewable && path.present?
+      return { id: document.id.to_s, title: title, path: path, width: width, height: height } if width && path.start_with?(THUMBNAIL_DIRECTORY)
     end
     nil
   end
@@ -257,5 +257,5 @@ module ExploreEntryPoints
     nil
   end
 
-  private_class_method :fetch_counts, :fetch_images, :fetch_link_images, :link_tiles, :example_image, :collection_pairs, :collection_tiles, :kind_links, :place_links, :period_links, :build_image
+  private_class_method :fetch_counts, :fetch_images, :fetch_link_images, :link_tiles, :example_image, :collection_pairs, :collection_tiles, :kind_links, :place_links, :period_links
 end

@@ -10,6 +10,11 @@ en:
     records:
       one: "%{count} record"
       other: "%{count} records"
+    cards:
+      see_all: "See all %{kind}"
+      before: "The earliest objects."
+      includes: "Includes %{kinds}."
+      held_in: "Held in %{collections}."
     kinds:
       makers:
         plural: "Makers"

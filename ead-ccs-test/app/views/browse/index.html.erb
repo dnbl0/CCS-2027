@@ -2,15 +2,26 @@
 <% content_for :title, "Browse the collections — Collections Navigator — University of Melbourne" %>
 <%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", nil ] ]) %>
 <%= render NexusCcs::PageBannerComponent.new(title: "Browse the collections", description: "No search term needed. Start from what the records are, where they come from, when they were made, who made them or what they are about.") %>
-<main class="browse" id="main-content">
-  <div class="browse__inner">
-    <ul class="browse__hubs">
-      <% @hubs.each do |hub| %>
-        <li class="browse__hub">
-          <h2 class="browse__hub-title"><%= link_to hub.title, browse_hub_path(hub.slug), class: "browse__hub-link" %></h2>
-          <p class="browse__hub-intro"><%= hub.intro %></p>
-        </li>
-      <% end %>
-    </ul>
-  </div>
+<main class="browse browse--hubs" id="main-content">
+  <%# One section for each way in: its name, a link to every value, and the eight values with the most records as result cards (two rows of four) %>
+  <% @sections.each do |hub, cards| %>
+    <section class="ccs-section browse-<%= hub.slug %>" aria-labelledby="browse-<%= hub.slug %>">
+      <div class="ccs-section__inner explore__inner">
+        <header class="explore__row-head">
+          <h2 id="browse-<%= hub.slug %>" class="ccs-section__heading"><%= hub.title %></h2>
+          <%= link_to t("browse.cards.see_all", kind: hub.title.downcase), browse_hub_path(hub.slug), class: "arrow-link arrow-link--icon explore__all" %>
+        </header>
+        <p class="explore__intro"><%= hub.intro %></p>
+        <% if cards.any? %>
+          <div class="ccs-mosaic ccs-mosaic--4">
+            <ul class="discover-cards">
+              <% cards.each do |card| %>
+                <li class="discover-cards__item"><%= render NexusCcs::ExploreCardComponent.new(tile: card, intro: card.intro, remote: true) %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
 </main>

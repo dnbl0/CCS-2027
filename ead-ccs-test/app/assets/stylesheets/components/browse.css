@@ -1,6 +1,6 @@
 /* The browse pages (BrowseController): the ways in at /browse, and the list of every value of one at /browse/:slug.
    The frame is the content pages' (banner, then the one page container); the letters follow the Help page's "On this page" menu,
-   the hubs are the University's card (title, text, arrow), and the value lists are the Explore rows. Targets are at least 44px tall. */
+   the ways in (/browse) are one section for each, two rows of four result cards as on the home page, and the value lists are the Explore rows. Targets are at least 44px tall. */
 .browse { background: var(--ccs-surface-default); }
 
 .browse__inner {
@@ -8,42 +8,13 @@
   max-width: var(--layout-container); margin-inline: auto; padding: var(--ccs-space-6) var(--space-32) var(--ccs-space-8);
 }
 
-.browse__hubs, .browse__list, .browse__letter-list { margin: 0; padding: 0; list-style: none; }
-
-/* The ways in: a card for each, the whole card the target (the title link is stretched over it), an arrow as the University's cards have */
-.browse__hubs { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: var(--ccs-space-5); }
-
-.browse__hub {
-  position: relative; display: flex; flex-direction: column; gap: var(--ccs-space-3);
-  padding: var(--ccs-space-5); border: 1px solid var(--ccs-border-panel); background: var(--ccs-white);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .browse__hub { transition: border-color var(--ccs-duration-base); }
-}
-
-.browse__hub:hover, .browse__hub:focus-within { border-color: var(--ccs-border-strong); }
-
-.browse__hub-title { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-heading-card-size); font-weight: var(--ccs-heading-weight-strong); line-height: var(--ccs-line-height-tight); }
-
-.browse__hub-link { color: var(--ccs-text-brand); text-decoration: none; }
-
-.browse__hub-link::after { content: ""; position: absolute; inset: 0; }
-
-.browse__hub:hover .browse__hub-link { text-decoration: underline; }
-
-.browse__hub-intro { margin: 0; color: var(--ccs-text-primary); }
-
-.browse__hub::after {
-  content: ""; width: 1.5rem; height: 1.5rem; margin-top: auto; background: var(--ccs-text-link);
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M17.15 12.75H4V11.25H17.15L10.95 5.05L12 4L20 12L12 20L10.95 18.95L17.15 12.75Z'/%3E%3C/svg%3E") center / contain no-repeat;
-}
+.browse__list, .browse__letter-list { margin: 0; padding: 0; list-style: none; }
 
 .browse__letter, .browse__link { color: var(--ccs-text-link); }
 
 .browse__letter:hover, .browse__link:hover { color: var(--ccs-text-link-hover); }
 
-.browse__hub-link:focus-visible, .browse__letter:focus-visible, .browse__link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.browse__letter:focus-visible, .browse__link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
 /* A to Z: the Help page's "On this page" (a title ruled underneath, then plain links); letters are 44px targets in a grid */
 .browse__letters-title {
@@ -90,3 +61,8 @@
 @media (max-width: 767px) {
   .browse__inner { padding-inline: var(--space-16); }
 }
+
+/* /browse: each way in is its own section after the banner, alternating white and light grey as the home page's do */
+body.page-browse main.browse--hubs { background: none; }
+body.page-browse main.browse--hubs > .ccs-section { background: var(--ccs-surface-default); }
+body.page-browse main.browse--hubs > .ccs-section:nth-of-type(even) { background: var(--ccs-surface-subtle); }

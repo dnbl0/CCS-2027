@@ -60,6 +60,19 @@ The home page's Explore section (PR #25; redesigned as collection tiles, docs/ex
 - **Entity pages** for a maker, a place, a subject, a century and a decade (below).
 - Index entries for makers, places, subjects and periods now **link to the entity page** (the page has the "See all N records" search link);
   object types still open the search, as they have no page.
+- **The `/browse` page itself** (2026-11-17) is one section for each way in (object types, places, periods, makers, subjects): an h2 with a
+  "See all" link to the A to Z list, then eight cards as the site's result cards (two rows of four, as the home page's Explore sections), on
+  white and light grey in turn. A card has a whole picture, the value's name and a short description, and no arrow; the whole card opens the
+  search results with that value as a facet filter (`BrowseHubs.query`). `Browse::Cards` chooses the cards with the index's own facets: the
+  facet counts only records that have a thumbnail and are not sensitive, so the values offered have something to show, and a value whose
+  records a result card would show no picture for (`AccessPolicy.view?`; withheld assets) is passed over for the next. No picture is shown
+  twice. Three Indigenous subjects (Aboriginal and Torres Strait Islander art, By Indigenous People, About Indigenous People) are not offered as cards
+  (`Browse::Cards::SKIPPED`) while the cultural review is pending, as the Indigenous Collections tile has no picture. **Object types** use the Classification facet (art and design, paintings, ceramics...) because nearly every Object Type value other
+  than Work, Object and Archive belongs to records whose assets are withheld, so it has no picture to show. The description is worked out from
+  the value's own records, so nothing is written by hand: "Includes prints, drawings. Held in University Art Collection." (the two commonest
+  kinds of record and the two commonest collections). The wording around it is a placeholder: the collections team has not approved it.
+  The cards are kept for a day, and the last good copy for a month. The home page's Record types, Places and Time tiles take their pictures
+  by the same rule (`ExploreEntryPoints.example_image` with `viewable: true`), preferring record types and places that have one.
 - A **type-to-filter box** (plain GET form, `?filter=`) and **paging** (120 a page, `?page=`) on every index page except periods.
 - Makers, places and subjects on the index pages are **grouped by spelling** (`Browse::Index`), so "Portraits" and "portraits" are one row.
 - Record pages link their place, subject and maker values to the entity page.

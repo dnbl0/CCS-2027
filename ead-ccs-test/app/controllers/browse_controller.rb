@@ -5,7 +5,7 @@ class BrowseController < ApplicationController
   layout "pages"
 
   def index
-    @hubs = BrowseHubs.all
+    @sections = BrowseHubs.all.to_h { |hub| [ hub, Browse::Cards.for(hub) ] }
     @browse_meta = Browse::Meta.index
   end
 

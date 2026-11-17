@@ -15,12 +15,50 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
   def seed(slug, values) = Rails.cache.write("browse_hubs/v1/#{slug}", values, expires_in: 1.day)
 
-  test "the browse page lists every way in, each with its page" do
+  # The cards of a hub as Browse::Cards keeps them (label, count, a picture, the description; a period has its years)
+  def seed_cards(slug, entries) = Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/#{slug}"), entries, expires_in: 1.day)
+
+  def entry(label, **extra) = { "label" => label, "count" => 5, "intro" => "Includes prints. Held in University Art Collection.", "image" => nil }.merge(extra.transform_keys(&:to_s))
+
+  test "the browse page is one section for each way in, with its heading and a link to every value" do
     get "/browse"
 
     assert_response :success
     assert_select "h1", "Browse the collections"
-    BrowseHubs.all.each { |hub| assert_select "main a[href='/browse/#{hub.slug}']", text: /#{hub.title}/ }
+    assert_select "main > section.ccs-section", count: BrowseHubs.all.size
+    BrowseHubs.all.each do |hub|
+      assert_select "section.browse-#{hub.slug}[aria-labelledby='browse-#{hub.slug}'] h2#browse-#{hub.slug}", hub.title
+      assert_select "section.browse-#{hub.slug} a.explore__all[href='/browse/#{hub.slug}']"
+    end
+  end
+
+  test "each section shows its cards, each with its description and opening the results with its filter applied" do
+    image = { id: "r1", title: "A print", path: "https://dam.example.org/a.jpg", width: nil, height: nil }
+    seed_cards("object-types", [ entry("Medical device", "image" => image) ] + (1..7).map { |number| entry("Type #{number}") })
+
+    get "/browse"
+
+    assert_select "section.browse-object-types article.explore-card", count: 8
+    assert_select "section.browse-object-types h3.document-title-heading a[href*='f%5Bclassification_ssim%5D%5B%5D=Medical+device'][href*='any_assets=1']", text: "Medical device"
+    assert_select "section.browse-object-types .explore-card__intro", text: "Includes prints. Held in University Art Collection.", count: 8
+    assert_select "section.browse-object-types article.explore-card img[src*='dam.example.org']", count: 1
+    assert_select "section.browse-object-types article.explore-card svg", count: 0 # no arrow
+    assert_select "section.browse-object-types .explore-card__intro", text: /records/, count: 0 # a description, not a count
+  end
+
+  test "the periods section opens the results with that period's range" do
+    seed_cards("periods", [ entry("1950–1959", "first" => 1950, "last" => 1959) ])
+
+    get "/browse"
+
+    assert_select "section.browse-periods h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1950'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1959']", text: "1950–1959"
+  end
+
+  test "a section whose list is unavailable keeps its heading and link but has no cards" do
+    get "/browse"
+
+    assert_select "section.browse-makers h2", "Makers"
+    assert_select "section.browse-makers article", count: 0
   end
 
   test "a way in lists the most common values first, each opening all its records with its count" do

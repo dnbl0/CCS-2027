@@ -63,12 +63,12 @@ class ExploreEntryPointsTest < ActiveSupport::TestCase
     assert_equal "University Art Collection", names.first
   end
 
-  test "places: the repeated and enclosing values are skipped and five are kept" do
+  test "places: the repeated and enclosing values are skipped and the first twelve are kept (the home page shows four of them, the ones with a picture first)" do
     places = [ [ "Oceania", 8642 ], [ "Australia", 8056 ], [ "Europe", 6842 ], [ "Victoria", 4430 ], [ "Melbourne", 3279 ], [ "United Kingdom", 3083 ],
                [ "Melbourne, Victoria, Australia", 2796 ], [ "England", 2548 ] ]
     kept = ExploreEntryPoints.parse(response(places: places))["places"].map(&:first)
 
-    assert_equal [ "Australia", "Europe", "Victoria", "Melbourne", "United Kingdom" ], kept
+    assert_equal [ "Australia", "Europe", "Victoria", "Melbourne", "United Kingdom", "England" ], kept
   end
 
   test "periods with no records are left out; the others link to the range filter" do
