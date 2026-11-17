@@ -13,7 +13,12 @@ class SharingLimitsTest < ActionDispatch::IntegrationTest
   BROWSER = { "User-Agent" => "Mozilla/5.0 (X11; Linux x86_64) Firefox/126.0" }.freeze
   IDS = %w[emu-400198 emu-400205 emu-400001].freeze
 
-  setup { BotGuard.store.clear }
+  # BotGuard counts in fixed one-minute windows: requests that straddle a minute's end start counting again (seen in CI,
+  # 2026-11-17: 404 where 429 was due). The clock stands still five seconds into a minute.
+  setup do
+    BotGuard.store.clear
+    travel_to Time.current.beginning_of_minute + 5.seconds
+  end
 
   test "a gallery, an embed and oEmbed share the record request limit, so a token cannot be guessed at speed" do
     token = "a" * 32
