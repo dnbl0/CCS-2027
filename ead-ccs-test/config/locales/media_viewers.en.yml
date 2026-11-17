@@ -8,3 +8,4 @@ en:
         message: "This %{kind} is in a format (%{file_format}) that web browsers cannot play."
         download: "Download %{title} (%{file_format})"
         request: "Ask the collection team for a copy of %{title}"
+        this: "this %{kind}"

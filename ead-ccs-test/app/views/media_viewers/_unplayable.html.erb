@@ -3,12 +3,14 @@
     (downloadable), else a request for a copy. Never the file's address for a file that may not be downloaded. %>
 <% kind = item[:kind].to_s == "audio" ? t("nexus_ccs.media.unplayable.audio") : t("nexus_ccs.media.unplayable.video") %>
 <% format = MediaTypes.format_name(item[:type], item[:url]) %>
+<%# A DAM file often has only its file name for a title ("item395-processed.wmv"): the links then say "this video" (the caption below names the file) %>
+<% name = title.to_s.match?(/\.[a-z0-9]{2,4}\z/i) ? t("nexus_ccs.media.unplayable.this", kind: kind) : title %>
 <div class="digital-assets__unplayable">
   <p><%= t("nexus_ccs.media.unplayable.message", kind: kind, file_format: format) %></p>
   <% if downloadable %>
-    <p><%= link_to t("nexus_ccs.media.unplayable.download", title: title, file_format: format), item[:url] %></p>
+    <p><%= link_to t("nexus_ccs.media.unplayable.download", title: name, file_format: format), item[:url] %></p>
   <% elsif local_assigns[:request_path].present? %>
-    <p><%= link_to t("nexus_ccs.media.unplayable.request", title: title), request_path %></p>
+    <p><%= link_to t("nexus_ccs.media.unplayable.request", title: name), request_path %></p>
   <% end %>
 </div>
 <%= render "media_viewers/transcript", item: item, title: title %>

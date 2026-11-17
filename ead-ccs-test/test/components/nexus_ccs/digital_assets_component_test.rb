@@ -83,6 +83,12 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_selector ".digital-assets__unplayable a[href^='/access_requests/new']", text: "Ask the collection team for a copy of Film"
   end
 
+  test "a file whose only title is its file name is called 'this video' in the links" do
+    render_for(assets(3).merge("digital_media_ssim" => [ "video|video/x-ms-wmv|/v.wmv|item395-processed.wmv" ]))
+
+    assert_selector ".digital-assets__unplayable a[href='/v.wmv']", text: "Download this video (WMV)"
+  end
+
   test "a video browsers can play keeps its player" do
     render_for(assets(3).merge("digital_media_ssim" => [ "video|video/mp4|/v.mp4|Film", "audio|audio/x-wav|/a.wav|Interview" ]))
 
