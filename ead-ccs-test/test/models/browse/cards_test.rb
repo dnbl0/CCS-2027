@@ -2,9 +2,11 @@
 
 require "test_helper"
 require_relative "../../support/discovery_records"
+require_relative "../../support/outages"
 
 class Browse::CardsTest < ActiveSupport::TestCase
   include DiscoveryRecords
+  include Outages
 
   setup do
     @cache = Rails.cache
@@ -95,6 +97,6 @@ class Browse::CardsTest < ActiveSupport::TestCase
   end
 
   test "when the index cannot answer there are no cards" do
-    assert_empty Browse::Cards.for(hub("subjects"))
+    with_solr_down { assert_empty Browse::Cards.for(hub("subjects")) }
   end
 end
