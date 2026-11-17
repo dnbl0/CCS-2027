@@ -6,9 +6,9 @@ is copied from it). The cards are the site's result cards (`NexusCcs::ExploreCar
 
 | Layout | What it is | Used by |
 |---|---|---|
-| `bento` | a feature card two cells wide and tall beside smaller ones; the last card two cells wide | Browse: Object types |
-| `rail` | a row that scrolls sideways, the next card peeking, with round previous and next buttons (`card_rail_controller.js`) | Browse: Places |
-| `strip` | from 900px the card pointed at or focused widens (the first one at rest); a two-column grid below | Browse: Periods |
+| `bento` | a feature card two cells wide and tall beside smaller ones; the last card two cells wide | Browse: Object types; Home: Record types |
+| `rail` | a row that scrolls sideways, the next card peeking, with round previous and next buttons (`card_rail_controller.js`) | Browse: Places; Home: Places (eight, `ExploreEntryPoints::PLACES_SHOWN`) |
+| `strip` | from 900px the card pointed at or focused widens (the first one at rest); a two-column grid below | Browse: Periods; Home: Time |
 | `grid` | an even grid of square pictures | Browse: Makers |
 | `wall` | an even grid with a brand panel after the first card that opens the full A to Z list | Browse: Subjects |
 
@@ -34,4 +34,4 @@ is copied from it). The cards are the site's result cards (`NexusCcs::ExploreCar
 
 - The fan of overlapping cards with a larger centre card, and a picture wall with no captions, were left out: both depend on motion or
   on text over pictures.
-- The home page's sections still use the mosaic (the next step).
+- The home page's collection tiles keep their own design (monogram tiles).
