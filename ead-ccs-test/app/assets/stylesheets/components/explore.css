@@ -210,6 +210,8 @@
 /* An Explore card is the result card: padding at the sides (a card with no picture is its title only), the title a link without an underline until hover (it has a class, so the page-wide "a with no class" underline rule does not reach it) */
 .explore-card .result-card__content { padding-inline: var(--ccs-space-4); }
 .explore-card .document-title-heading { padding-block: var(--ccs-space-4); }
+.explore-card__intro { margin: 0; padding: 0 0 var(--ccs-space-4); font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
+.explore-card .document-title-heading:has(+ .explore-card__intro) { padding-block-end: var(--ccs-space-1); }
 .explore-card .document-title-heading a { text-decoration: none; }
 .explore-card .document-title-heading a:hover,
 .explore-card:hover .document-title-heading a { text-decoration: underline; text-underline-position: from-font; }
