@@ -43,7 +43,7 @@ class SiteChromeTest < ActiveSupport::TestCase
     render_header
 
     assert_selector "header[data-controller='site-header']"
-    assert_selector "button.site-nav__trigger[aria-expanded='false'][data-action='site-header#toggleSection']", count: 3 # Search collections, Help and My saved items
+    assert_selector "button.site-nav__trigger[aria-expanded='false'][data-action='site-header#toggleSection']", count: 4 # Search collections, Browse, Help and My saved items
     assert_selector "button.site-header__menu[aria-controls='site-nav'][aria-expanded='false']"
     assert_selector "#site-nav-records button.site-nav__back"
   end

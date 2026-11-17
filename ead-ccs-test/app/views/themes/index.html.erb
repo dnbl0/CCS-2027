@@ -1,0 +1,19 @@
+<% content_for :title, "#{t('nexus_ccs.themes.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-browse page-themes" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.themes.title"), description: t("nexus_ccs.themes.description")) %>
+<main class="browse-main" id="main-content">
+  <div class="browse-main__inner">
+    <% if @themes.empty? %>
+      <p class="browse-empty"><%= t("nexus_ccs.themes.empty") %></p>
+    <% else %>
+      <ul class="discovery-index">
+        <% @themes.each do |theme| %>
+          <li class="discovery-index__item">
+            <h2 class="discovery-index__title"><%= link_to theme.title, theme.path %></h2>
+            <p class="discovery-index__text" data-placeholder-wording><%= theme.intro %></p>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+</main>

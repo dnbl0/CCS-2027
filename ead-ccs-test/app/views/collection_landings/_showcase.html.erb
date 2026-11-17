@@ -1,0 +1,33 @@
+<%# The body of a collection, named collection or theme page (Showcase): the placeholder introduction, the link to every record in the
+    search page, the commonest object types and eras as links that narrow that search, and the highlights with pictures.
+    showcase, search_query, intro %>
+<main class="browse-main" id="main-content">
+  <div class="browse-main__inner">
+    <section class="browse-facts" aria-labelledby="showcase-about">
+      <h2 id="showcase-about" class="visually-hidden"><%= t("nexus_ccs.showcase.about") %></h2>
+      <p class="showcase__intro" data-placeholder-wording><%= intro %> <span class="showcase__placeholder">[<%= t("nexus_ccs.placeholder") %>]</span></p>
+      <% if showcase.total.positive? %>
+        <p class="browse-facts__action"><%= link_to t("nexus_ccs.showcase.see_all", count: number_with_delimiter(showcase.total)), search_catalog_path(search_query), class: "btn btn-primary" %></p>
+      <% else %>
+        <p class="browse-facts__action"><%= t("nexus_ccs.showcase.no_records") %></p>
+      <% end %>
+      <dl class="browse-facts__list">
+        <% { "object_type_ssim" => :object_types, "date_era_ssim" => :eras, "named_collection_ssim" => :named_collections }.each do |field, label| %>
+          <% pairs = showcase.facets[field].to_a.reject { |value, _| Array(search_query.dig(:f, field)).include?(value) } %>
+          <% next if pairs.empty? %>
+          <div><dt><%= t("nexus_ccs.showcase.#{label}") %></dt>
+            <dd><ul class="browse-facts__links">
+              <% pairs.each do |value, count| %>
+                <li><%= link_to value, search_catalog_path(search_query.deep_merge(f: { field => Array(search_query.dig(:f, field)) + [ value ] })) %> <span class="browse-list__count">(<%= number_with_delimiter(count) %>)</span></li>
+              <% end %>
+            </ul></dd></div>
+        <% end %>
+      </dl>
+    </section>
+    <% if showcase.documents.any? %>
+      <%= render NexusCcs::RecordCardsComponent.new(id: "showcase-highlights", heading: t("nexus_ccs.showcase.highlights"), documents: showcase.documents) %>
+    <% elsif showcase.total.positive? %>
+      <p class="browse-empty"><%= t("nexus_ccs.showcase.none") %></p>
+    <% end %>
+  </div>
+</main>

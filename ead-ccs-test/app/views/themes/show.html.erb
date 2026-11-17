@@ -1,0 +1,4 @@
+<% content_for :title, "#{@theme.title} — #{t('nexus_ccs.themes.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-browse page-showcase" %>
+<%= render NexusCcs::PageBannerComponent.new(title: @theme.title, description: t("nexus_ccs.themes.title")) %>
+<%= render "collection_landings/showcase", showcase: @showcase, search_query: @theme.search_query, intro: @theme.intro %>

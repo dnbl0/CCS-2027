@@ -1,0 +1,7 @@
+# The introductions of the collection and named collection pages (/browse/collections/..., /browse/named-collections/...).
+#
+# PLACEHOLDER: lorem ipsum only. The collections team writes the real text; add an entry under `collections` or `named_collections`
+# keyed by the value exactly as the index spells it. A value with no entry shows `default`.
+default: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus posuere velit aliquet."
+collections: {}
+named_collections: {}
