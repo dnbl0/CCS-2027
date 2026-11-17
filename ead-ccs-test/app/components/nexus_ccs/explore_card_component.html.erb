@@ -1,0 +1,13 @@
+<article class="<%= classes %>">
+  <% if image? %>
+    <%# The title is the link text, so the picture's own link is hidden from assistive technology and the tab order, as on a result card %>
+    <%= link_to path, class: "result-card__media", tabindex: -1, "aria-hidden": true do %>
+      <%= image_tag image_path, alt: "", width: tile.image.width, height: tile.image.height, loading: "lazy", decoding: "async" %>
+    <% end %>
+  <% end %>
+  <div class="result-card__content">
+    <%= content_tag heading_tag, class: "document-title-heading" do %>
+      <%= link_to tile.label, path, class: "explore-card__link" %>
+    <% end %>
+  </div>
+</article>

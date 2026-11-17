@@ -32,17 +32,6 @@ class DiscoverTest < ApplicationSystemTestCase
       assert_accessible tags: AXE_TAGS + WCAG22_TAGS
       assert page.evaluate_script("document.documentElement.scrollWidth <= window.innerWidth"), "the page scrolls sideways"
     end
-
-    test "the home page fills its Featured and trending section when it scrolls into view, with no axe violations, at #{name}" do
-      page.current_window.resize_to(width, 900)
-      visit "/"
-      page.execute_script("document.getElementById('home-discover-heading').scrollIntoView()")
-
-      assert_selector "turbo-frame#home-discover[complete] .discover-section--featured article", minimum: 2
-      assert_link "See all featured and trending records", href: "/discover"
-      page.execute_script("window.scrollTo(0, 0)")
-      assert_accessible tags: AXE_TAGS + WCAG22_TAGS
-    end
   end
 
   test "the record page's Similar objects are cards linking to their records, and do not scroll sideways at 390px" do

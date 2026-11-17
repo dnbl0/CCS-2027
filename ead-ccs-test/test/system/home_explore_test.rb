@@ -49,22 +49,22 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     JS
   end
 
-  test "on a desktop: no axe violations (WCAG 2.2 AA), three collection tiles in a row, targets of 44px, then rows of four tiles" do
+  test "on a desktop: no axe violations (WCAG 2.2 AA), three collection tiles in a row, targets of 44px, then a mosaic of cards in each of three sections" do
     keep(counts)
     page.current_window.resize_to(1440, 900)
     visit "/"
 
-    assert_selector "section.explore ul.explore__tiles:not(.explore__tiles--row) > li.explore__tile", count: 6
+    assert_selector "section.explore ul.explore__tiles > li.explore__tile", count: 6
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
     assert_empty small_targets
     assert_not sideways_scroll?
-    tops = page.evaluate_script("[...document.querySelectorAll('ul.explore__tiles:not(.explore__tiles--row) > .explore__tile')].map(t => Math.round(t.getBoundingClientRect().top))")
+    tops = page.evaluate_script("[...document.querySelectorAll('ul.explore__tiles > .explore__tile')].map(t => Math.round(t.getBoundingClientRect().top))")
     assert_equal 1, tops.first(3).uniq.size, "the first three tiles are in one row"
     assert_operator tops[3], :>, tops[0]
-    assert_selector "ul.explore__tiles--row", count: 3
-    assert_selector "ul.explore__tiles--row a.explore__tile-link h4", text: "Australia"
-    row = page.evaluate_script("[...document.querySelectorAll('ul.explore__tiles--row')[1].children].map(t => Math.round(t.getBoundingClientRect().top))")
-    assert_equal 1, row.uniq.size, "a row's tiles sit side by side"
+    assert_selector ".explore-kinds .ccs-mosaic, .explore-places .ccs-mosaic, .explore-periods .ccs-mosaic", count: 3
+    assert_selector ".explore-places article.result-card h3 a", text: "Australia"
+    colours = page.evaluate_script("['hero','about','explore','explore-kinds','explore-places','explore-periods'].length && [...document.querySelectorAll('main > .ccs-section:not(.ccs-section--hero)')].map(s => getComputedStyle(s).backgroundColor)")
+    assert_equal colours.each_cons(2).count { |a, b| a != b }, colours.size - 1, "the sections' backgrounds alternate"
     assert_no_selector "section.explore img"
   end
 
@@ -73,12 +73,12 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     page.current_window.resize_to(390, PHONE_HEIGHT)
     visit "/"
 
-    assert_selector "section.explore ul.explore__tiles:not(.explore__tiles--row) > li.explore__tile", count: 6
+    assert_selector "section.explore ul.explore__tiles > li.explore__tile", count: 6
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
     assert_empty small_targets
     assert_not sideways_scroll?
-    assert_selector "ul.explore__tiles--row", count: 3
-    assert_selector "ul.explore__tiles--row a.explore__tile-link h4", text: "Australia"
+    assert_selector ".explore-kinds .ccs-mosaic, .explore-places .ccs-mosaic, .explore-periods .ccs-mosaic", count: 3
+    assert_selector ".explore-places article.result-card h3 a", text: "Australia"
   end
 
   test "with example images the section has no axe violations, the picture is whole and the Indigenous Collections tile is still text only" do

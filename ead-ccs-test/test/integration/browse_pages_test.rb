@@ -90,9 +90,9 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
     get "/"
 
-    assert_select "section.explore a.explore__all[href='/browse/object-types']"
-    assert_select "section.explore a.explore__all[href='/browse/places']"
-    assert_select "section.explore a.explore__all[href='/browse/periods']"
+    assert_select "section.explore-kinds a.explore__all[href='/browse/object-types']"
+    assert_select "section.explore-places a.explore__all[href='/browse/places']"
+    assert_select "section.explore-periods a.explore__all[href='/browse/periods']"
   end
 
   # --- Entity pages (BrowseEntitiesController) and the filter box ---

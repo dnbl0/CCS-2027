@@ -1,6 +1,6 @@
 /*
  * Featured and trending (home page frame, /discover): the site's result cards in a grid.
- * Markup: views/discover/_cards, _section, pages/_featured_and_trending, docs/similar-and-trending.md.
+ * Markup: views/discover/_cards, _section, docs/similar-and-trending.md.
  * The lazy frames reserve their height while they load, and only while JavaScript runs (no-js is removed by the layout), so
  * a late-arriving section does not move what is below it, and a visitor without JavaScript is not left with an empty gap.
  */
@@ -161,41 +161,4 @@ html:not(.no-js) .discover-frame:not([complete]) {
 .discover-frame__note {
   margin: 0;
   color: var(--ccs-text-secondary);
-}
-
-.home-discover__header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ccs-space-2);
-  margin-bottom: var(--ccs-space-5);
-}
-
-body.page-home .home-discover {
-  padding-block: var(--ccs-space-8);
-}
-
-body.page-home .home-discover .ccs-section__inner {
-  max-width: var(--layout-content-wide);
-}
-
-.home-discover__intro {
-  margin: 0;
-  font-size: var(--ccs-font-size-lg);
-}
-
-.home-discover__link {
-  display: inline-block;
-  min-height: 24px;
-  color: var(--ccs-text-link);
-  font-weight: var(--ccs-font-weight-bold);
-  text-decoration: underline;
-}
-
-.home-discover__link:hover {
-  color: var(--ccs-text-link-hover);
-}
-
-.home-discover__link:focus-visible {
-  outline: 3px solid var(--ccs-focus-ring);
-  outline-offset: 2px;
 }

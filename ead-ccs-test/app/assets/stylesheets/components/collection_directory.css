@@ -1,8 +1,0 @@
-/* The home page's "All University collections" list (NexusCcs::CollectionDirectoryComponent). Plain links in columns, no cards. */
-.collection-directory { background: var(--ccs-surface-subtle); }
-.collection-directory__inner { display: flex; flex-direction: column; gap: var(--ccs-space-6); }
-.collection-directory__intro, .collection-directory__note { margin: 0; max-width: 40rem; }
-.collection-directory__heading { margin: 0 0 var(--ccs-space-2); font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-xl); }
-.collection-directory__list { columns: 2 22rem; column-gap: var(--ccs-space-8); margin: var(--ccs-space-3) 0 0; padding: 0; list-style: none; }
-.collection-directory__list li { break-inside: avoid; }
-.collection-directory__link { display: inline-block; min-height: 2rem; padding-block: var(--ccs-space-1); }

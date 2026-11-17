@@ -1,6 +1,10 @@
-# All University collections on the home page
+# All University collections
 
-The home page lists every University cultural collection, not only the ones whose records are searchable here. The list is
+**Update 2026-11-17:** the home page no longer shows this list (the user asked for the "All collections" section and the older "Collections
+currently available" section to be removed; the component and its styles are deleted). The list below still decides which collections
+can be searched, and `UniversityCollections` still reads it.
+
+The list holds every University cultural collection, not only the ones whose records are searchable here. It is
 `config/university_collections.yml` (25 collections: the University Art Collection and the 24 on
 museumsandcollections.unimelb.edu.au/collections, read 2026-11-16). Only names and web addresses are kept.
 

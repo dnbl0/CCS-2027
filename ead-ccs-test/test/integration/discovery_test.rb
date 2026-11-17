@@ -173,7 +173,7 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
 
   # --- Home page and /discover ---
 
-  test "the home page holds a heading, a visible link to /discover and a lazy frame, and no records, no Solr request and one query at most" do
+  test "the home page has no Featured and trending section, no records, no Solr request and one query at most" do
     result = nil
     with_seeded_menu_cache do
       get "/"
@@ -181,9 +181,8 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :success
-    assert_select "section[aria-labelledby=home-discover-heading] h2#home-discover-heading", text: "Featured and trending"
-    assert_select "section[aria-labelledby=home-discover-heading] a[href='/discover']", text: "See all featured and trending records"
-    assert_select "turbo-frame#home-discover.discover-frame[loading=lazy][src='/discover/frame']"
+    assert_select "#home-discover-heading", count: 0
+    assert_select "turbo-frame#home-discover", count: 0
     assert_select ".result-card", count: 0
     assert_equal 0, result.solr
     assert_operator result.sql, :<=, 1

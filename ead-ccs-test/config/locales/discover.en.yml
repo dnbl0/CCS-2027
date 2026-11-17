@@ -4,10 +4,6 @@ en:
       title: "Discover"
       page_title: "Discover — Collections Navigator — University of Melbourne"
       description: "Featured records chosen by the collection teams, the record of the day, and what other visitors are looking at."
-      home_heading: "Featured and trending"
-      home_intro: "A few records to start from."
-      see_all: "See all featured and trending records"
-      home_fallback: "The records are loading. If none appear, use the link above."
       empty: "There is nothing to feature just now. You can still search all records."
       empty_link: "Search all records"
       sections:
