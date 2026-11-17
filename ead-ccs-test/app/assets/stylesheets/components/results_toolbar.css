@@ -59,9 +59,17 @@
   color: var(--ccs-text-brand);
 }
 
+/* The whole value shows: Blacklight cuts it at clamp(288px, 30vw, 500px) with an ellipsis; here a long one wraps inside the
+   pill (and a long unbroken word breaks), so nothing is hidden at any width or text size (WCAG 1.4.4, 1.4.10) */
 .constraints-container .applied-filter .constraint-value {
   min-width: 0;
+  max-width: none;
+  overflow: visible;
   padding: var(--space-2) var(--space-4) var(--space-2) var(--space-8);
+  text-align: start;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .constraints-container .applied-filter .remove {
