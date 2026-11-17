@@ -47,19 +47,27 @@ module Dam
       updated
     end
 
-    # The DAM fields of a record from its assets (nil values when it has none)
-    def self.fields_for(assets)
+    # The record fields AccessPolicy reads besides the DAM's own (an EMu restriction can still withhold an asset)
+    POLICY_FIELDS = %w[licence_type_ssim access_condition_ssi].freeze
+
+    # The DAM fields of a record from its assets (nil values when it has none). record: the record's POLICY_FIELDS.
+    # has_digital_asset_bsi says a visitor can see an asset (AccessPolicy.view?), not only that one exists: results sort
+    # records with assets first and the "with images" filters read it, and a withheld asset (blank DAM licence: most of the
+    # DAM) shows nothing. When the DAM's licence changes, the next sync changes the flag.
+    def self.fields_for(assets, record = {})
       return FIELDS.index_with { nil } if assets.empty?
 
       images = assets.select { |asset| asset.format_type == "image" && asset.urls["large"].present? }
       media = assets.select { |asset| MEDIA_KINDS.include?(asset.format_type) && asset.urls["original"].present? }
+      metadata = assets.map { |asset| metadata(asset) }
+      viewable = AccessPolicy.view?(SolrDocument.new(record.slice(*POLICY_FIELDS).merge("id" => record["id"], "digital_asset_metadata_ssm" => metadata)))
       fields = {
-        "digital_asset_metadata_ssm" => assets.map { |asset| metadata(asset) },
+        "digital_asset_metadata_ssm" => metadata,
         "thumbnail_path_ssi" => images.first&.urls&.dig("thumbnail") || images.first&.urls&.dig("large"),
         "digital_asset_paths_ssim" => images.map { |asset| asset.urls["thumbnail"].presence || asset.urls["large"] }.presence,
         "digital_asset_large_paths_ssim" => images.map { |asset| asset.urls["large"] }.presence,
         "digital_media_ssim" => media.map { |asset| media_entry(asset) }.presence,
-        "has_digital_asset_bsi" => (images.any? || media.any?),
+        "has_digital_asset_bsi" => viewable && (images.any? || media.any?),
         "digital_asset_format_ssim" => assets.filter_map { |asset| FORMATS[asset.format_type] }.uniq.presence
       }
       fields.merge("dam_digest_ss" => Digest::SHA256.hexdigest(fields.to_json))
@@ -79,7 +87,7 @@ module Dam
 
     def find(accessions)
       terms = accessions.map { |accession| %("#{accession.gsub(/["\\]/) { |c| "\\#{c}" }}") }.join(" OR ")
-      response = @solr.get("select", params: { q: "accession_number_ssim:(#{terms})", fl: "id,accession_number_ssim,collection_ssim,dam_digest_ss",
+      response = @solr.get("select", params: { q: "accession_number_ssim:(#{terms})", fl: "id,accession_number_ssim,collection_ssim,dam_digest_ss,#{POLICY_FIELDS.join(',')}",
                                                rows: accessions.size * 5, wt: "json" })
       response.dig("response", "docs") || []
     end
@@ -94,7 +102,7 @@ module Dam
       end
       return nil if mine.empty? && doc["dam_digest_ss"].blank?
 
-      fields = self.class.fields_for(mine.uniq)
+      fields = self.class.fields_for(mine.uniq, doc)
       return nil if fields["dam_digest_ss"] == doc["dam_digest_ss"]
 
       { "id" => doc["id"] }.merge(fields.transform_values { |value| { "set" => value } })

@@ -34,7 +34,10 @@ Each run rewrites only the records whose DAM fields changed (a digest in `dam_di
 | Image order | `dAwebdisplaysequence` | order of the image fields |
 
 It also writes `thumbnail_path_ssi`, `digital_asset_paths_ssim`, `digital_asset_large_paths_ssim`, `digital_media_ssim`
-(audio, video, PDF), `has_digital_asset_bsi` and `digital_asset_format_ssim` (the Format filter). When two records share an
+(audio, video, PDF), `has_digital_asset_bsi` and `digital_asset_format_ssim` (the Format filter). `has_digital_asset_bsi` is
+true only when a visitor may see an asset (`AccessPolicy.view?`): results sort those records first and the "with images" filters
+read it, so a record whose asset is withheld (a blank DAM licence) is not put first with nothing to show. After a change to
+those rules, `bin/rails dam:write` rewrites the fields from `dam_assets` without reading the DAM. When two records share an
 accession number, an asset goes to the record of its own collection (`cACollection1`).
 
 **Images**: the DAM's embed links (`unimelbourne.widen.net`), which do not expire. The preview links under `thumbnails`

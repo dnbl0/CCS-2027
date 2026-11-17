@@ -13,7 +13,7 @@ class DamSolrWriterTest < ActiveSupport::TestCase
   test "it writes the fields the app reads, linking the DAM's own (non-expiring) embed links" do
     asset("b", display_sequence: 2, licence: "CC BY", producer: "Lee McRae (Photographer)")
     asset("a", display_sequence: 1, licence: "CC BY")
-    asset("v", format: "video")
+    asset("v", format: "video", licence: "CC BY")
     solr = DamFakes::Solr.new([ { "id" => "emu-1", "accession_number_ssim" => [ "1987.0043" ] } ])
 
     assert_equal 1, Dam::SolrWriter.new(solr: solr).write([ "1987.0043" ])
@@ -30,6 +30,30 @@ class DamSolrWriterTest < ActiveSupport::TestCase
     assert_equal "Lee McRae (Photographer)", metadata.second["producer"]
     assert_equal :open, AccessPolicy.tier(SolrDocument.new(doc.merge("digital_asset_metadata_ssm" => doc["digital_asset_metadata_ssm"].first(2))))
     assert_equal 1, solr.commits
+  end
+
+  test "a record whose assets a visitor cannot see is not flagged as having one, so it does not sort first" do
+    asset("blank", accession: "1")
+    asset("icip", accession: "2", licence: "CC BY")
+    solr = DamFakes::Solr.new([ { "id" => "blank-rec", "accession_number_ssim" => [ "1" ] },
+                                { "id" => "icip-rec", "accession_number_ssim" => [ "2" ], "licence_type_ssim" => [ "ICIP Rights" ] } ])
+    Dam::SolrWriter.new(solr: solr).write(%w[1 2])
+
+    %w[blank-rec icip-rec].each do |id|
+      assert_equal false, solr.docs[id]["has_digital_asset_bsi"], id
+      assert solr.docs[id]["digital_asset_metadata_ssm"].present?, "#{id} keeps its DAM metadata (the page shows the licence and a request link)"
+    end
+  end
+
+  test "when the DAM fills in a licence, the record's flag follows" do
+    record = asset("x")
+    solr = DamFakes::Solr.new([ { "id" => "emu-1", "accession_number_ssim" => [ "1987.0043" ] } ])
+    writer = Dam::SolrWriter.new(solr: solr)
+    writer.write([ "1987.0043" ])
+    record.update!(licence: "All Rights reserved (UoM)")
+    writer.write([ "1987.0043" ])
+
+    assert_equal true, solr.docs["emu-1"]["has_digital_asset_bsi"]
   end
 
   test "only records whose DAM fields changed are sent" do

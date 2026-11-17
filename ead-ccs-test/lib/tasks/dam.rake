@@ -13,6 +13,13 @@ namespace :dam do
     ENV["FULL"].present? ? sync.full(resume: ENV["FRESH"].blank?) : sync.incremental
   end
 
+  desc "Rewrite the DAM index fields (DAM_SOLR_URL) from dam_assets, without reading the DAM: after a change to the rules " \
+       "that decide them (AccessPolicy, Dam::SolrWriter). Only records whose fields change are sent"
+  task write: :environment do
+    updated = Dam::SolrWriter.from_env.write(DamAsset.distinct.pluck(:accession_number))
+    puts "#{updated} records updated"
+  end
+
   desc "Mark assets the DAM no longer has as deleted, and update their records in the DAM index"
   task reconcile: :environment do
     Dam::Sync.new(logger: dam_logger).reconcile
