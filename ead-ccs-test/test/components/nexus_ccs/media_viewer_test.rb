@@ -70,4 +70,23 @@ class MediaViewerComponentTest < ActiveSupport::TestCase
     assert_selector "video track[kind=captions][src='/v.vtt'][srclang=en]", visible: :all
     assert_selector ".digital-assets__transcript a[href='/v.html'][target=_blank]", text: /Transcript of Film/
   end
+
+  DAM_LARGE = "https://unimelbourne.widen.net/content/abc123/jpeg/portrait.jpg?w=2000".freeze
+
+  test "a DAM image opens in the zoom viewer as a plain image, at its own address (no IIIF info.json needed)" do
+    render_for("digital_asset_large_paths_ssim" => [ DAM_LARGE ], "digital_asset_paths_ssim" => [ DAM_LARGE ])
+
+    sources = JSON.parse(page.find("[data-controller=deep-zoom]", visible: :all)["data-deep-zoom-sources-value"])
+    assert_equal [ DAM_LARGE ], sources.map { |source| source["url"] }
+    assert_nil sources.first["info"]
+  end
+
+  test "DAM audio and video play inline from their own address; a type the browser cannot use is left for it to work out" do
+    render_for("digital_media_ssim" => [ "audio|audio/mpeg|https://unimelbourne.widen.net/content/a1/original/song.mp3|song.mp3",
+                                         "video|application/octet-stream|https://unimelbourne.widen.net/content/v1/original/film|film" ])
+
+    assert_selector "audio[controls] source[src='https://unimelbourne.widen.net/content/a1/original/song.mp3'][type='audio/mpeg']", visible: :all
+    assert_selector "video[controls] source[src='https://unimelbourne.widen.net/content/v1/original/film']", visible: :all
+    assert_no_selector "video source[type]", visible: :all
+  end
 end

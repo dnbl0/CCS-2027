@@ -12,7 +12,8 @@ class SearchBuilder < Blacklight::SearchBuilder
 
   # Appending puts this after Blacklight's own add_query_to_solr, so
   # solr_parameters[:q] is the query string Solr will receive.
-  self.default_processor_chain += [ :add_minimum_should_match_to_solr, :limit_deep_paging, :add_highlighting_to_solr, :add_cjk_to_description ]
+  self.default_processor_chain += [ :add_minimum_should_match_to_solr, :limit_deep_paging, :add_highlighting_to_solr, :add_cjk_to_description,
+                                    :add_synonyms_to_query ]
 
   # Solr's cost grows with how deep a page starts, and nobody reads past page 250: a request deeper than this many records is answered
   # with the last page inside it (the ranking is unchanged). RESULTS_MAX_START overrides it.
@@ -44,6 +45,34 @@ class SearchBuilder < Blacklight::SearchBuilder
 
     solr_parameters[:qf] = "${description_qf}"
     solr_parameters[:pf] = "${description_pf}"
+  end
+
+  # config/synonyms.yml (QuerySynonyms): a plain keyword search also finds the versions of it with a word swapped for a synonym. The
+  # visitor's edismax clause (q, or the one Blacklight puts in its JSON query) becomes "any of" the versions, each with the same
+  # parser settings; the spelling check keeps reading the visitor's words (spellcheck.q). Only when the list has terms.
+  def add_synonyms_to_query(solr_parameters)
+    query = search_state.params[:q]
+    return unless QuerySynonyms.any? && query.is_a?(String) && query.present?
+    return if QuerySyntax.explicit?(query) || query.include?('"')
+
+    versions = QuerySynonyms.versions(query)
+    return if versions.size < 2
+
+    any_of = ->(settings) { { bool: { should: versions.map { |version| { edismax: settings.merge(query: version) } } } } }
+    if solr_parameters[:q] == query && dismax?(solr_parameters)
+      solr_parameters.delete(:q)
+      solr_parameters[:json] = (solr_parameters[:json] || {}).merge(query: { bool: { must: [ any_of.call({}) ] } })
+    else
+      # Blacklight's JSON query mixes string and symbol keys
+      key = ->(hash, name) { hash.is_a?(Hash) ? (hash[name.to_s] || hash[name.to_sym]) : nil }
+      musts = key.call(key.call(key.call(solr_parameters[:json], :query), :bool), :must)
+      edismax = ->(clause) { key.call(clause, :edismax) }
+      index = Array(musts).index { |clause| key.call(edismax.call(clause), :query) == query }
+      return unless index
+
+      musts[index] = any_of.call(edismax.call(musts[index]).to_h.transform_keys(&:to_sym).except(:query))
+    end
+    solr_parameters["spellcheck.q"] ||= query
   end
 
   private

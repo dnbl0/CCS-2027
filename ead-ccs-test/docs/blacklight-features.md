@@ -12,7 +12,7 @@ Configuration-only use of Blacklight 9.2.1 and its official plugins, in `Catalog
 | Sort: relevance, title A-Z / Z-A, date newest / oldest (relevance and the date sorts put records with a digital asset first, then A to Z) | `add_sort_field` | `title_si`, `date_start_isi`, `has_digital_asset_bsi` |
 | Per page 12 / 24 / 40 / 96 (default 40) | `config.per_page`, `default_per_page` | n/a |
 | Advanced search | `config.advanced_search.enabled` | search and facet fields |
-| Citation, JSON API, did-you-mean, autocomplete | built in | n/a |
+| Citation, JSON API, did-you-mean, autocomplete | built in; the suggestions say what they are (below) | n/a |
 | Search history (CCS-143) | Blacklight's own, as it comes: searches saved in the session and listed at `/search_history`, with Clear history and a 100-search cap. We add only the search overlay's last-5 list. Grouping by day (CCS-206) is not in the MVP, so there are no day headings | n/a |
 | Bookmarks, shown as "Save / Saved" and "saved records" (CCS-46) | Blacklight's own: `BookmarksController`, `/bookmarks` routes, `Bookmark` model, the bookmark JavaScript (no page reload, updates every `data-role="bookmark-counter"`), `current_or_guest_user`, `config.add_results_document_tool :bookmark`, Clear bookmarks. We add: a minimal `users` table + `User` model (guests only, no login, no email or password), `GuestBookmarks` (the guest row is only created on the first save, so browsing writes nothing; tied to the 30-day session cookie), `NexusCcs::SaveControlComponent` (the Save / Saved toggle, a real checkbox named "Save record: <title>"), `NexusCcs::Icons::BookmarkComponent` (`config.bookmark_icon_component`), `NexusCcs::SavedBarComponent` + `saved_bar_controller.js` (the slate-teal "N saved records" block at the right end of the breadcrumb strip, rendered by both breadcrumb components, exactly as tall as the strip; on a page with no breadcrumb (home) it stays in the header top strip; `site-nav__saved`, live region), the `/bookmarks` view and `blacklight.bookmarks` wording in `config/locales/en.yml` | n/a |
 | List and mosaic (masonry) views | built-in list + `blacklight-gallery` (git `main`) via `config.view.*`; grid and slideshow removed | `thumbnail_path_ssi` |
@@ -92,3 +92,34 @@ The one change to the stock form is its title, "Advanced search", through the lo
 `blacklight.advanced_search.form.title` and `page_title`). The rest of the wording in the reviewed copy (description, "Enter search term",
 tips, "Filters") has no locale hook in stock Blacklight and describes controls only the static form has (rows, match types, Add
 filter), so it is not applied here: a decision for the product owner.
+
+## Discovery aids on the record and results pages (2026-11-18)
+
+Ideas taken from Google Arts & Culture, written our own way (no code, images or wording copied).
+
+- **Record values are ways sideways.** In Object details each value of object type, classification, material, collection and named
+  collection links to the search filtered to it (Blacklight's `link_to_facet` idea, `RecordDocumentComponent::LINK_FIELDS`); creator, place
+  and subject keep their browse pages (and fall back to the filter where a value has none). Era (`date_era_ssim`) and region
+  (`region_ssim`) are tags under the title beside format and collection, each value its own filter. Free text is never a link.
+- **Suggestions say what they are.** `/catalog/suggest` (Blacklight's `<auto-complete>` element, unchanged) lists creators, collections,
+  object types and titles containing the typed text, each labelled ("Grainger, Percy Aldridge, Creator") and each a link option that opens
+  its search: a filter over every record, the whole collection, or a title search. One `rows=0` facet request with `facet.contains`
+  (`CategorisedSuggestions`), so it works on today's index with no Solr change, and it leaves out records taken off the site. When nothing
+  matches, Blacklight's own suggester terms are offered as before. Keyboard and screen reader behaviour is the element's: the input is the
+  combobox, Down and Up move through the options (`aria-activedescendant`), Enter or a click opens the option, Escape closes the list. A
+  per-field Solr suggester with the field name as payload would be the index-side way to do this; it needs a `solr/conf` change the dev team
+  would make on the shared index.
+- **Synonyms the collections team can edit.** `config/synonyms.yml` (empty; the team supplies the groups). The SearchBuilder
+  (`add_synonyms_to_query`, `QuerySynonyms`) sends a plain keyword search as "any of" the visitor's words and each version with a word
+  swapped for a synonym (at most eight), each held to the usual keyword rule, so synonyms only add results. Searches with operators,
+  quotes or fields are left alone; spelling suggestions still read the visitor's words. No Solr change or reload (Solr's own
+  `solr/conf/synonyms.txt` still applies); the app reads the file when it starts.
+- **An empty results page helps.** Besides the existing "N results without these filters" link, a search with several filters lists
+  each filter whose removal alone finds something, with the count (the counts `SearchService` already makes for "Why am I seeing these
+  results?"), and up to three related categories: the commonest collection, object type and creator of the same search without its
+  filters (asked in the same request that counts it), or, when the words find nothing at all, categories whose names contain the longest
+  word (one `CategorisedSuggestions` request). Did-you-mean is Blacklight's, unchanged.
+- **One-tap filters above the results.** `NexusCcs::QuickFiltersComponent`, under the results toolbar: up to eight of the commonest era,
+  object type and collection values among the results, from the facet counts the page already has (no extra request). A value every
+  result has, and a field the visitor already chose from (its values are alternatives, so another would widen the results), are left out.
+  A labelled list of links; hidden on an empty page and when fewer than two would help.

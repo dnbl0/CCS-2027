@@ -52,6 +52,11 @@ class SimilarRecords
     []
   end
 
+  # A card here shows an image this visitor may see (the result card's own rule); SimilarRows asks the same
+  def self.shows_image?(candidate)
+    candidate["thumbnail_path_ssi"].present? && AccessPolicy.view?(candidate) && !Sensitivity.sensitive?(candidate)
+  end
+
   def initialize(document, exclude: [])
     @document = document
     @skip = Array(exclude).map(&:to_s).push(document.id.to_s)
@@ -60,7 +65,7 @@ class SimilarRecords
   def documents
     candidates = Discovery.search(params).documents.reject { |candidate| @skip.include?(candidate.id.to_s) }
     best = candidates.filter_map { |candidate| candidate["score"] }.max.to_f
-    kept = candidates.select { |candidate| Discovery.listable?(candidate) && shows_image?(candidate) && strong?(candidate, best) }
+    kept = candidates.select { |candidate| Discovery.listable?(candidate) && self.class.shows_image?(candidate) && strong?(candidate, best) }
     varied(kept)
   end
 
@@ -93,10 +98,6 @@ class SimilarRecords
       creator = Array(candidate["creator_ssim"]).first
       creator.blank? || (seen[creator] += 1) <= MAX_PER_CREATOR
     end
-  end
-
-  def shows_image?(candidate)
-    candidate["thumbnail_path_ssi"].present? && AccessPolicy.view?(candidate) && !Sensitivity.sensitive?(candidate)
   end
 
   def strong?(candidate, best)

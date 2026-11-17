@@ -1,0 +1,17 @@
+<%# The search box's suggestions (Blacklight's <auto-complete> list, the listbox). Each categorised suggestion (CategorisedSuggestions) is
+    an option that is a link: Enter or a click opens its search, as a link does; its name ends with its kind ("…, Creator"). Without
+    those, Blacklight's own suggester terms are plain options that fill the box, as before. %>
+<% if @categorised.any? %>
+  <% @categorised.each do |suggestion| %>
+    <li role="presentation">
+      <%= link_to search_action_path(suggestion.query), role: "option", class: "dropdown-item search-suggestion" do %>
+        <span class="search-suggestion__value"><%= suggestion.value %></span><span class="visually-hidden">, </span>
+        <span class="search-suggestion__kind"><%= suggestion.kind %></span>
+      <% end %>
+    </li>
+  <% end %>
+<% else %>
+  <% @suggestions.each do |suggestion| %>
+    <li role="option" class="dropdown-item"><span><%= suggestion['term'] %></span></li>
+  <% end %>
+<% end %>

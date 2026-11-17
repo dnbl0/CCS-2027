@@ -11,7 +11,15 @@ module NexusCcs
 
     # Shown in the Copyright card, so not repeated in the details list
     COPYRIGHT_FIELDS = %w[rights_ssim credit_line_tsim].freeze
-    LINK_FIELDS = %w[collection_ssim].freeze
+    # Values that open the search filtered to them (Blacklight's link_to_facet idea), so a visitor can step sideways to more of the same.
+    # Creator, place and subject open their browse page instead (BROWSE_KINDS), and the filter when the value has none. Free text
+    # (description, credit line, dates) is never a link.
+    LINK_FIELDS = %w[collection_ssim named_collection_ssim object_type_ssim classification_ssim material_ssim].freeze
+    # Shown as filters where a browse page does not take them: the field each display field filters on
+    FALLBACK_FILTER_FIELDS = { "subject_ssim" => "subject_ssim", "creator_display_ssim" => "creator_ssim" }.freeze
+    # Tags under the byline beside the format and collection: each value its own filtered search (the fields a core may lack yet are
+    # simply absent)
+    TAG_FIELDS = %w[date_era_ssim region_ssim].freeze
 
     Row = Struct.new(:label, :values, :field, :copy, keyword_init: true)
 
@@ -60,12 +68,27 @@ module NexusCcs
     def browse_path(row, value)
       kind = BROWSE_KINDS[row.field] or return
       # creator_display_ssim is "Name (born - died) Role": the page is for the name, which is the record's creator_ssim value it starts with
-      value = Array(document["creator_ssim"]).select { |name| value.start_with?(name) }.max_by(&:length) if kind == "makers"
+      value = creator_name(value) if kind == "makers"
       Browse.path_for(kind, value) if value
     end
 
+    def creator_name(display) = Array(document["creator_ssim"]).select { |name| display.start_with?(name) }.max_by(&:length)
+
     def value_path(row, value)
       helpers.search_action_path(filter_query(row.field, value))
+    end
+
+    # Where a value in the details leads: its filtered search, its browse page, or nowhere (free text)
+    def value_link(row, value)
+      return value_path(row, value) if link_to_value?(row)
+
+      browse_path(row, value) || fallback_filter_path(row, value)
+    end
+
+    def fallback_filter_path(row, value)
+      field = FALLBACK_FILTER_FIELDS[row.field] or return
+      value = creator_name(value) if row.field == "creator_display_ssim"
+      helpers.search_action_path(filter_query(field, value)) if value
     end
 
     # The "Copyright" card
@@ -112,10 +135,11 @@ module NexusCcs
 
     Tag = Struct.new(:field, :value)
 
-    # Chips under the byline, as in 2026: the record's format and its collection, each a link to that filter
+    # Chips under the byline, as in 2026: the record's format and its collection, then each of its eras and regions, each a link to that filter
     def tags
-      [ Tag.new("format", Array(document["format"]).first), Tag.new(BrowseMenu::COLLECTION_FIELD, Array(document["collection_ssim"]).first) ]
-        .select { |tag| tag.value.present? }
+      list = [ Tag.new("format", Array(document["format"]).first), Tag.new(BrowseMenu::COLLECTION_FIELD, Array(document["collection_ssim"]).first) ]
+      TAG_FIELDS.each { |field| Array(document[field]).map(&:to_s).compact_blank.uniq.each { |value| list << Tag.new(field, value) } }
+      list.select { |tag| tag.value.present? }
     end
   end
 end

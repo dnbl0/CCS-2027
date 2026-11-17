@@ -16,21 +16,42 @@ class SearchService < Blacklight::SearchService
     response = super
     correction = SpellingCorrection.from(search_state.query_param, response)
     response = retry_with(correction) || response if correction
-    count_filter_removals(count_without_filters(response))
+    count_filter_removals(relate(count_without_filters(response)))
   end
 
   private
 
-  # One rows=0 request with no facets, stats or spellcheck, made only for an empty page with filters. (merge, because
-  # the builder's own rows= is overridden by the page size.)
+  # One rows=0 request with no stats or spellcheck, made only for an empty page with filters. It counts the same search without its
+  # filters and, in the same request, its commonest collection, object type and creator (the "related categories" the page offers).
+  # (merge, because the builder's own rows= is overridden by the page size.)
   def count_without_filters(response)
     return response unless response.total.zero? && ZeroResults.filtered?(search_state.to_hash)
 
     state = search_state.reset(ZeroResults.without_filters(search_state.to_hash))
-    builder = search_builder.with(state).merge(rows: 0, facet: false, stats: false, spellcheck: false)
+    builder = search_builder.with(state).merge(rows: 0, stats: false, spellcheck: false, **related_facets)
+    unfiltered = repository.search(params: builder)
 
     response.extend(ZeroResults::Response)
-    response.unfiltered_total = repository.search(params: builder).total
+    response.unfiltered_total = unfiltered.total
+    response.related_categories = ZeroResults.related_from_facets(unfiltered.dig("facet_counts", "facet_fields"), search_state.to_hash)
+    response
+  end
+
+  # Only the related categories' fields, the top value of each; no facet queries, ranges or JSON facets
+  def related_facets
+    { facet: true, "facet.field": ZeroResults::RELATED_FIELDS.keys, "facet.limit": 1, "facet.mincount": 1, "facet.query": [], "facet.range": [], hl: false }
+        .merge(ZeroResults::RELATED_FIELDS.keys.to_h { |field| [ :"f.#{field}.facet.limit", 1 ] })
+  end
+
+  # An empty page whose words find nothing even without filters: categories whose names contain its longest word (one more request)
+  def relate(response)
+    return response unless response.total.zero? && response.try(:unfiltered_total).to_i.zero?
+
+    words = search_state.query_param.to_s
+    return response if words.blank?
+
+    response.extend(ZeroResults::Response)
+    response.related_categories = ZeroResults.related_from_words(words)
     response
   end
 
