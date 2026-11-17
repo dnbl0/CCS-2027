@@ -3,10 +3,12 @@
 module NexusCcs
   # A record's media on its page: the large image on the page itself, shown whole at its own shape (a row of thumbnails under it
   # when there are several), one slim toolbar under it (the access chip and licence, the "Media information" and "Full screen"
-  # buttons with text labels, and Download for an open record) and a "Media metadata" panel that opens under the toolbar.
-  # Renders nothing for a record without assets. What it shows follows AccessPolicy: all of it for :open; for :view_only no
-  # download (the media players' download button, the PDF link and the thumbnails' links to the files go) and a notice; for
-  # :request none of the assets, only the notice, the licence and the media metadata. A sensitive record's assets are
+  # buttons with text labels, and Download when the image shown is an open asset) and a "Media metadata" panel that opens under the
+  # toolbar. Renders nothing for a record without assets. What it shows follows AccessPolicy, asset by asset: the index holds only
+  # the assets a visitor may see (Dam::SolrWriter), and of those only an open one is offered to download (its thumbnail links to
+  # the file, its player keeps its download button, a PDF is listed); a view-only one is shown without any of that. A record
+  # with some assets withheld says so under them, with a request link; a :request record shows none of the assets, only the
+  # notice, the licence and the media metadata. A sensitive record's assets are
   # shown only after the visitor chooses to view them (SensitivityGateComponent). Registered, through NexusCcs::RecordEmbedComponent, as the show
   # page's document_embed_component. Behaviour: controllers/media_viewer_controller.js.
   class DigitalAssetsComponent < Blacklight::Component
@@ -24,12 +26,17 @@ module NexusCcs
     attr_reader :tier
 
     # The record has assets, whether or not the policy lets them be shown
-    def render?
-      Array(@document["digital_asset_large_paths_ssim"]).any? || Array(@document["digital_media_ssim"]).any?
-    end
+    def render? = RecordMedia.assets?(@document)
 
     def withheld? = tier == :request
-    def downloadable? = tier == :open
+
+    # How many of the record's assets are withheld while the others are shown (AccessPolicy.withheld_assets); 0 while the
+    # visitor has not chosen to view a sensitive record (nothing is shown yet)
+    def withheld_count = assets_shown? ? AccessPolicy.withheld_assets(@document) : 0
+    def request_path = AccessPolicy.request_path(@document)
+
+    # May the image at this position (0 is the main one) be downloaded: is it an open asset (AccessPolicy.download_path?)
+    def image_downloadable?(index) = AccessPolicy.download_path?(@document, raw_large_paths[index])
 
     # A sensitive record's assets wait for the visitor's choice (Sensitivity, CCS-227): :ask, :declined or :viewing; nil for
     # any other record, and for one that is withheld anyway. Until the choice is "view", none of the assets is on the page.
@@ -49,14 +56,16 @@ module NexusCcs
     def gated? = %i[ask declined].include?(sensitivity_state)
     def assets_shown? = !withheld? && !gated?
 
-    # Audio, video and PDF files: [{ kind:, type:, url:, label: }]. A PDF can only be read by opening the file, so it is
+    # Audio, video and PDF files: [{ kind:, type:, url:, label:, downloadable: }] (downloadable: an open asset, AccessPolicy.download_path?).
+    # A PDF can only be read by opening the file, so it is
     # left out when the file may not be downloaded.
     def media
       return [] unless assets_shown?
 
       items = Array(@document["digital_media_ssim"]).map { |entry| Collections::DigitalMedia.parse(entry) }
+                                                    .map { |item| item.merge(downloadable: AccessPolicy.download_path?(@document, item[:url])) }
                                                     .map { |item| item.merge(url: AssetVersion.url(item[:url]), captions: AssetVersion.url(item[:captions]), transcript: AssetVersion.url(item[:transcript])) }
-      downloadable? ? items : items.select { |item| %w[video audio].include?(item[:kind]) }
+      items.select { |item| item[:downloadable] || %w[video audio].include?(item[:kind]) }
     end
 
     # Pairs of [large image path, thumbnail path], in display order.
@@ -76,8 +85,8 @@ module NexusCcs
 
     def access_chip = t("nexus_ccs.record_page.access.#{tier}")
 
-    # The one primary action: the image of an open record, to download (never for a view-only or withheld one: no path is in the markup)
-    def download_href = (main&.first if downloadable? && assets_shown?)
+    # The one primary action: the main image, to download, when it is an open asset (never a view-only or withheld one: no path is in the markup)
+    def download_href = (main&.first if assets_shown? && image_downloadable?(0))
 
     # The image's width and height attributes (nothing when its size cannot be read), so the page holds its space while it loads
     def image_size(path)
@@ -130,13 +139,19 @@ module NexusCcs
       [ [ "Licence type", licence ], [ "Advisory", advisory ], [ "Terms of use", terms ], [ "Producer", producer ] ].select { |_, text| text.present? }
     end
 
-    # The first non-blank value of a DAM field across the record's assets (digital_asset_metadata_ssm, written by Dam::SolrWriter)
+    # The first non-blank value of a DAM field across the record's assets (digital_asset_metadata_ssm, written by Dam::SolrWriter):
+    # the shown assets' first, so the licence beside an image is a shown asset's, not a withheld one's
     def dam_value(key)
-      @dam_metadata ||= Array(@document["digital_asset_metadata_ssm"]).filter_map do |json|
-        parsed = JSON.parse(json.to_s)
-        parsed if parsed.is_a?(Hash)
-      rescue JSON::ParserError
-        nil
+      @dam_metadata ||= begin
+        all = Array(@document["digital_asset_metadata_ssm"]).filter_map do |json|
+          parsed = JSON.parse(json.to_s)
+          parsed if parsed.is_a?(Hash)
+        rescue JSON::ParserError
+          nil
+        end
+        tiers = AccessPolicy.asset_tiers(@document) || []
+        shown, withheld = all.each_with_index.partition { |_asset, index| tiers[index] && tiers[index] != :request }
+        (shown + withheld).map(&:first)
       end
       @dam_metadata.filter_map { |asset| asset[key].to_s.strip.presence }.first
     end
@@ -163,7 +178,8 @@ module NexusCcs
 
     # Nothing of a withheld asset (or one the visitor has not chosen to view) reaches the page, not even as a path
     # (and the addresses carry a version token, AssetVersion, so a replaced file is fetched again)
-    def large_paths = assets_shown? ? Array(@document["digital_asset_large_paths_ssim"]).map { |path| AssetVersion.url(path) } : []
+    def raw_large_paths = assets_shown? ? Array(@document["digital_asset_large_paths_ssim"]) : []
+    def large_paths = raw_large_paths.map { |path| AssetVersion.url(path) }
     def thumbnail_paths = assets_shown? ? Array(@document["digital_asset_paths_ssim"]).map { |path| AssetVersion.url(path) } : []
   end
 end

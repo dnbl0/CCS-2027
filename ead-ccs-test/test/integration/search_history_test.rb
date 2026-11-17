@@ -37,8 +37,8 @@ class SearchHistoryTest < ActionDispatch::IntegrationTest
 
     get "/search_history"
 
-    assert_select "td.filters .applied-filter .filter-value", text: "With a digital asset"
-    assert_select "td.filters .applied-filter .filter-name", text: /Digital asset/
+    assert_select "td.filters .applied-filter .filter-value", text: "Yes"
+    assert_select "td.filters .applied-filter .filter-name", text: /With Digital Asset/
     assert_select "td.filters .applied-filter .remove", count: 0
     assert_select "table.search-history caption.visually-hidden", text: /Searches from Today/
   end

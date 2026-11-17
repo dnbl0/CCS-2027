@@ -33,23 +33,39 @@ Each run rewrites only the records whose DAM fields changed (a digest in `dam_di
 | Producer | `dACreatorNameRole` (DA Creator Name (Role)): nearest field, to be confirmed by the dev team | `digital_asset_metadata_ssm` |
 | Image order | `dAwebdisplaysequence` | order of the image fields |
 
-It also writes `thumbnail_path_ssi`, `digital_asset_paths_ssim`, `digital_asset_large_paths_ssim`, `digital_media_ssim`
-(audio, video, PDF), `has_digital_asset_bsi` and `digital_asset_format_ssim` (the Format filter). `has_digital_asset_bsi` is
-true only when a visitor may see an asset (`AccessPolicy.view?`): results sort those records first and the "with images" filters
-read it, so a record whose asset is withheld (a blank DAM licence) is not put first with nothing to show. After a change to
-those rules, `bin/rails dam:write` rewrites the fields from `dam_assets` without reading the DAM. When two records share an
-accession number, an asset goes to the record of its own collection (`cACollection1`).
+**Each asset has its own licence and its own tier** (`AccessPolicy.asset_tiers`; the University agreed on 2026-11-18): an
+asset is shown when its own DAM licence allows it, even if another asset of the same record is withheld. The EMu record-level
+restrictions still withhold every asset of the record: an ICIP or restricted EMu licence, and the "Community Restricted" access
+condition.
 
-For searching it also writes `dam_licence_ssim` (the DAM licences, "None" and blank left out: the **License type** filter) and
-`dam_access_tier_ssi` (`open`, `view_only` or `request`, from `AccessPolicy.tier`: the **Digital asset Access Condition**
-filter, shown in the record page's own words, and the **Open licence** switch, `FreeReuse`, which falls back to the EMu
-licence only for records without DAM data).
+| What | Rule |
+|---|---|
+| An asset's tier | From its own DAM licence (`AccessPolicy::TIER_BY_DAM_LICENCE`); blank or "None" is `request` (withheld) |
+| EMu ICIP / restricted licence, or "Community Restricted" | Every asset of the record is `request`, whatever the DAM says |
+| Shown on the record page | The assets whose own tier is `open` or `view_only`; the page says how many others are withheld, with a request link |
+| Offered to download | Only the assets whose own tier is `open` (`AccessPolicy.download_path?`) |
+| `thumbnail_path_ssi`, `digital_asset_paths_ssim`, `digital_asset_large_paths_ssim`, `digital_media_ssim` | The viewable assets only, in display order: no address of a withheld asset is in the index |
+| `digital_asset_download_paths_ssim` | The addresses (large image or original file) of the open assets |
+| `digital_asset_metadata_ssm` | Every asset, withheld ones too, each with its `tier`, so the page can explain what is withheld |
+| `has_digital_asset_bsi` | At least one asset is viewable (results sort these first; the **With Digital Asset** filter reads it) |
+| `dam_access_tier_ssi` | The most permissive tier among the record's assets after the EMu restrictions (`AccessPolicy.tier`): `open` when at least one asset is open, `request` only when all are withheld |
+
+It also writes `digital_asset_format_ssim` (the Format filter, for every asset). After a change to these rules,
+`bin/rails dam:write` rewrites the fields from `dam_assets` without reading the DAM. When two records share an accession
+number, an asset goes to the record of its own collection (`cACollection1`).
+
+For searching it also writes `dam_licence_ssim` (the DAM licences, "None" and blank left out: the **License type** filter).
+`dam_access_tier_ssi` feeds the **Digital asset Access Condition** filter, shown in the record page's own words, and the
+**Open licence** switch, `FreeReuse`, which therefore means "has at least one open asset" (it falls back to the EMu licence only
+for records without DAM data). The Pick of the day and the record's structured data use a record's picture only when that
+image itself is an open asset (`AccessPolicy.first_image_open?`).
 
 **Images**: the DAM's embed links (`unimelbourne.widen.net`), which do not expire. The preview links under `thumbnails`
 (`widencdn.net`) are signed and expire after about a day, so they are not used and nothing needs refreshing at render time.
 
-**Licences**: see `AccessPolicy::TIER_BY_DAM_LICENCE`. A blank licence withholds the image ("request access"); on 2026-11-17
-that was 96% of the DAM's assets, so most matched records still show no image until the licence is filled in at the DAM.
+**Licences**: see `AccessPolicy::TIER_BY_DAM_LICENCE`. A blank licence withholds that asset ("request access"); on 2026-11-17
+that was 96% of the DAM's assets. Before 2026-11-18 one withheld asset hid every asset of its record (only about 385 of 24,903
+DAM-linked records were viewable); now a record shows its licensed assets and withholds only the rest.
 
 ## Running it locally
 
@@ -81,7 +97,5 @@ rewrites every record with an asset).
 
 ## Not done here
 
-- The "Licence type" and "open licence" filters still read the EMu licence (`licence_type_ssim`, `FreeReuse`); the DAM licence
-  is not a facet yet.
 - Engineering and IT's 7,354 assets have no records in the index, so they match nothing.
 - Hosting: the recurring jobs need a process that runs them (`SOLID_QUEUE_IN_PUMA=1` or `bin/jobs`) wherever the site is hosted.

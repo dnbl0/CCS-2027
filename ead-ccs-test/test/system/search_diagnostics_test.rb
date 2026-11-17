@@ -12,7 +12,7 @@ class SearchDiagnosticsSystemTest < ApplicationSystemTestCase
 
     assert_selector "details.why-results[open]"
     assert page.evaluate_script("document.activeElement.matches('.why-results__summary')")
-    assert_selector ".why-results a", text: /Take off “With a digital asset”/
+    assert_selector ".why-results a", text: /Take off “With Digital Asset: Yes”/
     assert_accessible
   end
 end

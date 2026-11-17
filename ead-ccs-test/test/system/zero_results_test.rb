@@ -22,7 +22,7 @@ class ZeroResultsTest < ApplicationSystemTestCase
     assert_no_text(/no suggestions/i)
     total = unfiltered_total
     assert_operator total, :>, 0
-    assert_selector "a.results-empty__unfiltered", exact_text: "#{total} results without the ‘With a digital asset’ filter"
+    assert_selector "a.results-empty__unfiltered", exact_text: "#{total} results without the ‘With Digital Asset’ filter"
 
     query = link_query("a.results-empty__unfiltered")
     assert_equal "skull", query["q"]

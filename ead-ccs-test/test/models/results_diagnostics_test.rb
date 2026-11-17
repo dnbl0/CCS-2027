@@ -21,7 +21,7 @@ class ResultsDiagnosticsTest < ActiveSupport::TestCase
 
     assert_equal 3, list.size
     default = list.find { |item| item.field == "has_digital_asset" }
-    assert_equal "With a digital asset", default.label
+    assert_equal "With Digital Asset: Yes", default.label
     assert_equal({ "q" => "skull", "view" => "list", "f" => { "collection_ssim" => [ "Grainger Museum", "Medical History Museum" ] }, "any_assets" => "1" }, default.params)
     one = list.find { |item| item.label.end_with?("Grainger Museum") }
     assert_equal [ "Medical History Museum" ], one.params["f"]["collection_ssim"]

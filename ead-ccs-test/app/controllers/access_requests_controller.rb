@@ -49,7 +49,7 @@ class AccessRequestsController < ApplicationController
   def access_request_params = params.expect(access_request: %i[name email organisation purpose])
 
   # The record asked about must be in the index; its title is read here, never taken from the form. A record that is
-  # open has nothing to request, so the visitor goes to it.
+  # open, with no asset withheld, has nothing to request, so the visitor goes to it.
   def load_document
     id = params[:document_id].to_s
     raise ActionController::RoutingError, "Not Found" if id.blank? || id.length > 200
@@ -59,7 +59,7 @@ class AccessRequestsController < ApplicationController
     service = SearchService.new(config: config, search_state: Blacklight::SearchState.new({}, config), user_params: {})
     @document = service.fetch(id)
     raise ActionController::RoutingError, "Not Found" unless @document
-    @request_type = AccessRequest.request_type_for(AccessPolicy.tier(@document))
+    @request_type = AccessRequest.request_type_for(AccessPolicy.tier(@document), withheld: AccessPolicy.withheld_assets(@document).positive?)
     redirect_to solr_document_path(@document.id) unless @request_type
   rescue Blacklight::Exceptions::RecordNotFound
     raise ActionController::RoutingError, "Not Found"

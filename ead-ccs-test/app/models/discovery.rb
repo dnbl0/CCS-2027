@@ -14,14 +14,16 @@ module Discovery
   FIELDS = %w[
     id title_tsim creator_ssim object_type_ssim collection_ssim format thumbnail_path_ssi has_digital_asset_bsi
     licence_type_ssim digital_asset_metadata_ssm access_condition_ssi restrictions_tsi date_start_isi production_date_ssim
+    digital_asset_large_paths_ssim digital_asset_download_paths_ssim
   ].freeze
 
   # May the record be shown in a discovery section at all?
   def self.listable?(document) = !RobotsPolicy.withheld?(document)
 
-  # May the record be the "Pick of the day"? An image anyone may download (AccessPolicy :open) and nothing sensitive
+  # May the record be the "Pick of the day"? Its pictured image is one anyone may download (an open asset, not only an :open
+  # record: AccessPolicy.first_image_open?) and nothing sensitive
   def self.pickable?(document)
-    document["thumbnail_path_ssi"].present? && AccessPolicy.tier(document) == :open && !Sensitivity.sensitive?(document)
+    document["thumbnail_path_ssi"].present? && AccessPolicy.first_image_open?(document) && !Sensitivity.sensitive?(document)
   end
 
   # The records with these ids, in the order given; an id not in the index is left out. One Solr request.

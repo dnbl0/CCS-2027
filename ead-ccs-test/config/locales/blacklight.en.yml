@@ -41,8 +41,8 @@ en:
         # The search finds records, but none of them match its filters (ZeroResults)
         filtered_title: No results match your filters.
         without_default_filter:
-          one: "1 result without the ‘With a digital asset’ filter"
-          other: "%{total} results without the ‘With a digital asset’ filter"
+          one: "1 result without the ‘With Digital Asset’ filter"
+          other: "%{total} results without the ‘With Digital Asset’ filter"
         without_filters:
           one: "1 result without these filters"
           other: "%{total} results without these filters"

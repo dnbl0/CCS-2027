@@ -46,6 +46,15 @@ class BulkDownloadTest < ActiveSupport::TestCase
     assert_equal [ "emu-3/a.jpg" ], download.items.map(&:zip_name)
   end
 
+  test "a record with DAM licences gives only its open assets' files" do
+    dam = [ { "licence" => "CC BY" }, { "licence" => "Individual" } ].map(&:to_json)
+    download = plan([ doc("emu-1", "digital_asset_metadata_ssm" => dam,
+                                   "digital_asset_large_paths_ssim" => [ "/digital-assets/large/a.jpg", "/digital-assets/large/b.jpg" ],
+                                   "digital_asset_download_paths_ssim" => [ "/digital-assets/large/a.jpg" ]) ])
+
+    assert_equal [ "emu-1/a.jpg" ], download.items.map(&:zip_name)
+  end
+
   test "a sensitive record is skipped unless the visitor has chosen to view it" do
     sensitive = doc("emu-1", "restrictions_tsi" => "Sensitive", "digital_asset_large_paths_ssim" => [ "/digital-assets/large/a.jpg" ])
 

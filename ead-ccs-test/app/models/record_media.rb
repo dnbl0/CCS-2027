@@ -8,6 +8,22 @@
 class RecordMedia
   Image = Data.define(:url, :thumbnail, :info_url, :alt)
 
+  # The kinds of DAM asset the record page can show (Dam::SolrWriter::FORMATS), as digital_asset_metadata_ssm names them
+  SHOWABLE_FORMATS = %w[image audio video pdf].freeze
+
+  # Whether the record has a digital asset at all, whatever the policy lets a visitor see: a shown image or media file, or a DAM
+  # asset that is withheld (the index keeps no address of a withheld asset, only its metadata, Dam::SolrWriter). The record page
+  # then has its media band, with the request notice in place of a withheld record's media.
+  def self.assets?(document)
+    Array(document["digital_asset_large_paths_ssim"]).compact_blank.any? || Array(document["digital_media_ssim"]).any? ||
+      Array(document["digital_asset_metadata_ssm"]).any? do |json|
+        parsed = JSON.parse(json.to_s)
+        parsed.is_a?(Hash) && SHOWABLE_FORMATS.include?(parsed["format"])
+      rescue JSON::ParserError
+        false
+      end
+  end
+
   # session: the visitor's session (for the sensitivity choice); nil means no choice has been made.
   def self.for(document, session: nil)
     viewing = session && Sensitivity.sensitive?(document) && Sensitivity::Choices.new(session).viewing?(document.id)

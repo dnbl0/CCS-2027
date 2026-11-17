@@ -75,9 +75,7 @@ module StockRecordFields
       notes.map { |note| context.safe_join([ (context.tag.p(badge, class: "mb-2") if badge.present?), note ].compact) }
     end
 
-    def digital_assets?(document)
-      Array(document["digital_asset_large_paths_ssim"]).any? || Array(document["digital_media_ssim"]).any?
-    end
+    def digital_assets?(document) = RecordMedia.assets?(document)
 
     def caption(document)
       first = ->(name) { Array(document[name]).first }

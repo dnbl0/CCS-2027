@@ -46,5 +46,7 @@ class AccessRequestTest < ActiveSupport::TestCase
     assert_equal "view", AccessRequest.request_type_for(:request)
     assert_equal "download", AccessRequest.request_type_for(:view_only)
     assert_nil AccessRequest.request_type_for(:open)
+    assert_equal "view", AccessRequest.request_type_for(:open, withheld: true), "an open record with withheld assets: asking to see them"
+    assert_equal "view", AccessRequest.request_type_for(:view_only, withheld: true)
   end
 end
