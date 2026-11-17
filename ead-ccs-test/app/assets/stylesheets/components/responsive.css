@@ -82,6 +82,12 @@
   max-width: 100%;
 }
 
+/* ...but the sort and page-size boxes keep results_toolbar.css's 18rem cap: the rule above (later, same specificity) undid it,
+   so on a wide screen each stretched to half the row */
+#sortAndPerPage .search-widgets > :is(.sort-dropdown, .per_page-dropdown) {
+  max-width: min(18rem, 100%);
+}
+
 /* The view buttons are 48px square (3rem), so large text made the pair wider than the phone; 44px and not scaling with the text */
 @media (max-width: 599px) {
   #sortAndPerPage .view-type-group .btn {
