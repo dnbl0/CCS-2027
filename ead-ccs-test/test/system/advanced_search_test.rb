@@ -55,14 +55,22 @@ class AdvancedSearchTest < ApplicationSystemTestCase
     assert_no_selector ".advanced-search__notice"
   end
 
-  test "every workbook filter is an attribute, in the sheet's order; one with no data yet shows the note and no checkboxes" do
+  # Whether this core holds any value of a filter's field. Blacklight leaves out a filter with none, as on the results page: the
+  # fields the dev team's ingest fills (DataModelTest::DEV_TEAM_INGEST) and the DAM sync's are empty in a core built by this app.
+  def values_in_core?(field)
+    response = Blacklight.default_index.connection.get("select", params: { q: "*:*", rows: 0, facet: true, "facet.field": field, "facet.limit": 1, "facet.mincount": 1 })
+    response.dig("facet_counts", "facet_fields", field).present?
+  end
+
+  test "every workbook filter with data, or still waiting for data, is an attribute, in the sheet's order; one with no data yet shows the note" do
     visit "/catalog/advanced"
 
     labels = all("#advanced_search_facets .facet-field-heading button", visible: :all).map { |b| b.text(:all).strip }
-    assert_equal DataModel.filters.map(&:name), labels - [ "Digital asset" ]
+    expected = DataModel.filters.select { |filter| !filter.available? || values_in_core?(filter.solr) }
+    assert_equal expected.map(&:name), labels - [ "Digital asset" ]
 
-    find("#facet-pending_film_gaming_classification-header button").click
-    within("#facet-pending_film_gaming_classification") do
+    find("#facet-pending_language-header button").click
+    within("#facet-pending_language") do
       assert_text "No records have this information yet."
       assert_no_selector "input[type=checkbox]"
     end
