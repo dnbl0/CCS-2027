@@ -40,7 +40,17 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `WEB_CONCURRENCY` | unset | `config/puma.rb` | Puma worker processes. More than one process makes the in-memory rate limit per process |
 | `PORT` | `3000` | `config/puma.rb` | The port Puma listens on |
 | `PIDFILE` | unset | `config/puma.rb` | Puma pid file |
-| `SOLID_QUEUE_IN_PUMA` | unset | `config/puma.rb` | Runs Solid Queue inside Puma; unused, the app has no jobs |
+| `SOLID_QUEUE_IN_PUMA` | unset | `config/puma.rb`, `config/application.rb` | `1` runs Solid Queue inside Puma and sends jobs to it: the DAM sync's recurring jobs (`config/recurring.yml`). See [dam-sync.md](../ead-ccs-test/docs/dam-sync.md) |
+| `JOB_CONCURRENCY` | `1` | `config/queue.yml` | Solid Queue worker processes |
+| `DAM_API_TOKEN` | unset | `Dam::Client` | The Nexus DAM (Acquia DAM) API token. Never in a file: read from the macOS Keychain when the server or task starts. Unset: the DAM sync does nothing. See [dam-sync.md](../ead-ccs-test/docs/dam-sync.md) |
+| `DAM_API_URL` | `https://api.widencollective.com/v2` | `Dam::Client` | The DAM API's address |
+| `DAM_SOLR_URL` | unset | `Dam::SolrWriter`, `dam:*` tasks | The Solr core the DAM sync writes to: a core of its own (never port 8984, the shared Solr). Unset: the sync writes nothing |
+| `DAM_SYNC_EPOCH` | `2010-01-01T00:00:00Z` | `Dam::Sync.epoch` | A full sync reads everything last edited before this in one window, then a month at a time |
+| `FULL` | unset | `dam:sync` | `1` reads every DAM asset (resuming a stopped full run) instead of only what changed |
+| `FRESH` | unset | `dam:sync` | With `FULL=1`, starts again from the beginning instead of resuming |
+| `FROM` | `SOLR_URL` | `dam:copy_index` | The core copied from (only read) |
+| `TO` | `DAM_SOLR_URL` | `dam:copy_index` | The core copied into |
+| `OUT` | `tmp/dam_unmatched.csv` | `dam:report` | Where the list of DAM assets that match no record is written |
 | `REDIS_URL` | `redis://localhost:6379/1` | `config/cable.yml` | Action Cable; unused, the app has no cable channel |
 | `CCS_MEDIA_BASE_URL` | `/digital-assets/media` | `Collections::DigitalMedia` | Where the audio, video and PDF files are served from |
 | `SEO_CANONICAL_BASE_URL` | the request's own address | `BotControls.base_url` | The site's address in canonical links, the sitemap and structured data, when a proxy hides the real host |
