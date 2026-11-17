@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_17_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_18_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -98,6 +98,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000002) do
     t.index "user_id, lower((name)::text)", name: "index_lists_on_user_id_and_lower_name", unique: true
     t.index ["share_token"], name: "index_lists_on_share_token", unique: true
     t.index ["user_id"], name: "index_lists_on_user_id"
+  end
+
+  create_table "place_geocodes", force: :cascade do |t|
+    t.string "place", null: false
+    t.string "normalised", null: false
+    t.float "lat"
+    t.float "lon"
+    t.string "country"
+    t.string "country_code"
+    t.string "state"
+    t.string "locality"
+    t.string "region"
+    t.string "kind"
+    t.string "source"
+    t.datetime "looked_up_at"
+    t.boolean "not_found", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["normalised"], name: "index_place_geocodes_on_normalised"
+    t.index ["place"], name: "index_place_geocodes_on_place", unique: true
   end
 
   create_table "record_views", force: :cascade do |t|
