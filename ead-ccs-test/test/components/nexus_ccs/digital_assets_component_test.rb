@@ -67,6 +67,30 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_selector "a.digital-assets__pdf[href='/d.pdf']"
   end
 
+  # The DAM holds videos as WMV, which no web browser plays: a player would stay blank (seen 2026-11-18)
+  test "a video in a format browsers cannot play says so, and an open one offers the file to download instead" do
+    render_for(assets(3).merge("digital_media_ssim" => [ "video|video/x-ms-wmv|/v.wmv|Film" ]))
+
+    assert_no_selector "video"
+    assert_selector ".digital-assets__unplayable", text: "This video is in a format (WMV) that web browsers cannot play."
+    assert_selector ".digital-assets__unplayable a[href='/v.wmv']", text: "Download Film (WMV)"
+  end
+
+  test "a view-only video browsers cannot play offers a request for a copy, never the file" do
+    render_for(assets(3).merge("licence_type_ssim" => [ "Copyright - Current" ], "digital_media_ssim" => [ "video|video/x-ms-wmv|/v.wmv|Film" ]))
+
+    assert_no_selector "video, a[href='/v.wmv']"
+    assert_selector ".digital-assets__unplayable a[href^='/access_requests/new']", text: "Ask the collection team for a copy of Film"
+  end
+
+  test "a video browsers can play keeps its player" do
+    render_for(assets(3).merge("digital_media_ssim" => [ "video|video/mp4|/v.mp4|Film", "audio|audio/x-wav|/a.wav|Interview" ]))
+
+    assert_selector "video source[src='/v.mp4']"
+    assert_selector "audio source[src='/a.wav']"
+    assert_no_selector ".digital-assets__unplayable"
+  end
+
   test "a view-only record shows the viewer and a notice, with nothing that downloads" do
     render_for(assets(3).merge("licence_type_ssim" => [ "Copyright - Current" ],
                                "digital_media_ssim" => [ "video|video/mp4|/v.mp4|Film", "pdf|application/pdf|/d.pdf|Report" ]))

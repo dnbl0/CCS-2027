@@ -2,6 +2,20 @@ require "test_helper"
 
 # CCS-57: the registry that says how each kind of file is shown
 class MediaTypesTest < ActiveSupport::TestCase
+  test "browser_playable? knows the audio and video formats web browsers play; an unknown or blank type is tried" do
+    %w[video/mp4 video/webm video/ogg video/quicktime audio/mpeg audio/mp3 audio/wav audio/x-wav audio/ogg audio/aac audio/mp4 audio/x-m4a audio/flac audio/webm].each do |type|
+      assert MediaTypes.browser_playable?(type), type
+    end
+    %w[video/x-ms-wmv video/x-msvideo video/x-flv audio/x-ms-wma video/3gpp2].each { |type| assert_not MediaTypes.browser_playable?(type), type }
+    assert MediaTypes.browser_playable?(nil)
+    assert MediaTypes.browser_playable?("application/octet-stream"), "a DAM file with no known type is left to the browser"
+  end
+
+  test "a format's short name comes from its MIME type, else the file's extension" do
+    assert_equal "WMV", MediaTypes.format_name("video/x-ms-wmv", "/v.wmv")
+    assert_equal "AVI", MediaTypes.format_name("video/x-msvideo", "/clip.avi?x=1")
+  end
+
   test "the DAM's format types map to a kind and a viewer partial" do
     { "image" => :image, "Video" => :video, "AUDIO" => :audio, "pdf" => :pdf }.each do |format_type, kind|
       type = MediaTypes.for(format_type: format_type)

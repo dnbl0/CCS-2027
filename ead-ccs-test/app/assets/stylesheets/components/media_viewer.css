@@ -98,10 +98,22 @@
 }
 
 .digital-assets__unsupported,
+.digital-assets__unplayable,
 .digital-assets__transcript {
   margin: var(--ccs-space-2) 0 0;
   color: inherit;
   font-size: var(--ccs-font-size-sm);
+}
+
+/* A video or recording browsers cannot play: the message, then the download or request link (a 24px target, WCAG 2.5.8) */
+.digital-assets__unplayable p {
+  margin: 0 0 var(--ccs-space-2);
+}
+
+.digital-assets__unplayable a {
+  display: inline-block;
+  min-height: 1.5rem;
+  color: inherit;
 }
 
 /* Compare actions, under the thumbnails */

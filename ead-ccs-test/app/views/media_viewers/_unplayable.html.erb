@@ -1,0 +1,14 @@
+<%# locals: item, title, downloadable, request_path. Audio or video in a format web browsers cannot play (MediaTypes.browser_playable?:
+    the DAM holds videos as WMV): a player would stay blank, so say so, and offer the file to download when its licence allows it
+    (downloadable), else a request for a copy. Never the file's address for a file that may not be downloaded. %>
+<% kind = item[:kind].to_s == "audio" ? t("nexus_ccs.media.unplayable.audio") : t("nexus_ccs.media.unplayable.video") %>
+<% format = MediaTypes.format_name(item[:type], item[:url]) %>
+<div class="digital-assets__unplayable">
+  <p><%= t("nexus_ccs.media.unplayable.message", kind: kind, file_format: format) %></p>
+  <% if downloadable %>
+    <p><%= link_to t("nexus_ccs.media.unplayable.download", title: title, file_format: format), item[:url] %></p>
+  <% elsif local_assigns[:request_path].present? %>
+    <p><%= link_to t("nexus_ccs.media.unplayable.request", title: title), request_path %></p>
+  <% end %>
+</div>
+<%= render "media_viewers/transcript", item: item, title: title %>
