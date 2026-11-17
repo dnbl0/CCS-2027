@@ -65,14 +65,14 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
 
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
         assert_selector "h1", count: 1
-        assert_selector "header.record-header .record-header__kicker"
+        assert_selector ".record-page section.record-summary header.record-header h1"
         assert_equal false, page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
         outline = page.evaluate_script("[...document.querySelectorAll('#main-container h1, #main-container h2, #main-container h3')].filter(e => e.getClientRects().length > 0).map(e => e.tagName + ' ' + e.textContent.trim())")
         assert_equal "H1", outline.first.split.first
         levels = outline.map { |heading| heading[1].to_i }
         assert levels.each_cons(2).all? { |a, b| b <= a + 1 }, "headings skip a level: #{outline.inspect}"
-        assert_includes outline, "H2 Key facts"
+        assert_includes outline, "H2 Object details"
         assert_includes outline, "H2 Copyright and use"
 
         sticky = page.evaluate_script("[...document.querySelectorAll('#main-container *')].filter(e => e.getClientRects().length > 0 && ['sticky', 'fixed'].includes(getComputedStyle(e).position)).map(e => e.tagName + '.' + e.className)")
@@ -129,45 +129,42 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
   test "a request-only or sensitive record has no asset address in its page" do
     %w[request-only sensitive].each do |name|
       open_record(VARIANTS.fetch(name), "desktop")
-      assert_no_selector ".record-layout img[src*='/digital-assets/']"
-      layout = page.evaluate_script("document.querySelector('.record-layout').outerHTML")
+      assert_no_selector ".record-page img[src*='/digital-assets/']"
+      layout = page.evaluate_script("document.querySelector('.record-page').outerHTML")
       assert_not_includes layout, "/digital-assets/"
     end
   end
 
-  test "two columns from 1200px with the actions beside the media, and one column below it, in the same order" do
+  test "the media band spans the page; from 1024px the details and the Copyright card are two columns, below it one column in the same order" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
-    media, aside, sections = %w[.record-layout__media .record-layout__aside .record-layout__sections].map { |selector| page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
-    assert_operator aside["left"], :>, media["right"]
-    assert_operator sections["top"], :>=, media["bottom"]
+    band, details, side = %w[.record-band .record-main__details .record-main__side].map { |selector| page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
+    assert_operator details["top"], :>=, band["bottom"]
+    assert_operator side["left"], :>=, details["right"]
 
     open_record(VARIANTS.fetch("one image, open"), "phone")
-    media, aside, sections = %w[.record-layout__media .record-layout__aside .record-layout__sections].map { |selector| page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
-    assert_operator aside["top"], :>=, media["bottom"]
-    assert_operator sections["top"], :>=, aside["bottom"]
+    details, side = %w[.record-main__details .record-main__side].map { |selector| page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
+    assert_operator side["top"], :>=, details["bottom"]
   end
 
-  test "on a phone the sections are accordions with Object details open; from 768px they are open and fixed" do
-    open_record({}, "phone")
-    assert_selector "details.record-accordion", count: 3
-    assert_selector "details#record-about-details, details.record-accordion[open]", minimum: 1
-    states = page.evaluate_script("[...document.querySelectorAll('details.record-accordion')].map(d => [d.querySelector('h2').textContent.trim(), d.open, d.querySelector('summary').getBoundingClientRect().height >= 44])")
-    assert_equal [ [ "Object details", true, true ], [ "Copyright and use", false, true ], [ "About this record", false, true ] ], states
-
-    find("details.record-copyright summary").click
-    assert_selector "details.record-copyright[open]"
-    assert_selector ".record-copyright", text: "Rights held by the University"
-
-    open_record({}, "desktop")
-    assert_equal [ true, true, true ], page.evaluate_script("[...document.querySelectorAll('details.record-accordion')].map(d => d.open)")
+  test "the Copyright card is always open and states the record's rights, on a phone and a desktop" do
+    %w[phone desktop].each do |width|
+      open_record({}, width)
+      assert_no_selector "details.record-accordion"
+      assert_selector "aside.record-copyright h2", text: "Copyright and use"
+      assert_selector "aside.record-copyright", text: "Rights held by the University"
+      assert_selector "aside.record-copyright a[href='/help#copyright']", text: "About copyright and terms of use"
+    end
   end
 
   test "the Tab key moves through the record page in the order it reads, and each stop shows a focus ring" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
-    page.evaluate_script("document.querySelector('.record-header__byline a').focus()")
-    assert_equal "Grimwade, Sir Wilfrid Russell", page.evaluate_script("document.activeElement.textContent.trim()")
+    # start on the last control before the media band (the band comes first in this layout, then the title and the actions)
+    page.evaluate_script(<<~JS)
+      (() => { const all = [...document.querySelectorAll('a[href], button, input, select, summary, [tabindex]:not([tabindex="-1"])')].filter(e => e.getClientRects().length > 0 && !e.disabled),
+                     first = all.findIndex(e => e.closest('.record-band')); all[first - 1].focus() })()
+    JS
 
-    stops = 12.times.map do
+    stops = 16.times.map do
       page.driver.browser.keyboard.type(:Tab)
       page.evaluate_script(<<~JS)
         (() => { const e = document.activeElement, t = e.type === 'checkbox' ? e.closest('label') : e, s = getComputedStyle(t); return { text: (e.textContent || e.value || '').trim().replace(/\\s+/g, ' ').slice(0, 30), ring: s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) >= 2 } })()
@@ -176,8 +173,8 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     texts = stops.map { |stop| stop["text"] }
 
     assert stops.all? { |stop| stop["ring"] }, stops.reject { |stop| stop["ring"] }.inspect
-    # header (copy), media buttons, the toolbar, then the actions column, in that order
-    order = [ "Copy", "Zoom and pan", "Media information", "Full screen", "Download image" ].map { |label| texts.index { |text| text.include?(label) } }
+    # the media band's buttons and toolbar, then the header (Copy), in that order
+    order = [ "Zoom and pan", "Media information", "Full screen", "Download image", "Copy" ].map { |label| texts.index { |text| text.include?(label) } }
     assert_equal order.compact.sort, order.compact, texts.inspect
     assert_operator order.compact.size, :>=, 4, texts.inspect
   end

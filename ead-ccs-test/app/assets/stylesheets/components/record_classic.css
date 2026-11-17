@@ -24,7 +24,8 @@
 .record--classic .record-band__inner { max-width: calc(75rem + 2 * var(--record-gutter)); margin-inline: auto; padding: var(--ccs-space-7) var(--record-gutter) var(--ccs-space-4); }
 .record--classic .record-band--empty { background: var(--ccs-surface-subtle); color: inherit; }
 .record--classic .digital-assets__main { background: transparent; }
-.record--classic .digital-assets__main--sized { max-height: 36rem; width: auto; margin-inline: auto; }
+/* A definite width (never wider than the band, never taller than 36rem at the image's shape), so the figure holds its space before the image arrives */
+.record--classic .digital-assets__main--sized { max-height: 36rem; width: min(100%, calc(36rem * var(--digital-assets-ratio))); margin-inline: auto; }
 .record--classic .digital-assets__image { max-height: 36rem; }
 .record--classic .digital-assets__others { justify-content: center; }
 .record--classic .digital-assets__toolbar { margin-top: var(--ccs-space-3); padding-top: var(--ccs-space-3); border-top: 1px solid rgb(255 255 255 / 14%); }
@@ -118,3 +119,7 @@
 .record--classic .record-persistent { padding: var(--ccs-space-5); }
 .record--classic .record-persistent .persistent-link { padding: 0; border: 0; }
 .record--classic .record-copyright__contact .contact-collection { padding-block: 0; border-top: 0; }
+
+/* Every link and button on the record page shows the site's focus ring when reached by keyboard (WCAG 2.4.7), including the
+   persistent link and Download metadata, which this layout's cards would otherwise leave without one */
+.record--classic :is(a, button, summary):focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
