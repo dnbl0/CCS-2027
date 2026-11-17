@@ -61,7 +61,7 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     tops = page.evaluate_script("[...document.querySelectorAll('ul.explore__tiles > .explore__tile')].map(t => Math.round(t.getBoundingClientRect().top))")
     assert_equal 1, tops.first(3).uniq.size, "the first three tiles are in one row"
     assert_operator tops[3], :>, tops[0]
-    assert_selector ".explore-kinds .ccs-mosaic, .explore-places .ccs-mosaic, .explore-periods .ccs-mosaic", count: 3
+    assert_selector ".explore-kinds .card-layout--bento, .explore-places .card-layout--rail, .explore-periods .card-layout--strip", count: 3
     assert_selector ".explore-places article.result-card h3 a", text: "Australia"
     colours = page.evaluate_script("['hero','about','explore','explore-kinds','explore-places','explore-periods'].length && [...document.querySelectorAll('main > .ccs-section:not(.ccs-section--hero)')].map(s => getComputedStyle(s).backgroundColor)")
     assert_equal colours.each_cons(2).count { |a, b| a != b }, colours.size - 1, "the sections' backgrounds alternate"
@@ -77,7 +77,7 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
     assert_empty small_targets
     assert_not sideways_scroll?
-    assert_selector ".explore-kinds .ccs-mosaic, .explore-places .ccs-mosaic, .explore-periods .ccs-mosaic", count: 3
+    assert_selector ".explore-kinds .card-layout--bento, .explore-places .card-layout--rail, .explore-periods .card-layout--strip", count: 3
     assert_selector ".explore-places article.result-card h3 a", text: "Australia"
   end
 

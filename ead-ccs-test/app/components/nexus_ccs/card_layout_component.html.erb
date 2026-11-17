@@ -1,0 +1,23 @@
+<div class="card-layout card-layout--<%= layout %>" data-count="<%= cards.size %>"<% if rail? %> data-controller="card-rail"<% end %>>
+  <% if rail? %>
+    <button type="button" class="card-rail__button card-rail__button--previous" data-card-rail-target="previous" data-action="card-rail#previous" aria-label="<%= t("card_layout.previous", label: label) %>" hidden></button>
+  <% end %>
+  <ul class="card-layout__list"<% if rail? %> data-card-rail-target="scroller" tabindex="0" aria-label="<%= label %>"<% end %>>
+    <% items.each do |kind, item| %>
+      <% if kind == :panel %>
+        <li class="card-layout__item card-layout__item--panel">
+          <div class="card-layout__panel">
+            <h3 class="card-layout__panel-title"><%= item[:title] %></h3>
+            <p class="card-layout__panel-text"><%= item[:text] %></p>
+            <%= link_to item[:link], item[:path], class: "card-layout__panel-link" %>
+          </div>
+        </li>
+      <% else %>
+        <li class="card-layout__item"><%= render NexusCcs::ExploreCardComponent.new(tile: item, intro: item.try(:intro), remote: true) %></li>
+      <% end %>
+    <% end %>
+  </ul>
+  <% if rail? %>
+    <button type="button" class="card-rail__button card-rail__button--next" data-card-rail-target="next" data-action="card-rail#next" aria-label="<%= t("card_layout.next", label: label) %>" hidden></button>
+  <% end %>
+</div>

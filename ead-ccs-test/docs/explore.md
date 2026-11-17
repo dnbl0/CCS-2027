@@ -70,3 +70,7 @@ result cards in the mosaic (`NexusCcs::ExploreCardComponent`: the same `result-c
 pages; the picture whole when the tile has one, otherwise the title alone). The home page's sections after the hero alternate white and light
 grey (`--ccs-surface-default`, `--ccs-surface-subtle`) by position (`pages/home.css`), so a section left out does not break the pattern.
 The collection tiles stay in the first Explore section.
+
+## Layouts (2026-11-17)
+
+Record types, Places and Time are each their own section with their own card layout (bento, rail, strip): docs/card-layouts.md. The Places rail holds eight places, the ones with a picture first.

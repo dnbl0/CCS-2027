@@ -62,11 +62,13 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_no_selector "img"
   end
 
-  test "Record types, Places and Time are each their own section of result cards in the mosaic, with a See all link; a type with several values is an any-of filter" do
+  test "Record types, Places and Time are each their own section of result cards in its own layout (bento, rail, strip), with a See all link; a type with several values is an any-of filter" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
     assert_selector "section.explore-kinds[aria-labelledby=explore-kinds] h2#explore-kinds", text: "Record types"
-    assert_selector "section.explore-kinds .ccs-mosaic li.discover-cards__item article.result-card", count: 2
+    assert_selector "section.explore-kinds .card-layout--bento li.card-layout__item article.result-card", count: 2
+    assert_selector "section.explore-places .card-layout--rail"
+    assert_selector "section.explore-periods .card-layout--strip"
     assert_selector "article.result-card h3.document-title-heading a[href*='f%5Bclassification_ssim%5D%5B%5D=paintings']", text: "Paintings"
     assert_selector "article.result-card h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings']", text: "Prints and drawings"
     assert_selector "section.explore-kinds a.explore__all[href='/browse/object-types']", text: "See all object types"

@@ -23,6 +23,8 @@ module Browse
     CARD_FIELDS = { "object-types" => ExploreEntryPoints::CLASSIFICATION_FIELD }.freeze
     # Values that are not offered as a card (the Indigenous subjects wait for cultural review, as the Indigenous Collections tile does)
     SKIPPED = { "subjects" => [ "Aboriginal and Torres Strait Islander art", "By Indigenous People", "About Indigenous People" ] }.freeze
+    # How each hub's cards are laid out (NexusCcs::CardLayoutComponent): a different shape for each section, so the page is not one grid
+    LAYOUTS = { "object-types" => :bento, "places" => :rail, "periods" => :strip, "makers" => :grid, "subjects" => :wall }.freeze
     Card = Data.define(:label, :count, :query, :image, :intro)
 
     def self.for(hub)
