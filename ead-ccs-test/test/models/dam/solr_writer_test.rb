@@ -32,6 +32,21 @@ class DamSolrWriterTest < ActiveSupport::TestCase
     assert_equal 1, solr.commits
   end
 
+  test "the License type filter gets the DAM licences (not 'None'), and the access filters the record's tier" do
+    asset("a", accession: "1", licence: "CC BY")
+    asset("b", accession: "1", licence: "None")
+    asset("c", accession: "2", licence: "Individual")
+    asset("d", accession: "3")
+    solr = DamFakes::Solr.new(%w[1 2 3].map { |n| { "id" => "r#{n}", "accession_number_ssim" => [ n ] } })
+    Dam::SolrWriter.new(solr: solr).write(%w[1 2 3])
+
+    assert_equal [ "CC BY" ], solr.docs["r1"]["dam_licence_ssim"]
+    assert_equal "request", solr.docs["r1"]["dam_access_tier_ssi"], "the most restrictive licence wins ('None' withholds)"
+    assert_equal [ "view_only", [ "Individual" ] ], solr.docs["r2"].values_at("dam_access_tier_ssi", "dam_licence_ssim")
+    assert_equal "request", solr.docs["r3"]["dam_access_tier_ssi"]
+    assert_not solr.docs["r3"].key?("dam_licence_ssim"), "a blank licence is no License type value"
+  end
+
   test "a record whose assets a visitor cannot see is not flagged as having one, so it does not sort first" do
     asset("blank", accession: "1")
     asset("icip", accession: "2", licence: "CC BY")

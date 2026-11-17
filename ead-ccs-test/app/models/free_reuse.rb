@@ -26,11 +26,22 @@ module FreeReuse
     { VALUE.to_sym => { label: I18n.t("nexus_ccs.free_reuse.label"), fq: filter_query } }
   end
 
-  # The Solr filter query for tier :open, as text. The index keeps licences as written ("Public domain - Copyright expired"),
-  # AccessPolicy compares them in lower case, so the usual spellings of each open licence are all taken as open.
+  # The record's tier, as AccessPolicy decided it from the DAM's licences when the DAM sync wrote the record (Dam::SolrWriter)
+  DAM_TIER_FIELD = "dam_access_tier_ssi"
+
+  # The Solr filter query for tier :open, as text. A record with DAM data is open when the DAM sync found it so (DAM_TIER_FIELD:
+  # the DAM is the source of truth for usage rights); a record without is judged by its EMu licence, as before.
   def self.filter_query
+    emu = emu_filter_query
+    dam = "#{DAM_TIER_FIELD}:open"
+    emu ? "#{dam} OR (-#{DAM_TIER_FIELD}:[* TO *] #{emu})" : dam
+  end
+
+  # The EMu rule, or nil when no EMu licence is open. The index keeps licences as written ("Public domain - Copyright expired"),
+  # AccessPolicy compares them in lower case, so the usual spellings of each open licence are all taken as open.
+  def self.emu_filter_query
     open = spellings(AccessPolicy.licences_with_tier(:open))
-    return "-*:*" if open.empty? # no open licence: matches nothing
+    return nil if open.empty?
 
     parts = [ "#{LICENCE_FIELD}:(#{open.map { |value| quote(value) }.join(' ')})",
               "-#{LICENCE_FIELD}:(#{gaps(open).join(' ')})" ]
@@ -58,5 +69,5 @@ module FreeReuse
 
   def self.quote(value) = %("#{value.gsub(/["\\]/) { |char| "\\#{char}" }}")
 
-  private_class_method :gaps, :spellings, :quote
+  private_class_method :emu_filter_query, :gaps, :spellings, :quote
 end
