@@ -1,19 +1,26 @@
 # frozen_string_literal: true
 
 module Browse
-  # The cards of the Browse page: for each hub (BrowseHubs) the CARDS values with the most records, as two rows of four. A card is a
-  # value (an object type, a place, a period, a maker, a subject), its record count and the search that opens every record with it
+  # The cards of the Browse page: for each hub (BrowseHubs) eight values, as two rows of four. A card is a value (an object type, a place,
+  # a period, a maker, a subject), a picture of one of its records, a short description and the search that opens every record with it
   # (BrowseHubs.query: the hub's own facet filter, so "Medical device" opens the results with the Medical device object type applied).
   #
-  # A card has a picture when a record of the value has a thumbnail that a result card would show (AccessPolicy.view?, not sensitive).
-  # Only values with a picture compete for the first places, so the cards that have a picture come first, and no picture is shown twice.
-  # The list is kept for a day, and the last good copy for a month, as BrowseHubs does. If Solr cannot answer and nothing is kept, the
-  # hub has no cards and its section shows only its heading and its "See all" link.
+  # The values are found with the index's own facets (as Blacklight's facet fields are): the facet counts only the records that have a
+  # thumbnail and are not sensitive, so every value offered has something to show, and the values with the most such records come first.
+  # A value whose pictures a result card would not show (AccessPolicy.view?) is passed over for the next, so every card has a picture
+  # while the index has enough values that do; no picture is shown twice. The description is worked out from the value's own records (the
+  # kinds of record and the collections that hold most of them), so nothing is written by hand and nothing is invented. Wording is a
+  # placeholder: the collections team has not approved it. The cards are kept for a day, and the last good copy for a month, as BrowseHubs.
   module Cards
     CARDS = 8
-    # The values looked at when choosing the cards that have a picture, most records first
-    CANDIDATES = 60
+    # The values looked at, most records with a thumbnail first
+    CANDIDATES = 80
     PER_VALUE = 20 # records looked at for one value's picture
+    THUMBNAIL_FILTERS = [ "thumbnail_path_ssi:*", "-restrictions_tsi:sensitive" ].freeze
+    # Object types: the cards use the Classification facet (art and design, paintings, ceramics), as the home page's Record types do. Most
+    # Object Type values (equipment, photographic medium, instruments) belong to records whose assets are withheld, so they have no
+    # picture to show; the "See all" list still lists every Object Type.
+    CARD_FIELDS = { "object-types" => ExploreEntryPoints::CLASSIFICATION_FIELD }.freeze
     Card = Data.define(:label, :count, :query, :image, :intro)
 
     def self.for(hub)
@@ -21,92 +28,105 @@ module Browse
       return [] if kept.blank?
 
       kept.map do |entry|
-        Card.new(label: entry["label"], count: entry["count"], query: query(hub, entry), image: ExploreEntryPoints.build_image(entry["image"]), intro: intro(hub, entry["count"]))
+        Card.new(label: entry["label"].to_s.upcase_first, count: entry["count"], query: query(hub, entry), image: ExploreEntryPoints.build_image(entry["image"]), intro: entry["intro"])
       end
     end
 
-    # "12 records of this object type": the hub's singular noun, so no description of the value is invented
-    def self.intro(hub, count) = I18n.t("browse.cards.intro", count: count, number: ActiveSupport::NumberHelper.number_to_delimited(count), kind: hub.singular)
+    def self.field(hub) = CARD_FIELDS.fetch(hub.slug, hub.field)
 
     def self.query(hub, entry)
-      entry["first"] ? BrowseHubs.period_query(entry["first"], entry["last"]) : BrowseHubs.query(hub.field, entry["label"])
+      entry["first"] ? BrowseHubs.period_query(entry["first"], entry["last"]) : BrowseHubs.query(field(hub), entry["label"])
     end
 
-    # [{ "label", "count", "image", "first", "last" }, ...]: nil when Solr cannot answer
+    # [{ "label", "count", "image", "intro", "first", "last" }, ...]; nil when Solr cannot answer
     def self.build(hub)
       candidates = candidates(hub)
       return if candidates.nil?
 
-      images = images(hub, candidates)
-      chosen = candidates.select { |candidate| images[candidate["label"]] } + candidates.reject { |candidate| images[candidate["label"]] }
-      chosen.first(CARDS).map { |candidate| candidate.merge("image" => images[candidate["label"]]) }
-    end
-
-    def self.candidates(hub)
-      if hub.slug == "periods"
-        entries = BrowseHubs.period_entries
-        entries&.sort_by { |_label, count, _first, _last| -count }&.first(CANDIDATES)&.map { |label, count, first, last| { "label" => label, "count" => count, "first" => first, "last" => last } }
-      else
-        values = BrowseHubs.values(hub)
-        values&.reject { |value, _count| Browse.noise?(value) }&.first(CANDIDATES)&.map { |value, count| { "label" => value, "count" => count.to_i } }
-      end
-    end
-
-    # { label => image hash }, drawn for the values in order until there are CARDS of them. A value's picture is the first of its
-    # records that a result card would show: its asset may be seen (AccessPolicy.view?, so not a withheld one) and it is not sensitive
-    # (Sensitivity), so a card never shows more than the same record's card in the results.
-    def self.images(hub, candidates)
-      found = {}
       used = []
-      candidates.each do |candidate|
-        break if found.size >= CARDS
+      cards = candidates.each_with_object([]) do |candidate, chosen|
+        break chosen if chosen.size >= CARDS
 
         image = example_image(hub, candidate, used)
         next unless image
 
         used << image[:id]
-        found[candidate["label"]] = image
+        chosen << candidate.merge("image" => image, "intro" => describe(hub, candidate))
       end
-      found
-    rescue StandardError => e
-      Rails.logger.warn("Browse card pictures unavailable: #{e.class}")
-      {}
+      hub.slug == "periods" ? cards.sort_by { |card| card["first"] } : cards
+    rescue *SolrGuard::FAILURES, RSolr::Error::Http, SolrGuard::Unavailable => e
+      Rails.logger.warn("Browse cards unavailable: #{e.class}")
+      nil
     end
 
-    def self.example_image(hub, candidate, used)
-      group = if candidate["first"]
-                ExploreEntryPoints.period_query(candidate["first"], candidate["last"])
+    # The values that have records with a thumbnail, most first, from one facet request
+    def self.candidates(hub)
+      if hub.slug == "periods"
+        list = BrowseHubs.periods
+        response = Discovery.search(q: "*:*", rows: 0, facet: true, fq: THUMBNAIL_FILTERS, "facet.query": list.map { |_label, first, last| ExploreEntryPoints.period_query(first, last) })
+        found = response.dig("facet_counts", "facet_queries") || {}
+        list.filter_map do |label, first, last|
+          count = found[ExploreEntryPoints.period_query(first, last)].to_i
+          { "label" => label, "count" => count, "first" => first, "last" => last } if count.positive?
+        end.sort_by { |candidate| -candidate["count"] }.first(CANDIDATES)
       else
-                "#{hub.field}:#{Browse.phrase(candidate["label"])}"
+        response = Discovery.search(q: "*:*", rows: 0, facet: true, fq: THUMBNAIL_FILTERS, "facet.field": field(hub), "facet.limit": CANDIDATES * 2, "facet.mincount": 1, "facet.sort": "count")
+        pairs = response.dig("facet_counts", "facet_fields", field(hub)).to_a.each_slice(2).to_a
+        pairs.reject { |value, _count| Browse.noise?(value) }.first(CANDIDATES).map { |value, count| { "label" => value, "count" => count.to_i } }
       end
-      response = Discovery.search(q: "*:*", sort: "id asc", rows: PER_VALUE, fq: [ "thumbnail_path_ssi:*", "-restrictions_tsi:sensitive", group ])
+    end
+
+    def self.group_filter(hub, candidate)
+      candidate["first"] ? ExploreEntryPoints.period_query(candidate["first"], candidate["last"]) : "#{field(hub)}:#{Browse.phrase(candidate["label"])}"
+    end
+
+    # The first record, in id order, that a result card would show a picture for: its asset may be seen (AccessPolicy.view?, so not a
+    # withheld one) and it is not sensitive (Sensitivity). The picture is as the Explore tiles keep it; its size is known only for a thumbnail
+    # this server holds (the DAM's are on its own host).
+    def self.example_image(hub, candidate, used)
+      response = Discovery.search(q: "*:*", sort: "id asc", rows: PER_VALUE, fq: THUMBNAIL_FILTERS + [ group_filter(hub, candidate) ])
       response.documents.each do |document|
         next if used.include?(document.id.to_s) || !AccessPolicy.view?(document) || Sensitivity.sensitive?(document)
 
-        image = image_of(document)
-        return image if image
+        path = document["thumbnail_path_ssi"].to_s
+        next if path.blank?
+
+        width, height = ImageDimensions.for_path(path)
+        return { id: document.id.to_s, title: Array(document["title_tsim"]).first.to_s.strip.presence || "Untitled record", path: path, width: width, height: height }
       end
       nil
     end
 
-    # The picture as the Explore tiles keep it; its size is known only for a thumbnail this server holds (the DAM's are on its own host)
-    def self.image_of(document)
-      path = document["thumbnail_path_ssi"].to_s
-      return if path.blank?
-
-      width, height = ImageDimensions.for_path(path)
-      { id: document.id.to_s, title: Array(document["title_tsim"]).first.to_s.strip.presence || "Untitled record", path: path, width: width, height: height }
+    # "Includes photographs, letters. Held in the Grainger Museum Collection and the University Art Collection." One facet request
+    # for the value's records: the kinds of record (not for a kind itself) and the collections that hold most of them. A
+    # period that reaches back before the records' own dates says so.
+    def self.describe(hub, candidate)
+      kinds_field = hub.slug == "object-types" ? nil : ExploreEntryPoints::CLASSIFICATION_FIELD
+      fields = [ kinds_field, ExploreEntryPoints::COLLECTION_FIELD ].compact
+      response = Discovery.search(q: "*:*", rows: 0, facet: true, fq: [ group_filter(hub, candidate) ], "facet.field": fields, "facet.limit": 4, "facet.mincount": 1, "facet.sort": "count")
+      facets = response.dig("facet_counts", "facet_fields") || {}
+      kinds = kinds_field ? top(facets[kinds_field], 2).map(&:downcase) : []
+      collections = top(facets[ExploreEntryPoints::COLLECTION_FIELD], 2)
+      parts = []
+      parts << I18n.t("browse.cards.before") if candidate["first"] == ExploreEntryPoints::EARLIEST_YEAR
+      parts << I18n.t("browse.cards.includes", kinds: kinds.join(", ")) if kinds.any?
+      parts << I18n.t("browse.cards.held_in", collections: collections.to_sentence) if collections.any?
+      parts.join(" ")
+    rescue *SolrGuard::FAILURES, RSolr::Error::Http, SolrGuard::Unavailable
+      ""
     end
+
+    def self.top(pairs, limit) = pairs.to_a.each_slice(2).map(&:first).reject { |value| Browse.noise?(value) || value == "[other]" }.first(limit)
 
     def self.cached(hub)
-      key = "browse_cards/v1/#{hub.slug}"
+      key = "browse_cards/v2/#{hub.slug}"
       Rails.cache.fetch(SuppressedRecord.cache_key(key), expires_in: 1.day, skip_nil: true) do
         fetched = yield
-        Rails.cache.write(SuppressedRecord.cache_key("browse_cards/last_good/v1/#{hub.slug}"), fetched, expires_in: 30.days) if fetched
+        Rails.cache.write(SuppressedRecord.cache_key("browse_cards/last_good/v2/#{hub.slug}"), fetched, expires_in: 30.days) if fetched
         fetched
-      end || Rails.cache.read(SuppressedRecord.cache_key("browse_cards/last_good/v1/#{hub.slug}"))
+      end || Rails.cache.read(SuppressedRecord.cache_key("browse_cards/last_good/v2/#{hub.slug}"))
     end
 
-    private_class_method :build, :candidates, :images, :example_image, :image_of, :cached
+    private_class_method :build, :field, :candidates, :group_filter, :example_image, :describe, :top, :cached
   end
 end

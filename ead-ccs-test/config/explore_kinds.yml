@@ -31,9 +31,10 @@ collections:
   # Tiles that never show a picture. Indigenous Collections: the choice of image is waiting for cultural review (docs/explore.md).
   text_only: [Indigenous Collections]
 
-# places: the most common production places, without the values that repeat or enclose another one
+# places: the most common production places, without the values that repeat or enclose another one. The home page shows four, those that
+# have a picture first, so more are kept than shown.
 places:
-  limit: 5
+  limit: 12
   skip: [Oceania, "Melbourne, Victoria, Australia", Western Europe, Great Britain]
 
 # periods: [label, first year, last year]; the last year of the last one is the current year

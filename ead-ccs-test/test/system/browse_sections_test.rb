@@ -10,11 +10,9 @@ class BrowseSectionsSystemTest < ApplicationSystemTestCase
     @cache = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
     BrowseHubs.all.each do |hub|
-      next if hub.slug == "periods"
-
-      Rails.cache.write("browse_hubs/v1/#{hub.slug}", (1..9).map { |number| [ "#{hub.singular} #{number}", 100 - number ] }, expires_in: 1.day)
+      entries = (1..9).map { |number| { "label" => "#{hub.singular} #{number}", "count" => 5, "intro" => "Includes prints. Held in University Art Collection.", "image" => nil } }
+      Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v2/#{hub.slug}"), entries.first(8), expires_in: 1.day)
     end
-    Rails.cache.write("browse_hubs/v1/periods", [ [ "1950–1959", 12, 1950, 1959 ], [ "1960–1969", 9, 1960, 1969 ] ], expires_in: 1.day)
   end
 
   teardown { Rails.cache = @cache }
@@ -46,8 +44,8 @@ class BrowseSectionsSystemTest < ApplicationSystemTestCase
   test "a card opens the search results with its filter applied" do
     page.current_window.resize_to(1440, 900)
     visit "/browse"
-    click_link "object type 1", match: :first
+    click_link "Object type 1", match: :first
 
-    assert_current_path(/\/catalog\?.*object_type_ssim.*object\+type\+1/)
+    assert_current_path(/\/catalog\?.*classification_ssim.*object\+type\+1/)
   end
 end

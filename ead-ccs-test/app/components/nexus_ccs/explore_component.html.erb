@@ -41,7 +41,7 @@
       <div class="ccs-mosaic ccs-mosaic--4">
         <ul class="discover-cards">
           <% tiles.each do |tile| %>
-            <li class="discover-cards__item"><%= render NexusCcs::ExploreCardComponent.new(tile: tile) %></li>
+            <li class="discover-cards__item"><%= render NexusCcs::ExploreCardComponent.new(tile: tile, remote: true) %></li>
           <% end %>
         </ul>
       </div>
