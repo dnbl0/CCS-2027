@@ -117,6 +117,8 @@ class SearchJourneysTest < ApplicationSystemTestCase
       visit search_catalog_path(q: "harp", view: view)
       assert_selector ".result-card__media img", minimum: 1
 
+      # The DAM's thumbnails come from its own host, so give the first ones a moment to load
+      page.document.synchronize(5) { raise Capybara::ElementNotFound, "no thumbnail loaded" unless page.evaluate_script('Array.from(document.querySelectorAll(".result-card__media img")).some((img) => img.complete && img.naturalWidth > 0)') }
       shapes = page.evaluate_script(<<~JS)
         Array.from(document.querySelectorAll(".result-card__media img"))
           .filter((img) => img.complete && img.naturalWidth > 0)

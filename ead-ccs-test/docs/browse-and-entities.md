@@ -66,7 +66,8 @@ The home page's Explore section (PR #25; redesigned as collection tiles, docs/ex
   search results with that value as a facet filter (`BrowseHubs.query`). `Browse::Cards` chooses the cards with the index's own facets: the
   facet counts only records that have a thumbnail and are not sensitive, so the values offered have something to show, and a value whose
   records a result card would show no picture for (`AccessPolicy.view?`; withheld assets) is passed over for the next. No picture is shown
-  twice. **Object types** use the Classification facet (art and design, paintings, ceramics...) because nearly every Object Type value other
+  twice. Three Indigenous subjects (Aboriginal and Torres Strait Islander art, By Indigenous People, About Indigenous People) are not offered as cards
+  (`Browse::Cards::SKIPPED`) while the cultural review is pending, as the Indigenous Collections tile has no picture. **Object types** use the Classification facet (art and design, paintings, ceramics...) because nearly every Object Type value other
   than Work, Object and Archive belongs to records whose assets are withheld, so it has no picture to show. The description is worked out from
   the value's own records, so nothing is written by hand: "Includes prints, drawings. Held in University Art Collection." (the two commonest
   kinds of record and the two commonest collections). The wording around it is a placeholder: the collections team has not approved it.

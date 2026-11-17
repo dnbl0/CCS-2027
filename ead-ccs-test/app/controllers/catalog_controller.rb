@@ -136,9 +136,11 @@ class CatalogController < ApplicationController
     # date_start_isi rather than pub_date_si
     # title_si rather than author_si
     # ================================================================
-    config.add_sort_field "relevance", sort: "score desc, title_si asc", label: "relevance"
-    config.add_sort_field "date-desc", sort: "date_start_isi desc, title_si asc", label: "date (newest)"
-    config.add_sort_field "date-asc", sort: "date_start_isi asc, title_si asc", label: "date (oldest)"
+    # Records that have a digital asset come before those that do not, then A to Z: a browse or a filter with no search words scores every
+    # record the same, so without this the records with a picture were buried among the ones without (the title sorts stay A to Z)
+    config.add_sort_field "relevance", sort: "score desc, has_digital_asset_bsi desc, title_si asc", label: "relevance"
+    config.add_sort_field "date-desc", sort: "date_start_isi desc, has_digital_asset_bsi desc, title_si asc", label: "date (newest)"
+    config.add_sort_field "date-asc", sort: "date_start_isi asc, has_digital_asset_bsi desc, title_si asc", label: "date (oldest)"
     config.add_sort_field "title", sort: "title_si asc", label: "title (A-Z)"
     config.add_sort_field "title-desc", sort: "title_si desc", label: "title (Z-A)"
 

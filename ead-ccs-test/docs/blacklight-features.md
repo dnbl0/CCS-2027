@@ -9,7 +9,7 @@ Configuration-only use of Blacklight 9.2.1 and its official plugins, in `Catalog
 | Facets with "more" modal, collapse, limits, in sections | `add_facet_field ... limit:`, `group:`, built from the workbook | see `docs/data-model.md` |
 | Year selectors (production date, creator birth and death) | `blacklight_range_limit` 9.3.0, `range: true` | `date_start_isi`, `creator_birth_isim`, `creator_death_isim` |
 | Constraints and Start over | built in (restyled in `unimelb.css`) | n/a |
-| Sort: relevance, title A-Z / Z-A, date newest / oldest | `add_sort_field` | `title_si`, `date_start_isi` |
+| Sort: relevance, title A-Z / Z-A, date newest / oldest (relevance and the date sorts put records with a digital asset first, then A to Z) | `add_sort_field` | `title_si`, `date_start_isi`, `has_digital_asset_bsi` |
 | Per page 12 / 24 / 40 / 96 (default 40) | `config.per_page`, `default_per_page` | n/a |
 | Advanced search | `config.advanced_search.enabled` | search and facet fields |
 | Citation, JSON API, did-you-mean, autocomplete | built in | n/a |

@@ -11,7 +11,7 @@ class BrowseSectionsSystemTest < ApplicationSystemTestCase
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
     BrowseHubs.all.each do |hub|
       entries = (1..9).map { |number| { "label" => "#{hub.singular} #{number}", "count" => 5, "intro" => "Includes prints. Held in University Art Collection.", "image" => nil } }
-      Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v2/#{hub.slug}"), entries.first(8), expires_in: 1.day)
+      Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/#{hub.slug}"), entries.first(8), expires_in: 1.day)
     end
   end
 
