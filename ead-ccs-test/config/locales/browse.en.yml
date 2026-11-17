@@ -10,6 +10,11 @@ en:
     records:
       one: "%{count} record"
       other: "%{count} records"
+    cards:
+      see_all: "See all %{kind}"
+      intro:
+        one: "%{number} record of this %{kind}"
+        other: "%{number} records of this %{kind}"
     kinds:
       makers:
         plural: "Makers"

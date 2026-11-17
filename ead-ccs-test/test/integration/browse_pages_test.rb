@@ -15,12 +15,42 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
   def seed(slug, values) = Rails.cache.write("browse_hubs/v1/#{slug}", values, expires_in: 1.day)
 
-  test "the browse page lists every way in, each with its page" do
+  test "the browse page is one section for each way in, with its heading and a link to every value" do
     get "/browse"
 
     assert_response :success
     assert_select "h1", "Browse the collections"
-    BrowseHubs.all.each { |hub| assert_select "main a[href='/browse/#{hub.slug}']", text: /#{hub.title}/ }
+    assert_select "main > section.ccs-section", count: BrowseHubs.all.size
+    BrowseHubs.all.each do |hub|
+      assert_select "section.browse-#{hub.slug}[aria-labelledby='browse-#{hub.slug}'] h2#browse-#{hub.slug}", hub.title
+      assert_select "section.browse-#{hub.slug} a.explore__all[href='/browse/#{hub.slug}']"
+    end
+  end
+
+  test "each section shows at most eight cards, each opening the results with its filter applied" do
+    seed("object-types", [ [ "Medical device", 500 ] ] + (1..12).map { |number| [ "type #{number}", 100 - number ] })
+
+    get "/browse"
+
+    assert_select "section.browse-object-types article.explore-card", count: 8
+    assert_select "section.browse-object-types h3.document-title-heading a[href*='f%5Bobject_type_ssim%5D%5B%5D=Medical+device'][href*='any_assets=1']", text: "Medical device"
+    assert_select "section.browse-object-types .explore-card__intro", text: "500 records of this object type"
+    assert_select "section.browse-object-types article.explore-card svg", count: 0 # no arrow
+  end
+
+  test "the periods section opens the results with that period's range" do
+    Rails.cache.write("browse_hubs/v1/periods", [ [ "1950–1959", 12, 1950, 1959 ] ], expires_in: 1.day)
+
+    get "/browse"
+
+    assert_select "section.browse-periods h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1950'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1959']", text: "1950–1959"
+  end
+
+  test "a section whose list is unavailable keeps its heading and link but has no cards" do
+    get "/browse"
+
+    assert_select "section.browse-makers h2", "Makers"
+    assert_select "section.browse-makers article", count: 0
   end
 
   test "a way in lists the most common values first, each opening all its records with its count" do

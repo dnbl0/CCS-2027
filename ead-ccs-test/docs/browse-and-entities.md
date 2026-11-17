@@ -60,6 +60,14 @@ The home page's Explore section (PR #25; redesigned as collection tiles, docs/ex
 - **Entity pages** for a maker, a place, a subject, a century and a decade (below).
 - Index entries for makers, places, subjects and periods now **link to the entity page** (the page has the "See all N records" search link);
   object types still open the search, as they have no page.
+- **The `/browse` page itself** (2026-11-17) is one section for each way in (object types, places, periods, makers, subjects): an h2 with a
+  "See all" link to the A to Z list, then the eight values with the most records as the site's result cards (two rows of four, as the home
+  page's Explore sections), on white and light grey in turn. A card has a picture, the value's name and a short line ("12,345 records of this
+  object type"), and no arrow; the whole card opens the search results with that value as a filter (`BrowseHubs.query`, so "Medical device"
+  opens the results with the Medical device object type applied). `Browse::Cards` chooses the cards: the picture is the first record of the
+  value that a result card would show (`AccessPolicy.view?`, not sensitive), values that have a picture come first, and no picture is shown
+  twice. The lists are kept for a day with the last good copy for a month. The line under each name is a placeholder: the collections team
+  has not approved the wording.
 - A **type-to-filter box** (plain GET form, `?filter=`) and **paging** (120 a page, `?page=`) on every index page except periods.
 - Makers, places and subjects on the index pages are **grouped by spelling** (`Browse::Index`), so "Portraits" and "portraits" are one row.
 - Record pages link their place, subject and maker values to the entity page.

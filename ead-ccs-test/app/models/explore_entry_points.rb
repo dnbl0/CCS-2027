@@ -257,5 +257,5 @@ module ExploreEntryPoints
     nil
   end
 
-  private_class_method :fetch_counts, :fetch_images, :fetch_link_images, :link_tiles, :example_image, :collection_pairs, :collection_tiles, :kind_links, :place_links, :period_links, :build_image
+  private_class_method :fetch_counts, :fetch_images, :fetch_link_images, :link_tiles, :example_image, :collection_pairs, :collection_tiles, :kind_links, :place_links, :period_links
 end
