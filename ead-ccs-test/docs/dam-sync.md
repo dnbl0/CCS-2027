@@ -40,6 +40,11 @@ read it, so a record whose asset is withheld (a blank DAM licence) is not put fi
 those rules, `bin/rails dam:write` rewrites the fields from `dam_assets` without reading the DAM. When two records share an
 accession number, an asset goes to the record of its own collection (`cACollection1`).
 
+For searching it also writes `dam_licence_ssim` (the DAM licences, "None" and blank left out: the **License type** filter) and
+`dam_access_tier_ssi` (`open`, `view_only` or `request`, from `AccessPolicy.tier`: the **Digital asset Access Condition**
+filter, shown in the record page's own words, and the **Open licence** switch, `FreeReuse`, which falls back to the EMu
+licence only for records without DAM data).
+
 **Images**: the DAM's embed links (`unimelbourne.widen.net`), which do not expire. The preview links under `thumbnails`
 (`widencdn.net`) are signed and expire after about a day, so they are not used and nothing needs refreshing at render time.
 

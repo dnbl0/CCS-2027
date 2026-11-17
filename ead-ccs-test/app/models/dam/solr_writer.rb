@@ -11,8 +11,10 @@ module Dam
   # Collection both have a 0.0013), an asset goes to the record of its own collection (cACollection1), or to both when it
   # names none. Deleted assets are left out; a record left with none has its DAM fields removed.
   class SolrWriter
+    # dam_licence_ssim (the License type filter) and dam_access_tier_ssi (the Digital asset Access Condition filter and the
+    # Open licence switch, FreeReuse) are for searching: the record page reads digital_asset_metadata_ssm through AccessPolicy.
     FIELDS = %w[digital_asset_metadata_ssm thumbnail_path_ssi digital_asset_paths_ssim digital_asset_large_paths_ssim
-                digital_media_ssim has_digital_asset_bsi digital_asset_format_ssim dam_digest_ssi].freeze
+                digital_media_ssim has_digital_asset_bsi digital_asset_format_ssim dam_licence_ssim dam_access_tier_ssi dam_digest_ssi].freeze
     # The Format facet's values (digital_asset_format_ssim), by DAM format type; other types are not shown
     FORMATS = { "image" => "Image", "audio" => "Audio", "video" => "Video", "pdf" => "PDF" }.freeze
     # Audio, video and PDF go in digital_media_ssim ("kind|type|url|label", Collections::DigitalMedia)
@@ -60,8 +62,12 @@ module Dam
       images = assets.select { |asset| asset.format_type == "image" && asset.urls["large"].present? }
       media = assets.select { |asset| MEDIA_KINDS.include?(asset.format_type) && asset.urls["original"].present? }
       metadata = assets.map { |asset| metadata(asset) }
-      viewable = AccessPolicy.view?(SolrDocument.new(record.slice(*POLICY_FIELDS).merge("id" => record["id"], "digital_asset_metadata_ssm" => metadata)))
+      tier = AccessPolicy.tier(SolrDocument.new(record.slice(*POLICY_FIELDS).merge("id" => record["id"], "digital_asset_metadata_ssm" => metadata)))
+      viewable = tier != :request
       fields = {
+        "dam_licence_ssim" => assets.map { |asset| asset.licence.to_s.strip }.reject { |licence| AccessPolicy::DAM_NO_LICENCE.include?(licence.downcase) }
+                                    .uniq.sort.presence,
+        "dam_access_tier_ssi" => tier.to_s,
         "digital_asset_metadata_ssm" => metadata,
         "thumbnail_path_ssi" => images.first&.urls&.dig("thumbnail") || images.first&.urls&.dig("large"),
         "digital_asset_paths_ssim" => images.map { |asset| asset.urls["thumbnail"].presence || asset.urls["large"] }.presence,

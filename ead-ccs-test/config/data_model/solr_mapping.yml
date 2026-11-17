@@ -43,20 +43,20 @@ filters:
   4:  { solr: creator_role_ssim }             # the 19/10 workbook lists it between Creator Name and the birth date
   5:  { solr: creator_birth_isim }             # four-digit years parsed from EMu's birth dates
   6:  { solr: creator_death_isim }
-  7:  { gap: "Inventory: held by M&C, but neither export has a nationality column." }
+  7:  { solr: nationality_ssim }                # dev-team ingest (2026-11): free text, e.g. "Australian composer and pianist"
   8:  { solr: date_start_isi }
-  9:  { gap: "Open question in the workbook: is the era/period/century derived? No source column." }
+  9:  { solr: date_era_ssim }                   # dev-team ingest: "20th century", "19th century" ...
   10: { solr: classification_ssim }
   11: { solr: object_type_ssim }
   12: { solr: material_ssim }
   13: { gap: "Language is not held by either system." }
-  14: { gap: "Open question in the workbook: is Region derived from Place of Production?" }
+  14: { solr: region_ssim }                     # dev-team ingest: Oceania, Europe, Asia ...
   15: { solr: subject_ssim }
-  16: { gap: "Workbook marks the filter type as 'Unsure' (is it the same as Creator Name?)." }
+  16: { solr: subject_agent_ssim }              # dev-team ingest; sparse (about 330 records)
   17: { solr: associated_entity_place_ssim }   # EMu only, sparsely populated
   18: { gap: "No subject event in either export." }
-  19: { solr: licence_type_ssim }              # the bracketed licence at the start of EMu rights notes
-  20: { gap: "No film or gaming classification in either export." }
-  21: { gap: "Workbook marks the filter type as 'tbd' and asks whether it is needed." }
-  22: { gap: "Workbook marks the filter type as 'tbd' and asks whether it is needed." }
+  19: { solr: dam_licence_ssim }                # the DAM licence (DA License Type), written by the DAM sync (Dam::SolrWriter)
+  20: { solr: digital_asset_advisory_classification_ssim }  # dev-team ingest: G, PG, M, MA 15+ ... (about 24 records)
+  21: { solr: object_access_condition_ssim }    # dev-team ingest; one value ("Open") so far
+  22: { solr: dam_access_tier_ssi }             # AccessPolicy tier from the DAM licence (DAM sync): open, view_only, request
   23: { solr: digital_asset_format_ssim }      # "Image" for the records that have a digital asset
