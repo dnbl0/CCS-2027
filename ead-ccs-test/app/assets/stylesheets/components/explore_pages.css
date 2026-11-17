@@ -1,0 +1,79 @@
+/* Explore by time and by place (ExploreController): the browse pages' frame and lists (browse.css), plus the period strip, the era
+   chips and the map. The strip is positioned so the visually hidden text inside it is clipped with it. Targets are at least 44px; focus rings as the browse pages; no horizontal page scroll at 320px. */
+.explore__section { display: flex; flex-direction: column; gap: var(--ccs-space-4); min-width: 0; }
+.explore__hint, .explore__back { margin: 0; color: var(--ccs-text-secondary); }
+.explore__back a { color: var(--ccs-text-link); }
+
+/* The period strip: a row that scrolls sideways on wide screens, a plain column on a phone */
+.timeline { position: relative; display: flex; max-width: 100%; gap: var(--ccs-space-4); margin: 0; padding: 0 0 var(--ccs-space-3); list-style: none; overflow-x: auto; scroll-snap-type: x proximity; }
+.timeline__period { flex: 0 0 15rem; display: flex; flex-direction: column; gap: var(--ccs-space-2); scroll-snap-align: start; }
+
+.timeline__link {
+  flex: 1;
+  display: flex; flex-direction: column; gap: var(--ccs-space-2); min-height: 44px; padding: var(--ccs-space-4);
+  border: 1px solid var(--ccs-border-default); border-top: 4px solid var(--ccs-border-brand); border-radius: var(--ccs-radius-panel);
+  background: var(--ccs-surface-raised); color: var(--ccs-text-link); text-decoration: none;
+}
+.timeline__link:hover .timeline__label { text-decoration: underline; }
+.timeline__link:focus-visible, .timeline__zoom:focus-visible, .explore-chips__chip:focus-visible, .explore-map__toggle:focus-visible,
+.explore-places summary:focus-visible, .explore-places__region a:focus-visible {
+  outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px;
+}
+.timeline__label { font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); }
+.timeline__count { font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
+.timeline__images { display: flex; gap: var(--ccs-space-1); }
+.timeline__images img { width: 4rem; height: 4rem; object-fit: cover; background: var(--ccs-surface-subtle); }
+.timeline__zoom { display: inline-flex; align-items: center; min-height: 44px; color: var(--ccs-text-link); text-decoration: underline; }
+
+@media (max-width: 576px) {
+  .timeline { flex-direction: column; overflow-x: visible; }
+  .timeline__period { flex-basis: auto; }
+}
+
+/* Era chips */
+.explore-chips { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2); margin: 0; padding: 0; list-style: none; }
+.explore-chips__chip {
+  display: inline-flex; align-items: center; gap: var(--ccs-space-1); min-height: 44px; padding: var(--ccs-space-2) var(--ccs-space-4);
+  border: 1px solid var(--ccs-border-strong); border-radius: var(--ccs-radius-circle); color: var(--ccs-text-link); text-decoration: none;
+}
+.explore-chips__chip:hover { text-decoration: underline; }
+.explore-chips__count { color: var(--ccs-text-secondary); }
+
+/* The map beside its lists on wide screens, the lists under it on narrow ones */
+.explore-places { display: grid; gap: var(--ccs-space-6); }
+@media (min-width: 992px) { .explore-places { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: start; } }
+.explore-places__map, .explore-places__lists { display: flex; flex-direction: column; gap: var(--ccs-space-4); min-width: 0; }
+.explore-places__map p { margin: 0; }
+.explore-map__toggle { align-self: flex-start; min-height: 44px; }
+.explore-map { height: min(70vh, 36rem); border: 1px solid var(--ccs-border-default); }
+.explore-map[hidden] { display: none; }
+.no-js .explore-map__toggle { display: none; }
+.explore-map__credit { font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
+.explore-map__credit a { color: var(--ccs-text-link); }
+
+/* A marker: Leaflet positions the (empty) pin at the place; its badge is centred on it */
+.explore-map__pin { width: 0; height: 0; }
+.explore-map__pin:focus-visible { outline: none; }
+.explore-map__marker {
+  position: absolute; display: flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 var(--ccs-space-2);
+  transform: translate(-50%, -50%); border: 2px solid var(--ccs-surface-default); border-radius: var(--ccs-radius-circle);
+  background: var(--ccs-surface-brand); color: var(--ccs-text-inverse); font-weight: var(--ccs-font-weight-bold); font-size: var(--ccs-font-size-sm);
+  box-shadow: 0 0 0 1px var(--ccs-border-strong); white-space: nowrap;
+}
+.explore-map__pin--group .explore-map__marker { min-width: 44px; height: 44px; background: var(--ccs-surface-brand-strong); }
+.explore-map__pin:focus-visible .explore-map__marker { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.explore-map__popup-title { margin: 0 0 var(--ccs-space-1); font-weight: var(--ccs-font-weight-semibold); }
+
+.explore-places__region { display: flex; justify-content: space-between; align-items: baseline; gap: var(--ccs-space-3); margin: var(--ccs-space-3) 0 0; font-size: var(--ccs-heading-subsection-size); }
+.explore-places__region a { color: var(--ccs-text-link); }
+.explore-places__countries { margin: 0; padding: 0; list-style: none; }
+.explore-places__places { padding: var(--ccs-space-2) 0 var(--ccs-space-2) var(--ccs-space-4); }
+.explore-places__places summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; color: var(--ccs-text-link); }
+.explore-places__places .browse__list { grid-template-columns: 1fr; }
+
+/* The Place filter in the results sidebar (NexusCcs::PlaceHierarchyFacetComponent): nested branches under a disclosure each */
+.place-hierarchy, .place-hierarchy ul { margin: 0; padding: 0; list-style: none; }
+.place-hierarchy ul { padding-left: var(--ccs-space-4); }
+.place-hierarchy__row { display: flex; justify-content: space-between; align-items: center; gap: var(--ccs-space-2); min-height: 44px; }
+.place-hierarchy summary { cursor: pointer; }
+.place-hierarchy summary:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }

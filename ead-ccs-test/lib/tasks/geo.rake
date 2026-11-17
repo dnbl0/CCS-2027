@@ -13,7 +13,7 @@ namespace :geo do
     solr = RSolr.connect(url: ENV.fetch("SOLR_URL"))
     limit = ENV["LIMIT"].presence&.to_i
     report = Geo::Geocoder.new(solr: solr, logger: geo_logger, dry_run: ENV["DRY_RUN"].present?, limit: limit).run
-    puts report.to_s
+    puts report.lines
   end
 
   desc "Write the places' coordinates, countries, states and the Place filter (place_hierarchy_ssim) into the DAM index " \

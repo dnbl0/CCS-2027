@@ -7,7 +7,9 @@ Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self
     policy.font_src    :self, :data
-    policy.img_src     :self, :data, :https
+    # The Explore by place map's tiles (Explore::MapTiles), named even though https: covers them, so the policy stays right when
+    # https: is narrowed. The browser asks this host only once the visitor presses "Show the map".
+    policy.img_src     :self, :data, :https, -> { Explore::MapTiles.origin } # a lambda: worked out per request, once the app has loaded
     policy.object_src  :none
     policy.base_uri    :self
     policy.frame_ancestors :self

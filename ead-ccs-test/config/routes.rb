@@ -146,6 +146,10 @@ Rails.application.routes.draw do
   get "discover/frame", to: "discover#frame", as: :discover_frame
   get "catalog/:id/similar", to: "similar#show", as: :similar, constraints: { id: %r{[^/]+} }, format: false
 
+  # Explore by time and by place (docs/time-and-place.md): lists that open the search with a filter
+  get "explore/time", to: "explore#time", as: :explore_time
+  get "explore/places", to: "explore#places", as: :explore_places
+
   # Entity pages (BrowseEntitiesController), under the browse index pages (BrowseController): one maker, place or subject, one century or decade
   scope "/browse", controller: "browse_entities" do
     get "periods/:slug", action: :period, as: :browse_period, constraints: { slug: /[a-z0-9-]+/ }

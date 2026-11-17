@@ -6,7 +6,7 @@ each can be changed. **Plain-language summary first.**
 
 ## In short
 
-- Eight questions are decided and built or kept as they are.
+- Thirteen questions are decided and built or kept as they are.
 - Two cannot be decided by the product owner or by the developers, so they stay open on purpose: **the legal and privacy
   wording** (it has to come from the University's privacy, legal and accessibility owners) and **the de-bias term list** (it has to
   come from the collections team and Indigenous advisers). Both are marked in the pages and listed below so nothing is mistaken for
@@ -28,6 +28,7 @@ each can be changed. **Plain-language summary first.**
 | 10 | How is metadata uploaded (CCS-31)? | `Collections::CsvSource` plus `records:validate_csv` and `records:csv_to_documents`: a documented header set, per-row errors, JSON out; indexing only with `INDEX=1` and a writable `SOLR_URL` that is not the shared Solr. | No sign-in means no upload page (rule 10). Checking before converting keeps bad rows out of the index. See `ead-ccs-test/docs/csv-upload.md`. |
 | 11 | How is Chinese, Japanese and Korean text searched (CCS-56)? | Separate `text_cjk` fields (CJK characters only, single characters and pairs) filled by `copyField`, in `qf`; a "Chinese, Japanese, Korean" search option and a CJK Description search shown only when the core has the fields. | Substring search needs no word list; keeping Latin text out leaves English ranking unchanged; the detection means a core without the change works as before. The shared index needs the configuration and a reindex (dev team). See `ead-ccs-test/docs/multilingual-search.md`. |
 | 12 | How are PDFs searched by their text (CCS-36)? | `pdftotext` at indexing into `pdf_text_tim` (indexed, not stored, named so no copyField reaches it), a "Full text (PDF)" search option shown when the core has the field, and "Found in PDF" on the result. A withheld or sensitive record's PDF text is not indexed. No OCR. | `pdftotext` is already on dev machines and needs no new dependency; the name keeps the text out of the suggester and the default search; the access rules are not weakened. No snippet because the text is not stored. See `ead-ccs-test/docs/pdf-full-text.md`. |
+| 13 | May the site have "explore by time" and "explore by place" pages (CCS 2027, inspired by Google Arts & Culture; nothing copied)? | **Yes: approved by the product owner (Dean) on 2026-11-17** as new page types under rule 10: `/explore/time` (centuries and decades with counts and pictures, and era chips) and `/explore/places` (an opt-in map and lists of regions, countries and places), plus a "Place" filter (Region > Country > State > Place) in the results, added after the workbook's Region. Every list opens `/catalog` with a filter; neither page has a search of its own. | Time and place are the two ways in visitors ask for most after a search box. The map needs coordinates the index lacks, so the places are geocoded once with OpenStreetMap Nominatim on the owner's machine (`rake geo:geocode`) and written to the DAM sync's own core (`rake geo:write`); the map is opt-in so no third party is contacted unless the visitor asks, and the lists do the same job without it. See `ead-ccs-test/docs/time-and-place.md`. |
 
 ## Not decided on purpose (needs the University)
 
@@ -44,8 +45,8 @@ each can be changed. **Plain-language summary first.**
   logs limited to staff, and use "Stop sharing" or "Make a new link" (both end the old link at once) if a log leaks.
 - **Gallery publication for discovery, with moderation (Europeana's publication request) is not built.** A shared list is link-only
   and `noindex`. Moderation needs staff accounts, which wait for login.
-- **Subjects with `--` and places like "Town, State, Country" are not split into a tree.** The index values are shown as catalogued;
-  a tree needs a data decision from the collections team.
+- **Subjects with `--` are not split into a tree.** The index values are shown as catalogued; a tree needs a data decision from the
+  collections team. Places now have one (decision 13): the catalogued place text is unchanged, and the tree comes from geocoding it.
 
 ## Earlier decisions
 

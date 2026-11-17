@@ -10,7 +10,7 @@ module Geo
     REGION_FIELD = "region_ssim"
 
     Report = Struct.new(:places, :cached, :copied, :looked_up, :found, :not_found, :failures, :dry_run, keyword_init: true) do
-      def to_s
+      def lines
         verb = dry_run ? "would look up" : "looked up"
         lines = [ "#{places} places: #{cached} already known, #{copied} copied from another spelling, #{looked_up} #{verb} " \
                   "(#{found} found, #{not_found} not found), #{failures.size} failed" ]

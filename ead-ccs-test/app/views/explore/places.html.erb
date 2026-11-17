@@ -1,0 +1,68 @@
+<%# Explore by place (Explore::Places). The map is opt-in: nothing is asked of the tile server until the visitor presses Show the map.
+    The lists of regions, countries and places beside it do the same job without the map. %>
+<% content_for :body_class, "page-browse page-explore" %>
+<% content_for :title, "#{t('explore_pages.places.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :head, stylesheet_link_tag("vendor/leaflet", media: "all") if @places&.map? %>
+<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", browse_path ], [ t("explore_pages.places.title"), nil ] ]) %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("explore_pages.places.title"), description: t("explore_pages.places.intro")) %>
+<main class="browse explore" id="main-content">
+  <div class="browse__inner">
+    <% if @places.nil? %>
+      <p class="browse__unavailable"><%= t("explore_pages.unavailable_html", link: link_to(t("explore_pages.search_all"), search_action_path(any_assets: "1", search_field: "all_fields"))) %></p>
+    <% elsif @places.map? %>
+      <div class="explore-places">
+        <section class="explore-places__map" aria-labelledby="map-heading" data-controller="place-map"
+                 data-place-map-markers-value="<%= @places.markers.map { |marker| { label: marker.label, lat: marker.lat, lon: marker.lon, count: marker.count, href: search_action_path(marker.search_query) } }.to_json %>"
+                 data-place-map-tiles-value="<%= Explore::MapTiles.url %>"
+                 data-place-map-attribution-value="<%= String.new(sanitize(Explore::MapTiles.attribution, tags: %w[a], attributes: %w[href])) %>"
+                 data-place-map-show-label-value="<%= t('explore_pages.places.show_map') %>" data-place-map-hide-label-value="<%= t('explore_pages.places.hide_map') %>">
+          <h2 class="browse__heading" id="map-heading"><%= t("explore_pages.places.map") %></h2>
+          <p id="map-note"><%= t("explore_pages.places.map_note", count: number_with_delimiter(@places.markers.size)) %></p>
+          <button type="button" class="btn btn-primary explore-map__toggle" aria-expanded="false" aria-controls="place-map"
+                  data-place-map-target="button" data-action="place-map#toggle"><%= t("explore_pages.places.show_map") %></button>
+          <div class="explore-map" id="place-map" role="region" aria-label="<%= t('explore_pages.places.map_label') %>" aria-describedby="map-note" hidden data-place-map-target="map"></div>
+          <p class="explore-map__credit"><%= t("explore_pages.places.credit") %> <%= sanitize(Explore::MapTiles.attribution, tags: %w[a], attributes: %w[href]) %></p>
+        </section>
+
+        <section class="explore-places__lists" aria-labelledby="regions-heading">
+          <h2 class="browse__heading" id="regions-heading"><%= t("explore_pages.places.lists") %></h2>
+          <% @places.regions.each do |region| %>
+            <h3 class="explore-places__region">
+              <%= link_to search_action_path(region.search_query) do %><%= region.label %><% end %>
+              <span class="browse__count"><%= t("explore_pages.count", count: region.count, number: number_with_delimiter(region.count)) %></span>
+            </h3>
+            <ul class="explore-places__countries">
+              <% region.children.each do |country| %>
+                <li>
+                  <%= link_to search_action_path(country.search_query), class: "browse__link" do %>
+                    <span class="browse__label"><%= country.label %></span>
+                    <span class="browse__count"><%= t("explore_pages.count", count: country.count, number: number_with_delimiter(country.count)) %></span>
+                  <% end %>
+                  <% if country.children.any? %>
+                    <details class="explore-places__places">
+                      <summary><%= t("explore_pages.places.places_in", country: country.label) %> (<%= country.children.size %>)</summary>
+                      <%= render "explore/entries", entries: country.children %>
+                    </details>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          <% end %>
+        </section>
+      </div>
+    <% else %>
+      <p class="explore__hint"><%= t("explore_pages.places.pending") %></p>
+      <% if @places.plain_regions.any? %>
+        <section class="explore__section" aria-labelledby="regions-heading">
+          <h2 class="browse__heading" id="regions-heading"><%= t("explore_pages.places.regions") %></h2>
+          <%= render "explore/entries", entries: @places.plain_regions %>
+        </section>
+      <% end %>
+      <section class="explore__section" aria-labelledby="places-heading">
+        <h2 class="browse__heading" id="places-heading"><%= t("explore_pages.places.top_places") %></h2>
+        <%= render "explore/entries", entries: @places.top_places %>
+        <p><%= link_to t("explore_pages.places.all_places"), browse_hub_path("places") %></p>
+      </section>
+    <% end %>
+  </div>
+</main>

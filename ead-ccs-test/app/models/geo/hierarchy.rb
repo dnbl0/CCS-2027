@@ -15,11 +15,11 @@ module Geo
 
       region = geocode.region.presence || CONTINENTS[geocode.country_code.to_s.upcase]
       levels = case geocode.kind
-               when "region" then [ region || PlaceName.clean(geocode.place) ]
-               when "country" then [ region, geocode.country ]
-               when "state" then [ region, geocode.country, geocode.state ]
-               else [ region, geocode.country, geocode.state, geocode.locality.presence || PlaceName.clean(geocode.place).split(",").first ]
-               end
+      when "region" then [ region || PlaceName.clean(geocode.place) ]
+      when "country" then [ region, geocode.country ]
+      when "state" then [ region, geocode.country, geocode.state ]
+      else [ region, geocode.country, geocode.state, geocode.locality.presence || PlaceName.clean(geocode.place).split(",").first ]
+      end
       levels.map { |level| level.to_s.tr(SEPARATOR, "/").squish }.compact_blank.chunk_while { |a, b| a.casecmp?(b) }.map(&:first)
     end
 

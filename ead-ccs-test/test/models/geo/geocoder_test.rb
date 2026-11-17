@@ -11,7 +11,7 @@ class Geo::GeocoderTest < ActiveSupport::TestCase
     { "value" => "Unknown", "count" => 40 }
   ].freeze
 
-  def nominatim(http) = Geo::Nominatim.new(http: http, sleeper: ->(_seconds) {})
+  def nominatim(http) = Geo::Nominatim.new(http: http, sleeper: ->(_seconds) { })
 
   def http
     Http.new({ "Melbourne, Victoria, Australia" => [ nominatim_hit(lat: -37.81, lon: 144.96, city: "Melbourne", state: "Victoria",
@@ -43,7 +43,7 @@ class Geo::GeocoderTest < ActiveSupport::TestCase
   test "a dry run asks nothing and stores nothing; a failure is reported and asked again next time" do
     report = Geo::Geocoder.new(solr: Solr.new(pivot: PIVOT), client: nominatim(http), logger: Logger.new(nil), dry_run: true).run
     assert_equal 0, PlaceGeocode.count
-    assert_includes report.to_s.first, "would look up"
+    assert_includes report.lines.first, "would look up"
 
     report = Geo::Geocoder.new(solr: Solr.new(pivot: PIVOT), client: nominatim(Http.new(status: 503)), logger: Logger.new(nil)).run
     assert_equal 3, report.failures.size

@@ -51,6 +51,12 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `FROM` | `SOLR_URL` | `dam:copy_index` | The core copied from (only read) |
 | `TO` | `DAM_SOLR_URL` | `dam:copy_index` | The core copied into |
 | `OUT` | `tmp/dam_unmatched.csv` | `dam:report` | Where the list of DAM assets that match no record is written |
+| `DRY_RUN` | unset | `geo:geocode` | `1` counts the places that would be looked up and changes nothing. See [time-and-place.md](../ead-ccs-test/docs/time-and-place.md) |
+| `LIMIT` | unset | `geo:geocode` | Stop after this many lookups (a test run); the next run carries on |
+| `GEOCODER_URL` | `https://nominatim.openstreetmap.org/search` | `Geo::Nominatim` | The Nominatim search address `geo:geocode` asks. Only the place text is sent |
+| `GEOCODER_USER_AGENT` | `CollectionsNavigator-PlaceGeocoder/1.0 (...)` | `Geo::Nominatim` | The User-Agent sent to Nominatim: names the application, never a person or email address |
+| `MAP_TILE_URL` | `https://tile.openstreetmap.org/{z}/{x}/{y}.png` | `Explore::MapTiles` | The Explore by place map's tile server, fetched by the visitor's browser only after they press "Show the map". Its host is added to the Content Security Policy. Production should name a service the University has an agreement with |
+| `MAP_TILE_ATTRIBUTION` | the OpenStreetMap credit | `Explore::MapTiles` | The tile provider's required credit (HTML, links only), shown on and under the map |
 | `REDIS_URL` | `redis://localhost:6379/1` | `config/cable.yml` | Action Cable; unused, the app has no cable channel |
 | `CCS_MEDIA_BASE_URL` | `/digital-assets/media` | `Collections::DigitalMedia` | Where the audio, video and PDF files are served from |
 | `SEO_CANONICAL_BASE_URL` | the request's own address | `BotControls.base_url` | The site's address in canonical links, the sitemap and structured data, when a proxy hides the real host |

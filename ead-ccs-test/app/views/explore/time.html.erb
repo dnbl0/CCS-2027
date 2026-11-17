@@ -1,0 +1,56 @@
+<%# Explore by time (Explore::Timeline): centuries, or the decades of one, as a strip of links into the search; eras below. Works as a plain list without JavaScript. %>
+<% period_label = @century && Explore::Timeline::Period.new(first: @century, last: @century + 99, count: 0, images: []).label %>
+<% content_for :body_class, "page-browse page-explore" %>
+<% content_for :title, "#{[ period_label, t('explore_pages.time.title') ].compact.join(' — ')} — Collections Navigator — University of Melbourne" %>
+<% trail = [ [ "Browse", browse_path ], [ t("explore_pages.time.title"), (explore_time_path if @century) ] ] %>
+<% trail << [ period_label, nil ] if @century %>
+<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: trail) %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("explore_pages.time.title"), description: t("explore_pages.time.intro")) %>
+<main class="browse explore" id="main-content">
+  <div class="browse__inner">
+    <% if @timeline %>
+      <section class="explore__section" aria-labelledby="timeline-heading">
+        <h2 class="browse__heading" id="timeline-heading"><%= @century ? t("explore_pages.time.decades", period: period_label) : t("explore_pages.time.centuries") %></h2>
+        <% if @century %><p class="explore__back"><%= link_to t("explore_pages.time.all_centuries"), explore_time_path %></p><% end %>
+        <% if @timeline.periods.empty? %>
+          <p><%= t("explore_pages.time.empty") %></p>
+        <% else %>
+          <p class="explore__hint" id="timeline-keys"><%= t("explore_pages.time.keys") %></p>
+          <ol class="timeline" aria-label="<%= t('explore_pages.time.list_label') %>" data-controller="timeline">
+            <% @timeline.periods.each do |period| %>
+              <li class="timeline__period">
+                <%= link_to search_action_path(period.search_query), class: "timeline__link", "aria-describedby": "timeline-keys",
+                      data: { timeline_target: "link", action: "keydown->timeline#move" } do %>
+                  <span class="timeline__label"><%= period.label %></span>
+                  <span class="timeline__count"><%= t("explore_pages.count", count: period.count, number: number_with_delimiter(period.count)) %></span>
+                  <% if period.images.any? %>
+                    <span class="timeline__images">
+                      <% period.images.each do |image| %><img src="<%= image.src %>" alt="" loading="lazy" width="96" height="96"><% end %>
+                    </span>
+                  <% end %>
+                <% end %>
+                <% if period.century? && !@century %>
+                  <%= link_to explore_time_path(century: period.first), class: "timeline__zoom" do %><%= t("explore_pages.time.show_decades") %><span class="visually-hidden"> <%= t("explore_pages.time.show_decades_of", period: period.label) %></span><% end %>
+                <% end %>
+              </li>
+            <% end %>
+          </ol>
+        <% end %>
+      </section>
+
+      <% if @timeline.eras.any? %>
+        <section class="explore__section" aria-labelledby="eras-heading">
+          <h2 class="browse__heading" id="eras-heading"><%= t("explore_pages.time.eras") %></h2>
+          <p><%= t("explore_pages.time.eras_intro") %></p>
+          <ul class="explore-chips">
+            <% @timeline.eras.each do |era| %>
+              <li><%= link_to search_action_path(era.search_query), class: "explore-chips__chip" do %><%= era.name %> <span class="explore-chips__count">(<%= number_with_delimiter(era.count) %>)</span><% end %></li>
+            <% end %>
+          </ul>
+        </section>
+      <% end %>
+    <% else %>
+      <p class="browse__unavailable"><%= t("explore_pages.unavailable_html", link: link_to(t("explore_pages.search_all"), search_action_path(any_assets: "1", search_field: "all_fields"))) %></p>
+    <% end %>
+  </div>
+</main>

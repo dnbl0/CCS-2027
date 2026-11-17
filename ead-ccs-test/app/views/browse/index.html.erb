@@ -3,6 +3,13 @@
 <%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", nil ] ]) %>
 <%= render NexusCcs::PageBannerComponent.new(title: "Browse the collections", description: "No search term needed. Start from what the records are, where they come from, when they were made, who made them or what they are about.") %>
 <main class="browse browse--hubs" id="main-content">
+  <%# The time line and the map (docs/time-and-place.md) %>
+  <nav class="browse__inner browse-explore-links" aria-label="<%= t("explore_pages.links_label") %>">
+    <ul class="explore-chips">
+      <li><%= link_to t("explore_pages.time.title"), explore_time_path, class: "explore-chips__chip" %></li>
+      <li><%= link_to t("explore_pages.places.title"), explore_places_path, class: "explore-chips__chip" %></li>
+    </ul>
+  </nav>
   <%# One section for each way in: its name, a link to every value, and eight cards in a layout of their own (Browse::Cards) %>
   <% @sections.each do |hub, cards| %>
     <%= render NexusCcs::CardSectionComponent.new(slug: hub.slug, prefix: "browse", heading: hub.title, intro: hub.intro,

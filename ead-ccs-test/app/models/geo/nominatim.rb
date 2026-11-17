@@ -54,10 +54,10 @@ module Geo
       address = hit["address"] || {}
       type = hit["addresstype"].to_s
       kind = if type == "continent" then "region"
-             elsif type == "country" then "country"
-             elsif STATE_TYPES.include?(type) && address.key?(type) && type != "county" then "state"
-             else "place"
-             end
+      elsif type == "country" then "country"
+      elsif STATE_TYPES.include?(type) && address.key?(type) && type != "county" then "state"
+      else "place"
+      end
       locality = kind == "place" ? (address.values_at(*LOCALITY_KEYS).compact.first || hit["name"]) : nil
       Result.new(lat: hit["lat"].to_f, lon: hit["lon"].to_f, country: address["country"], country_code: address["country_code"]&.upcase,
                  state: address["state"] || address["province"] || address["territory"], locality: locality, kind: kind)
