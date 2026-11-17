@@ -3,20 +3,14 @@
 <%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", nil ] ]) %>
 <%= render NexusCcs::PageBannerComponent.new(title: "Browse the collections", description: "No search term needed. Start from what the records are, where they come from, when they were made, who made them or what they are about.") %>
 <main class="browse browse--hubs" id="main-content">
-  <%# One section for each way in: its name, a link to every value, and the eight values with the most records as result cards (two rows of four) %>
+  <%# One section for each way in: its name, a link to every value, and eight cards in a layout of their own (Browse::Cards) %>
   <% @sections.each do |hub, cards| %>
-    <section class="ccs-section browse-<%= hub.slug %>" aria-labelledby="browse-<%= hub.slug %>">
-      <div class="ccs-section__inner explore__inner">
-        <header class="explore__row-head">
-          <h2 id="browse-<%= hub.slug %>" class="ccs-section__heading"><%= hub.title %></h2>
-          <%= link_to t("browse.cards.see_all", kind: hub.title.downcase), browse_hub_path(hub.slug), class: "arrow-link arrow-link--icon explore__all" %>
-        </header>
-        <p class="explore__intro"><%= hub.intro %></p>
-        <% if cards.any? %>
-          <%= render NexusCcs::CardLayoutComponent.new(cards: cards, layout: Browse::Cards::LAYOUTS.fetch(hub.slug), label: hub.title,
-                                                       panel: { title: t("browse.cards.panel_title", kind: hub.title.downcase), text: hub.intro, link: t("browse.cards.see_all", kind: hub.title.downcase), path: browse_hub_path(hub.slug) }) %>
-        <% end %>
-      </div>
-    </section>
+    <%= render NexusCcs::CardSectionComponent.new(slug: hub.slug, prefix: "browse", heading: hub.title, intro: hub.intro,
+                                                  see_all: t("browse.cards.see_all", kind: hub.title.downcase), see_all_path: browse_hub_path(hub.slug)) do %>
+      <% if cards.any? %>
+        <%= render NexusCcs::CardLayoutComponent.new(cards: cards, layout: Browse::Cards::LAYOUT_BY_HUB.fetch(hub.slug), label: hub.title,
+                                                     panel: { title: t("browse.cards.panel_title", kind: hub.title.downcase), text: t("browse.cards.panel_text", kind: hub.title.downcase), link: t("browse.cards.see_all", kind: hub.title.downcase), path: browse_hub_path(hub.slug) }) %>
+      <% end %>
+    <% end %>
   <% end %>
 </main>

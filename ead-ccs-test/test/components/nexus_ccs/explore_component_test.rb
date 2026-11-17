@@ -80,6 +80,14 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_selector "a.explore__all[href='/browse/periods']", text: "See all periods"
   end
 
+  test "a tile with a description shows it under its name" do
+    kinds = [ ExploreEntryPoints::Link.new("Paintings", 5, Browse.search_query("classification_ssim", [ "paintings" ])) ]
+    tiles = [ ExploreEntryPoints::Tile.new(label: "Paintings", count: 5, query: kinds.first.query, image: nil, tint: 1, intro: "Held in University Art Collection.") ]
+    render_inline NexusCcs::ExploreComponent.new(overview: ExploreEntryPoints::Overview.new([], kinds, [], [], tiles, [], []))
+
+    assert_selector "section.explore-kinds .explore-card__intro", text: "Held in University Art Collection."
+  end
+
   test "nothing renders without anything to show" do
     render_inline NexusCcs::ExploreComponent.new(overview: empty_overview)
 

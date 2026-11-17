@@ -13,9 +13,7 @@ en:
     cards:
       see_all: "See all %{kind}"
       panel_title: "All %{kind}, A to Z"
-      before: "The earliest objects."
-      includes: "Includes %{kinds}."
-      held_in: "Held in %{collections}."
+      panel_text: "Look up any one of the %{kind} by name."
     kinds:
       makers:
         plural: "Makers"

@@ -22,7 +22,9 @@
 module ExploreEntryPoints
   Image = Data.define(:id, :title, :path, :width, :height)
   # A collection tile: its name, the exact number of records, the search that opens them, an optional example image, and its tint (1..TINTS)
-  Tile = Data.define(:label, :count, :query, :image, :tint)
+  Tile = Data.define(:label, :count, :query, :image, :tint, :intro) do
+    def initialize(label:, count:, query:, image:, tint:, intro: nil) = super
+  end
   # A plain link: a kind of record, a place or a period
   Link = Data.define(:label, :count, :query)
   Overview = Data.define(:collections, :kinds, :places, :periods, :kind_tiles, :place_tiles, :period_tiles) do
@@ -39,8 +41,8 @@ module ExploreEntryPoints
   PLACE_FIELD = "production_place_ssim"
   DATE_FIELD = "date_start_isi"
   CONFIG_PATH = Rails.root.join("config/explore_kinds.yml")
-  CACHE_KEY = "explore_entry_points/v5"
-  LAST_GOOD_KEY = "explore_entry_points/last_good/v5"
+  CACHE_KEY = "explore_entry_points/v6"
+  LAST_GOOD_KEY = "explore_entry_points/last_good/v6"
   # The tints of the collection tiles (--ccs-explore-tint-1 to -6 in tokens/semantic.css)
   TINTS = 6
   # Records looked at, in id order, for each collection's example image
@@ -67,7 +69,8 @@ module ExploreEntryPoints
 
     kinds = kind_links(counts); places = place_links(counts); periods = period_links(counts["periods"] || {})
     Overview.new(collection_tiles(counts), kinds, places, periods,
-                 link_tiles(kinds, counts["kind_images"], prefer_images: true), link_tiles(places, counts["place_images"], prefer_images: true, limit: PLACES_SHOWN), link_tiles(periods, counts["period_images"]))
+                 link_tiles(kinds, counts["kind_images"], counts["kind_intros"], prefer_images: true), link_tiles(places, counts["place_images"], counts["place_intros"], prefer_images: true, limit: PLACES_SHOWN),
+                 link_tiles(periods, counts["period_images"], counts["period_intros"]))
   end
 
   def self.counts(connection = nil)
@@ -89,7 +92,8 @@ module ExploreEntryPoints
     end
     fetched = parse(response)
     fetched = fetched.merge("images" => fetch_images(fetched["collections"]))
-    fetched.merge(fetch_link_images(fetched))
+    fetched = fetched.merge(fetch_link_images(fetched))
+    fetched.merge(fetch_link_intros(fetched))
   rescue RSolr::Error::Http, RSolr::Error::ConnectionRefused, RSolr::Error::Timeout, Faraday::Error, SystemCallError, Timeout::Error => e
     Rails.logger.warn("Explore entry points unavailable: #{e.class}")
     nil
@@ -153,12 +157,27 @@ module ExploreEntryPoints
     {}
   end
 
+  # The description of each record type, place and period (CardDescription): { "kind_intros" => { label => text }, ... }. A failure costs the
+  # descriptions only.
+  def self.fetch_link_intros(fetched)
+    kinds = fetched["kinds"].to_a.filter_map { |label, _count, values| [ label, { filter: Browse.field_query(CLASSIFICATION_FIELD, values), kinds: false } ] if values.any? }
+    places = fetched["places"].to_a.map { |value, _count| [ value, { filter: "#{PLACE_FIELD}:#{Browse.phrase(value)}" } ] }
+    periods = periods().map { |label, first, last| [ label, { filter: period_query(first, last), earliest: first == EARLIEST_YEAR } ] }
+    { "kind_intros" => kinds, "place_intros" => places, "period_intros" => periods }.transform_values do |described|
+      described.to_h { |label, options| [ label, CardDescription.for(**options) ] }
+    end
+  rescue StandardError => e
+    Rails.logger.warn("Explore descriptions unavailable: #{e.class}")
+    {}
+  end
+
   # Links as tiles: the first ROW (record types: those with a picture first, in the list's order), each with its picture if it has one
-  def self.link_tiles(links, images, prefer_images: false, limit: ROW)
+  def self.link_tiles(links, images, intros = nil, prefer_images: false, limit: ROW)
     images ||= {}
+    intros ||= {}
     chosen = prefer_images ? links.select { |link| images[link.label] } + links.reject { |link| images[link.label] } : links
     chosen.first(limit).each_with_index.map do |link, index|
-      Tile.new(label: link.label, count: link.count, query: link.query, image: build_image(images[link.label]), tint: ((index + 2) % TINTS) + 1)
+      Tile.new(label: link.label, count: link.count, query: link.query, image: build_image(images[link.label]), tint: ((index + 2) % TINTS) + 1, intro: intros[link.label].presence)
     end
   end
 
@@ -259,5 +278,5 @@ module ExploreEntryPoints
     nil
   end
 
-  private_class_method :fetch_counts, :fetch_images, :fetch_link_images, :link_tiles, :example_image, :collection_pairs, :collection_tiles, :kind_links, :place_links, :period_links
+  private_class_method :fetch_counts, :fetch_images, :fetch_link_images, :fetch_link_intros, :link_tiles, :example_image, :collection_pairs, :collection_tiles, :kind_links, :place_links, :period_links
 end

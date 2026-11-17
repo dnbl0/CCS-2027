@@ -13,8 +13,10 @@ module Browse
   # placeholder: the collections team has not approved it. The cards are kept for a day, and the last good copy for a month, as BrowseHubs.
   module Cards
     CARDS = 8
+    CACHE_KEY = "browse_cards/v3"
+    LAST_GOOD_KEY = "browse_cards/last_good/v3"
     # The values looked at, most records with a thumbnail first
-    CANDIDATES = 80
+    CANDIDATES = 40
     PER_VALUE = 20 # records looked at for one value's picture
     THUMBNAIL_FILTERS = [ "thumbnail_path_ssi:*", "-restrictions_tsi:sensitive" ].freeze
     # Object types: the cards use the Classification facet (art and design, paintings, ceramics), as the home page's Record types do. Most
@@ -24,7 +26,7 @@ module Browse
     # Values that are not offered as a card (the Indigenous subjects wait for cultural review, as the Indigenous Collections tile does)
     SKIPPED = { "subjects" => [ "Aboriginal and Torres Strait Islander art", "By Indigenous People", "About Indigenous People" ] }.freeze
     # How each hub's cards are laid out (NexusCcs::CardLayoutComponent): a different shape for each section, so the page is not one grid
-    LAYOUTS = { "object-types" => :bento, "places" => :rail, "periods" => :strip, "makers" => :grid, "subjects" => :wall }.freeze
+    LAYOUT_BY_HUB = { "object-types" => :bento, "places" => :rail, "periods" => :strip, "makers" => :grid, "subjects" => :wall }.freeze
     Card = Data.define(:label, :count, :query, :image, :intro)
 
     def self.for(hub)
@@ -35,6 +37,8 @@ module Browse
         Card.new(label: entry["label"].to_s.upcase_first, count: entry["count"], query: query(hub, entry), image: ExploreEntryPoints.build_image(entry["image"]), intro: entry["intro"])
       end
     end
+
+    def self.periods?(hub) = hub.slug == "periods"
 
     def self.field(hub) = CARD_FIELDS.fetch(hub.slug, hub.field)
 
@@ -57,7 +61,7 @@ module Browse
         used << image[:id]
         chosen << candidate.merge("image" => image, "intro" => describe(hub, candidate))
       end
-      hub.slug == "periods" ? cards.sort_by { |card| card["first"] } : cards
+      periods?(hub) ? cards.sort_by { |card| card["first"] } : cards
     rescue *SolrGuard::FAILURES, RSolr::Error::Http, SolrGuard::Unavailable => e
       Rails.logger.warn("Browse cards unavailable: #{e.class}")
       nil
@@ -65,7 +69,7 @@ module Browse
 
     # The values that have records with a thumbnail, most first, from one facet request
     def self.candidates(hub)
-      if hub.slug == "periods"
+      if periods?(hub)
         list = BrowseHubs.periods
         response = Discovery.search(q: "*:*", rows: 0, facet: true, fq: THUMBNAIL_FILTERS, "facet.query": list.map { |_label, first, last| ExploreEntryPoints.period_query(first, last) })
         found = response.dig("facet_counts", "facet_queries") || {}
@@ -101,36 +105,25 @@ module Browse
       nil
     end
 
-    # "Includes photographs, letters. Held in the Grainger Museum Collection and the University Art Collection." One facet request
-    # for the value's records: the kinds of record (not for a kind itself) and the collections that hold most of them. A
-    # period that reaches back before the records' own dates says so.
+    # One facet request for the card's records (CardDescription): the kinds of record (not for a kind itself) and the collections
     def self.describe(hub, candidate)
-      kinds_field = hub.slug == "object-types" ? nil : ExploreEntryPoints::CLASSIFICATION_FIELD
-      fields = [ kinds_field, ExploreEntryPoints::COLLECTION_FIELD ].compact
-      response = Discovery.search(q: "*:*", rows: 0, facet: true, fq: [ group_filter(hub, candidate) ], "facet.field": fields, "facet.limit": 4, "facet.mincount": 1, "facet.sort": "count")
-      facets = response.dig("facet_counts", "facet_fields") || {}
-      kinds = kinds_field ? top(facets[kinds_field], 2).map(&:downcase) : []
-      collections = top(facets[ExploreEntryPoints::COLLECTION_FIELD], 2)
-      parts = []
-      parts << I18n.t("browse.cards.before") if candidate["first"] == ExploreEntryPoints::EARLIEST_YEAR
-      parts << I18n.t("browse.cards.includes", kinds: kinds.join(", ")) if kinds.any?
-      parts << I18n.t("browse.cards.held_in", collections: collections.to_sentence) if collections.any?
-      parts.join(" ")
-    rescue *SolrGuard::FAILURES, RSolr::Error::Http, SolrGuard::Unavailable
-      ""
+      CardDescription.for(filter: group_filter(hub, candidate), kinds: hub.slug != "object-types", earliest: candidate["first"] == ExploreEntryPoints::EARLIEST_YEAR)
     end
-
-    def self.top(pairs, limit) = pairs.to_a.each_slice(2).map(&:first).reject { |value| Browse.noise?(value) || value == "[other]" }.first(limit)
 
     def self.cached(hub)
-      key = "browse_cards/v3/#{hub.slug}"
-      Rails.cache.fetch(SuppressedRecord.cache_key(key), expires_in: 1.day, skip_nil: true) do
+      key = SuppressedRecord.cache_key("#{CACHE_KEY}/#{hub.slug}")
+      last_good = SuppressedRecord.cache_key("#{LAST_GOOD_KEY}/#{hub.slug}")
+      # race_condition_ttl: when the day is up one request builds the cards while the others are still given the old ones
+      Rails.cache.fetch(key, expires_in: 1.day, race_condition_ttl: 30.seconds, skip_nil: true) do
         fetched = yield
-        Rails.cache.write(SuppressedRecord.cache_key("browse_cards/last_good/v3/#{hub.slug}"), fetched, expires_in: 30.days) if fetched
+        Rails.cache.write(last_good, fetched, expires_in: 30.days) if fetched
         fetched
-      end || Rails.cache.read(SuppressedRecord.cache_key("browse_cards/last_good/v3/#{hub.slug}"))
+      end || Rails.cache.read(last_good)
     end
 
-    private_class_method :build, :field, :candidates, :group_filter, :example_image, :describe, :top, :cached
+    # Builds the cards of every hub now (rake browse:warm_cards), so no visitor waits for the first build of the day
+    def self.warm = BrowseHubs.all.each { |hub| self.for(hub) }
+
+    private_class_method :build, :periods?, :field, :candidates, :group_filter, :example_image, :describe, :cached
   end
 end

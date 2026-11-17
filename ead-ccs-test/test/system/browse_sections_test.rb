@@ -57,6 +57,28 @@ class BrowseSectionsSystemTest < ApplicationSystemTestCase
     assert_equal "0", page.evaluate_script("document.querySelector('.browse-places .card-layout__list').getAttribute('tabindex')")
   end
 
+  test "the rail hands the keyboard focus to its row when the button under it is hidden" do
+    page.current_window.resize_to(1440, 900)
+    visit "/browse"
+
+    20.times do
+      break if page.evaluate_script("document.querySelector('.browse-places .card-rail__button--next').hidden")
+
+      page.execute_script("document.querySelector('.browse-places .card-rail__button--next').focus(); document.querySelector('.browse-places .card-rail__button--next').click()")
+      sleep 0.3
+    end
+    assert page.evaluate_script("document.querySelector('.browse-places .card-rail__button--next').hidden"), "the row scrolled to its end"
+    assert page.evaluate_script("document.activeElement === document.querySelector('.browse-places .card-layout__list')"), "the focus is on the row, not lost"
+  end
+
+  test "a narrow cell leaves out the description" do
+    page.current_window.resize_to(320, 700)
+    visit "/browse"
+
+    assert_equal "none", page.evaluate_script("getComputedStyle(document.querySelectorAll('.browse-object-types .card-layout__item')[1].querySelector('.explore-card__intro')).display")
+    assert_not page.evaluate_script("document.documentElement.scrollWidth > window.innerWidth")
+  end
+
   test "the strip widens the card that is focused and the first card at rest" do
     page.current_window.resize_to(1440, 900)
     visit "/browse"

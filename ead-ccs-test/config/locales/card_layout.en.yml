@@ -3,3 +3,8 @@ en:
   card_layout:
     previous: "Previous %{label}"
     next: "Next %{label}"
+  # The description under a card (CardDescription), the wall's panel and the rail's buttons. Placeholder wording.
+  card_description:
+    earliest: "The earliest objects."
+    includes: "Includes %{kinds}."
+    held_in: "Held in %{collections}."
