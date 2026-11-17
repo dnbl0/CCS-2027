@@ -13,13 +13,8 @@
         </header>
         <p class="explore__intro"><%= hub.intro %></p>
         <% if cards.any? %>
-          <div class="ccs-mosaic ccs-mosaic--4">
-            <ul class="discover-cards">
-              <% cards.each do |card| %>
-                <li class="discover-cards__item"><%= render NexusCcs::ExploreCardComponent.new(tile: card, intro: card.intro, remote: true) %></li>
-              <% end %>
-            </ul>
-          </div>
+          <%= render NexusCcs::CardLayoutComponent.new(cards: cards, layout: Browse::Cards::LAYOUTS.fetch(hub.slug), label: hub.title,
+                                                       panel: { title: t("browse.cards.panel_title", kind: hub.title.downcase), text: hub.intro, link: t("browse.cards.see_all", kind: hub.title.downcase), path: browse_hub_path(hub.slug) }) %>
         <% end %>
       </div>
     </section>
