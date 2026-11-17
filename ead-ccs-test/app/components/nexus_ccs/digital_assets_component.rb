@@ -105,26 +105,42 @@ module NexusCcs
       count == 1 ? title : "#{title}, image #{position} of #{count}"
     end
 
-    # e.g. "Copyright - Current"; the toolbar shows it as the licence chip
+    # The DAM's licence (DA License Type) when the record has DAM assets, else the EMu licence, e.g. "Copyright - Current";
+    # the toolbar shows it as the licence chip
     def licence
-      Array(@document["licence_type_ssim"]).first.presence
+      dam_value("licence") || Array(@document["licence_type_ssim"]).first.presence
     end
 
-    # What the record's rights note says (the licence name in brackets is the chip's, so it is not repeated)
+    # The DAM's DA Terms of Use, else what the record's rights note says (the licence name in brackets is the chip's, so it is
+    # not repeated)
     def terms
-      note = Array(@document["rights_ssim"]).first.to_s.sub(/\A\s*\[[^\]]*\]\s*/, "").strip
-      note.presence
+      dam_value("terms_of_use") || Array(@document["rights_ssim"]).first.to_s.sub(/\A\s*\[[^\]]*\]\s*/, "").strip.presence
     end
 
-    # Person or organisation responsible for creating the digital asset (DataModel field 30; no DAM export yet)
+    # Person or organisation responsible for creating the digital asset (DataModel field 30): the DAM's DA Creator Name (Role)
     def producer
-      Array(@document["producer_ssim"]).first.presence
+      dam_value("producer") || Array(@document["producer_ssim"]).first.presence
     end
+
+    # The DAM's DA Advisory, else the advisory every record carries
+    def advisory = dam_value("advisory") || ADVISORY
 
     # [label, text] rows of the Media metadata panel
     def metadata
-      [ [ "Licence type", licence ], [ "Advisory", ADVISORY ], [ "Terms of use", terms ], [ "Producer", producer ] ].select { |_, text| text.present? }
+      [ [ "Licence type", licence ], [ "Advisory", advisory ], [ "Terms of use", terms ], [ "Producer", producer ] ].select { |_, text| text.present? }
     end
+
+    # The first non-blank value of a DAM field across the record's assets (digital_asset_metadata_ssm, written by Dam::SolrWriter)
+    def dam_value(key)
+      @dam_metadata ||= Array(@document["digital_asset_metadata_ssm"]).filter_map do |json|
+        parsed = JSON.parse(json.to_s)
+        parsed if parsed.is_a?(Hash)
+      rescue JSON::ParserError
+        nil
+      end
+      @dam_metadata.filter_map { |asset| asset[key].to_s.strip.presence }.first
+    end
+    private :dam_value
 
     def metadata?
       metadata.any?

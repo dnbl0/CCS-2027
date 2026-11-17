@@ -9,7 +9,12 @@ class BotGuardTest < ActionDispatch::IntegrationTest
   BOT = { "User-Agent" => "Mozilla/5.0 (compatible; GPTBot/1.1; +https://openai.com/gptbot)" }.freeze
   BROWSER = { "User-Agent" => "Mozilla/5.0 (X11; Linux x86_64) Firefox/126.0" }.freeze
 
-  setup { BotGuard.store.clear }
+  # BotGuard counts in fixed one-minute windows (Time.now / 60): a test whose requests straddle a minute's end starts counting
+  # again and gets no 429. The clock stands still five seconds into a minute, so every request falls in one window.
+  setup do
+    BotGuard.store.clear
+    travel_to Time.current.beginning_of_minute + 5.seconds
+  end
 
   test "a listed user agent gets a 403 on an asset file; a browser, Googlebot and no user agent do not" do
     skip "no asset file in this checkout" unless Rails.public_path.join(ASSET.delete_prefix("/")).exist?

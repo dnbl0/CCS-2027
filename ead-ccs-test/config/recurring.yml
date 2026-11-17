@@ -1,0 +1,20 @@
+# Solid Queue's recurring tasks: run by the jobs process (bin/jobs), or inside Puma with SOLID_QUEUE_IN_PUMA=1.
+# The DAM sync (docs/dam-sync.md): what changed in the Nexus DAM every 10 minutes; a weekly check for deleted assets.
+default: &default
+  dam_sync:
+    class: DamSyncJob
+    args: [ "incremental" ]
+    schedule: every 10 minutes
+  dam_reconcile:
+    class: DamSyncJob
+    args: [ "reconcile" ]
+    schedule: every sunday at 3am Australia/Melbourne
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12
+
+development:
+  <<: *default
+
+production:
+  <<: *default
