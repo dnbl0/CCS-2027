@@ -1,0 +1,30 @@
+# The colour browse page (/explore/colours), the Colour filter and the record page's "Looks similar" (docs/colour-and-clean-up.md).
+# PLACEHOLDER wording, for the collections team to review.
+en:
+  colours:
+    title: "Explore by colour"
+    description: "Find records by the colours in their images. The colours are worked out by a computer from each image, so they are a guide, not a description."
+    heading: "Colours"
+    intro: "Choose a colour to see the records whose images have a lot of it."
+    count:
+      one: "%{formatted} record"
+      other: "%{formatted} records"
+    empty: "No colours are available yet."
+    unavailable: "The colours cannot be shown just now. Please try again later."
+    filter: "Colour"
+    names:
+      red: "Red"
+      orange: "Orange"
+      yellow: "Yellow"
+      green: "Green"
+      teal: "Teal"
+      blue: "Blue"
+      purple: "Purple"
+      pink: "Pink"
+      brown: "Brown"
+      black: "Black"
+      grey: "Grey"
+      white: "White"
+    looks_similar:
+      heading: "Looks similar"
+      description: "Records whose images have similar colours."

@@ -145,6 +145,9 @@ Rails.application.routes.draw do
   get "discover", to: "discover#index", as: :discover
   get "discover/frame", to: "discover#frame", as: :discover_frame
   get "catalog/:id/similar", to: "similar#show", as: :similar, constraints: { id: %r{[^/]+} }, format: false
+  # Colour (docs/colour-and-clean-up.md): browse by colour, and a record's "Looks similar" (a lazy frame on the record page)
+  get "explore/colours", to: "colours#index", as: :explore_colours
+  get "catalog/:id/looks-similar", to: "looks_similar#show", as: :looks_similar, constraints: { id: %r{[^/]+} }, format: false
 
   # Entity pages (BrowseEntitiesController), under the browse index pages (BrowseController): one maker, place or subject, one century or decade
   scope "/browse", controller: "browse_entities" do

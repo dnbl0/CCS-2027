@@ -25,16 +25,18 @@ module CatalogConfig
         end
 
         options = { label: filter.name, group: filter.group }
+        solr = NormalisedTerms.field_for(filter.solr) # Materials / Medium and Nationality: the cleaned-up terms when the core has them
         case filter.type
         when :year then options.merge!(range: true, advanced_search_component: NexusCcs::AdvancedYearRangeComponent) # the range limit plugin's own form and histogram; From and To years in Advanced search
-        when :checkbox then options.merge!(limit: nil, **MULTI_SELECT.call(filter.solr))
-        else options.merge!(limit: 20, index_range: "A".."Z", **MULTI_SELECT.call(filter.solr))   # browse, with "search within this filter" in the modal
+        when :checkbox then options.merge!(limit: nil, **MULTI_SELECT.call(solr))
+        else options.merge!(limit: 20, index_range: "A".."Z", **MULTI_SELECT.call(solr))   # browse, with "search within this filter" in the modal
         end
         # FILM COPY: every collection title is listed (config/initializers/film_all_collections.rb); the sidebar shows the first ten and
         # Blacklight's own "More Collection Title" modal the rest, on one page
         options.merge!(limit: 10, more_limit: 40) if filter.solr == "collection_ssim" && ENV["FILM_ALL_COLLECTIONS"].present?
         options[:helper_method] = VALUE_HELPERS[filter.solr] if VALUE_HELPERS.key?(filter.solr)
-        config.add_facet_field filter.solr, **options
+        config.add_facet_field solr, **options
+        add_colour_option(config, filter.group) if filter.solr == DIGITAL_ASSET_FORMAT_FIELD
       end
 
       add_free_reuse_option(config) unless config.facet_fields.key?(FreeReuse::FIELD)
@@ -55,6 +57,17 @@ module CatalogConfig
     # labels. A pill or a saved search's name says the filter's name too, as "With Digital Asset: Yes" (.digital_asset_choice).
     DIGITAL_ASSET_FIELD = SearchDefaults::DIGITAL_ASSET_FIELD
     DIGITAL_ASSET_VALUES = { "with" => "Yes", "without" => "No" }.freeze
+
+    # The Colour filter sits under Digital Asset Format Type (docs/colour-and-clean-up.md)
+    DIGITAL_ASSET_FORMAT_FIELD = "digital_asset_format_ssim"
+    COLOUR_FIELD = "colour_ssim"
+
+    # "Colour": the colour names of the records' images (rake colour:write). Not in the workbook: an addition the owner approved on
+    # 2026-11-17 (docs/decisions-2027.md). Like every list filter, it is not drawn while the index has no values for it.
+    def self.add_colour_option(config, group)
+      config.add_facet_field COLOUR_FIELD, label: I18n.t("colours.filter"), group: group, limit: nil, sort: "count",
+        helper_method: :colour_facet_label, include_in_advanced_search: false, **MULTI_SELECT.call(COLOUR_FIELD)
+    end
 
     # Filters whose stored values are codes, shown through a helper (FacetValuesHelper)
     VALUE_HELPERS = { "dam_access_tier_ssi" => :access_tier_facet_label }.freeze

@@ -172,7 +172,9 @@ class RecordRemovalTest < ActionDispatch::IntegrationTest
                 "app/models/dam/client.rb" => "the DAM's API, not Solr",
                 "app/models/dam/solr_writer.rb" => "writes DAM fields to DAM_SOLR_URL; a removed record keeps its fields and stays filtered when shown",
                 "app/models/dam/index_copy.rb" => "copies one core into another, removed records too (removal is a filter, not a deletion)",
-                "lib/tasks/dam.rake" => "dam:report reads accession numbers for a count; shows no record" }
+                "lib/tasks/dam.rake" => "dam:report reads accession numbers for a count; shows no record",
+                "app/models/colour/fetcher.rb" => "downloads DAM thumbnails (Net::HTTP), not Solr",
+                "app/models/writable_core.rb" => "colour:* and index:normalise write fields to DAM_SOLR_URL; shows no record" }
     offenders = Dir[Rails.root.join("{app,lib}/**/*.{rb,erb,rake}")].filter_map do |file|
       relative = Pathname(file).relative_path_from(Rails.root).to_s
       next if allowed.key?(relative) || relative == "lib/suppressed_solr_filter.rb"

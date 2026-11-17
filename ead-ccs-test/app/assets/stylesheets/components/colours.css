@@ -1,0 +1,60 @@
+/* Explore by colour (/explore/colours) and the record page's "Looks similar" (docs/colour-and-clean-up.md).
+   Every swatch sits beside its colour's name and count: the swatch is decoration, never the only cue. */
+.colours__intro { margin-block: var(--ccs-space-3) var(--ccs-space-5); color: var(--ccs-text-secondary); }
+
+.colours__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  gap: var(--ccs-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.colours__link {
+  display: grid;
+  grid-template-columns: 2.75rem 1fr;
+  grid-template-rows: auto auto;
+  column-gap: var(--ccs-space-3);
+  align-items: center;
+  min-height: 3.5rem;
+  padding: var(--ccs-space-3);
+  border: 1px solid var(--ccs-border-default);
+  border-radius: 4px;
+  color: var(--ccs-text-primary);
+  text-decoration: none;
+}
+
+.colours__link:hover { border-color: var(--ccs-text-link); }
+.colours__link:hover .colours__name { color: var(--ccs-text-link-hover); }
+.colours__link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+.colours__swatch {
+  grid-row: 1 / span 2;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--ccs-neutral-600);
+  border-radius: 50%;
+}
+
+.colours__name { font-weight: var(--ccs-heading-weight-strong); color: var(--ccs-text-link); text-decoration: underline; overflow-wrap: anywhere; }
+.colours__count { color: var(--ccs-text-secondary); font-size: 0.9375rem; }
+
+/* One fixed sample per colour name (Colour::Palette::NAMES) */
+.colours__swatch--red { background: #c8102e; }
+.colours__swatch--orange { background: #f28c28; }
+.colours__swatch--yellow { background: #f6d32d; }
+.colours__swatch--green { background: #2e8b57; }
+.colours__swatch--teal { background: #138a8a; }
+.colours__swatch--blue { background: #1f5fbf; }
+.colours__swatch--purple { background: #6a3d9a; }
+.colours__swatch--pink { background: #e77fb3; }
+.colours__swatch--brown { background: #7b4a2a; }
+.colours__swatch--black { background: #1a1a1a; }
+.colours__swatch--grey { background: #8a8a8a; }
+.colours__swatch--white { background: #fff; }
+
+.colours__empty { margin-top: var(--ccs-space-4); }
+
+/* Looks similar sits after More like this, in the same column; its cards are the record page's (object_cards.css) */
+.looks-similar .object-cards__list { margin-top: var(--ccs-space-5); }

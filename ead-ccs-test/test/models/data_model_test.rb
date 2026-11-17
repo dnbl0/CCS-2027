@@ -37,7 +37,7 @@ class DataModelTest < ActiveSupport::TestCase
   end
 
   # The open-licence switch (FreeReuse) is not a workbook filter. (CCS-41's has_digital_asset is now the workbook's "With Digital Asset".)
-  JIRA_ADDITIONS = %w[free_reuse].freeze
+  JIRA_ADDITIONS = %w[free_reuse colour_ssim].freeze # colour_ssim: the Colour filter the owner approved on 2026-11-17 (docs/decisions-2027.md)
 
   test "facets are every workbook filter, in the order of the sheet's # column, with its names, sections and types" do
     expected = DataModel.filters
@@ -80,7 +80,7 @@ class DataModelTest < ActiveSupport::TestCase
     assert_equal "media_type", facet.group
 
     order = config.facet_fields.keys
-    assert_equal %w[digital_asset_format_ssim has_digital_asset free_reuse], order.last(3) # the open-licence switch sits under it
+    assert_equal %w[digital_asset_format_ssim colour_ssim has_digital_asset free_reuse], order.last(4) # the open-licence switch sits under it
   end
 
   test "a filter's choice is named in full where its value is shown alone" do
