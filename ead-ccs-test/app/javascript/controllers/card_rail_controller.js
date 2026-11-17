@@ -30,7 +30,13 @@ export default class extends Controller {
 
   update() {
     const { scrollLeft, scrollWidth, clientWidth } = this.scrollerTarget
-    this.previousTarget.hidden = scrollLeft <= 1
-    this.nextTarget.hidden = scrollLeft + clientWidth >= scrollWidth - 1
+    this.show(this.previousTarget, scrollLeft > 1)
+    this.show(this.nextTarget, scrollLeft + clientWidth < scrollWidth - 1)
+  }
+
+  // A button that has the keyboard focus is not hidden from under it: the focus moves to the row first, so the visitor keeps their place
+  show(button, visible) {
+    if (!visible && document.activeElement === button) this.scrollerTarget.focus()
+    button.hidden = !visible
   }
 }

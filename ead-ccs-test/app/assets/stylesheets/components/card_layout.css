@@ -1,4 +1,4 @@
-/* The layouts of a section's cards (NexusCcs::CardLayoutComponent, docs/card-layouts.md): bento, rail, strip, grid and wall. The cards are the
+/* The layouts of a section's cards (NexusCcs::CardLayoutComponent, docs/card-layouts.md); the card itself is components/explore_card.css: bento, rail, strip, grid and wall. The cards are the
    site's result cards (ExploreCardComponent). The picture is whole on a mat and never cropped, so no layout depends on its shape. Motion is only
    a width or scroll change the visitor starts, and none of it runs with prefers-reduced-motion. */
 .card-layout { position: relative; }
@@ -31,7 +31,7 @@
 .card-layout .explore-card__intro { margin-block-end: var(--ccs-space-4); padding: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 
 @container (max-width: 10rem) {
-  .explore-card__intro { display: none; }
+  .card-layout .explore-card__intro { display: none; }
 }
 
 /* ---- bento: a feature card two cells wide and tall; the last card is two cells wide ---- */
@@ -61,8 +61,8 @@
 .card-layout--rail .explore-card--text { min-height: 15rem; }
 
 .card-rail__button {
-  position: absolute; z-index: 1; top: 7.5rem; translate: 0 -50%; width: 2.75rem; height: 2.75rem; padding: 0; border: 1px solid var(--ccs-border-strong); border-radius: var(--ccs-radius-circle);
-  background: var(--ccs-white); color: var(--ccs-text-link); cursor: pointer; box-shadow: 0 1px 4px rgb(0 0 0 / 0.25);
+  position: absolute; z-index: 1; top: 7.5rem; translate: 0 -50%; width: 44px; height: 44px; padding: 0; border: 2px solid var(--ccs-border-strong); border-radius: var(--ccs-radius-circle);
+  background: var(--ccs-white); color: var(--ccs-text-link); cursor: pointer;
 }
 
 .card-rail__button[hidden] { display: none; }
@@ -103,10 +103,10 @@
   /* While another card is pointed at or focused, the first goes back to the narrow width */
   .card-layout--strip .card-layout__list:has(.card-layout__item:hover, .card-layout__item:focus-within) .card-layout__item:first-child:not(:hover, :focus-within) { flex-grow: 1; }
 
-  /* A card at rest is narrow: its title is small and on one line so a short label (a decade) is whole; it grows to its full size when the card widens */
+  /* A card at rest is narrow: its title is small, and wraps if it must, so the whole name is always there; it grows when the card widens */
   .card-layout--strip .explore-card .result-card__content { padding-inline: var(--ccs-space-2); }
 
-  .card-layout--strip .explore-card .document-title-heading { padding-block: var(--ccs-space-3); overflow: hidden; font-size: var(--ccs-font-size-sm); white-space: nowrap; text-overflow: ellipsis; }
+  .card-layout--strip .explore-card .document-title-heading { padding-block: var(--ccs-space-3); font-size: var(--ccs-font-size-sm); overflow-wrap: anywhere; }
 
   .card-layout--strip .card-layout__item:first-child .document-title-heading,
   .card-layout--strip .card-layout__item:hover .document-title-heading,
@@ -152,7 +152,7 @@
 
 .card-layout__panel-text { margin: 0; color: inherit; }
 
-.card-layout__panel-link { align-self: flex-start; display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--ccs-white); font-weight: var(--ccs-heading-weight-strong); text-decoration: underline; text-underline-position: from-font; }
+.card-layout__panel-link { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; color: var(--ccs-white); font-weight: var(--ccs-heading-weight-strong); text-decoration: underline; text-underline-position: from-font; }
 
 .card-layout__panel-link:hover { text-decoration-thickness: 2px; }
 
@@ -166,7 +166,7 @@
 
 /* A phone shows two cards across: the title is smaller so a long word is whole, and the wall's panel sits between a full-width first and last card */
 @media (max-width: 599px) {
-  .card-layout .explore-card .document-title-heading { font-size: 1rem; overflow-wrap: break-word; hyphens: auto; }
+  .card-layout .explore-card .document-title-heading { font-size: var(--ccs-font-size-md); overflow-wrap: break-word; hyphens: auto; }
 
   .card-layout .explore-card .result-card__content { padding-inline: var(--ccs-space-3); }
 

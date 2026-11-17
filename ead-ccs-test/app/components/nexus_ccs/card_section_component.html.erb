@@ -1,0 +1,10 @@
+<section class="ccs-section <%= id %>" aria-labelledby="<%= id %>">
+  <div class="ccs-section__inner explore__inner">
+    <header class="explore__row-head">
+      <h2 id="<%= id %>" class="ccs-section__heading"><%= heading %></h2>
+      <%= link_to see_all, see_all_path, class: "arrow-link arrow-link--icon explore__all" %>
+    </header>
+    <% if intro.present? %><p class="explore__intro"><%= intro %></p><% end %>
+    <%= content %>
+  </div>
+</section>

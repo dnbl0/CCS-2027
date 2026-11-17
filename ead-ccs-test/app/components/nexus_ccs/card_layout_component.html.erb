@@ -13,7 +13,7 @@
           </div>
         </li>
       <% else %>
-        <li class="card-layout__item"><%= render NexusCcs::ExploreCardComponent.new(tile: item, intro: item.try(:intro), remote: true) %></li>
+        <li class="card-layout__item"><%= render NexusCcs::ExploreCardComponent.new(tile: item, intro: item.intro, remote: true) %></li>
       <% end %>
     <% end %>
   </ul>

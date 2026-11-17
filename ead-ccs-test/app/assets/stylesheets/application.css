@@ -24,7 +24,8 @@
 @import url("components/results_layout.css");
 @import url("components/result_card.css");
 @import url("components/explore.css");
-@import url("components/card_layouts.css");
+@import url("components/explore_card.css");
+@import url("components/card_layout.css");
 @import url("components/browse.css");
 @import url("components/results_toolbar.css");
 @import url("components/collection_intro.css");
