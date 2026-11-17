@@ -122,4 +122,4 @@
 
 /* Every link and button on the record page shows the site's focus ring when reached by keyboard (WCAG 2.4.7), including the
    persistent link and Download metadata, which this layout's cards would otherwise leave without one */
-.record--classic :is(a, button, summary):focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.record--classic :is(a, button, summary, input):focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }

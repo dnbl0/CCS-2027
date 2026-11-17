@@ -69,8 +69,10 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
         assert_equal false, page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
         outline = page.evaluate_script("[...document.querySelectorAll('#main-container h1, #main-container h2, #main-container h3')].filter(e => e.getClientRects().length > 0).map(e => e.tagName + ' ' + e.textContent.trim())")
-        assert_equal "H1", outline.first.split.first
-        levels = outline.map { |heading| heading[1].to_i }
+        # the media band comes first in this layout, so its (visually hidden) "Digital assets" h2 may precede the title
+        before_title = outline.take_while { |heading| !heading.start_with?("H1") }
+        assert before_title.all? { |heading| heading.match?(/\AH2 Digital assets?\z/) }, outline.inspect
+        levels = outline.drop(before_title.size).map { |heading| heading[1].to_i }
         assert levels.each_cons(2).all? { |a, b| b <= a + 1 }, "headings skip a level: #{outline.inspect}"
         assert_includes outline, "H2 Object details"
         assert_includes outline, "H2 Copyright and use"
@@ -142,8 +144,9 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_operator side["left"], :>=, details["right"]
 
     open_record(VARIANTS.fetch("one image, open"), "phone")
-    details, side = %w[.record-main__details .record-main__side].map { |selector| page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
-    assert_operator side["top"], :>=, details["bottom"]
+    # one column: summary, actions, details, then the Copyright card
+    details, copyright = %w[.record-main__details .record-copyright].map { |selector| page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
+    assert_operator copyright["top"], :>=, details["bottom"]
   end
 
   test "the Copyright card is always open and states the record's rights, on a phone and a desktop" do
