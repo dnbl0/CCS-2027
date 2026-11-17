@@ -59,6 +59,9 @@ module EadCcs
          rack.request.form_pairs rack.request.form_vars rack.request.form_error action_dispatch.request.content_type action_dispatch.request.request_parameters action_dispatch.request.parameters].each { |key| env.delete(key) }
       Rails.application.routes.call(env)
     }
+    # Background jobs (the DAM sync, docs/dam-sync.md) go to Solid Queue, in the primary database, where something runs them:
+    # SOLID_QUEUE_IN_PUMA=1 runs the queue inside the web server. Elsewhere Rails' default in-process adapter stays.
+    config.active_job.queue_adapter = :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"].present? && !Rails.env.test?
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

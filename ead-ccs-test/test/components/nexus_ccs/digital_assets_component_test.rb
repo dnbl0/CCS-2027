@@ -24,6 +24,19 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     }
   end
 
+  test "the media metadata panel shows the DAM's licence, advisory, terms of use and producer" do
+    dam = { "licence" => "All Rights reserved (UoM)", "advisory" => "Sensitivity", "terms_of_use" => "Ask the Grainger Museum",
+            "producer" => "Lee McRae (Photographer)" }
+    render_for(assets(1).merge("digital_asset_metadata_ssm" => [ dam.to_json ], "rights_ssim" => [ "EMu note" ]))
+
+    { "Licence type" => dam["licence"], "Advisory" => dam["advisory"], "Terms of use" => dam["terms_of_use"], "Producer" => dam["producer"] }.each do |label, text|
+      assert_includes page.native.to_html, label
+      assert_includes page.native.to_html, text
+    end
+    assert_not_includes page.native.to_html, "EMu note"
+    assert_not_includes page.native.to_html, "Public domain - Copyright expired"
+  end
+
   test "a single asset is one large image named for the record" do
     render_for(assets(1))
 

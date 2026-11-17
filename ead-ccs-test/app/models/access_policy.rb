@@ -61,11 +61,18 @@ module AccessPolicy
 
   # The DAM's usage rights are the source of truth (digital_asset_metadata_ssm: one JSON object per asset, with a "licence").
   # Compared in lower case. A blank licence (the DAM has none, or "None") is not cleared for display, so it is :request.
+  # The last five (seen in the DAM on 2026-11-17) are placeholders until the University confirms them: free-to-reuse statements
+  # are open; the non-commercial Creative Commons licences are view only for now (the cautious choice).
   TIER_BY_DAM_LICENCE = {
     "cc by" => :open,
     "all rights reserved (uom)" => :view_only,
     "copyright agency limited" => :view_only,
-    "individual" => :view_only
+    "individual" => :view_only,
+    "public domain" => :open,
+    "no known copyright" => :open,
+    "cc0" => :open,
+    "cc by-nc" => :view_only,
+    "cc by-nc-sa" => :view_only
   }.freeze
   DAM_NO_LICENCE = [ "", "none" ].freeze
 

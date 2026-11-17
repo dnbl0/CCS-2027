@@ -32,6 +32,11 @@ class AccessPolicyTest < ActiveSupport::TestCase
     assert_equal :view_only, AccessPolicy.tier(dam_doc("Individual"))
   end
 
+  test "the DAM's free-to-reuse statements are open and its non-commercial licences view only (placeholders)" do
+    [ "Public Domain", "No known copyright", "CC0" ].each { |licence| assert_equal :open, AccessPolicy.tier(dam_doc(licence)), licence }
+    [ "CC BY-NC", "CC BY-NC-SA" ].each { |licence| assert_equal :view_only, AccessPolicy.tier(dam_doc(licence)), licence }
+  end
+
   test "a DAM licence overrides a more open EMu licence" do
     doc = dam_doc("All Rights reserved (UoM)", licence_type_ssim: [ "Public domain - Copyright expired" ])
     assert_equal :view_only, AccessPolicy.tier(doc)
