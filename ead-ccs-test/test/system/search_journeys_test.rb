@@ -15,7 +15,7 @@ class SearchJourneysTest < ApplicationSystemTestCase
     end
 
     assert_current_path(%r{\A/catalog\?.*q=skull})
-    assert_selector ".filter-has_digital_asset", text: /with a digital asset/i # applied by default
+    assert_selector ".filter-has_digital_asset", text: /with digital asset:?\s*yes/i # applied by default, its name shown (drawn in capitals)
     find(".filter-has_digital_asset a.remove").click
     assert_no_selector ".filter-has_digital_asset"
     assert_selector ".result-card", minimum: 12
@@ -42,7 +42,7 @@ class SearchJourneysTest < ApplicationSystemTestCase
     assert_selector ".results-empty"
     assert_no_text(/no suggestions/i)
     unfiltered = find("a.results-empty__unfiltered").text
-    assert_match(/\A\d+ results without the ‘With a digital asset’ filter\z/, unfiltered)
+    assert_match(/\A\d+ results without the ‘With Digital Asset’ filter\z/, unfiltered)
 
     click_link "Clear all filters"
     assert_no_selector ".results-empty"

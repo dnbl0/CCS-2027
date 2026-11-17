@@ -31,7 +31,8 @@ class SearchHistoryTest < ApplicationSystemTestCase
     heading = find("th.history-actions-heading").evaluate_script("this.getBoundingClientRect().left + parseFloat(getComputedStyle(this).paddingLeft)").round
     group = first(".history-actions__group").evaluate_script("this.getBoundingClientRect().left").round
     assert_in_delta heading, group, 1, "the Actions heading starts at #{heading}px, its icons at #{group}px"
-    assert_selector "td.filters .applied-filter .filter-value", text: /with a digital asset/i, count: 3 # drawn in capitals
+    assert_selector "td.filters .applied-filter .filter-value", text: /\Ayes\z/i, count: 3 # drawn in capitals
+    assert_selector "td.filters .applied-filter .filter-name", text: /with digital asset/i, count: 3 # this filter shows its name
   end
 
   test "each row has Save, Share and Delete icon buttons, at least 24px square, named for their search" do

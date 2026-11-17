@@ -29,7 +29,7 @@ module ResultsDiagnostics
   end
 
   # Each filter value or year range, as something that can be taken off, in the order the page lists them. Taking the
-  # default "With a digital asset" off leaves the any_assets marker so it does not come back (DigitalAssetFilterField).
+  # default "With Digital Asset: Yes" off leaves the any_assets marker so it does not come back (DigitalAssetFilterField).
   # params: the search state's parameters (string keys); facets: blacklight_config.facet_fields
   def self.removals(params, facets)
     params = params.to_h.deep_stringify_keys.except("page", "controller", "action")
@@ -46,10 +46,12 @@ module ResultsDiagnostics
     list
   end
 
-  # "Collection: Grainger Museum"; the Digital asset choices are named by their own labels ("With a digital asset")
+  # "Collection: Grainger Museum"; a query facet's choice by its own label ("Open licence (public domain)"), with the filter's
+  # name when the label alone says nothing ("With Digital Asset: Yes")
   def self.value_label(field, value, facets)
     config = facets[field]
     named = config&.query&.dig(value.to_s, :label)
+    named = "#{field_label(field, facets)}: #{named}" if named && field == SearchDefaults::DIGITAL_ASSET_FIELD
     named || "#{field_label(field, facets)}: #{value}"
   end
 

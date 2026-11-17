@@ -12,7 +12,9 @@ Sources (in data/, not tracked in git; copied from the static CCS repo's extract
       "AH sequencing"                -> sequencing.json
       "Copyright Advice"             -> copyright-advice.json
       ("CCS Data Inventory - 18 Aug" and "- Superseeded" are older versions and are not used)
-  ../CCS Field labels and filters.xlsx (repo root; the source of truth for CCS Field Labels and CCS Filters)
+  ../CCS Field labels and filters - Project Owners to Review.xlsx (repo root, not tracked in git; the project owners' latest
+      version, the source of truth for CCS Field Labels and CCS Filters. It adds one filter, "With Digital Asset", after #23,
+      with no # of its own: it is kept as #24)
       "CCS Field Labels"             -> field_labels.json
       "CCS Filters"                  -> filters.json
 """
@@ -22,7 +24,7 @@ import openpyxl
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 OUT = os.path.join(ROOT, 'config', 'data_model')
 INV = os.path.join(ROOT, 'data', 'CCS-data-inventory.xlsx')
-LAB = os.path.join(ROOT, '..', 'CCS Field labels and filters.xlsx')
+LAB = os.path.join(ROOT, '..', 'CCS Field labels and filters - Project Owners to Review.xlsx')
 
 def clean(v):
     if v is None: return None
@@ -72,15 +74,16 @@ for r in FR[hi + 1:]:
 fl.sort(key=lambda f: f['seq'])
 write('field_labels.json', fl)
 
-# ---- filters (23; columns found by their headings) ----
+# ---- filters (24; columns found by their headings). A row with a filter name but no # (the project owners' "With Digital
+# Asset", added after #23) takes the next number, so it keeps its place in the sheet ----
 ft, section = [], None
 TR = rows(lab['CCS Filters'])
 hi, H2 = header(TR, '#')
 for r in TR[hi + 1:]:
-    if num(r[0]) is None: continue
     name = at(r, H2, 'filter name')
+    if num(r[0]) is None and not (name and ft): continue
     section = at(r, H2, 'filter section') or section
-    ft.append({'seq': num(r[0]), 'section': section, 'name': name, 'type': at(r, H2, 'filter type'), 'options': at(r, H2, 'filter options'),
+    ft.append({'seq': num(r[0]) if num(r[0]) is not None else ft[-1]['seq'] + 1, 'section': section, 'name': name, 'type': at(r, H2, 'filter type'), 'options': at(r, H2, 'filter options'),
                'dataModelRef': at(r, H2, 'ccs data model'), 'questions': ' / '.join(x for x in (at(r, H2, 'jb notes'), at(r, H2, 'kh notes')) if x) or None})
 write('filters.json', ft)
 

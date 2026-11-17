@@ -205,5 +205,14 @@
     "options": "List of available format types (Images, audio, video, PDF)",
     "dataModelRef": "Material Technique - Digital format",
     "questions": "List of available format types (Images, audio, video, PDF)"
+  },
+  {
+    "seq": 24,
+    "section": "Media type",
+    "name": "With Digital Asset",
+    "type": null,
+    "options": "Yes / No",
+    "dataModelRef": null,
+    "questions": null
   }
 ]

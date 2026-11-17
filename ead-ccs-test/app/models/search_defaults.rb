@@ -4,7 +4,7 @@
 #
 #   1. Nothing asked (no search, filter or sort): the home page, which has the hero search.
 #   2. The Advanced search form sent with nothing in it: the form again, with a notification, instead of every record.
-#   3. No Digital asset choice made: the same search with "With a digital asset" applied (docs/adr/0004). Taking that
+#   3. No Digital asset choice made: the same search with "With Digital Asset: Yes" applied (docs/adr/0004). Taking that
 #      filter off leaves the `any_assets` marker (DigitalAssetFilterField), which stops it coming back. Advanced
 #      searches are left alone: the visitor sets Digital asset on the form.
 #

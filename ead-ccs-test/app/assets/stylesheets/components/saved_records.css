@@ -78,8 +78,8 @@
   font-weight: var(--ccs-font-weight-semibold);
 }
 
-/* A row reads "grainger  With a digital asset": each filter's value alone, as on the results page's pills (its name,
-   "Digital asset:", stays for screen readers), with a gap between the search's parts */
+/* A row reads "grainger  Grainger Museum": each filter's value alone, as on the results page's pills (its name, "Collection
+   Title:", stays for screen readers; With Digital Asset shows its name, unimelb.css), with a gap between the search's parts */
 .search-history .constraint .filter-name {
   position: absolute;
   width: 1px;

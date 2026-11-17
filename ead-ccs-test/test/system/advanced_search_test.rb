@@ -67,7 +67,7 @@ class AdvancedSearchTest < ApplicationSystemTestCase
 
     labels = all("#advanced_search_facets .facet-field-heading button", visible: :all).map { |b| b.text(:all).strip }
     expected = DataModel.filters.select { |filter| !filter.available? || values_in_core?(filter.solr) }
-    assert_equal expected.map(&:name), labels - [ "Digital asset" ]
+    assert_equal expected.map(&:name), labels
 
     find("#facet-pending_language-header button").click
     within("#facet-pending_language") do

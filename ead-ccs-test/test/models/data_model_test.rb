@@ -10,7 +10,7 @@ class DataModelTest < ActiveSupport::TestCase
 
   test "every workbook field and filter is mapped, and nothing else is" do
     assert_equal (1..13).to_a + (15..29).to_a, DataModel::MAPPING["fields"].keys.sort
-    assert_equal (1..23).to_a, DataModel::MAPPING["filters"].keys.sort
+    assert_equal (1..24).to_a, DataModel::MAPPING["filters"].keys.sort
     assert_equal DataModel::FIELD_LABELS.map { |row| row["seq"] }.sort, DataModel::MAPPING["fields"].keys.sort
     assert_equal DataModel::FILTER_ROWS.map { |row| row["seq"] }.sort, DataModel::MAPPING["filters"].keys.sort
   end
@@ -36,14 +36,14 @@ class DataModelTest < ActiveSupport::TestCase
     end
   end
 
-  # CCS-41 asks for a with/without digital assets option, which is not in the workbook's filter list.
-  JIRA_ADDITIONS = %w[has_digital_asset free_reuse].freeze # free_reuse: the open-licence switch (FreeReuse), not a workbook filter either
+  # The open-licence switch (FreeReuse) is not a workbook filter. (CCS-41's has_digital_asset is now the workbook's "With Digital Asset".)
+  JIRA_ADDITIONS = %w[free_reuse].freeze
 
   test "facets are every workbook filter, in the order of the sheet's # column, with its names, sections and types" do
     expected = DataModel.filters
     actual = config.facet_fields.values.reject { |facet| JIRA_ADDITIONS.include?(facet.key) }
 
-    assert_equal (1..23).to_a, expected.map(&:seq)
+    assert_equal (1..24).to_a, expected.map(&:seq)
     assert_equal expected.map(&:key), actual.map(&:key)
     assert_equal expected.map(&:name), actual.map(&:label)
     assert_equal expected.map(&:group), actual.map(&:group)
@@ -69,14 +69,24 @@ class DataModelTest < ActiveSupport::TestCase
     end
   end
 
-  test "the facet beyond the workbook: CCS-41's digital asset option, above Digital Asset Format Type" do
-    extra = config.facet_fields["has_digital_asset"]
+  test "With Digital Asset (the project owners' row after #23, CCS-41's filter): Yes / No, after Digital Asset Format Type" do
+    filter = DataModel.filters.last
+    assert_equal [ 24, "Media type", "With Digital Asset", "has_digital_asset", "has_digital_asset_bsi" ], [ filter.seq, filter.section, filter.name, filter.key, filter.solr ]
 
-    assert_equal %w[with without], extra.query.keys.map(&:to_s)
-    assert_equal "media_type", extra.group
+    facet = config.facet_fields["has_digital_asset"]
+    assert_equal "With Digital Asset", facet.label
+    assert_equal({ "with" => "Yes", "without" => "No" }, facet.query.to_h { |key, option| [ key.to_s, option[:label] ] })
+    assert_equal [ "has_digital_asset_bsi:true", "-has_digital_asset_bsi:true" ], facet.query.values.map { |option| option[:fq] }
+    assert_equal "media_type", facet.group
 
     order = config.facet_fields.keys
-    assert_equal %w[free_reuse digital_asset_format_ssim], order[order.index("has_digital_asset") + 1, 2] # the open-licence switch sits under it
+    assert_equal %w[digital_asset_format_ssim has_digital_asset free_reuse], order.last(3) # the open-licence switch sits under it
+  end
+
+  test "a filter's choice is named in full where its value is shown alone" do
+    assert_equal "With Digital Asset: Yes", CatalogConfig::Facets.digital_asset_choice("with")
+    assert_equal "With Digital Asset: No", CatalogConfig::Facets.digital_asset_choice("without")
+    assert_nil CatalogConfig::Facets.digital_asset_choice("other")
   end
 
   test "Creator role is a workbook filter, between Creator Name and the birth date" do
