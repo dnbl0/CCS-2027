@@ -20,7 +20,7 @@ a Solr core of its own. Images are linked from the DAM, not copied.
   A run that sees fewer than 90% of the live assets marks nothing deleted. `bin/rails dam:reconcile` does the same by hand.
 - **Report** (`bin/rails dam:report`): counts, and a CSV of the assets whose accession number matches no record.
 
-Each run rewrites only the records whose DAM fields changed (a digest in `dam_digest_ss`), as Solr atomic updates.
+Each run rewrites only the records whose DAM fields changed (a digest in `dam_digest_ssi`), as Solr atomic updates.
 
 ## Fields
 

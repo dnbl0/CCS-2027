@@ -94,20 +94,37 @@ class DamSyncTest < ActiveSupport::TestCase
     assert_not_includes client.queries, month
   end
 
-  test "a range that comes back short (an asset edited while it was read) is read again" do
-    attempts = 0
-    client = DamFakes::Client.new(any: [ dam_item("a1") ])
-    client.define_singleton_method(:each_page) do |query:, expand: true, &block|
-      attempts += 1
-      raise Dam::Client::ShortRead, "short" if attempts == 1
-
-      super(query: query, expand: expand, &block)
+  # A client whose first sort order returns a tied asset twice and misses another, as the DAM did on 2026-11-17
+  def tied_client(orders)
+    sorts = []
+    client = Object.new
+    client.define_singleton_method(:count) { |_query| 3 }
+    client.define_singleton_method(:each_page) do |query:, expand: true, sort: nil, &block|
+      sorts << sort
+      items = orders.fetch(sort, orders.values.last)
+      block.call(items, items.size, 3)
+      3
     end
+    [ client, sorts ]
+  end
+
+  test "a range that comes back short (tied creation times) is read again in the next sort order and the reads merged" do
+    client, sorts = tied_client("created_date" => [ dam_item("a1"), dam_item("a2"), dam_item("a2") ],
+                                "-created_date" => [ dam_item("a3"), dam_item("a2"), dam_item("a1") ])
     DamSyncRun.create!(kind: "full", status: "finished", started_at: NOW - 1.hour)
     sync(client).incremental
 
-    assert_equal 2, attempts
-    assert_equal 1, DamAsset.count
+    assert_equal %w[created_date -created_date], sorts
+    assert_equal %w[a1 a2 a3], DamAsset.order(:dam_id).pluck(:dam_id)
+  end
+
+  test "a range short in every sort order fails the run, to be resumed" do
+    client, sorts = tied_client("created_date" => [ dam_item("a1"), dam_item("a1"), dam_item("a1") ])
+    DamSyncRun.create!(kind: "full", status: "finished", started_at: NOW - 1.hour)
+
+    assert_raises(Dam::Client::ShortRead) { sync(client).incremental }
+    assert_equal Dam::Client::SORTS, sorts
+    assert_equal "failed", DamSyncRun.order(:id).last.status
   end
 
   test "a reconcile that lists far fewer assets than are live marks nothing deleted" do

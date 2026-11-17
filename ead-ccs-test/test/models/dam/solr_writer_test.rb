@@ -64,7 +64,7 @@ class DamSolrWriterTest < ActiveSupport::TestCase
     assert_equal 1, writer.write([ "1987.0043", "9" ])
     assert_equal 0, writer.write([ "1987.0043", "9" ])
     assert_equal 1, solr.adds.size
-    assert_nil solr.docs["emu-2"]["dam_digest_ss"], "a record that never had DAM assets is left alone"
+    assert_nil solr.docs["emu-2"]["dam_digest_ssi"], "a record that never had DAM assets is left alone"
   end
 
   test "a record whose assets were all deleted has its DAM fields removed" do

@@ -30,7 +30,7 @@ class DamClientTest < ActiveSupport::TestCase
     ids = []
     read = client(transport).each_page(query: "lastEditDate:[x to y]") { |items, _seen, _total| ids.concat(items.map { |i| i["id"] }) }
 
-    assert_equal 150, read
+    assert_equal 150, read, "the DAM's count"
     assert_equal 150, ids.uniq.size
     assert_equal({ "query" => "lastEditDate:[x to y]", "offset" => "0", "limit" => "100", "sort" => "created_date", "expand" => "metadata,file_properties,embeds" },
                  params(transport.requests.first))
@@ -60,9 +60,10 @@ class DamClientTest < ActiveSupport::TestCase
     assert_no_match "t0k3n", error.message
   end
 
-  test "fewer distinct assets than counted is a short read, to be read again" do
-    shifted = Transport.new(page((1..100).map { |n| "a#{n}" }, total: 200), page((100..199).map { |n| "a#{n}" }, total: 200))
-    assert_raises(Dam::Client::ShortRead) { client(shifted).each_page(query: "q") { nil } }
+  test "another sort order can be asked for" do
+    transport = Transport.new(page(%w[a], total: 1))
+    client(transport).each_page(query: "q", sort: "-created_date") { nil }
+    assert_equal "-created_date", params(transport.requests.first)["sort"]
   end
 
   test "a search bigger than offset paging allows must be split" do

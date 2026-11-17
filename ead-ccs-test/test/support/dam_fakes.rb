@@ -32,13 +32,15 @@ module DamFakes
     def items_for(query) = @results.respond_to?(:call) ? @results.call(query) : @results.fetch(query, @results.fetch(:any, []))
     def count(query) = @counts&.call(query) || items_for(query).size
 
-    def each_page(query:, expand: true)
+    # Returns the count, as Dam::Client#each_page does
+    def each_page(query:, expand: true, sort: Dam::Client::SORTS.first)
       @queries << query
       items = items_for(query)
       items.each_slice(100).inject(0) do |seen, page|
         yield page, seen + page.size, items.size
         seen + page.size
       end
+      items.size
     end
   end
 

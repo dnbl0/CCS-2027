@@ -18,13 +18,15 @@ module Dam
     PAGE_SIZE = 100
     # The DAM refuses limit + offset above this
     OFFSET_LIMIT = 10_000
-    SORT = "created_date"
+    # Offset pages need a fixed order, but up to 20 assets of an upload share a creation time to the second, and the DAM
+    # orders ties differently from page to page: one order can return a tied asset twice and miss another (seen 2026-11-17).
+    # Dam::Sync reads a range that comes back short again in the next order and merges the two by id.
+    SORTS = %w[created_date -created_date filename].freeze
     ATTEMPTS = 6
     RETRIED = [ 429, 500, 502, 503, 504 ].freeze
     TRANSPORT_ERRORS = [ Net::OpenTimeout, Net::ReadTimeout, Errno::ECONNRESET, Errno::ECONNREFUSED, SocketError, EOFError, OpenSSL::SSL::SSLError ].freeze
 
-    # A search that returned fewer distinct assets than the DAM counted: an asset was edited while it was read (and moved
-    # out of the date range), so the pages shifted. Reading it again gives the right set.
+    # A range that returned fewer distinct assets than the DAM counted in every sort order (Dam::Sync)
     class ShortRead < Error; end
 
     def self.configured? = ENV["DAM_API_TOKEN"].present?
@@ -50,37 +52,33 @@ module Dam
     # How many assets a search matches
     def count(query) = search(query, offset: 0, limit: 1, expand: false)["total_count"].to_i
 
-    # Yields each page's assets (an Array of Hashes) with the number read so far and the total, and returns the number of
-    # distinct assets read. expand: false reads ids and dates only (the weekly reconcile). A search of more than OFFSET_LIMIT
-    # assets is an error (split it); one that returns fewer distinct assets than it counted raises ShortRead.
-    def each_page(query:, expand: true)
-      first = search(query, offset: 0, limit: PAGE_SIZE, expand: expand)
+    # Yields each page's assets (an Array of Hashes) with the number read so far and the total, and returns the DAM's count
+    # of matching assets (which may be more than the distinct assets yielded: see SORTS). expand: false reads ids and dates
+    # only (the weekly reconcile). A search of more than OFFSET_LIMIT assets is an error: split it.
+    def each_page(query:, expand: true, sort: SORTS.first)
+      first = search(query, offset: 0, limit: PAGE_SIZE, expand: expand, sort: sort)
       total = first["total_count"].to_i
       raise Error, "#{total} assets match #{query.inspect}: more than #{OFFSET_LIMIT} cannot be paged; split the search" if total > OFFSET_LIMIT
 
-      ids = Set.new
       page = first
       offset = 0
       loop do
         items = Array(page["items"])
         break if items.empty?
 
-        ids.merge(items.map { |item| item["id"] })
         yield items, offset + items.size, total
         offset += PAGE_SIZE
         break if offset >= total
 
-        page = search(query, offset: offset, limit: PAGE_SIZE, expand: expand)
+        page = search(query, offset: offset, limit: PAGE_SIZE, expand: expand, sort: sort)
       end
-      raise ShortRead, "#{query.inspect} returned #{ids.size} of the #{total} assets the DAM counted" if ids.size < total
-
-      ids.size
+      total
     end
 
     private
 
-    def search(query, offset:, limit:, expand:)
-      params = { query: query.presence, offset: offset, limit: limit, sort: SORT, expand: (EXPAND if expand) }.compact
+    def search(query, offset:, limit:, expand:, sort: SORTS.first)
+      params = { query: query.presence, offset: offset, limit: limit, sort: sort, expand: (EXPAND if expand) }.compact
       page = get("/assets/search", params)
       raise Error, "the DAM cannot read the query #{query.inspect}: #{page['query_explained']}" if page["query_syntax_ok"] == false
 

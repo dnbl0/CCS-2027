@@ -2,7 +2,7 @@
 
 module Dam
   # Writes the DAM assets in dam_assets (DamAsset) into the index fields the app already reads, as Solr atomic updates, for
-  # the records whose DAM fields changed only (a digest of the fields, dam_digest_ss, says whether they did).
+  # the records whose DAM fields changed only (a digest of the fields, dam_digest_ssi, says whether they did).
   #
   # It writes only to DAM_SOLR_URL, a core of its own (a copy of the shared index: rake dam:copy_index), never the shared
   # core: an atomic update rewrites the whole document, and a field that is indexed but not stored would be lost.
@@ -12,7 +12,7 @@ module Dam
   # names none. Deleted assets are left out; a record left with none has its DAM fields removed.
   class SolrWriter
     FIELDS = %w[digital_asset_metadata_ssm thumbnail_path_ssi digital_asset_paths_ssim digital_asset_large_paths_ssim
-                digital_media_ssim has_digital_asset_bsi digital_asset_format_ssim dam_digest_ss].freeze
+                digital_media_ssim has_digital_asset_bsi digital_asset_format_ssim dam_digest_ssi].freeze
     # The Format facet's values (digital_asset_format_ssim), by DAM format type; other types are not shown
     FORMATS = { "image" => "Image", "audio" => "Audio", "video" => "Video", "pdf" => "PDF" }.freeze
     # Audio, video and PDF go in digital_media_ssim ("kind|type|url|label", Collections::DigitalMedia)
@@ -70,7 +70,7 @@ module Dam
         "has_digital_asset_bsi" => viewable && (images.any? || media.any?),
         "digital_asset_format_ssim" => assets.filter_map { |asset| FORMATS[asset.format_type] }.uniq.presence
       }
-      fields.merge("dam_digest_ss" => Digest::SHA256.hexdigest(fields.to_json))
+      fields.merge("dam_digest_ssi" => Digest::SHA256.hexdigest(fields.to_json))
     end
 
     def self.metadata(asset)
@@ -87,7 +87,7 @@ module Dam
 
     def find(accessions)
       terms = accessions.map { |accession| %("#{accession.gsub(/["\\]/) { |c| "\\#{c}" }}") }.join(" OR ")
-      response = @solr.get("select", params: { q: "accession_number_ssim:(#{terms})", fl: "id,accession_number_ssim,collection_ssim,dam_digest_ss,#{POLICY_FIELDS.join(',')}",
+      response = @solr.get("select", params: { q: "accession_number_ssim:(#{terms})", fl: "id,accession_number_ssim,collection_ssim,dam_digest_ssi,#{POLICY_FIELDS.join(',')}",
                                                rows: accessions.size * 5, wt: "json" })
       response.dig("response", "docs") || []
     end
@@ -100,10 +100,10 @@ module Dam
 
         assets.select { |asset| asset.collection.blank? || collections.include?(asset.collection.downcase) }
       end
-      return nil if mine.empty? && doc["dam_digest_ss"].blank?
+      return nil if mine.empty? && doc["dam_digest_ssi"].blank?
 
       fields = self.class.fields_for(mine.uniq, doc)
-      return nil if fields["dam_digest_ss"] == doc["dam_digest_ss"]
+      return nil if fields["dam_digest_ssi"] == doc["dam_digest_ssi"]
 
       { "id" => doc["id"] }.merge(fields.transform_values { |value| { "set" => value } })
     end

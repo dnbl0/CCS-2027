@@ -6,6 +6,9 @@ module Dam
   # What the DAM sync matched (rake dam:report): the live assets whose accession number no record in the index has, and counts.
   class Report
     HEADERS = %w[dam_id accession_number collection filename format_type].freeze
+    # The records carrying DAM fields. The digest is hex, so a term range over 0-9a-f finds every one (an exists query,
+    # [* TO *], needs docValues or norms, which a string field here does not have).
+    DIGEST_PRESENT = 'dam_digest_ssi:["0" TO "g"]'
 
     def initialize(solr:)
       @solr = solr
@@ -27,7 +30,7 @@ module Dam
         DAM assets: #{DamAsset.count} (#{live.count} live, #{DamAsset.where.not(deleted_at: nil).count} deleted)
         Live assets with an accession number: #{with_accession.count}
         Accession numbers that match a record: #{matched.size} of #{with_accession.distinct.count(:accession_number)}
-        Records with DAM data in the index: #{@solr.get('select', params: { q: 'dam_digest_ss:[* TO *]', rows: 0, wt: 'json' }).dig('response', 'numFound')}
+        Records with DAM data in the index: #{@solr.get('select', params: { q: DIGEST_PRESENT, rows: 0, wt: 'json' }).dig('response', 'numFound')}
         Unmatched assets: #{unmatched.count}#{by_collection.map { |name, count| "\n  #{name || '(no collection)'}: #{count}" }.join}
       TEXT
     end

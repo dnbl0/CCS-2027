@@ -20,7 +20,6 @@ module Dam
     OVERLAP = 10.minutes
     # A reconcile that sees fewer ids than this share of the live rows marks nothing deleted: something is wrong with the read
     RECONCILE_FLOOR = 0.9
-    READ_ATTEMPTS = 3
     PROGRESS_EVERY = 1_000
 
     def self.epoch = ENV["DAM_SYNC_EPOCH"].present? ? Time.iso8601(ENV["DAM_SYNC_EPOCH"]) : EPOCH
@@ -111,24 +110,21 @@ module Dam
       end
     end
 
-    # The pages of one range, read again when it comes back short
+    # The assets of one range, in pages of 100. A range that returns fewer distinct assets than the DAM counted (tied sort
+    # keys, or an asset edited while it was read) is read again in the next of Client::SORTS, and the reads merged by id.
     def read_range(from, to, run, expand: true)
       query = Client.edited_between(from, to)
-      attempts = 0
-      begin
-        attempts += 1
-        pages = []
-        @client.each_page(query: query, expand: expand) do |items, seen, total|
-          pages << items
-          progress(run, items.size, seen, total)
+      by_id = {}
+      total = 0
+      Client::SORTS.each_with_index do |sort, index|
+        log("#{query} returned #{by_id.size} of the #{total} assets the DAM counted; reading it again sorted by #{sort}") if index.positive?
+        total = @client.each_page(query: query, expand: expand, sort: sort) do |items, seen, page_total|
+          items.each { |item| by_id[item["id"]] = item }
+          progress(run, items.size, seen, page_total)
         end
-        pages
-      rescue Client::ShortRead => e
-        raise if attempts >= READ_ATTEMPTS
-
-        log("#{e.message}; reading it again")
-        retry
+        return by_id.values.each_slice(Client::PAGE_SIZE).to_a if by_id.size >= total
       end
+      raise Client::ShortRead, "#{query} returned #{by_id.size} of the #{total} assets the DAM counted, in every sort order"
     end
 
     # Reads one range into dam_assets; returns the accession numbers whose assets changed (before and after the change, so an
