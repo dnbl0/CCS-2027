@@ -47,15 +47,27 @@ module Dam
         page = get("/assets/search/scroll", { scroll_id: page["scroll_id"], expand: (EXPAND if expand) }.compact)
         raise Error, "the DAM dropped the search after #{seen} of #{total} assets (the scroll expired)" if page.nil?
       end
-      raise Error, "the search ended after #{seen} of #{total} assets" if seen < total
-
+      check_count(seen, total, query)
       seen
     end
 
     # The DAM's search query for assets last edited between two times (both included)
     def self.edited_between(from, to) = "lastEditDate:[#{from.utc.iso8601} to #{to.utc.iso8601}]"
 
+    # The DAM's total_count runs a little ahead of what a scroll returns (on 2026-11-17: 175,308 counted, 175,108 returned, no
+    # duplicates, the same each time), so a gap of up to this share is logged; a bigger one means the read went wrong.
+    SHORTFALL_ALLOWED = 0.01
+
     private
+
+    def check_count(seen, total, query)
+      return if seen >= total
+
+      message = "the search #{query.inspect} returned #{seen} of the #{total} assets the DAM counted"
+      raise Error, message if total - seen > (total * SHORTFALL_ALLOWED).ceil
+
+      @logger.warn("[dam] #{message} (within the DAM's usual gap)")
+    end
 
     # GET a path; the parsed JSON, or nil for 404 (a scroll that has expired)
     def get(path, params)

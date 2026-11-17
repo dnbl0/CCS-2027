@@ -22,7 +22,7 @@ module Dam
       live = DamAsset.live
       with_accession = live.where.not(accession_number: nil)
       matched = with_accession.distinct.pluck(:accession_number) & index_accessions.to_a
-      by_collection = unmatched.group(:collection).count.sort_by { |_name, count| -count }.first(8)
+      by_collection = unmatched.reorder(nil).group(:collection).count.sort_by { |_name, count| -count }.first(8)
       <<~TEXT
         DAM assets: #{DamAsset.count} (#{live.count} live, #{DamAsset.where.not(deleted_at: nil).count} deleted)
         Live assets with an accession number: #{with_accession.count}

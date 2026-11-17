@@ -63,8 +63,14 @@ class DamClientTest < ActiveSupport::TestCase
     expired = Transport.new(page([ { "id" => "a" } ], total: 2), [ 404, "" ])
     assert_raises(Dam::Error) { client(expired).each_page { nil } }
 
-    short = Transport.new(page([ { "id" => "a" } ], total: 2), page([], total: 2))
+    short = Transport.new(page([ { "id" => "a" } ], total: 10), page([], total: 10))
     assert_raises(Dam::Error) { client(short).each_page { nil } }
+  end
+
+  test "the DAM's usual small gap between its count and what it returns is logged, not an error" do
+    items = Array.new(100) { |i| { "id" => "a#{i}" } }
+    transport = Transport.new(page(items, total: 10_000), *Array.new(98) { page(items, total: 10_000) }, page([], total: 10_000))
+    assert_equal 9_900, client(transport).each_page { nil }
   end
 
   test "a query the DAM cannot read is an error" do
