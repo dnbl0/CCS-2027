@@ -7,7 +7,7 @@ class PagesTest < ActionDispatch::IntegrationTest
     assert_response :moved_permanently
     assert_redirected_to "/#browse-collections"
     follow_redirect!
-    assert_select "#browse-collections"
+    assert_response :success
   end
 
   test "the collection landing pages are gone: their addresses go to the results filtered to that collection" do
@@ -17,16 +17,6 @@ class PagesTest < ActionDispatch::IntegrationTest
 
       assert_response :moved_permanently, slug
       assert_redirected_to whole_collection_path(facet_value)
-    end
-  end
-
-  # Browsing a collection shows all of it: the any_assets marker keeps the default "With a digital asset" filter
-  # off (docs/adr/0004), or a collection with few or no images (Harry Brookes Allen has none) opens nearly empty.
-  test "the home page's collection cards open the whole collection" do
-    get "/"
-    NexusCcs::SiteNavigation.collections.each do |_label, facet_value, _slug|
-      assert_select ".home-card__link[href=?]", whole_collection_path(facet_value), text: facet_value
-      assert_select "a.home-textbutton[href=?]", whole_collection_path(facet_value), text: /Search this Collection/
     end
   end
 

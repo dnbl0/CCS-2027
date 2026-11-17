@@ -62,19 +62,19 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_no_selector "img"
   end
 
-  test "Record types, Places and Time are each a row of tiles with a See all link; a type with several values is an any-of filter" do
+  test "Record types, Places and Time are each their own section of result cards in the mosaic, with a See all link; a type with several values is an any-of filter" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
-    assert_selector "h3#explore-kinds", text: "Record types"
-    assert_selector "ul.explore__tiles--row[aria-labelledby=explore-kinds] li.explore__tile", count: 2
-    assert_selector "a.explore__tile-link[href*='f%5Bclassification_ssim%5D%5B%5D=paintings'] h4", text: "Paintings"
-    assert_selector "a.explore__tile-link[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings'] h4", text: "Prints and drawings"
-    assert_selector "a.explore__all[href='/browse/object-types']", text: "See all object types"
-    assert_selector "h3#explore-places", text: "Places"
-    assert_selector "a.explore__tile-link[href*='f%5Bproduction_place_ssim%5D%5B%5D=Australia'] h4", text: "Australia"
-    assert_selector "a.explore__all[href='/browse/places']", text: "See all places"
-    assert_selector "h3#explore-periods", text: "Time"
-    assert_selector "a.explore__tile-link[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'] h4", text: "1900s"
+    assert_selector "section.explore-kinds[aria-labelledby=explore-kinds] h2#explore-kinds", text: "Record types"
+    assert_selector "section.explore-kinds .ccs-mosaic li.discover-cards__item article.result-card", count: 2
+    assert_selector "article.result-card h3.document-title-heading a[href*='f%5Bclassification_ssim%5D%5B%5D=paintings']", text: "Paintings"
+    assert_selector "article.result-card h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings']", text: "Prints and drawings"
+    assert_selector "section.explore-kinds a.explore__all[href='/browse/object-types']", text: "See all object types"
+    assert_selector "section.explore-places h2#explore-places", text: "Places"
+    assert_selector "section.explore-places article.result-card h3 a[href*='f%5Bproduction_place_ssim%5D%5B%5D=Australia']", text: "Australia"
+    assert_selector "section.explore-places a.explore__all[href='/browse/places']", text: "See all places"
+    assert_selector "section.explore-periods h2#explore-periods", text: "Time"
+    assert_selector "section.explore-periods article.result-card h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900']", text: "1900s"
     assert_selector "a.explore__all[href='/browse/periods']", text: "See all periods"
   end
 
@@ -88,7 +88,8 @@ class ExploreComponentTest < ViewComponent::TestCase
     render_inline NexusCcs::ExploreComponent.new(overview: empty_overview(overview.collections))
 
     assert_selector "li.explore__tile", count: 3
-    assert_no_selector "h3", text: "Record types"
-    assert_no_selector "h3", text: "Places"
+    assert_no_selector "h2", text: "Record types"
+    assert_no_selector "h2", text: "Places"
+    assert_no_selector ".result-card"
   end
 end

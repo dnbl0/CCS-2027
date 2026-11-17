@@ -1,4 +1,4 @@
-/* The home page's "Explore the collections" section (NexusCcs::ExploreComponent), on a grey band. A Fraunces H2 and a line, then:
+/* The home page's "Explore the collections" section (NexusCcs::ExploreComponent). A Fraunces H2 and a line, then:
    1. collection tiles, as the University's Listings component: a 16:10 face, the whole tile is the one link, its title an H3 inside the
       link, the exact count in the same link. The face is a tinted letter (the designed default: few records have a picture) or, where
       one was kept, the example picture shown whole and never cropped. Three per row from 768px, two from 600px, and a compact row
@@ -6,8 +6,6 @@
    2. "Kinds of records": a plain grouped list of arrow links (the University Library's collections page).
    3. "Place and time": two lists of arrow links in disclosures, closed on a phone and open from 768px (explore_disclosure_controller.js).
    Every link and summary is at least 44px tall. */
-.ccs-section.explore { background: var(--ccs-surface-subtle); }
-
 .explore__inner { display: flex; flex-direction: column; gap: var(--ccs-space-6); max-width: var(--layout-content-wide); }
 
 .explore__header { display: flex; flex-direction: column; gap: var(--ccs-space-3); max-width: var(--layout-reading); }
@@ -205,11 +203,13 @@
   .explore__tile-link:hover .explore__tile-body::after { translate: var(--ccs-space-1) 0; }
 }
 
-/* FILM COPY: Record types, Places and Time, each a row of four tiles with its See all link beside the heading; the picture fills its face */
-.explore__group--row { gap: var(--ccs-space-4); }
+/* Record types, Places and Time are their own sections (explore-kinds, explore-places, explore-periods): a heading with its See all link beside it,
+   then the site's result cards in the mosaic (ExploreCardComponent, components/film_polish.css). */
 .explore__row-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--ccs-space-2) var(--ccs-space-5); }
-.explore__tiles--row { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--ccs-space-4); }
-.explore__tiles--row .explore__image { object-fit: cover; }
-.explore__tiles--row .explore__tile-title { display: block; }
-@media (max-width: 1023px) { .explore__tiles--row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 599px) { .explore__tiles--row { grid-template-columns: 1fr; } }
+
+/* An Explore card is the result card: padding at the sides (a card with no picture is its title only), the title a link without an underline until hover (it has a class, so the page-wide "a with no class" underline rule does not reach it) */
+.explore-card .result-card__content { padding-inline: var(--ccs-space-4); }
+.explore-card .document-title-heading { padding-block: var(--ccs-space-4); }
+.explore-card .document-title-heading a { text-decoration: none; }
+.explore-card .document-title-heading a:hover,
+.explore-card:hover .document-title-heading a { text-decoration: underline; text-underline-position: from-font; }

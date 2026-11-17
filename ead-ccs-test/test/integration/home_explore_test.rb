@@ -31,9 +31,11 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
     assert_select "a.explore__tile-link[href*='f%5Bcollection_ssim%5D%5B%5D=University+Art+Collection'] h3", text: "University Art Collection"
     assert_select ".explore__tile-count", count: 0
     assert_select "a.explore__tile-link h3", count: 2
-    assert_select "a.explore__tile-link[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'] h4", text: "Prints and drawings"
-    assert_select "a.explore__tile-link[href*='f%5Bproduction_place_ssim%5D%5B%5D=Japan']"
-    assert_select "a.explore__tile-link[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999'] h4", text: "1900s"
+    assert_select "section.explore-kinds article.result-card h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints']", text: "Prints and drawings"
+    assert_select "section.explore-places article.result-card a[href*='f%5Bproduction_place_ssim%5D%5B%5D=Japan']"
+    assert_select "section.explore-periods article.result-card h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999']", text: "1900s"
+    assert_select "section.explore-kinds, section.explore-places, section.explore-periods", count: 3
+    assert_select ".home-collections, .collection-directory, #home-discover-heading", count: 0
   end
 
   test "the section has no picture unless one was kept for a tile, and the Indigenous Collections tile never has one" do
@@ -54,7 +56,7 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
 
     get "/"
 
-    assert_select "section.explore a[href*='any_assets=1']", count: 2 + 2 + 1 + 2
+    assert_select "section.explore a[href*='any_assets=1'], section.explore-kinds a[href*='any_assets=1'], section.explore-places a[href*='any_assets=1'], section.explore-periods a[href*='any_assets=1']", count: 2 + 2 + 1 + 2
   end
 
   test "the entry points come from the indexed records, with their real counts" do

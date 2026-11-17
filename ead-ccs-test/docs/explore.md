@@ -13,8 +13,8 @@ It adds no route and no URL scheme. Every link is an existing `/catalog` facet U
 | Group | Source | Shape |
 |---|---|---|
 | Browse by collection | `collection_ssim`, most records first. `[other]` and values under 100 records are hidden; at most 6 | A tile each: 16:10 face, the whole tile is one link, the title an `h3` inside the link, the exact count in the same link. 3 per row from 768px, 2 from 600px, a compact row (48px face beside the text) on a phone |
-| Kinds of records | `kinds` in `config/explore_kinds.yml`: a label and the `classification_ssim` values it stands for | A plain list of arrow links in two columns, no counts, and "See all object types" |
-| Place and time | The 5 most common `production_place_ssim` values (minus the repeated or enclosing ones in `places.skip`), and the periods in the same file | Two disclosures (`details`): closed on a phone, open from 768px (CSS shows the content at that width at once, the script sets `open`). Each ends with "See all places" / "See all periods" |
+| Record types (own section, `explore-kinds`) | `kinds` in `config/explore_kinds.yml`: a label and the `classification_ssim` values it stands for | A plain list of arrow links in two columns, no counts, and "See all object types" |
+| Places and Time (own sections, `explore-places`, `explore-periods`) | The 5 most common `production_place_ssim` values (minus the repeated or enclosing ones in `places.skip`), and the periods in the same file | Two disclosures (`details`): closed on a phone, open from 768px (CSS shows the content at that width at once, the script sets `open`). Each ends with "See all places" / "See all periods" |
 
 The layout follows the University's Listings component (16:10, the whole item is the link, `h3`) and its Library collections page (plain grouped
 link lists). Decisions and research: the record-and-Explore plan and addendum of 2026-11-11 (sections B, D, E WP1).
@@ -62,3 +62,11 @@ overview is empty and the home page leaves the section out (CI has no Solr). Ima
 - On a phone, with the disclosures closed, the section is about 1.5 screens (a system test checks it stays under 1.6).
 - The home page HTML stays under 70 kB (`PerformanceTest`, docs/performance.md); one more small controller is preloaded (57 allowed).
 - No motion except a 4px arrow nudge on hover, off for reduced motion.
+
+## Home page sections (2026-11-17)
+
+Record types, Places and Time are three separate sections after "Explore the collections", each with an `h2`, its "See all" link and the site's
+result cards in the mosaic (`NexusCcs::ExploreCardComponent`: the same `result-card` markup and styles as the results, Similar objects and Browse
+pages; the picture whole when the tile has one, otherwise the title alone). The home page's sections after the hero alternate white and light
+grey (`--ccs-surface-default`, `--ccs-surface-subtle`) by position (`pages/home.css`), so a section left out does not break the pattern.
+The collection tiles stay in the first Explore section.

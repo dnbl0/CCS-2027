@@ -30,7 +30,7 @@ module NexusCcs
     # Whether the tile has a picture to draw. The picture is a record's thumbnail, so only a record whose asset anyone may download and that
     # is not sensitive is ever given here (ExploreEntryPoints); this is the second lock, not the only one. The Indigenous Collections tile is
     # always text only (cultural review pending).
-    def image?(tile) = tile.image.present? && tile.image.path.to_s.start_with?("/") && !ExploreEntryPoints.text_only?(tile.label)
+    def image?(tile) = ExploreCardComponent.image?(tile)
 
     def image_path(tile) = AssetVersion.url(tile.image.path)
   end

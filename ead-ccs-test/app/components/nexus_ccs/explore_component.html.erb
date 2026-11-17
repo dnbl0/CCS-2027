@@ -6,7 +6,7 @@
     </header>
 
     <% if overview.collections.any? %>
-      <ul class="explore__tiles<%= " explore__tiles--all" if overview.collections.size > 6 %>" aria-label="<%= t("explore.collections.label") %>">
+      <ul id="browse-collections" class="explore__tiles<%= " explore__tiles--all" if overview.collections.size > 6 %>" aria-label="<%= t("explore.collections.label") %>">
         <% overview.collections.each do |tile| %>
           <li class="explore__tile explore__tile--tint-<%= tile.tint %>">
             <%= link_to helpers.search_action_path(tile.query), class: "explore__tile-link" do %>
@@ -24,34 +24,27 @@
         <% end %>
       </ul>
     <% end %>
+  </div>
+</section>
 
-    <%# FILM COPY: Record types, Places and Time, each its own section: a row of four tiles (the collection tiles' design) and a See all link %>
-    <% [ [ :kinds, overview.kind_tiles, t("explore.kinds.heading"), t("explore.kinds.see_all"), "object-types" ],
-         [ :places, overview.place_tiles, t("explore.place_time.places"), t("explore.place_time.see_all_places"), "places" ],
-         [ :periods, overview.period_tiles, t("explore.place_time.periods"), t("explore.place_time.see_all_periods"), "periods" ] ].each do |key, tiles, heading, see_all, slug| %>
-      <% next if tiles.empty? %>
-      <div class="explore__group explore__group--row" aria-labelledby="explore-<%= key %>">
-        <div class="explore__row-head">
-          <h3 id="explore-<%= key %>" class="explore__heading"><%= heading %></h3>
-          <%= link_to see_all, helpers.browse_hub_path(slug), class: "arrow-link arrow-link--icon explore__all" %>
-        </div>
-        <ul class="explore__tiles explore__tiles--row" aria-labelledby="explore-<%= key %>">
+<%# Record types, Places and Time: each its own section (the page's sections alternate white and grey), its tiles the site's result cards in the mosaic %>
+<% [ [ :kinds, overview.kind_tiles, t("explore.kinds.heading"), t("explore.kinds.see_all"), "object-types" ],
+     [ :places, overview.place_tiles, t("explore.place_time.places"), t("explore.place_time.see_all_places"), "places" ],
+     [ :periods, overview.period_tiles, t("explore.place_time.periods"), t("explore.place_time.see_all_periods"), "periods" ] ].each do |key, tiles, heading, see_all, slug| %>
+  <% next if tiles.empty? %>
+  <section class="ccs-section explore-<%= key %>" aria-labelledby="explore-<%= key %>">
+    <div class="ccs-section__inner explore__inner">
+      <header class="explore__row-head">
+        <h2 id="explore-<%= key %>" class="ccs-section__heading"><%= heading %></h2>
+        <%= link_to see_all, helpers.browse_hub_path(slug), class: "arrow-link arrow-link--icon explore__all" %>
+      </header>
+      <div class="ccs-mosaic ccs-mosaic--4">
+        <ul class="discover-cards">
           <% tiles.each do |tile| %>
-            <li class="explore__tile explore__tile--tint-<%= tile.tint %>">
-              <%= link_to helpers.search_action_path(tile.query), class: "explore__tile-link" do %>
-                <% if image?(tile) %>
-                  <span class="explore__face explore__face--image"><%= image_tag image_path(tile), alt: "", width: tile.image.width, height: tile.image.height, loading: "lazy", decoding: "async", class: "explore__image" %></span>
-                <% else %>
-                  <span class="explore__face" aria-hidden="true"><span class="explore__monogram"><%= monogram(tile) %></span></span>
-                <% end %>
-                <span class="explore__tile-body">
-                  <h4 class="explore__tile-title"><%= tile.label %></h4>
-                </span>
-              <% end %>
-            </li>
+            <li class="discover-cards__item"><%= render NexusCcs::ExploreCardComponent.new(tile: tile) %></li>
           <% end %>
         </ul>
       </div>
-    <% end %>
-  </div>
-</section>
+    </div>
+  </section>
+<% end %>

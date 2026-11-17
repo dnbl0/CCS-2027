@@ -36,14 +36,14 @@ class PerformanceMarkupSystemTest < ApplicationSystemTestCase
     assert_operator layout_shift, :<=, 0.1, "Cumulative Layout Shift budget is 0.1"
   end
 
-  test "the home page's banner is high priority and the collection cards below it are lazy and sized" do
+  test "the home page's banner is high priority and any pictures on the cards below it are lazy and sized" do
     visit "/"
 
     assert_selector ".ccs-hero__image"
     assert_equal "high", attribute(".ccs-hero__image", "fetchpriority")
     assert_nil attribute(".ccs-hero__image", "loading")
-    cards = page.evaluate_script("Array.from(document.querySelectorAll('.home-card__image')).map(function (i) { return [i.loading, i.getAttribute('width') > 0, i.getAttribute('height') > 0] })")
-    assert_operator cards.size, :>=, 5
+    # few cards have a picture (only records anyone may download), so there may be none: those that are there are lazy and sized
+    cards = page.evaluate_script("Array.from(document.querySelectorAll('.explore__image, .explore-card img')).map(function (i) { return [i.loading, i.getAttribute('width') > 0, i.getAttribute('height') > 0] })")
     assert cards.all? { |loading, width, height| loading == "lazy" && width && height }, cards.inspect
     assert_operator layout_shift, :<=, 0.1
   end

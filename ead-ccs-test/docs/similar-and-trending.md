@@ -1,5 +1,7 @@
 # Similar records, Featured, Pick of the day and Trending
 
+**Update 2026-11-17:** the home page no longer has a Featured and trending section (removed at the user's request). `/discover` and the record page's sections are unchanged; `/discover/frame` is still served but nothing on the home page loads it.
+
 Four ways into the collections that do not need a search. They sit on the record page (Similar records), the home page and
 `/discover` (Featured, Pick of the day, Trending).
 

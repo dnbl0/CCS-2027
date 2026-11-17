@@ -51,6 +51,8 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `PDF_MEDIA_DIR` | `public/digital-assets/media` | `Collections::DigitalMedia.pdf_dir` | Where the PDF files are on the machine that indexes |
 | `PDF_TEXT_MAX_MB` | `50` | `Collections::PdfText` | A larger PDF is skipped |
 | `PDF_TEXT_TIMEOUT` | `30` | `Collections::PdfText` | Seconds a PDF may take to read |
+| `FILM_ALL_COLLECTIONS` | unset | `ExploreEntryPoints`, `CatalogConfig::Facets`, `config/initializers/film_all_collections.rb` | Showcase film mode: lists every collection as a tile and in the Collection facet. For the private showcase copy only |
+| `HARVESTED_CSV` | `data/harvested.csv` | `rake collections:index_harvested` | The CSV of harvested records that task indexes |
 | `PDF_TEXT_MAX_CHARS` | `1000000` | `Collections::PdfText` | Text kept per PDF |
 | `SEO_SITEMAP_CACHE_HOURS` | `12` | `BotControls.sitemap_cache_hours` | How long the list of record ids for the sitemap is kept |
 | `TRENDING_ENABLED` | `on` | `RecordView.enabled?` | `off` stops counting record views and hides the Trending section (Featured and Pick of the day stay). See [similar-and-trending.md](../ead-ccs-test/docs/similar-and-trending.md) |

@@ -8,18 +8,9 @@ class LandingTest < ActionDispatch::IntegrationTest
     assert_select "body.page-home h1", "Collections Navigator"
     assert_select ".ccs-hero__search search form"
     assert_select ".ccs-hero__search a.advanced_search[href=?]", "/catalog/advanced"
-    assert_select ".home-card__title a", count: 6
+    assert_select ".home-collections, .collection-directory, .home-discover", count: 0
     assert_select ".home-about__statement", count: 1
-    assert_select ".home-card__text a[href=?]", "https://museumsandcollections.unimelb.edu.au/collections"
     assert_select ".ccs-section--help, .ccs-section--faq", count: 0
-  end
-
-  test "the Collections Navigator card searches all five collections" do
-    get "/"
-
-    assert_select ".home-card__text", /search all five collections/
-    assert_select "a.home-textbutton[href=?]", "/catalog?search_field=all_fields", text: /University museums and collections/
-    assert_select ".home-card__title a[href=?]", "/catalog?search_field=all_fields", text: "Collections Navigator"
   end
 
   test "a bare search page goes to the home page with the hero search" do

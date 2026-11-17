@@ -2,7 +2,7 @@
 
 # Every University cultural collection (config/university_collections.yml: the list on museumsandcollections.unimelb.edu.au/collections),
 # split into the ones that can be searched here and the ones that are not yet, which link to their own site. The home page's
-# "All University collections" lists both (NexusCcs::CollectionDirectoryComponent).
+# "All University collections" lists both.
 #
 # A collection is searchable here when it has a landing page (config/pages.yml) OR the index holds records whose collection_ssim is its
 # name (or its `facet_value` in the YAML, when the index spells it differently). So when a collection's records are loaded, it moves to
