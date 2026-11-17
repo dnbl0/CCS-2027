@@ -83,6 +83,11 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_selector ".digital-assets__unplayable a[href^='/access_requests/new']", text: "Ask the collection team for a copy of Film"
   end
 
+  test "the unplayable link takes the media band's light text, as specific as the site's ID-scoped link rule" do
+    css = Rails.root.join("app/assets/stylesheets/components/media_viewer.css").read
+    assert_match(/:is\(main, #main-container\) \.digital-assets__unplayable a \{[^}]*color: inherit;/, css)
+  end
+
   test "a file whose only title is its file name is called 'this video' in the links" do
     render_for(assets(3).merge("digital_media_ssim" => [ "video|video/x-ms-wmv|/v.wmv|item395-processed.wmv" ]))
 
