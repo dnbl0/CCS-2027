@@ -15,6 +15,10 @@ Rails.application.configure do
     policy.script_src  :self
     policy.style_src   :self, :unsafe_inline # Blacklight sets some inline styles
     policy.connect_src :self
+    # Audio and video play from this site, from the Nexus DAM's embed links (digital_media_ssim, written by the DAM sync) and from
+    # CCS_MEDIA_BASE_URL when that is on another host. Images already come from any https host (img-src), DAM images included.
+    media_base = ENV["CCS_MEDIA_BASE_URL"].to_s[%r{\Ahttps://[^/]+}]
+    policy.media_src :self, "https://unimelbourne.widen.net", *media_base
   end
 
   # Nonces for the importmap and inline scripts

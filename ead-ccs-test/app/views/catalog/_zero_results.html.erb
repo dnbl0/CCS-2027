@@ -4,6 +4,11 @@
 <% filters = search_state.to_hash %>
 <% hidden = @response.respond_to?(:unfiltered_total) ? @response.unfiltered_total.to_i : 0 %>
 <% cleared = search_action_url(ZeroResults.without_filters(filters)) %>
+<%# Each filter taken off on its own, where that finds something (counted by SearchService), most first; only when there are several
+    (one filter is the link above). Then related categories (ZeroResults). %>
+<% all_removals = Array(@response.try(:filter_removals)) %>
+<% removals = all_removals.size > 1 ? all_removals.select { |removal| removal.total.to_i.positive? }.sort_by { |removal| -removal.total } : [] %>
+<% related = Array(@response.try(:related_categories)) %>
 <div id="documents" class="noresults results-empty">
   <% if hidden.positive? %>
     <h3 class="results-empty__title"><%= t("blacklight.search.zero_results.filtered_title") %></h3>
@@ -16,5 +21,25 @@
     <h3 class="results-empty__title"><%= t("blacklight.search.zero_results.title") %></h3>
     <p class="results-empty__text"><%= t("blacklight.search.zero_results.hint") %></p>
     <%= link_to t("blacklight.search.zero_results.new_search"), root_path, class: "results-empty__button results-empty__new-search" %>
+  <% end %>
+  <% if removals.any? || related.any? %>
+    <div class="results-empty__help">
+      <% if removals.any? %>
+        <h4 id="zero-remove-heading"><%= t("nexus_ccs.zero_results.remove_heading") %></h4>
+        <ul class="results-empty__list results-empty__removals" aria-labelledby="zero-remove-heading">
+          <% removals.each do |removal| %>
+            <li><%= link_to t("nexus_ccs.zero_results.remove", filter: removal.label, count: removal.total, number: number_with_delimiter(removal.total)), search_action_path(removal.params) %></li>
+          <% end %>
+        </ul>
+      <% end %>
+      <% if related.any? %>
+        <h4 id="zero-related-heading"><%= t("nexus_ccs.zero_results.related_heading") %></h4>
+        <ul class="results-empty__list results-empty__related" aria-labelledby="zero-related-heading">
+          <% related.each do |category| %>
+            <li><%= link_to search_action_path(category.query) do %><%= category.value %><span class="results-empty__kind"> (<%= category.kind %>)</span><% end %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
   <% end %>
 </div>

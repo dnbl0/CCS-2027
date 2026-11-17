@@ -39,6 +39,9 @@ class PageMeta
   def og_type = @type == :record ? "article" : "website"
   def twitter_card = og_image ? "summary_large_image" : "summary"
 
+  # The shared image's text alternative: the record's title (a share card is read aloud by screen readers on the sites it lands on)
+  def og_image_alt = (StructuredData::Description.title(@document) if og_image)
+
   private
 
   def type_of(controller, action)

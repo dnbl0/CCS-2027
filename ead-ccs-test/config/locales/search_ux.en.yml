@@ -1,0 +1,21 @@
+# Wording for the results-page aids: the one-tap filters above the results (QuickFiltersComponent), the suggestions as you type
+# (CategorisedSuggestions) and the extra help on an empty results page (ZeroResults).
+en:
+  nexus_ccs:
+    quick_filters:
+      heading: "Narrow these results"
+      results:
+        one: "result"
+        other: "results"
+    suggestions:
+      kinds:
+        creator: "Creator"
+        collection: "Collection"
+        object_type: "Object type"
+        title: "Title"
+    zero_results:
+      remove_heading: "Or take off one filter"
+      remove:
+        one: "Without %{filter}: 1 result"
+        other: "Without %{filter}: %{number} results"
+      related_heading: "Related categories"

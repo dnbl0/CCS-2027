@@ -20,6 +20,9 @@ class SeoHeadTest < ActionDispatch::IntegrationTest
     "viewonly" => record("viewonly", "licence_type_ssim" => [ "Copyright - Current" ]),
     "request" => record("request", "licence_type_ssim" => [ "ICIP Rights" ]),
     "sensitive" => record("sensitive", "restrictions_tsi" => [ "Not for publishing. Culturally sensitive images." ]),
+    "dam" => record("dam", "thumbnail_path_ssi" => "https://unimelbourne.widen.net/content/t1/jpeg/dam.jpg?w=800",
+                    "digital_asset_paths_ssim" => [ "https://unimelbourne.widen.net/content/t1/jpeg/dam.jpg?w=800" ],
+                    "digital_asset_large_paths_ssim" => [ "https://unimelbourne.widen.net/content/t1/jpeg/dam.jpg?w=2000" ]),
     "evil" => record("evil", "title_tsim" => [ "\"><script>alert(1)</script>" ], "description_tsim" => [ "</script><script>alert(2)</script>" ])
   }.freeze
 
@@ -94,12 +97,23 @@ class SeoHeadTest < ActionDispatch::IntegrationTest
     assert_no_match(/digital-assets\/large/, css_select("head").to_s)
   end
 
+  test "a record whose image is in the DAM shares the DAM's address, with the record's title as the image's text" do
+    with_env(@env) { get "/catalog/dam" }
+
+    assert_equal "https://unimelbourne.widen.net/content/t1/jpeg/dam.jpg?w=800", meta("og:image")
+    assert_equal "https://unimelbourne.widen.net/content/t1/jpeg/dam.jpg?w=800", meta("twitter:image")
+    assert_equal "Record dam", meta("og:image:alt")
+    assert_equal "Record dam", meta("twitter:image:alt")
+    assert_equal "summary_large_image", meta("twitter:card")
+  end
+
   test "a view-only record is indexed but has no image in any tag" do
     with_env(@env) { get "/catalog/viewonly" }
 
     assert_equal "noai, noimageai", robots_meta
     assert_nil meta("og:image")
     assert_nil meta("twitter:image")
+    assert_nil meta("og:image:alt")
     assert_nil json_ld.sole["image"]
     assert_equal "summary", meta("twitter:card")
   end

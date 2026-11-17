@@ -24,14 +24,17 @@ module DiscoveryRecords
 
   def sensitive_record(id, **extra) = open_record(id, restrictions_tsi: "Culturally sensitive images. Only select images to be published online", **extra)
 
-  # records: every record the index "holds"; similar: ids MLT finds for any record, with the score each has
-  def discovery_solr(records:, similar: {})
+  # records: every record the index "holds"; similar: ids MLT finds for any record, with the score each has; row: ids a labelled
+  # row (SimilarRows) finds, for any row
+  def discovery_solr(records:, similar: {}, row: [])
     by_id = records.index_by { |record| record["id"] }
     lambda do |params|
       params = params.to_h.with_indifferent_access
       if params[:ids]
         docs = params[:ids].split(",").filter_map { |id| by_id[id] }
         canned_response(docs)
+      elsif params[:similar_row]
+        canned_response(row.filter_map { |id| by_id[id] })
       elsif params[:sim_mlt]
         docs = similar.filter_map { |id, score| by_id[id]&.merge("score" => score) }
         canned_response(docs)
