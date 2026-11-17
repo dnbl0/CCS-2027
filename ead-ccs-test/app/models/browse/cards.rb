@@ -21,6 +21,8 @@ module Browse
     # Object Type values (equipment, photographic medium, instruments) belong to records whose assets are withheld, so they have no
     # picture to show; the "See all" list still lists every Object Type.
     CARD_FIELDS = { "object-types" => ExploreEntryPoints::CLASSIFICATION_FIELD }.freeze
+    # Values that are not offered as a card (the Indigenous subjects wait for cultural review, as the Indigenous Collections tile does)
+    SKIPPED = { "subjects" => [ "Aboriginal and Torres Strait Islander art", "By Indigenous People", "About Indigenous People" ] }.freeze
     Card = Data.define(:label, :count, :query, :image, :intro)
 
     def self.for(hub)
@@ -72,7 +74,7 @@ module Browse
       else
         response = Discovery.search(q: "*:*", rows: 0, facet: true, fq: THUMBNAIL_FILTERS, "facet.field": field(hub), "facet.limit": CANDIDATES * 2, "facet.mincount": 1, "facet.sort": "count")
         pairs = response.dig("facet_counts", "facet_fields", field(hub)).to_a.each_slice(2).to_a
-        pairs.reject { |value, _count| Browse.noise?(value) }.first(CANDIDATES).map { |value, count| { "label" => value, "count" => count.to_i } }
+        pairs.reject { |value, _count| Browse.noise?(value) || SKIPPED.fetch(hub.slug, []).include?(value) }.first(CANDIDATES).map { |value, count| { "label" => value, "count" => count.to_i } }
       end
     end
 
@@ -119,12 +121,12 @@ module Browse
     def self.top(pairs, limit) = pairs.to_a.each_slice(2).map(&:first).reject { |value| Browse.noise?(value) || value == "[other]" }.first(limit)
 
     def self.cached(hub)
-      key = "browse_cards/v2/#{hub.slug}"
+      key = "browse_cards/v3/#{hub.slug}"
       Rails.cache.fetch(SuppressedRecord.cache_key(key), expires_in: 1.day, skip_nil: true) do
         fetched = yield
-        Rails.cache.write(SuppressedRecord.cache_key("browse_cards/last_good/v2/#{hub.slug}"), fetched, expires_in: 30.days) if fetched
+        Rails.cache.write(SuppressedRecord.cache_key("browse_cards/last_good/v3/#{hub.slug}"), fetched, expires_in: 30.days) if fetched
         fetched
-      end || Rails.cache.read(SuppressedRecord.cache_key("browse_cards/last_good/v2/#{hub.slug}"))
+      end || Rails.cache.read(SuppressedRecord.cache_key("browse_cards/last_good/v3/#{hub.slug}"))
     end
 
     private_class_method :build, :field, :candidates, :group_filter, :example_image, :describe, :top, :cached

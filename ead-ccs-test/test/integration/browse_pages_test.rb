@@ -16,7 +16,7 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
   def seed(slug, values) = Rails.cache.write("browse_hubs/v1/#{slug}", values, expires_in: 1.day)
 
   # The cards of a hub as Browse::Cards keeps them (label, count, a picture, the description; a period has its years)
-  def seed_cards(slug, entries) = Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v2/#{slug}"), entries, expires_in: 1.day)
+  def seed_cards(slug, entries) = Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/#{slug}"), entries, expires_in: 1.day)
 
   def entry(label, **extra) = { "label" => label, "count" => 5, "intro" => "Includes prints. Held in University Art Collection.", "image" => nil }.merge(extra.transform_keys(&:to_s))
 
