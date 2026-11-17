@@ -21,56 +21,60 @@ class DamClientTest < ActiveSupport::TestCase
                     logger: Logger.new(IO::NULL))
   end
 
-  def page(items, total:, scroll: "s1") = [ 200, { "items" => items, "total_count" => total, "scroll_id" => scroll }.to_json ]
+  def page(ids, total:) = [ 200, { "items" => ids.map { |id| { "id" => id } }, "total_count" => total }.to_json ]
+  def params(request) = URI.decode_www_form(request.first.query).to_h
 
-  test "a search is read with a scroll, 100 a page, expanding only what the sync uses, with the token in the header" do
-    transport = Transport.new(page([ { "id" => "a" } ], total: 2), page([ { "id" => "b" } ], total: 2), page([], total: 2))
+  test "a search is read in offset pages of 100, sorted, expanding only what the sync uses, with the token in the header" do
+    first = (1..100).map { |n| "a#{n}" }
+    transport = Transport.new(page(first, total: 150), page((101..150).map { |n| "a#{n}" }, total: 150))
     ids = []
-    seen = client(transport).each_page(query: "lastEditDate:[x to y]") { |items, _seen, _total| ids.concat(items.map { |i| i["id"] }) }
+    read = client(transport).each_page(query: "lastEditDate:[x to y]") { |items, _seen, _total| ids.concat(items.map { |i| i["id"] }) }
 
-    assert_equal %w[a b], ids
-    assert_equal 2, seen
-    first, headers = transport.requests.first
-    assert_equal "/v2/assets/search", first.path
-    params = URI.decode_www_form(first.query).to_h
-    assert_equal({ "scroll" => "true", "limit" => "100", "query" => "lastEditDate:[x to y]", "expand" => "metadata,file_properties,embeds" }, params)
-    assert_equal "Bearer t0k3n", headers["Authorization"]
-    assert_equal "/v2/assets/search/scroll", transport.requests.second.first.path
-    assert_equal "s1", URI.decode_www_form(transport.requests.second.first.query).to_h["scroll_id"]
+    assert_equal 150, read
+    assert_equal 150, ids.uniq.size
+    assert_equal({ "query" => "lastEditDate:[x to y]", "offset" => "0", "limit" => "100", "sort" => "created_date", "expand" => "metadata,file_properties,embeds" },
+                 params(transport.requests.first))
+    assert_equal "100", params(transport.requests.second)["offset"]
+    assert_equal "/v2/assets/search", transport.requests.second.first.path
+    assert_equal "Bearer t0k3n", transport.requests.first.last["Authorization"]
   end
 
-  test "rate limiting, server errors and dropped connections are retried with a growing wait" do
-    transport = Transport.new([ 429, "" ], [ 503, "" ], Net::ReadTimeout.new, page([ { "id" => "a" } ], total: 1), page([], total: 1))
+  test "rate limiting, server errors and dropped connections are retried with a growing wait, asking for the same page again" do
+    transport = Transport.new([ 429, "" ], [ 500, "" ], Net::ReadTimeout.new, page(%w[a], total: 1))
     waits = []
-    client(transport, waits).each_page { |_items, _seen, _total| nil }
+    client(transport, waits).each_page(query: "q") { nil }
 
     assert_equal [ 2, 4, 8 ], waits
+    assert_equal [ "0" ], transport.requests.map { |request| params(request)["offset"] }.uniq
   end
 
   test "it gives up after six attempts" do
     transport = Transport.new(*Array.new(6) { [ 500, "" ] })
-    error = assert_raises(Dam::Error) { client(transport).each_page { nil } }
+    error = assert_raises(Dam::Error) { client(transport).each_page(query: "q") { nil } }
     assert_match "6 attempts", error.message
   end
 
   test "an error that is not worth retrying stops at once, without the token in the message" do
-    error = assert_raises(Dam::Error) { client(Transport.new([ 401, "" ])).each_page { nil } }
+    error = assert_raises(Dam::Error) { client(Transport.new([ 401, "" ])).each_page(query: "q") { nil } }
     assert_match "HTTP 401", error.message
     assert_no_match "t0k3n", error.message
   end
 
-  test "a scroll that expires part way, or ends short of the count, is an error" do
-    expired = Transport.new(page([ { "id" => "a" } ], total: 2), [ 404, "" ])
-    assert_raises(Dam::Error) { client(expired).each_page { nil } }
-
-    short = Transport.new(page([ { "id" => "a" } ], total: 10), page([], total: 10))
-    assert_raises(Dam::Error) { client(short).each_page { nil } }
+  test "fewer distinct assets than counted is a short read, to be read again" do
+    shifted = Transport.new(page((1..100).map { |n| "a#{n}" }, total: 200), page((100..199).map { |n| "a#{n}" }, total: 200))
+    assert_raises(Dam::Client::ShortRead) { client(shifted).each_page(query: "q") { nil } }
   end
 
-  test "the DAM's usual small gap between its count and what it returns is logged, not an error" do
-    items = Array.new(100) { |i| { "id" => "a#{i}" } }
-    transport = Transport.new(page(items, total: 10_000), *Array.new(98) { page(items, total: 10_000) }, page([], total: 10_000))
-    assert_equal 9_900, client(transport).each_page { nil }
+  test "a search bigger than offset paging allows must be split" do
+    error = assert_raises(Dam::Error) { client(Transport.new(page(%w[a], total: 10_001))).each_page(query: "q") { nil } }
+    assert_match "split", error.message
+  end
+
+  test "count asks for one asset and reads the total" do
+    transport = Transport.new(page(%w[a], total: 61_924))
+    assert_equal 61_924, client(transport).count("q")
+    assert_equal "1", params(transport.requests.first)["limit"]
+    assert_nil params(transport.requests.first)["expand"]
   end
 
   test "a query the DAM cannot read is an error" do

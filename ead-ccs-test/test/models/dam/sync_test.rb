@@ -47,6 +47,7 @@ class DamSyncTest < ActiveSupport::TestCase
 
   test "a failure marks the run failed, so the next run resumes it" do
     failing = Object.new
+    def failing.count(_query) = 0
     def failing.each_page(**) = raise(Dam::Error, "the DAM was still failing")
     assert_raises(Dam::Error) { sync(failing).full }
 
@@ -80,6 +81,33 @@ class DamSyncTest < ActiveSupport::TestCase
     assert_equal NOW, DamAsset.find_by!(dam_id: "a10").deleted_at
     assert_equal 9, DamAsset.live.count
     assert_equal [ [ "N.9" ] ], writer.written
+  end
+
+  test "a range with more assets than offset paging can read is halved until each part fits, in time order" do
+    month = Dam::Client.edited_between(Time.utc(2026, 10, 1), Time.utc(2026, 11, 1))
+    counts = ->(query) { query == month ? Dam::Sync::MAX_RANGE + 1 : 0 }
+    client = DamFakes::Client.new({ any: [] }, counts: counts)
+    sync(client, now: Time.utc(2026, 11, 1)).full
+
+    halves = [ [ Time.utc(2026, 10, 1), Time.utc(2026, 10, 16, 12) ], [ Time.utc(2026, 10, 16, 12), Time.utc(2026, 11, 1) ] ]
+    assert_equal halves.map { |from, to| Dam::Client.edited_between(from, to) }, client.queries.last(2)
+    assert_not_includes client.queries, month
+  end
+
+  test "a range that comes back short (an asset edited while it was read) is read again" do
+    attempts = 0
+    client = DamFakes::Client.new(any: [ dam_item("a1") ])
+    client.define_singleton_method(:each_page) do |query:, expand: true, &block|
+      attempts += 1
+      raise Dam::Client::ShortRead, "short" if attempts == 1
+
+      super(query: query, expand: expand, &block)
+    end
+    DamSyncRun.create!(kind: "full", status: "finished", started_at: NOW - 1.hour)
+    sync(client).incremental
+
+    assert_equal 2, attempts
+    assert_equal 1, DamAsset.count
   end
 
   test "a reconcile that lists far fewer assets than are live marks nothing deleted" do

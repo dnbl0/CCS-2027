@@ -18,15 +18,23 @@ module DamFakes
     }
   end
 
-  # A Dam::Client whose searches are answered from a Hash { query => [items] } (nil: every asset)
+  # A Dam::Client whose searches are answered from a Hash { query => [items] } (:any for every other query), or a callable
+  # ->(query) { items }. counts: ->(query) { Integer }, to make a range look bigger than it is. queries: what each_page read.
   class Client
     attr_reader :queries
 
-    def initialize(results) = (@results = results) && (@queries = [])
+    def initialize(results = nil, counts: nil, **by_query)
+      @results = results || by_query
+      @counts = counts
+      @queries = []
+    end
 
-    def each_page(query: nil, expand: true)
+    def items_for(query) = @results.respond_to?(:call) ? @results.call(query) : @results.fetch(query, @results.fetch(:any, []))
+    def count(query) = @counts&.call(query) || items_for(query).size
+
+    def each_page(query:, expand: true)
       @queries << query
-      items = @results.respond_to?(:call) ? @results.call(query) : @results.fetch(query, @results.fetch(:any, []))
+      items = items_for(query)
       items.each_slice(100).inject(0) do |seen, page|
         yield page, seen + page.size, items.size
         seen + page.size

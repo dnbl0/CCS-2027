@@ -6,9 +6,14 @@ a Solr core of its own. Images are linked from the DAM, not copied.
 
 ## What it does
 
-- **Full** (`bin/rails dam:sync FULL=1`): reads every asset. It works through the DAM a month at a time by last edit date, and
-  saves the end of each finished month, so a run that stopped resumes there (`FRESH=1` starts again). About 70 minutes for
-  175,000 assets.
+- **Full** (`bin/rails dam:sync FULL=1`): reads every asset. It works through the DAM a month at a time by last edit date
+  (a month with more than 5,000 assets is halved until each part has 5,000 or fewer), and saves the end of each finished part,
+  so a run that stopped resumes there (`FRESH=1` starts again). About 70 minutes for 175,000 assets.
+- **Why offset pages, not the DAM's scroll**: the DAM sometimes answers a scroll request with HTTP 500 *after* moving the
+  scroll on, so a retry silently skips 100 assets (found on 2026-11-17: every retry lost exactly one page). An offset page
+  ("assets 300 to 400, sorted by creation date") is the same however often it is asked for. Offset paging stops at 10,000,
+  hence the halving. A part that returns fewer distinct assets than the DAM counted (an asset edited while it was read) is
+  read again. The dev team's ingest (`api/src/ccs_api/acquia.py`) scrolls and retries, so it can lose pages the same way.
 - **Incremental** (`DamSyncJob`, every 10 minutes): reads only the assets edited since the last run started, with 10 minutes
   of overlap. `bin/rails dam:sync` does the same by hand.
 - **Reconcile** (`DamSyncJob`, Sundays 3 am Melbourne time): lists every asset id the DAM still has and marks the rest deleted.

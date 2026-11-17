@@ -4,17 +4,23 @@ module Dam
   # Keeps dam_assets (DamAsset) up to date with the Nexus DAM, then has Dam::SolrWriter rewrite the index fields of the records
   # whose assets changed.
   #
-  #   full         every asset, read in date windows by last edit date (from before DAM_SYNC_EPOCH to the run's start); the
-  #                end of each finished window is saved, so a run that stopped resumes from it (rake dam:sync FULL=1)
+  #   full         every asset (rake dam:sync FULL=1)
   #   incremental  the assets edited since the last finished run started, with a little overlap (DamSyncJob, every 10 minutes)
   #   reconcile    every asset id the DAM still has; a row the DAM no longer has is marked deleted (DamSyncJob, weekly)
+  #
+  # The DAM is read by last edit date: everything before DAM_SYNC_EPOCH, then a month at a time, and a range with more than
+  # MAX_RANGE assets is halved until each part can be paged by offset (Dam::Client explains why not the scroll). A full run
+  # saves the end of each range it finishes, so a run that stopped resumes there. A range that comes back short (an asset
+  # edited while it was read) is read again.
   class Sync
-    # Before this, assets are read in one window; after it, a month at a time
     EPOCH = Time.utc(2010, 1, 1)
+    # Well under Client::OFFSET_LIMIT, so a range that grows while it is read can still be paged
+    MAX_RANGE = 5_000
     # An incremental run reads from a little before the last run started, so an edit saved while that run was reading is not missed
     OVERLAP = 10.minutes
     # A reconcile that sees fewer ids than this share of the live rows marks nothing deleted: something is wrong with the read
     RECONCILE_FLOOR = 0.9
+    READ_ATTEMPTS = 3
     PROGRESS_EVERY = 1_000
 
     def self.epoch = ENV["DAM_SYNC_EPOCH"].present? ? Time.iso8601(ENV["DAM_SYNC_EPOCH"]) : EPOCH
@@ -31,9 +37,11 @@ module Dam
       run = (DamSyncRun.unfinished_full if resume) || DamSyncRun.create!(kind: "full", started_at: @now.call)
       run.update!(status: "running", error: nil, finished_at: nil)
       log("full sync #{run.checkpoint ? "resumed from #{run.checkpoint.iso8601}" : 'started'} (run #{run.id})")
-      windows(run.checkpoint, run.started_at).each do |from, to|
-        read(Client.edited_between(from, to), run)
-        run.update!(checkpoint: to)
+      months(run.checkpoint, run.started_at).each do |from, to|
+        each_range(from, to) do |range_from, range_to|
+          upsert_range(range_from, range_to, run)
+          run.update!(checkpoint: range_to)
+        end
       end
       # A resumed run does not know which records the stopped one touched, so every record with an asset is looked at;
       # the writer only sends the records whose fields changed
@@ -48,7 +56,8 @@ module Dam
       raise Error, "no finished DAM sync yet: run a full one first (rake dam:sync FULL=1)" unless since
 
       run = DamSyncRun.create!(kind: "incremental", started_at: @now.call, updated_since: since - OVERLAP)
-      touched = read(Client.edited_between(run.updated_since, run.started_at), run)
+      touched = Set.new
+      each_range(run.updated_since, run.started_at) { |from, to| touched.merge(upsert_range(from, to, run)) }
       finish(run, touched)
     rescue StandardError => e
       run&.fail!(e)
@@ -58,9 +67,10 @@ module Dam
     def reconcile
       run = DamSyncRun.create!(kind: "reconcile", started_at: @now.call)
       ids = Set.new
-      @client.each_page(expand: false) do |items, seen, total|
-        ids.merge(items.map { |item| item["id"] })
-        progress(run, seen, total)
+      months(nil, run.started_at).each do |month_from, month_to|
+        each_range(month_from, month_to) do |from, to|
+          ids.merge(read_range(from, to, run, expand: false).flat_map { |items| items.map { |item| item["id"] } })
+        end
       end
       live = DamAsset.live.count
       raise Error, "the DAM listed #{ids.size} assets for #{live} live rows; nothing marked deleted" if ids.size < live * RECONCILE_FLOOR
@@ -78,28 +88,58 @@ module Dam
 
     private
 
-    # [from, to] windows: everything up to the epoch, then a month at a time to the run's start
-    def windows(checkpoint, until_time)
-      epoch = self.class.epoch
-      edges = [ Time.utc(1970, 1, 1), epoch ]
+    # [from, to] month ranges: everything up to the epoch, then a month at a time to the run's start; those ending at or
+    # before the checkpoint are done
+    def months(checkpoint, until_time)
+      edges = [ Time.utc(1970, 1, 1), self.class.epoch ]
       edges << edges.last.next_month while edges.last.next_month < until_time
       edges << until_time
       pairs = edges.each_cons(2).to_a
-      checkpoint ? pairs.reject { |_from, to| to <= checkpoint } : pairs
+      return pairs unless checkpoint
+
+      pairs.reject { |_from, to| to <= checkpoint }.map { |from, to| [ [ from, checkpoint ].max, to ] }
     end
 
-    # Reads one search into dam_assets; returns the accession numbers whose assets changed (before and after the change, so an
+    # Yields [from, to] parts of a range, in time order, each matching at most MAX_RANGE assets
+    def each_range(from, to, &block)
+      if (to - from) > 1 && @client.count(Client.edited_between(from, to)) > MAX_RANGE
+        middle = from + ((to - from) / 2).floor
+        each_range(from, middle, &block)
+        each_range(middle, to, &block)
+      else
+        yield from, to
+      end
+    end
+
+    # The pages of one range, read again when it comes back short
+    def read_range(from, to, run, expand: true)
+      query = Client.edited_between(from, to)
+      attempts = 0
+      begin
+        attempts += 1
+        pages = []
+        @client.each_page(query: query, expand: expand) do |items, seen, total|
+          pages << items
+          progress(run, items.size, seen, total)
+        end
+        pages
+      rescue Client::ShortRead => e
+        raise if attempts >= READ_ATTEMPTS
+
+        log("#{e.message}; reading it again")
+        retry
+      end
+    end
+
+    # Reads one range into dam_assets; returns the accession numbers whose assets changed (before and after the change, so an
     # asset moved from one record to another rewrites both)
-    def read(query, run)
+    def upsert_range(from, to, run)
       touched = Set.new
-      @client.each_page(query: query) do |items, seen, total|
+      read_range(from, to, run).each do |items|
         rows = items.map { |item| DamAsset.attributes_from_api(item) }
-        ids = rows.map { |row| row[:dam_id] }
-        touched.merge(DamAsset.where(dam_id: ids).pluck(:accession_number))
+        touched.merge(DamAsset.where(dam_id: rows.map { |row| row[:dam_id] }).pluck(:accession_number))
         touched.merge(rows.map { |row| row[:accession_number] })
         DamAsset.upsert_all(rows, unique_by: :dam_id)
-        run.increment!(:seen, items.size)
-        progress(run, seen, total)
       end
       touched.delete(nil)
       touched
@@ -112,9 +152,9 @@ module Dam
       updated
     end
 
-    def progress(run, seen, total)
-      run.update_column(:total, total) if run.total != total
-      log("#{run.kind}: #{seen}/#{total} assets") if (seen % PROGRESS_EVERY).zero? || seen == total
+    def progress(run, read, seen, total)
+      run.increment!(:seen, read)
+      log("#{run.kind}: #{run.seen} assets read (#{seen}/#{total} of this range)") if (run.seen % PROGRESS_EVERY).zero?
     end
 
     def log(message) = @logger.info("[dam] #{message}")
