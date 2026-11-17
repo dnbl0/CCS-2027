@@ -16,7 +16,7 @@ module NexusCcs
     def tier = media.tier
 
     # The record has a digital asset, whether or not this visitor may see it now
-    def assets? = media.images? || Array(document["digital_media_ssim"]).any?
+    def assets? = RecordMedia.assets?(document)
 
     def notice? = assets? && tier == :view_only
 

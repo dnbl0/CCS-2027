@@ -36,6 +36,12 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     "request-only" => { "licence_type_ssim" => [ "ICIP Rights" ], "digital_asset_large_paths_ssim" => LARGE, "digital_asset_paths_ssim" => THUMBS },
     "sensitive" => { "licence_type_ssim" => [ "Copyright - Current" ], "restrictions_tsi" => [ "Culturally sensitive images" ],
                      "digital_asset_large_paths_ssim" => LARGE, "digital_asset_paths_ssim" => THUMBS },
+    # As the DAM sync writes them (Dam::SolrWriter): the index holds only the viewable assets' addresses, every asset's metadata
+    "per-asset licences, one shown and one withheld" => {
+      "digital_asset_metadata_ssm" => [ { "licence" => "CC BY", "format" => "image", "tier" => "open" }, { "licence" => "None", "format" => "image", "tier" => "request" } ].map(&:to_json),
+      "digital_asset_large_paths_ssim" => LARGE.first(1), "digital_asset_paths_ssim" => THUMBS.first(1), "digital_asset_download_paths_ssim" => LARGE.first(1)
+    },
+    "DAM assets all withheld" => { "digital_asset_metadata_ssm" => [ { "licence" => "None", "format" => "image", "tier" => "request" } ].map(&:to_json) },
     "audio, video and PDF" => { "licence_type_ssim" => [ "Public domain - Copyright expired" ],
                                 "digital_media_ssim" => [ "audio|audio/mpeg|/digital-assets/media/GraingerLowRes.mp3|Interview", "video|video/mp4|/digital-assets/media/v.mp4|Film", "pdf|application/pdf|/d.pdf|Report" ] }
   }.freeze
@@ -126,6 +132,27 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_selector ".record-actions .access-notice--view-only"
     assert_no_selector "a[download]"
     assert_no_selector ".digital-assets a[href*='/digital-assets/']"
+  end
+
+  WIDTHS.each_key do |width|
+    test "a record with one licensed and one unlicensed image at #{width} width shows the licensed one, says the other is withheld, and offers the download" do
+      open_record(VARIANTS.fetch("per-asset licences, one shown and one withheld"), width)
+
+      assert_selector ".digital-assets__main img[src^='#{LARGE.first}']"
+      assert_selector ".digital-assets .access-notice--partly-withheld", text: "1 other digital asset of this record is not shown here"
+      assert_selector ".access-notice--partly-withheld a[href='/access_requests/new?document_id=emu-9044']", text: "Request access to it"
+      assert_selector ".digital-assets__toolbar a.digital-assets__primary[download]", text: "Download image"
+      assert_selector ".digital-assets__licence", text: "CC BY"
+      notice = page.evaluate_script("(() => { const r = document.querySelector('.access-notice--partly-withheld').getBoundingClientRect(); return [r.left >= 0, r.right <= window.innerWidth] })()")
+      assert_equal [ true, true ], notice, "the notice fits the width"
+    end
+  end
+
+  test "a record whose DAM assets are all withheld has the request notice and no image" do
+    open_record(VARIANTS.fetch("DAM assets all withheld"), "desktop")
+
+    assert_selector ".digital-assets .access-notice--request", text: "This item is available on request"
+    assert_no_selector ".digital-assets img, .access-notice--partly-withheld"
   end
 
   test "a request-only or sensitive record has no asset address in its page" do

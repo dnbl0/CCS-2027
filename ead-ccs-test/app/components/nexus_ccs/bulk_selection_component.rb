@@ -38,8 +38,6 @@ module NexusCcs
 
     private
 
-    def assets?(document)
-      Array(document["digital_asset_large_paths_ssim"]).any? || Array(document["digital_media_ssim"]).any?
-    end
+    def assets?(document) = RecordMedia.assets?(document)
   end
 end

@@ -44,10 +44,10 @@ module StructuredData
     data
   end
 
-  # The thumbnail's address, for an :open, non-sensitive record only (nil otherwise)
+  # The thumbnail's address, when its image is an open asset (AccessPolicy.first_image_open?) of a non-sensitive record (nil otherwise)
   def self.image(document, base_url)
     path = document["thumbnail_path_ssi"].presence
-    return unless path && AccessPolicy.tier(document) == :open && !Sensitivity.sensitive?(document)
+    return unless path && AccessPolicy.first_image_open?(document) && !Sensitivity.sensitive?(document)
 
     path.start_with?("http") ? path : "#{base_url}#{AssetVersion.url(path)}"
   end

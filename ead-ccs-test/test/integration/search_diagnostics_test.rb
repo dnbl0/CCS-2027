@@ -37,7 +37,7 @@ class SearchDiagnosticsTest < ActionDispatch::IntegrationTest
       assert_select "summary", text: "Why am I seeing these results?"
       assert_select "q", text: "skull"
       assert_select "li", text: /A record must contain your word\./
-      assert_select "li", text: /Filter on: With a digital asset\. This filter is on until you take it off\./
+      assert_select "li", text: /Filter on: With Digital Asset: Yes\. This filter is on until you take it off\./
       assert_select "li", text: /Filter on: Collection Title: Grainger Museum\./
     end
   end
@@ -45,7 +45,7 @@ class SearchDiagnosticsTest < ActionDispatch::IntegrationTest
   test "it counts what each filter hides and links to the search without it" do
     visit(FILTERED, COUNTS)
 
-    assert_select ".why-results a", text: "Take off “With a digital asset”" do |links|
+    assert_select ".why-results a", text: "Take off “With Digital Asset: Yes”" do |links|
       assert_equal "12 more results", links.first.parent.at_css(".why-results__count").text.delete("()")
       query = Rack::Utils.parse_nested_query(URI(links.first["href"]).query)
       assert_equal "skull", query["q"]
@@ -80,7 +80,7 @@ class SearchDiagnosticsTest < ActionDispatch::IntegrationTest
     seen = []
     visit({ q: "skull", f: { has_digital_asset: [ "with" ] } }, { [ true, false ] => 0, [ false, false ] => 44 }, requests: seen)
 
-    assert_select ".why-results a", text: "Take off “With a digital asset”"
+    assert_select ".why-results a", text: "Take off “With Digital Asset: Yes”"
     assert_select ".why-results__count", text: "(44 more results)"
     assert_equal 2, seen.size, "the search, and the same search without its filter"
   end

@@ -49,5 +49,14 @@ en:
         full_screen: "Full screen"
         exit_full_screen: "Exit full screen"
         close_information: "Close media information"
+        # Under the media of a record that shows some of its digital assets and withholds others (their own licence does not
+        # let them be shown: AccessPolicy.withheld_assets). PLACEHOLDER WORDING, NOT YET APPROVED: the University must approve it.
+        partly_withheld:
+          body:
+            one: "1 other digital asset of this record is not shown here. Its licence does not yet allow it to be shown online."
+            other: "%{count} other digital assets of this record are not shown here. Their licences do not yet allow them to be shown online."
+          link:
+            one: "Request access to it"
+            other: "Request access to them"
       more_like_this:
         heading: "More like this"

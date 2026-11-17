@@ -25,9 +25,7 @@ module NexusCcs
 
     # Whether the record has a digital asset to draw (DigitalAssetsComponent), whatever the policy lets this visitor see; if not, the
     # page says so in one plain sentence (NoImageComponent)
-    def assets?
-      Array(document["digital_asset_large_paths_ssim"]).any? || Array(document["digital_media_ssim"]).any?
-    end
+    def assets? = RecordMedia.assets?(document)
 
     # Fields that name a collection: their links open all of it, as the header's Search collections menu does
     # (BrowseMenu, docs/adr/0004). Any other detail keeps the search's default.

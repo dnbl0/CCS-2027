@@ -212,6 +212,18 @@ dialog.modal {
   white-space: nowrap;
 }
 
+/* Except With Digital Asset's: its values ("Yes", "No") say nothing without the filter's name, so the pill shows
+   "With Digital Asset: Yes", on the results and in Search History */
+.constraints-container .applied-filter.filter-has_digital_asset .filter-name,
+.search-history .constraint.filter-has_digital_asset .filter-name {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  margin-inline-end: 0.25em;
+}
+
 .documentHeader h1 {
   color: var(--uom-navy)
 }

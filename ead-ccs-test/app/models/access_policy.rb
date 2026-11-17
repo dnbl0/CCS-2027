@@ -28,10 +28,23 @@
 # licence: access is limited to a community, so a visitor is not offered a "view anyway" choice (Sensitivity is for
 # material that may be shown if the visitor chooses).
 #
-# A record with several licences gets the most restrictive tier.
+# A record with several EMu licences gets the most restrictive tier.
 #
-# DAM usage rights now decide the tier (TIER_BY_DAM_LICENCE, .tier); the EMu licence table is the fallback and a tightening
-# gate. FreeReuse (the "open licence" filter) still reads the EMu field until the index has an indexed DAM licence field.
+# DAM usage rights decide, asset by asset (TIER_BY_DAM_LICENCE, .asset_tiers); the EMu licence table is the fallback for a record
+# with no DAM data, and a record-level gate:
+#
+#   each DAM asset                               its own tier, from its own DAM licence (blank or "None": :request)
+#   EMu licence :request (ICIP, restricted) or   every asset of the record is :request, whatever the DAM says
+#     access condition "Community Restricted"
+#   what a record shows                          the assets whose own tier is :open or :view_only; the rest are withheld
+#   what a record offers to download             the assets whose own tier is :open (.download_path?)
+#   the record's tier (.tier)                    the most permissive of its assets' tiers: :open when at least one asset is
+#                                                open, :request only when every asset is withheld
+#
+# Dam::SolrWriter writes the image and media fields of the index with the viewable assets only (no address of a withheld asset
+# is in the index), digital_asset_download_paths_ssim with the open ones, and dam_access_tier_ssi with .tier (the Digital asset
+# Access Condition filter, and the Open licence switch, FreeReuse: "has at least one open asset"). The University agreed on
+# 2026-11-18 that a licensed asset is shown even when another asset of the same record is not.
 #
 # (Earlier note) Swapping in the DAM: the ingest keeps each asset's full DAM metadata in the Solr field assets_json. The fields likely to
 # carry the real classification are metadata.dAUseStatus (fixture value "Requires Action"; real values not yet known),
@@ -76,18 +89,45 @@ module AccessPolicy
   }.freeze
   DAM_NO_LICENCE = [ "", "none" ].freeze
 
-  # document: a SolrDocument. Returns one of TIERS.
-  # With DAM usage rights on the record they decide the tier (the most restrictive across its assets); the EMu licence and
-  # access condition below can only tighten that to :request (ICIP, restricted, community restricted), never open it up.
-  # A record whose index has no DAM usage rights at all falls back to the EMu licence rules.
+  # The index field with the addresses of the record's open assets (large images and media files), written by Dam::SolrWriter
+  DOWNLOAD_PATHS_FIELD = "digital_asset_download_paths_ssim"
+
+  # document: a SolrDocument. Returns one of TIERS: the most permissive of the record's assets' tiers (.asset_tiers), so a record
+  # with one open asset is :open and one whose assets are all withheld is :request. A record whose index has no DAM usage rights
+  # at all falls back to the EMu licence rules.
   def self.tier(document)
-    return :request if withheld_by_access_condition?(document)
+    tiers = asset_tiers(document)
+    return (withheld_by_access_condition?(document) ? :request : emu_tier(document)) if tiers.nil?
 
-    dam = dam_licences(document)
-    return emu_tier(document) if dam.nil?
+    tiers.min_by { |tier| TIERS.index(tier) }
+  end
 
-    dam_tier = dam.map { |licence| dam_tier_of(licence) }.max_by { |tier| TIERS.index(tier) }
-    [ dam_tier, (:request if emu_tier(document) == :request) ].compact.max_by { |tier| TIERS.index(tier) }
+  # Each DAM asset's own tier, in the order of digital_asset_metadata_ssm, or nil when the record carries no DAM usage rights.
+  # An EMu restriction (ICIP, restricted, community restricted) makes every asset :request: the DAM can never open those up.
+  def self.asset_tiers(document)
+    licences = dam_licences(document)
+    return nil if licences.nil?
+    return Array.new(licences.size, :request) if withheld_by_access_condition?(document) || emu_tier(document) == :request
+
+    licences.map { |licence| dam_tier_of(licence) }
+  end
+
+  # How many of the record's DAM assets are withheld while others are shown (0 when nothing is withheld, and 0 when everything
+  # is: that record has the request notice in place of its media)
+  def self.withheld_assets(document)
+    tiers = asset_tiers(document)
+    return 0 if tiers.nil? || tiers.all?(:request)
+
+    tiers.count(:request)
+  end
+
+  # May the file at this address (a large image or a media file, as indexed, without a version token) be downloaded? Only an
+  # open asset's: for a record with DAM data the addresses in DOWNLOAD_PATHS_FIELD, for one without, every file of an :open record.
+  def self.download_path?(document, url)
+    return false unless download?(document)
+    return true if dam_licences(document).nil?
+
+    Array(document[DOWNLOAD_PATHS_FIELD]).include?(url.to_s)
   end
 
   def self.emu_tier(document)
@@ -134,10 +174,16 @@ module AccessPolicy
   # The access conditions (lower case) that withhold a record's asset whatever its licence
   def self.withheld_access_conditions = WITHHELD_ACCESS_CONDITIONS
 
-  # The asset may be shown (:open, :view_only)
+  # Is the record's first image (the one its thumbnail shows) an open asset? For the places that give the image away as the
+  # record's picture (the Pick of the day, structured data): another asset of the record being open is not enough.
+  def self.first_image_open?(document)
+    download_path?(document, Array(document["digital_asset_large_paths_ssim"]).first)
+  end
+
+  # At least one asset may be shown (:open, :view_only)
   def self.view?(document) = tier(document) != :request
 
-  # The asset may be downloaded (:open only)
+  # At least one asset may be downloaded (:open only); which ones: .download_path?
   def self.download?(document) = tier(document) == :open
 
   # Where a visitor asks for access to a record (the access request form, app/controllers/access_requests_controller.rb)

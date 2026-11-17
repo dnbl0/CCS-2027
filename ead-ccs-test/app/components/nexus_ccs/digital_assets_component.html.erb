@@ -23,7 +23,7 @@
       <% media.each do |item| %>
         <figure class="digital-assets__media">
           <%# Each kind of file has its viewer (MediaTypes): one that cannot be previewed says so %>
-          <%= helpers.render partial: MediaTypes.viewer_for(item[:kind]), locals: { item: item, title: media_title(item), downloadable: downloadable? } %>
+          <%= helpers.render partial: MediaTypes.viewer_for(item[:kind]), locals: { item: item, title: media_title(item), downloadable: item[:downloadable] } %>
           <figcaption><%= media_title(item) %></figcaption>
         </figure>
       <% end %>
@@ -38,7 +38,7 @@
     <ul class="digital-assets__others">
       <% others.each_with_index do |(large, thumbnail), index| %>
         <li>
-          <% if downloadable? %>
+          <% if image_downloadable?(index + 1) %>
             <%= link_to large, class: "digital-assets__other", target: "_blank", rel: "noopener",
                   data: { action: "media-viewer#show", media_viewer_large: large, media_viewer_alt: alt(index + 2) } do %>
               <%= image_tag thumbnail, alt: "#{alt(index + 2)} (opens full size in a new tab)", loading: "lazy", decoding: "async" %>
@@ -52,6 +52,15 @@
         </li>
       <% end %>
     </ul>
+  <% end %>
+
+  <% if withheld_count.positive? %>
+    <%# Some assets are withheld while these are shown (AccessPolicy.withheld_assets): said in plain words, with the request link.
+        Static text, there when the page loads, so no live region. PLACEHOLDER WORDING (config/locales/en.yml). %>
+    <div class="access-notice access-notice--partly-withheld">
+      <p class="access-notice__body"><%= t("nexus_ccs.record_page.media.partly_withheld.body", count: withheld_count) %></p>
+      <p class="access-notice__action"><a class="access-notice__link" href="<%= request_path %>"><%= t("nexus_ccs.record_page.media.partly_withheld.link", count: withheld_count) %></a></p>
+    </div>
   <% end %>
 
   <%# One slim toolbar directly under the image: what the visitor may do (chip) and under what licence on the left, the media tools

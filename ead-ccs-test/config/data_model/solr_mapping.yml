@@ -4,7 +4,9 @@
 # here invents data: a gap stays a gap until a source column exists. DataModel loads this file and
 # test/models/data_model_test.rb checks it against the workbooks.
 #
-# Keys are the FINAL SEQUENCE ORDER of the 19/10 workbook (the `seq` of field_labels.json) and the # of its CCS Filters sheet.
+# Keys are the FINAL SEQUENCE ORDER of the 19/10 workbook (the `seq` of field_labels.json) and the # of its CCS Filters sheet
+# (24 is the project owners' unnumbered "With Digital Asset" row after #23). filters: `facet:` is the facet key when it is not
+# the Solr field (a query facet).
 # fields: `index: true` also shows the field in the search results list.
 fields:
   1:  { solr: title_tsim }                     # the record heading, not repeated in the details list
@@ -60,3 +62,5 @@ filters:
   21: { solr: object_access_condition_ssim }    # dev-team ingest; one value ("Open") so far
   22: { solr: dam_access_tier_ssi }             # AccessPolicy tier from the DAM licence (DAM sync): open, view_only, request
   23: { solr: digital_asset_format_ssim }      # "Image" for the records that have a digital asset
+  24: { solr: has_digital_asset_bsi, facet: has_digital_asset }  # the project owners' "With Digital Asset" (Yes / No), CCS-41's filter: a
+                                                # query facet under its old key, so saved searches and links (f[has_digital_asset][]=with) keep working
