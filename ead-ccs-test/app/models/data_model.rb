@@ -1,5 +1,5 @@
 # The CCS data model: the display fields and filters defined by the two project workbooks
-# (../CCS Field labels and filters.xlsx at the repo root, data/CCS-data-inventory.xlsx), extracted to
+# (../CCS Field labels and filters - Project Owners to Review.xlsx at the repo root, data/CCS-data-inventory.xlsx), extracted to
 # config/data_model/*.json by script/extract_data_model.py, plus config/data_model/solr_mapping.yml
 # which says which Solr field carries each one (or why none does yet).
 #
@@ -15,11 +15,12 @@ class DataModel
   end
 
   # `type` is :checkbox, :browse (browse and search within the filter), :year (year selector) or :other.
-  Filter = Data.define(:seq, :section, :name, :type, :solr, :gap) do
+  Filter = Data.define(:seq, :section, :name, :type, :solr, :gap, :facet) do
     def available? = solr.present?
 
-    # The facet key: the Solr field, or for a filter with no data yet a stand-in made from its name.
-    def key = solr || "pending_#{name.parameterize(separator: "_")}"
+    # The facet key: the mapping's own (`facet:`, a query facet such as has_digital_asset), else the Solr field, or for a filter with
+    # no data yet a stand-in made from its name.
+    def key = facet || solr || "pending_#{name.parameterize(separator: "_")}"
 
     # A form usable as a facet group id and locale key: "Subject / Topic" becomes "subject_topic".
     def group = section.parameterize(separator: "_")
@@ -42,7 +43,7 @@ class DataModel
       @filters ||= FILTER_ROWS.sort_by { |row| row["seq"] }.map do |row|
         mapping = MAPPING.fetch("filters").fetch(row["seq"])
         Filter.new(seq: row["seq"], section: row["section"], name: row["name"], type: TYPES.fetch(row["type"], :other),
-          solr: mapping["solr"], gap: mapping["gap"])
+          solr: mapping["solr"], gap: mapping["gap"], facet: mapping["facet"])
       end
     end
 

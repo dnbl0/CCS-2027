@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# The "Open licence (public domain)" switch: records whose licence lets a visitor view AND download the asset (AccessPolicy tier
-# :open). It is a search filter (the facet field `free_reuse`, value `open`: ?f[free_reuse][]=open), so it is a removable pill, it is
+# The "Open licence (public domain)" switch: records with an asset a visitor may view AND download (AccessPolicy tier :open: for
+# a record with DAM data, at least one open asset). It is a search filter (the facet field `free_reuse`, value `open`: ?f[free_reuse][]=open), so it is a removable pill, it is
 # kept in search history and saved searches, and the "Why am I seeing these results?" panel can take it off.
 #
 # The filter is built from AccessPolicy (its :open licences and its withheld access conditions), not from a list of its own, so it
@@ -26,11 +26,13 @@ module FreeReuse
     { VALUE.to_sym => { label: I18n.t("nexus_ccs.free_reuse.label"), fq: filter_query } }
   end
 
-  # The record's tier, as AccessPolicy decided it from the DAM's licences when the DAM sync wrote the record (Dam::SolrWriter)
+  # The record's tier, as AccessPolicy decided it from the DAM's licences when the DAM sync wrote the record (Dam::SolrWriter): the
+  # most permissive of its assets' own tiers, after the EMu restrictions
   DAM_TIER_FIELD = "dam_access_tier_ssi"
 
   # The Solr filter query for tier :open, as text. A record with DAM data is open when the DAM sync found it so (DAM_TIER_FIELD:
-  # the DAM is the source of truth for usage rights); a record without is judged by its EMu licence, as before.
+  # the DAM is the source of truth for usage rights), which means it has at least one open asset (it may have others that are
+  # view only or withheld); a record without is judged by its EMu licence, as before.
   def self.filter_query
     emu = emu_filter_query
     dam = "#{DAM_TIER_FIELD}:open"

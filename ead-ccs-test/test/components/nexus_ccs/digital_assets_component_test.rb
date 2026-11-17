@@ -2,9 +2,12 @@ require "test_helper"
 require "view_component/test_helpers"
 require "capybara/minitest"
 
+require_relative "../../support/dam_fakes"
+
 class DigitalAssetsComponentTest < ActiveSupport::TestCase
   include ViewComponent::TestHelpers
   include Capybara::Minitest::Assertions
+  include DamFakes
 
   Presenter = Struct.new(:document)
 
@@ -90,6 +93,66 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_selector "button[aria-controls=media-metadata]", text: "Media information"
     assert_selector ".digital-assets__access--request", text: "Available on request"
     %w[/digital-assets /v.mp4 a1.jpg].each { |path| assert_not_includes rendered_content, path }
+  end
+
+  # Per-asset licences: the record as the DAM sync writes it (Dam::SolrWriter), from DAM assets with their own licences
+  def dam_record(licences, emu: {})
+    licences.each_with_index do |(id, licence, format), index|
+      DamAsset.create!(DamAsset.attributes_from_api(dam_item(id, format: format || "image")).merge(licence: licence, display_sequence: index + 1))
+    end
+    assets = DamAsset.live.in_display_order.to_a
+    fields = Dam::SolrWriter.fields_for(assets, { "id" => "emu-1" }.merge(emu)).compact
+    { "id" => "emu-1", "title_tsim" => [ "Cary Pocket microscope" ] }.merge(emu).merge(fields)
+  end
+
+  def dam_url(id, size = "large") = "https://unimelbourne.widen.net/content/#{id}/jpeg/#{size}.jpg"
+
+  test "a record with a licensed and an unlicensed image shows the licensed one only, and no address of the other" do
+    render_for(dam_record([ [ "unlicensed", "None" ], [ "licensed", "CC BY" ] ]))
+
+    assert_selector "figure.digital-assets__main img[src^='#{dam_url('licensed')}'][alt='Cary Pocket microscope']"
+    assert_no_selector ".digital-assets__others"
+    assert_not_includes rendered_content, "/content/unlicensed/"
+    assert_selector ".access-notice--partly-withheld", text: "1 other digital asset of this record is not shown"
+    assert_selector ".access-notice--partly-withheld a[href='/access_requests/new?document_id=emu-1']", text: "Request access to it"
+    assert_selector "a.digital-assets__primary[download][href^='#{dam_url('licensed')}']"
+    assert_selector ".digital-assets__licence", text: "CC BY" # the shown asset's licence, not the withheld one's "None"
+  end
+
+  test "only open assets are offered to download: a view-only image is a button, an open one a link" do
+    render_for(dam_record([ [ "open", "CC BY" ], [ "view", "Individual" ], [ "open2", "CC0" ] ]))
+
+    assert_selector "a.digital-assets__primary[href^='#{dam_url('open')}']"
+    assert_selector "button.digital-assets__other[data-media-viewer-large^='#{dam_url('view')}']"
+    assert_no_selector "a[href^='#{dam_url('view')}']"
+    assert_selector "a.digital-assets__other[href^='#{dam_url('open2')}']"
+    assert_no_selector ".access-notice"
+  end
+
+  test "a first image that is view only has no download button, even when the record has an open one" do
+    render_for(dam_record([ [ "view", "Individual" ], [ "open", "CC BY" ] ]))
+
+    assert_selector "figure.digital-assets__main img[src^='#{dam_url('view')}']"
+    assert_no_selector ".digital-assets__primary"
+    assert_selector "a.digital-assets__other[href^='#{dam_url('open')}']"
+  end
+
+  test "media files follow their own licence: an open film can be downloaded, a view-only PDF is left out" do
+    render_for(dam_record([ [ "img", "CC BY" ], [ "film", "CC BY", "video" ], [ "doc", "Individual", "pdf" ], [ "talk", "Individual", "audio" ] ]))
+
+    assert_selector "video:not([controlslist])"
+    assert_selector "video a", text: /Download/
+    assert_selector "audio[controlslist=nodownload]"
+    assert_no_selector "audio a"
+    assert_no_selector ".digital-assets__pdf"
+  end
+
+  test "an ICIP record shows none of its assets, whatever their DAM licences" do
+    render_for(dam_record([ [ "a", "CC BY" ], [ "b", "Individual" ] ], emu: { "licence_type_ssim" => [ "ICIP Rights" ] }))
+
+    assert_selector ".access-notice--request"
+    assert_no_selector "img, .access-notice--partly-withheld"
+    assert_not_includes rendered_content, "unimelbourne.widen.net"
   end
 
   test "a record without assets renders nothing" do

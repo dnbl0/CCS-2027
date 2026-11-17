@@ -41,10 +41,57 @@ class DamSolrWriterTest < ActiveSupport::TestCase
     Dam::SolrWriter.new(solr: solr).write(%w[1 2 3])
 
     assert_equal [ "CC BY" ], solr.docs["r1"]["dam_licence_ssim"]
-    assert_equal "request", solr.docs["r1"]["dam_access_tier_ssi"], "the most restrictive licence wins ('None' withholds)"
+    assert_equal "open", solr.docs["r1"]["dam_access_tier_ssi"], "the most permissive asset decides ('None' withholds only its own asset)"
     assert_equal [ "view_only", [ "Individual" ] ], solr.docs["r2"].values_at("dam_access_tier_ssi", "dam_licence_ssim")
     assert_equal "request", solr.docs["r3"]["dam_access_tier_ssi"]
     assert_not solr.docs["r3"].key?("dam_licence_ssim"), "a blank licence is no License type value"
+  end
+
+  test "only the viewable assets' addresses are written; every asset's metadata is kept, with its own tier" do
+    asset("open", display_sequence: 1, licence: "CC BY")
+    asset("blank", display_sequence: 2)
+    asset("view", display_sequence: 3, licence: "Individual")
+    asset("none", format: "video", licence: "None")
+    asset("film", format: "video", licence: "CC BY")
+    asset("pdf", format: "pdf", licence: "Individual")
+    solr = DamFakes::Solr.new([ { "id" => "emu-1", "accession_number_ssim" => [ "1987.0043" ] } ])
+    Dam::SolrWriter.new(solr: solr).write([ "1987.0043" ])
+
+    doc = solr.docs["emu-1"]
+    large = ->(id) { "https://unimelbourne.widen.net/content/#{id}/jpeg/large.jpg" }
+    original = ->(id) { "https://unimelbourne.widen.net/content/#{id}/original/#{id}" }
+    assert_equal [ large.call("open"), large.call("view") ], doc["digital_asset_large_paths_ssim"]
+    assert_equal [ "https://unimelbourne.widen.net/content/open/jpeg/thumb.jpg", "https://unimelbourne.widen.net/content/view/jpeg/thumb.jpg" ], doc["digital_asset_paths_ssim"]
+    assert_equal "https://unimelbourne.widen.net/content/open/jpeg/thumb.jpg", doc["thumbnail_path_ssi"]
+    assert_equal [ original.call("film"), original.call("pdf") ], doc["digital_media_ssim"].map { |entry| entry.split("|")[2] }
+    assert_equal [ large.call("open"), original.call("film") ], doc["digital_asset_download_paths_ssim"]
+    assert_not_includes doc.to_json, "/content/blank/", "no address of a withheld asset is in the index"
+    assert_not_includes doc.to_json, "/content/none/"
+
+    tiers = doc["digital_asset_metadata_ssm"].map { |json| JSON.parse(json).values_at("dam_id", "tier") }.to_h
+    assert_equal({ "open" => "open", "blank" => "request", "view" => "view_only", "none" => "request", "film" => "open", "pdf" => "view_only" }, tiers)
+    assert_equal [ true, "open" ], doc.values_at("has_digital_asset_bsi", "dam_access_tier_ssi")
+  end
+
+  test "an ICIP record keeps no address of any asset" do
+    asset("a", licence: "CC BY")
+    solr = DamFakes::Solr.new([ { "id" => "icip", "accession_number_ssim" => [ "1987.0043" ], "licence_type_ssim" => [ "ICIP Rights" ] } ])
+    Dam::SolrWriter.new(solr: solr).write([ "1987.0043" ])
+
+    doc = solr.docs["icip"]
+    %w[thumbnail_path_ssi digital_asset_paths_ssim digital_asset_large_paths_ssim digital_media_ssim digital_asset_download_paths_ssim].each do |field|
+      assert_not doc.key?(field), field
+    end
+    assert_equal [ false, "request" ], doc.values_at("has_digital_asset_bsi", "dam_access_tier_ssi")
+  end
+
+  test "a record with only view-only assets offers none to download" do
+    asset("a", licence: "Individual")
+    solr = DamFakes::Solr.new([ { "id" => "v", "accession_number_ssim" => [ "1987.0043" ] } ])
+    Dam::SolrWriter.new(solr: solr).write([ "1987.0043" ])
+
+    assert_equal [ true, "view_only" ], solr.docs["v"].values_at("has_digital_asset_bsi", "dam_access_tier_ssi")
+    assert_not solr.docs["v"].key?("digital_asset_download_paths_ssim")
   end
 
   test "a record whose assets a visitor cannot see is not flagged as having one, so it does not sort first" do

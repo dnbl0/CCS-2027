@@ -52,9 +52,44 @@ class AccessPolicyTest < ActiveSupport::TestCase
     assert_equal :request, AccessPolicy.tier(SolrDocument.new("id" => "d", "digital_asset_metadata_ssm" => [ { "producer" => "x" }.to_json ]))
   end
 
-  test "with several assets the most restrictive DAM licence wins" do
-    assert_equal :view_only, AccessPolicy.tier(dam_doc("CC BY", "Individual"))
-    assert_equal :request, AccessPolicy.tier(dam_doc("CC BY", "None"))
+  test "each asset has its own tier, and the record's is the most permissive of them" do
+    assert_equal %i[open view_only request], AccessPolicy.asset_tiers(dam_doc("CC BY", "Individual", "None"))
+    assert_equal :open, AccessPolicy.tier(dam_doc("CC BY", "Individual"))
+    assert_equal :open, AccessPolicy.tier(dam_doc("None", "CC BY"))
+    assert_equal :view_only, AccessPolicy.tier(dam_doc("", "Individual"))
+    assert_equal :request, AccessPolicy.tier(dam_doc("None", ""))
+    assert_nil AccessPolicy.asset_tiers(SolrDocument.new("id" => "x", "licence_type_ssim" => [ "Copyright" ]))
+  end
+
+  test "an EMu restriction withholds every asset of the record" do
+    assert_equal %i[request request], AccessPolicy.asset_tiers(dam_doc("CC BY", "Individual", licence_type_ssim: [ "ICIP Rights" ]))
+    assert_equal %i[request], AccessPolicy.asset_tiers(dam_doc("CC BY", access_condition_ssi: "Community Restricted"))
+  end
+
+  test "withheld_assets counts the assets held back from a record that shows others" do
+    assert_equal 1, AccessPolicy.withheld_assets(dam_doc("CC BY", "None"))
+    assert_equal 0, AccessPolicy.withheld_assets(dam_doc("CC BY", "Individual"))
+    assert_equal 0, AccessPolicy.withheld_assets(dam_doc("None", "None")), "a record that shows nothing has the request notice instead"
+    assert_equal 0, AccessPolicy.withheld_assets(SolrDocument.new("id" => "x"))
+  end
+
+  test "download_path? is true only for an open asset's file" do
+    doc = dam_doc("CC BY", "Individual", digital_asset_download_paths_ssim: [ "https://dam/a/large.jpg" ])
+    assert AccessPolicy.download_path?(doc, "https://dam/a/large.jpg")
+    assert_not AccessPolicy.download_path?(doc, "https://dam/b/large.jpg")
+    icip = dam_doc("CC BY", licence_type_ssim: [ "ICIP Rights" ], digital_asset_download_paths_ssim: [ "https://dam/a/large.jpg" ])
+    assert_not AccessPolicy.download_path?(icip, "https://dam/a/large.jpg")
+  end
+
+  test "first_image_open? asks about the image the thumbnail shows, not the record" do
+    paths = { digital_asset_large_paths_ssim: [ "https://dam/view.jpg", "https://dam/open.jpg" ] }
+    assert_not AccessPolicy.first_image_open?(dam_doc("Individual", "CC BY", **paths, digital_asset_download_paths_ssim: [ "https://dam/open.jpg" ]))
+    assert AccessPolicy.first_image_open?(dam_doc("CC BY", "Individual", **paths, digital_asset_download_paths_ssim: [ "https://dam/view.jpg" ]))
+  end
+
+  test "without DAM data, download_path? follows the record's EMu tier" do
+    assert AccessPolicy.download_path?(SolrDocument.new("id" => "o", "licence_type_ssim" => [ "Public domain - Copyright expired" ]), "/digital-assets/large/a.jpg")
+    assert_not AccessPolicy.download_path?(SolrDocument.new("id" => "v", "licence_type_ssim" => [ "Copyright" ]), "/digital-assets/large/a.jpg")
   end
 
   test "EMu restrictions still withhold whatever the DAM says" do

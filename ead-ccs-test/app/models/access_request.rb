@@ -9,8 +9,9 @@ class AccessRequest < ApplicationRecord
   # The longest value accepted for each text field (the form shows them as maxlength too)
   LIMITS = { name: 200, email: 254, organisation: 200, purpose: 2000 }.freeze
 
-  # The request type a record's tier calls for: nil for an open record, which needs no request.
-  def self.request_type_for(tier) = { request: "view", view_only: "download" }[tier]
+  # The request type a record's tier calls for: nil for an open record, which needs no request. withheld: some of the record's
+  # assets are withheld while others are shown (AccessPolicy.withheld_assets), so seeing them is what is asked for.
+  def self.request_type_for(tier, withheld: false) = withheld ? "view" : { request: "view", view_only: "download" }[tier]
 
   validates :document_id, :document_title, :name, :email, :purpose, presence: true
   validates :request_type, inclusion: { in: REQUEST_TYPES }

@@ -17,7 +17,7 @@ class SavedSearch < ApplicationRecord
   scope :recent, -> { order(created_at: :desc, id: :desc) }
 
   # The name given to a saved search when the visitor does not type one: its terms, then its filters, as
-  # "skull · Grainger Museum, With a digital asset". A search with neither is "All records". Cut to NAME_LIMIT.
+  # "skull · Grainger Museum, With Digital Asset: Yes". A search with neither is "All records". Cut to NAME_LIMIT.
   # params: the search's parameters (string keys, e.g. "q", "f" => { "collection_ssim" => [...] }, "clause" for Advanced search)
   def self.default_name(params)
     params = params.to_h.deep_stringify_keys
@@ -50,9 +50,9 @@ class SavedSearch < ApplicationRecord
     values + years
   end
 
-  # The Digital asset filter stores "with"; the page says "With a digital asset"
+  # The With Digital Asset filter stores "with" or "without"; the name says "With Digital Asset: Yes" or "...: No"
   def self.filter_label(field, value)
-    return "With a digital asset" if field == SearchDefaults::DIGITAL_ASSET_FIELD && value == "with"
+    return CatalogConfig::Facets.digital_asset_choice(value) if field == SearchDefaults::DIGITAL_ASSET_FIELD && CatalogConfig::Facets.digital_asset_choice(value)
     return I18n.t("nexus_ccs.free_reuse.label") if field == FreeReuse::FIELD && value == FreeReuse::VALUE
 
     value.to_s.squish

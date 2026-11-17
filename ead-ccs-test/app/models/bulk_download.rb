@@ -110,10 +110,12 @@ class BulkDownload
 
   def skip(document, reason, name = nil) = skipped << Skip.new(document: document, reason: reason, name: name)
 
-  # Large images, then the audio, video and PDF files, as the record page shows them
+  # Large images, then the audio, video and PDF files, as the record page shows them: only the open ones (a record can mix open
+  # and view-only assets, AccessPolicy.download_path?)
   def asset_urls(document)
     media = Array(document["digital_media_ssim"]).map { |entry| Collections::DigitalMedia.parse(entry)[:url] }
     (Array(document["digital_asset_large_paths_ssim"]) + media).map(&:to_s).compact_blank.uniq
+                                                               .select { |url| AccessPolicy.download_path?(document, url) }
   end
 
   # The file on this server for a path such as /digital-assets/large/a.jpg, or nil: not under /digital-assets/, not a real

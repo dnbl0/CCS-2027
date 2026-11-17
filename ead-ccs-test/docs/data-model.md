@@ -1,10 +1,10 @@
 # Data model
 
-The data model is defined by two project workbooks: `CCS Field labels and filters.xlsx` at the repo root (tracked; the source of truth for CCS Field Labels on record pages and CCS Filters in search results and advanced search) and `data/CCS-data-inventory.xlsx` (not tracked in git):
+The data model is defined by two project workbooks: `CCS Field labels and filters - Project Owners to Review.xlsx` at the repo root (the project owners' latest version, not tracked in git; it replaces `CCS Field labels and filters.xlsx`, whose Filters sheet lacks "With Digital Asset"; the source of truth for CCS Field Labels on record pages and CCS Filters in search results and advanced search) and `data/CCS-data-inventory.xlsx` (not tracked in git):
 
 | Workbook | Sheets used | Defines |
 |---|---|---|
-| `../CCS Field labels and filters.xlsx` | CCS Field Labels, CCS Filters | The 28 record display fields (label, final sequence order, source system, display rules) and the 23 filters (section, name, type). Licence Type, Advisory, Terms of Use and Producer (DAM) are the media metadata, shown in the media viewer's modal only |
+| `../CCS Field labels and filters - Project Owners to Review.xlsx` | CCS Field Labels, CCS Filters | The 28 record display fields (label, final sequence order, source system, display rules) and the 24 filters (section, name, type; the 24th, "With Digital Asset", has no # in the sheet and is kept as 24). Licence Type, Advisory, Terms of Use and Producer (DAM) are the media metadata, shown in the media viewer's modal only |
 | `CCS-data-inventory.xlsx` | CCS Data Inventory - 9 Sept, CCS Datatypes, Complex fields, AH sequencing, Copyright Advice | 107 metadata building blocks: which systems hold each (M&C is EMu, MDHS is Vernon, Nexus DAM), whether it displays, what happens when it is unpopulated |
 
 ## How the app follows it
@@ -96,6 +96,7 @@ and game records.
 | 21 | Access | Object Access Condition | other | **gap**: Workbook marks the filter type as 'tbd' and asks whether it is needed. |
 | 22 | Access | Digital asset Access Condition | other | **gap**: Workbook marks the filter type as 'tbd' and asks whether it is needed. |
 | 23 | Media type | Digital Asset Format Type | checkbox | `digital_asset_format_ssim` |
+| 24 | Media type | With Digital Asset (Yes / No) | other | `has_digital_asset_bsi`, as the query facet `has_digital_asset` (`f[has_digital_asset][]=with` or `without`, the keys of CCS-41's filter, so saved searches and links keep working). Applied by default (docs/adr/0004). The Open licence switch sits under it. |
 
 ## Indexer changes made to follow the model
 

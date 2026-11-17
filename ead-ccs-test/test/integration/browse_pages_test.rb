@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require_relative "../support/outages"
 
 # The pages behind the home page's Explore tiles: every object type, place, period, maker and subject, each opening its records.
 class BrowsePagesTest < ActionDispatch::IntegrationTest
+  include Outages
   VALUES = [ [ "lyre", 120 ], [ "harp", 40 ], [ "bell", 3 ], [ "Étui", 1 ], [ "1973 print", 1 ] ].freeze
 
   setup do
@@ -55,8 +57,9 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
   end
 
   test "a section whose list is unavailable keeps its heading and link but has no cards" do
-    get "/browse"
+    with_solr_down { get "/browse" }
 
+    assert_response :success
     assert_select "section.browse-makers h2", "Makers"
     assert_select "section.browse-makers article", count: 0
   end

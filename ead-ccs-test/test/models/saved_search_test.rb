@@ -4,7 +4,7 @@ class SavedSearchTest < ActiveSupport::TestCase
   test "a name is the search term, then the filters" do
     params = { "q" => "skull", "f" => { "collection_ssim" => [ "Grainger Museum" ], "has_digital_asset" => [ "with" ] } }
 
-    assert_equal "skull · Grainger Museum, With a digital asset", SavedSearch.default_name(params)
+    assert_equal "skull · Grainger Museum, With Digital Asset: Yes", SavedSearch.default_name(params)
   end
 
   test "a search with only a term is named for the term, with its spaces tidied" do

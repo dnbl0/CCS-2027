@@ -426,7 +426,7 @@ en:
       from_year: "from %{year}"
       to_year: "up to %{year}"
       reasons:
-        default_filter: "Records without a digital asset are hidden while the ‘With a digital asset’ filter is on. Many records have no image."
+        default_filter: "Records without a digital asset are hidden while the ‘With Digital Asset’ filter is set to Yes. Many records have no image."
         filters: "Each filter narrows the results. Several filters together may leave few or no records."
         operators: "AND, OR, NOT, + and - change which records match. Check that each one is what you meant."
         phrase: "A phrase in quotation marks matches only those words, together, in that order."

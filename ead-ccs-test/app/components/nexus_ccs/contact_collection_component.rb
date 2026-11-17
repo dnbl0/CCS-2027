@@ -25,7 +25,7 @@ module NexusCcs
 
     def mailto = contact.mailto(document: document, url: url)
 
-    def request_access? = AccessPolicy.tier(document) != :open
+    def request_access? = AccessPolicy.tier(document) != :open || AccessPolicy.withheld_assets(document).positive?
     def request_access_path = AccessPolicy.request_path(document)
   end
 end

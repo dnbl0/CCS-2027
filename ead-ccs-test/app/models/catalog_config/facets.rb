@@ -11,10 +11,11 @@ module CatalogConfig
       # Every filter is shown, on the results and in Advanced search (the year selectors as From and To years there). One the data cannot support yet (see
       # config/data_model/solr_mapping.yml) says so in place of values, and is never asked of Solr.
       DataModel.filters.each do |filter|
-        # CCS-41 (not in the workbook): the Digital asset option sits above Digital Asset Format Type.
-        if filter.name == DIGITAL_ASSET_FORMAT_FILTER
-          add_digital_asset_option(config)
+        # The workbook's "With Digital Asset" (Yes / No) is CCS-41's query facet; the Open licence switch sits under it
+        if filter.key == DIGITAL_ASSET_FIELD
+          add_digital_asset_option(config, filter)
           add_free_reuse_option(config)
+          next
         end
 
         unless filter.available?
@@ -36,7 +37,6 @@ module CatalogConfig
         config.add_facet_field filter.solr, **options
       end
 
-      add_digital_asset_option(config) unless config.facet_fields.key?("has_digital_asset")
       add_free_reuse_option(config) unless config.facet_fields.key?(FreeReuse::FIELD)
 
       config.add_facet_fields_to_solr_request!
@@ -51,7 +51,10 @@ module CatalogConfig
       pending.each { |field| params.delete("f.#{field}.facet.limit") }
     end
 
-    DIGITAL_ASSET_FORMAT_FILTER = "Digital Asset Format Type"
+    # The "With Digital Asset" filter: its facet key (kept from CCS-41, so saved searches and links still work), and its values'
+    # labels. A pill or a saved search's name says the filter's name too, as "With Digital Asset: Yes" (.digital_asset_choice).
+    DIGITAL_ASSET_FIELD = SearchDefaults::DIGITAL_ASSET_FIELD
+    DIGITAL_ASSET_VALUES = { "with" => "Yes", "without" => "No" }.freeze
 
     # Filters whose stored values are codes, shown through a helper (FacetValuesHelper)
     VALUE_HELPERS = { "dam_access_tier_ssi" => :access_tier_facet_label }.freeze
@@ -60,16 +63,23 @@ module CatalogConfig
     # with the field, and Solr leaves that tag out when it counts the facet's own values, so a chosen collection keeps the others listed.
     MULTI_SELECT = ->(field) { { filter_class: InclusiveFilterField, tag: field, ex: field } }
 
-    # CCS-41: show results with or without digital assets. Not in the workbook's filter list, so it is
-    # an addition from the Jira story; it sits with the Media type filters.
-    def self.add_digital_asset_option(config)
-      config.add_facet_field "has_digital_asset", label: "Digital asset", group: "media_type", filter_class: DigitalAssetFilterField, query: {
-        with: { label: "With a digital asset", fq: "has_digital_asset_bsi:true" },
-        without: { label: "Without a digital asset", fq: "-has_digital_asset_bsi:true" }
+    # "With Digital Asset" (the workbook's filter after Digital Asset Format Type, first asked for by CCS-41): Yes shows the records
+    # with an asset a visitor may see (has_digital_asset_bsi), No the rest. filter: its DataModel::Filter (name and section).
+    def self.add_digital_asset_option(config, filter)
+      config.add_facet_field DIGITAL_ASSET_FIELD, label: filter.name, group: filter.group, filter_class: DigitalAssetFilterField, query: {
+        with: { label: DIGITAL_ASSET_VALUES["with"], fq: "#{filter.solr}:true" },
+        without: { label: DIGITAL_ASSET_VALUES["without"], fq: "-#{filter.solr}:true" }
       }
     end
 
-    # The "Open licence (public domain)" switch (FreeReuse): not in the workbook either; it sits under Digital asset. A switch, not a
+    # "With Digital Asset: Yes": a choice of the filter named in full, for the places that show a value without its filter
+    # (a saved search's name, the "Why am I seeing these results?" panel, the default filter's notices). nil for another value.
+    def self.digital_asset_choice(value)
+      label = DIGITAL_ASSET_VALUES[value.to_s]
+      "#{DataModel.filters.find { |filter| filter.key == DIGITAL_ASSET_FIELD }&.name}: #{label}" if label
+    end
+
+    # The "Open licence (public domain)" switch (FreeReuse): not in the workbook; it sits under With Digital Asset. A switch, not a
     # list of values, on the results page (NexusCcs::FreeReuseSwitchComponent) and on Advanced search (FreeReuseAdvancedComponent).
     def self.add_free_reuse_option(config)
       config.add_facet_field FreeReuse::FIELD, label: I18n.t("nexus_ccs.free_reuse.facet"), group: "media_type", query: FreeReuse.query_config,

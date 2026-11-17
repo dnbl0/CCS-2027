@@ -61,3 +61,8 @@
   outline: 3px solid var(--ccs-focus-ring);
   outline-offset: 2px;
 }
+
+/* Under the shown media of a record whose other assets are withheld (DigitalAssetsComponent): the same card, a step below */
+.digital-assets .access-notice--partly-withheld {
+  margin-top: var(--ccs-space-3);
+}
