@@ -186,10 +186,14 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
 
   # --- Budgets ---
 
+  # A maker's page also asks for its related makers (Browse::Creator.related), kept for six hours: two requests the first time, one after
   test "with the value lists cached an entity page makes one Solr request" do
     with_seeded_menu_cache do
       seed_lists
       with_canned_search(answer) do |seen|
+        get entity_path("makers", "Bunny, Rupert")
+        assert_operator seen.size, :<=, 2
+        seen.clear
         get entity_path("makers", "Bunny, Rupert")
         assert_equal 1, seen.size
         seen.clear

@@ -68,7 +68,23 @@
             </div>
           </li>
 
-          <li><%= link_to t("browse.title"), helpers.browse_path, aria: { current: (helpers.controller_name.start_with?("browse") ? "page" : nil) } %></li>
+          <li>
+            <button type="button" class="site-nav__trigger" aria-expanded="false" aria-controls="site-nav-browse"
+                    data-site-header-target="trigger" data-action="site-header#toggleSection">
+              <%= t("browse.title") %><%= image_tag "site/icon-expand.svg", alt: "" %>
+            </button>
+            <div id="site-nav-browse" class="site-nav__panel">
+              <button type="button" class="site-nav__back" data-action="site-header#back"><%= back_label %></button>
+              <%= link_to helpers.browse_path, class: "site-nav__panel-title", aria: { current: (helpers.controller_name.start_with?("browse") ? "page" : nil) } do %>
+                <%= image_tag "site/icon-arrow-footer.svg", alt: "" %><%= t("browse.footer_link") %>
+              <% end %>
+              <ul class="site-nav__panel-list">
+                <% browse_more_links.each do |link| %>
+                  <li><%= link_to link.href, aria: { current: (helpers.current_page?(link.href) ? "page" : nil) } do %><%= image_tag "site/icon-arrow-footer.svg", alt: "" %><%= link.label %><% end %></li>
+                <% end %>
+              </ul>
+            </div>
+          </li>
 
           <li><%= link_to about.label, about.href, aria: { current: (helpers.current_page?(about.href) ? "page" : nil) } %></li>
 

@@ -1,0 +1,20 @@
+<% content_for :title, "#{t('nexus_ccs.stories.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-browse page-stories" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.stories.title"), description: t("nexus_ccs.stories.description")) %>
+<main class="browse-main" id="main-content">
+  <div class="browse-main__inner">
+    <% if @stories.empty? %>
+      <p class="browse-empty"><%= t("nexus_ccs.stories.empty") %></p>
+    <% else %>
+      <ul class="discovery-index">
+        <% @stories.each do |story| %>
+          <li class="discovery-index__item">
+            <h2 class="discovery-index__title"><%= link_to story.title, story.path %></h2>
+            <p class="discovery-index__text"><%= story.summary %></p>
+            <p class="discovery-index__meta"><%= t("nexus_ccs.stories.published", date: l(story.date, format: "%-d %B %Y")) %></p>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+</main>

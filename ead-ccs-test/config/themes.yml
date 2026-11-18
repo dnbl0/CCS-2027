@@ -1,0 +1,31 @@
+# Themed collections (/themes, ThemesController, docs/categories-themes-stories.md).
+#
+# PLACEHOLDER: every title and intro below is example wording (lorem ipsum) that needs the collections team's approval before launch.
+# The filters use real index fields and values, so the pages show real records.
+#
+# Each theme:
+#   slug      the address, /themes/<slug> (lower case letters, digits and hyphens)
+#   title     the page heading
+#   intro     a short introduction (plain text)
+#   filters   Blacklight facet filters: { field: [values] }; every field must be a filter of the search page
+#   range     optional: { begin: year, end: year } on date_start_isi (the Date filter)
+#   hero      optional: the id of a record to show first, when its picture may be shown
+themes:
+  - slug: twentieth-century-prints
+    title: "Twentieth-century prints (placeholder)"
+    intro: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    filters:
+      classification_ssim: [ "prints" ]
+      date_era_ssim: [ "20th century" ]
+  - slug: grainger-in-the-1920s
+    title: "Grainger in the 1920s (placeholder)"
+    intro: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+    filters:
+      collection_ssim: [ "Grainger Museum Collection" ]
+    range: { begin: 1920, end: 1929 }
+  - slug: nineteenth-century-medicine
+    title: "Nineteenth-century medicine (placeholder)"
+    intro: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    filters:
+      collection_ssim: [ "Medical History Museum" ]
+      date_era_ssim: [ "19th century" ]

@@ -91,3 +91,6 @@ group :development, :test do
   gem "solr_wrapper", ">= 0.3"
 end
 gem "rsolr", ">= 1.0", "< 4"
+
+# Stories (content/stories/*.md): Markdown to HTML on the server, pure Ruby. The output is sanitised (Stories::Renderer).
+gem "kramdown", "~> 2.5"

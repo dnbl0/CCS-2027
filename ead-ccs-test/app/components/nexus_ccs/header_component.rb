@@ -71,6 +71,16 @@ module NexusCcs
         links << SiteNavigation::Link.new(I18n.t("nexus_ccs.saved_searches.title"), helpers.saved_searches_path)
       end
       links << SiteNavigation::Link.new(I18n.t("nexus_ccs.search_history.title"), helpers.blacklight.search_history_path)
+      # How Save, lists and shared galleries work: a short explainer on the lists page
+      links << SiteNavigation::Link.new(I18n.t("nexus_ccs.lists_help.link"), helpers.lists_path(anchor: "how-saving-works")) if Rails.configuration.x.saved_records
+      links
+    end
+
+    # The Browse menu: the category picture pages, themes and stories (docs/categories-themes-stories.md)
+    def browse_more_links
+      [ SiteNavigation::Link.new(I18n.t("nexus_ccs.categories.title"), helpers.categories_path),
+        SiteNavigation::Link.new(I18n.t("nexus_ccs.themes.title"), helpers.themes_path),
+        SiteNavigation::Link.new(I18n.t("nexus_ccs.stories.title"), helpers.stories_path) ]
     end
 
     def about = SiteNavigation::Link.new(SiteNavigation::ABOUT_LABEL, helpers.about_path)
