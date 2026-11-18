@@ -3,7 +3,7 @@
 ## In plain language
 
 Two new pages let visitors start from **when** and **where** instead of a search box (approved by the product owner on
-2026-11-17, [decision 13](../../docs/decisions-2027.md)). The idea comes from Google Arts & Culture's "explore by time" and map;
+2026-11-17, [decision 14](../../docs/decisions-2027.md)). The idea comes from Google Arts & Culture's "explore by time" and map;
 no code, pictures or wording were taken from it.
 
 - **`/explore/time`**: a strip of centuries, earliest first (years before 0 are "BCE"), each with its number of records and up to

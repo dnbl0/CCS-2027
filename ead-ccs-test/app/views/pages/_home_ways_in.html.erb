@@ -1,0 +1,12 @@
+<%# Links to the Stories, Themes and Browse by category pages %>
+<section class="ccs-section home-more" aria-labelledby="home-ways-in">
+  <div class="ccs-section__inner explore__inner">
+    <h2 id="home-ways-in" class="ccs-section__heading"><%= t("nexus_ccs.home_more.ways_in") %></h2>
+    <p class="explore__intro"><%= t("nexus_ccs.home_more.ways_in_text") %></p>
+    <ul class="home-more__links">
+      <li><%= link_to t("nexus_ccs.stories.title"), stories_path, class: "arrow-link arrow-link--icon" %></li>
+      <li><%= link_to t("nexus_ccs.themes.title"), themes_path, class: "arrow-link arrow-link--icon" %></li>
+      <li><%= link_to t("nexus_ccs.categories.title"), categories_path, class: "arrow-link arrow-link--icon" %></li>
+    </ul>
+  </div>
+</section>

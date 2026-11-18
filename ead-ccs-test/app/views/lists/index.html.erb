@@ -15,6 +15,7 @@
         <%= link_to t("nexus_ccs.lists.new_list"), new_list_path, class: "btn btn-primary" %>
       </div>
     </div>
+    <%= render "lists/how_saving_works" %>
     <% if @lists.empty? %>
       <div class="saved-empty">
         <p class="saved-empty__text"><%= t("nexus_ccs.lists.empty") %></p>
