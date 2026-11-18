@@ -1,0 +1,25 @@
+en:
+  nexus_ccs:
+    # Viewing classification (CCS-44): ViewingClassification, ClassificationBadgeComponent and SensitivityGateComponent.
+    # PLACEHOLDER WORDING, NOT YET APPROVED: the University to approve.
+    viewing_classification:
+      badge_label: "Classified %{rating}: %{meaning}"
+      meaning:
+        g: "general"
+        pg: "parental guidance recommended"
+        m: "mature, recommended for 15 and over"
+        ma_15: "restricted to 15 and over"
+        r_18: "restricted to 18 and over"
+        x_18: "restricted to 18 and over, sexually explicit"
+        rc: "refused classification"
+        ctc: "classification to be checked"
+      gate:
+        ask:
+          title: "This item is classified %{rating}"
+          body: "It is %{meaning}. It is not shown unless you choose to see it."
+        declined:
+          title: "You chose not to view this item"
+          body: "It is %{meaning}. You can view it if you change your mind."
+        viewing:
+          title: "This item is classified %{rating}. You chose to view it."
+          body: "It is %{meaning}. You can hide it again at any time."

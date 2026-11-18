@@ -18,7 +18,7 @@ module Browse
     # The values looked at, most records with a thumbnail first
     CANDIDATES = 40
     PER_VALUE = 20 # records looked at for one value's picture
-    THUMBNAIL_FILTERS = [ "thumbnail_path_ssi:*", "-restrictions_tsi:sensitive" ].freeze
+    THUMBNAIL_FILTERS = [ "thumbnail_path_ssi:*", "-restrictions_tsi:sensitive", ViewingClassification::EXCLUDE_RESTRICTED ].freeze
     # Object types: the cards use the Classification facet (art and design, paintings, ceramics), as the home page's Record types do. Most
     # Object Type values (equipment, photographic medium, instruments) belong to records whose assets are withheld, so they have no
     # picture to show; the "See all" list still lists every Object Type.

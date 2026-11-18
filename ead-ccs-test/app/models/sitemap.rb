@@ -56,7 +56,7 @@ class Sitemap
 
   # The records in Solr that may be listed, as [id, date of last change] in id order
   module RecordSource
-    FIELDS = %w[id timestamp licence_type_ssim digital_asset_metadata_ssm access_condition_ssi restrictions_tsi].freeze
+    FIELDS = %w[id timestamp licence_type_ssim digital_asset_metadata_ssm access_condition_ssi restrictions_tsi digital_asset_advisory_classification_ssim].freeze
     ROWS = 1000
 
     def self.call(connection = Blacklight.default_index.connection)
