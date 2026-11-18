@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_18_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_18_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_000001) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["document_id"], name: "index_bookmarks_on_document_id"
     t.index ["user_id"], name: "index_bookmarks_on_user_id"
+  end
+
+  create_table "colour_neighbours", force: :cascade do |t|
+    t.string "record_id", null: false
+    t.jsonb "neighbour_ids", default: [], null: false
+    t.datetime "computed_at", null: false
+    t.index ["record_id"], name: "index_colour_neighbours_on_record_id", unique: true
   end
 
   create_table "dam_assets", force: :cascade do |t|
@@ -118,6 +125,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_000001) do
     t.datetime "updated_at", null: false
     t.index ["normalised"], name: "index_place_geocodes_on_normalised"
     t.index ["place"], name: "index_place_geocodes_on_place", unique: true
+  end
+
+  create_table "record_colours", force: :cascade do |t|
+    t.string "record_id", null: false
+    t.string "image_url", null: false
+    t.jsonb "palette", default: [], null: false
+    t.jsonb "buckets", default: [], null: false
+    t.jsonb "histogram", default: {}, null: false
+    t.string "error"
+    t.datetime "extracted_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["record_id"], name: "index_record_colours_on_record_id", unique: true
   end
 
   create_table "record_views", force: :cascade do |t|

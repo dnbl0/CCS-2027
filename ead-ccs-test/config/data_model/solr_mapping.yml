@@ -45,12 +45,12 @@ filters:
   4:  { solr: creator_role_ssim }             # the 19/10 workbook lists it between Creator Name and the birth date
   5:  { solr: creator_birth_isim }             # four-digit years parsed from EMu's birth dates
   6:  { solr: creator_death_isim }
-  7:  { solr: nationality_ssim }                # dev-team ingest (2026-11): free text, e.g. "Australian composer and pianist"
+  7:  { solr: nationality_ssim }                # dev-team ingest (2026-11): free text, e.g. "Australian composer and pianist"; the filter reads nationality_term_ssim once index:normalise has written it (NormalisedTerms)
   8:  { solr: date_start_isi }
   9:  { solr: date_era_ssim }                   # dev-team ingest: "20th century", "19th century" ...
   10: { solr: classification_ssim }
   11: { solr: object_type_ssim }
-  12: { solr: material_ssim }
+  12: { solr: material_ssim }                   # the filter reads material_term_ssim once index:normalise has written it (NormalisedTerms)
   13: { gap: "Language is not held by either system." }
   14: { solr: region_ssim }                     # dev-team ingest: Oceania, Europe, Asia ...
   15: { solr: subject_ssim }

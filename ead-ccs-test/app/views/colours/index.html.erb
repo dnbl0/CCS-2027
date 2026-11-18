@@ -1,0 +1,28 @@
+<% content_for :body_class, "page-colours" %>
+<% content_for :title, "#{t('colours.title')} — Collections Navigator — University of Melbourne" %>
+<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ t("colours.title"), nil ] ]) %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("colours.title"), description: t("colours.description")) %>
+<main class="colours" id="main-content">
+  <section class="ccs-section" aria-labelledby="colours-heading">
+    <div class="ccs-section__inner">
+      <h2 id="colours-heading" class="ccs-section__heading"><%= t("colours.heading") %></h2>
+      <% if @colours.present? %>
+        <p class="colours__intro"><%= t("colours.intro") %></p>
+        <%# Every colour is named in text and counted: the swatch is decoration (aria-hidden), never the only cue %>
+        <ul class="colours__list">
+          <% @colours.each do |colour| %>
+            <li class="colours__item">
+              <%= link_to search_catalog_path(f: { CatalogConfig::Facets::COLOUR_FIELD => [ colour.name ] }), class: "colours__link" do %>
+                <span class="colours__swatch colours__swatch--<%= colour.name %>" aria-hidden="true"></span>
+                <span class="colours__name"><%= colour_facet_label(colour.name) %></span>
+                <span class="colours__count"><%= t("colours.count", count: colour.count, formatted: number_with_delimiter(colour.count)) %></span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="colours__empty"><%= @colours.nil? ? t("colours.unavailable") : t("colours.empty") %></p>
+      <% end %>
+    </div>
+  </section>
+</main>
