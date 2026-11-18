@@ -6,6 +6,18 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["link"]
 
+  // The strip opens on the period with the most records (most are 19th and 20th century), centred, by scrolling the strip
+  // itself: the page does not move and nothing animates
+  connect() {
+    if (this.element.scrollWidth <= this.element.clientWidth) return
+
+    const busiest = this.linkTargets.reduce((best, link) => (Number(link.dataset.count) > Number(best?.dataset.count ?? -1) ? link : best), null)
+    const period = busiest?.closest("li")
+    if (!period) return
+
+    this.element.scrollLeft = period.offsetLeft - (this.element.clientWidth - period.offsetWidth) / 2
+  }
+
   move(event) {
     const keys = { ArrowLeft: -1, ArrowRight: 1, Home: "first", End: "last" }
     if (!(event.key in keys) || event.altKey || event.ctrlKey || event.metaKey) return

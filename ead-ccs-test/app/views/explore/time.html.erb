@@ -20,7 +20,7 @@
             <% @timeline.periods.each do |period| %>
               <li class="timeline__period">
                 <%= link_to search_action_path(period.search_query), class: "timeline__link", "aria-describedby": "timeline-keys",
-                      data: { timeline_target: "link", action: "keydown->timeline#move" } do %>
+                      data: { timeline_target: "link", action: "keydown->timeline#move", count: period.count } do %>
                   <span class="timeline__label"><%= period.label %></span>
                   <span class="timeline__count"><%= t("explore_pages.count", count: period.count, number: number_with_delimiter(period.count)) %></span>
                   <% if period.images.any? %>
@@ -43,7 +43,8 @@
           <h2 class="browse__heading" id="eras-heading"><%= t("explore_pages.time.eras") %></h2>
           <p><%= t("explore_pages.time.eras_intro") %></p>
           <ul class="explore-chips">
-            <% @timeline.eras.each do |era| %>
+            <%# Most records first (the source data has a few impossible eras, "30th century", with one or two records: they fall to the end) %>
+            <% @timeline.eras.sort_by { |era| -era.count }.each do |era| %>
               <li><%= link_to search_action_path(era.search_query), class: "explore-chips__chip" do %><%= era.name %> <span class="explore-chips__count">(<%= number_with_delimiter(era.count) %>)</span><% end %></li>
             <% end %>
           </ul>

@@ -46,6 +46,23 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
     end
   end
 
+  test "the strip opens on the period with the most records, scrolling only the strip" do
+    page.driver.resize(1440, 900)
+    visit "/explore/time"
+    assert_selector ".timeline__link", minimum: 2
+
+    visible = page.evaluate_script(<<~JS)
+      (() => {
+        const strip = document.querySelector('.timeline'), links = [...strip.querySelectorAll('.timeline__link')]
+        const busiest = links.reduce((a, b) => Number(b.dataset.count) > Number(a.dataset.count) ? b : a).closest('li')
+        const s = strip.getBoundingClientRect(), p = busiest.getBoundingClientRect()
+        return p.left >= s.left - 1 && p.right <= s.right + 1
+      })()
+    JS
+    assert visible, "the busiest period is in view when the page opens"
+    assert_equal 0, page.evaluate_script("window.scrollX"), "only the strip scrolled, not the page"
+  end
+
   test "the arrow keys move between periods, and a period opens the search with its years" do
     visit "/explore/time"
     links = all(".timeline__link")
