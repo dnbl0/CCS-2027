@@ -174,7 +174,10 @@ class RecordRemovalTest < ActionDispatch::IntegrationTest
                 "app/models/dam/index_copy.rb" => "copies one core into another, removed records too (removal is a filter, not a deletion)",
                 "lib/tasks/dam.rake" => "dam:report reads accession numbers for a count; shows no record",
                 "app/models/colour/fetcher.rb" => "downloads DAM thumbnails (Net::HTTP), not Solr",
-                "app/models/writable_core.rb" => "colour:* and index:normalise write fields to DAM_SOLR_URL; shows no record" }
+                "app/models/writable_core.rb" => "colour:* and index:normalise write fields to DAM_SOLR_URL; shows no record",
+                "app/models/geo/nominatim.rb" => "OpenStreetMap Nominatim, not Solr (rake geo:geocode)",
+                "app/models/geo/solr_writer.rb" => "writes place fields to DAM_SOLR_URL; a removed record stays filtered when shown",
+                "lib/tasks/geo.rake" => "geo:geocode reads the production place values for a count; shows no record" }
     offenders = Dir[Rails.root.join("{app,lib}/**/*.{rb,erb,rake}")].filter_map do |file|
       relative = Pathname(file).relative_path_from(Rails.root).to_s
       next if allowed.key?(relative) || relative == "lib/suppressed_solr_filter.rb"

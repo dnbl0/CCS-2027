@@ -6,7 +6,7 @@ each can be changed. **Plain-language summary first.**
 
 ## In short
 
-- Eight questions are decided and built or kept as they are.
+- Thirteen questions are decided and built or kept as they are.
 - Two cannot be decided by the product owner or by the developers, so they stay open on purpose: **the legal and privacy
   wording** (it has to come from the University's privacy, legal and accessibility owners) and **the de-bias term list** (it has to
   come from the collections team and Indigenous advisers). Both are marked in the pages and listed below so nothing is mistaken for
@@ -28,7 +28,9 @@ each can be changed. **Plain-language summary first.**
 | 10 | How is metadata uploaded (CCS-31)? | `Collections::CsvSource` plus `records:validate_csv` and `records:csv_to_documents`: a documented header set, per-row errors, JSON out; indexing only with `INDEX=1` and a writable `SOLR_URL` that is not the shared Solr. | No sign-in means no upload page (rule 10). Checking before converting keeps bad rows out of the index. See `ead-ccs-test/docs/csv-upload.md`. |
 | 11 | How is Chinese, Japanese and Korean text searched (CCS-56)? | Separate `text_cjk` fields (CJK characters only, single characters and pairs) filled by `copyField`, in `qf`; a "Chinese, Japanese, Korean" search option and a CJK Description search shown only when the core has the fields. | Substring search needs no word list; keeping Latin text out leaves English ranking unchanged; the detection means a core without the change works as before. The shared index needs the configuration and a reindex (dev team). See `ead-ccs-test/docs/multilingual-search.md`. |
 | 12 | How are PDFs searched by their text (CCS-36)? | `pdftotext` at indexing into `pdf_text_tim` (indexed, not stored, named so no copyField reaches it), a "Full text (PDF)" search option shown when the core has the field, and "Found in PDF" on the result. A withheld or sensitive record's PDF text is not indexed. No OCR. | `pdftotext` is already on dev machines and needs no new dependency; the name keeps the text out of the suggester and the default search; the access rules are not weakened. No snippet because the text is not stored. See `ead-ccs-test/docs/pdf-full-text.md`. |
-| 13 | Can visitors browse by colour (approved by the owner, Dean Noble, on 2026-11-17)? | Yes: a colour browse page, `/explore/colours`, with twelve named colours and their counts, each opening `/catalog` filtered by colour; a Colour filter in the results sidebar under Digital Asset Format Type (shown only when the index has colours); and a lazily loaded "Looks similar" section on the record page. Colours are worked out locally from the DAM thumbnails (`colour:extract`) and written to the DAM sync's own core. | A new page type, so an exception like those in decision 8, approved by the owner. Inspired by Google Arts & Culture's colour exploration; no code, assets, branding or wording were taken from it. Every colour is named in text, so colour is never the only cue. See `ead-ccs-test/docs/colour-and-clean-up.md`. |
+| 13 | New page types for discovery: category picture pages, collection and named collection pages, themes and stories (2026-11-17). | **Approved by Dean (product owner) on 2026-11-17** as an exception to CLAUDE.md rule 10. Every list of records still opens Blacklight's search page with filters. Stories are Markdown files in the repository; **Spotlight is not used**. | Google Arts & Culture's lesson: every record reachable through visual categories and curated stories. Spotlight needs staff sign-in, which the site does not have; files in the repository need no admin page. All wording is placeholder until the collections team approves it. See `ead-ccs-test/docs/categories-themes-stories.md`. |
+| 14 | May the site have "explore by time" and "explore by place" pages (CCS 2027, inspired by Google Arts & Culture; nothing copied)? | **Yes: approved by the product owner (Dean) on 2026-11-17** as new page types under rule 10: `/explore/time` (centuries and decades with counts and pictures, and era chips) and `/explore/places` (an opt-in map and lists of regions, countries and places), plus a "Place" filter (Region > Country > State > Place) in the results, added after the workbook's Region. Every list opens `/catalog` with a filter; neither page has a search of its own. | Time and place are the two ways in visitors ask for most after a search box. The map needs coordinates the index lacks, so the places are geocoded once with OpenStreetMap Nominatim on the owner's machine (`rake geo:geocode`) and written to the DAM sync's own core (`rake geo:write`); the map is opt-in so no third party is contacted unless the visitor asks, and the lists do the same job without it. See `ead-ccs-test/docs/time-and-place.md`. |
+| 15 | Can visitors browse by colour (approved by the owner, Dean Noble, on 2026-11-17)? | Yes: a colour browse page, `/explore/colours`, with twelve named colours and their counts, each opening `/catalog` filtered by colour; a Colour filter in the results sidebar under Digital Asset Format Type (shown only when the index has colours); and a lazily loaded "Looks similar" section on the record page. Colours are worked out locally from the DAM thumbnails (`colour:extract`) and written to the DAM sync's own core. | A new page type, so an exception like those in decision 8, approved by the owner. Inspired by Google Arts & Culture's colour exploration; no code, assets, branding or wording were taken from it. Every colour is named in text, so colour is never the only cue. See `ead-ccs-test/docs/colour-and-clean-up.md`. |
 
 ## Not decided on purpose (needs the University)
 
@@ -38,6 +40,7 @@ each can be changed. **Plain-language summary first.**
 | The de-bias term list | The collections team, with Indigenous advisers | `config/debias_terms.yml` (shipped empty) | The mechanism, the import (`bin/rails debias:import CSV=...`), the report (`bin/rails debias:report`) and the explanatory page are built. No terms were invented. See `ead-ccs-test/docs/debias-terms.md`. |
 | Cultural-protocols and entity-page notices | Indigenous advisers | Record and entity pages | Placeholder wording. |
 | Featured blurbs and Discover wording | The collection teams | `config/featured.yml`, `config/locales/discover.en.yml` | Placeholder. |
+| Theme, story, collection-page and saving-explainer wording | The collection teams | `config/themes.yml`, `config/collection_intros.yml`, `content/stories/*.md`, `config/locales/categories_themes_stories.en.yml` | Lorem ipsum or marked placeholder. |
 
 ## Accepted as they are, with the reason
 
@@ -45,8 +48,8 @@ each can be changed. **Plain-language summary first.**
   logs limited to staff, and use "Stop sharing" or "Make a new link" (both end the old link at once) if a log leaks.
 - **Gallery publication for discovery, with moderation (Europeana's publication request) is not built.** A shared list is link-only
   and `noindex`. Moderation needs staff accounts, which wait for login.
-- **Subjects with `--` and places like "Town, State, Country" are not split into a tree.** The index values are shown as catalogued;
-  a tree needs a data decision from the collections team.
+- **Subjects with `--` are not split into a tree.** The index values are shown as catalogued; a tree needs a data decision from the
+  collections team. Places now have one (decision 13): the catalogued place text is unchanged, and the tree comes from geocoding it.
 
 ## Earlier decisions
 

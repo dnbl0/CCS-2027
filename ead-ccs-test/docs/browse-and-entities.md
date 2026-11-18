@@ -122,6 +122,13 @@ so there is nothing to enumerate; a century of 1800 or later is reached from its
 Warm cache: an index page makes 0 Solr requests (it did before); an entity or period page makes 1. Cold: the lists are the existing
 cached requests. No new scripts or importmap pins; one more stylesheet inside `application.css`. Nothing was added to the home page.
 
+## Maker pages: more facts (2026-11-18)
+
+A maker's page also shows born, died, nationality and roles (`Browse::Creator.facts`, read only from the page's records that name the maker
+alone, as these fields are lists not reliably in creator order), works with pictures, records by object type, and related makers (makers whose
+records share the maker's three commonest subjects or two commonest named collections: one facet request, cached 6 hours, so a maker page makes
+2 Solr requests the first time in six hours and 1 after). Empty fields leave their part out. See `categories-themes-stories.md`.
+
 ## Open questions
 
 1. Should the hierarchies (subjects with `--`, places "Town, State, Country") become a tree?

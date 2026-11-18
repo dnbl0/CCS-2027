@@ -1,0 +1,10 @@
+<%= render(layout.new(facet_field: @facet_field)) do |component| %>
+  <% component.with_label do %><%= @facet_field.label %><% end %>
+  <% component.with_body do %>
+    <ul class="place-hierarchy facet-values">
+      <% roots.each do |node| %>
+        <%= render "nexus_ccs/place_hierarchy_node", node: node, component: self %>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>

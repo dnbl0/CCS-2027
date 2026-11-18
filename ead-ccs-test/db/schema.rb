@@ -107,6 +107,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_000002) do
     t.index ["user_id"], name: "index_lists_on_user_id"
   end
 
+  create_table "place_geocodes", force: :cascade do |t|
+    t.string "place", null: false
+    t.string "normalised", null: false
+    t.float "lat"
+    t.float "lon"
+    t.string "country"
+    t.string "country_code"
+    t.string "state"
+    t.string "locality"
+    t.string "region"
+    t.string "kind"
+    t.string "source"
+    t.datetime "looked_up_at"
+    t.boolean "not_found", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["normalised"], name: "index_place_geocodes_on_normalised"
+    t.index ["place"], name: "index_place_geocodes_on_place", unique: true
+  end
+
   create_table "record_colours", force: :cascade do |t|
     t.string "record_id", null: false
     t.string "image_url", null: false

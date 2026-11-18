@@ -37,7 +37,7 @@ class DataModelTest < ActiveSupport::TestCase
   end
 
   # The open-licence switch (FreeReuse) is not a workbook filter. (CCS-41's has_digital_asset is now the workbook's "With Digital Asset".)
-  JIRA_ADDITIONS = %w[free_reuse colour_ssim].freeze # colour_ssim: the Colour filter the owner approved on 2026-11-17 (docs/decisions-2027.md)
+  JIRA_ADDITIONS = %w[free_reuse place_hierarchy_ssim colour_ssim].freeze # place_hierarchy_ssim: the Place filter (docs/time-and-place.md); colour_ssim: the Colour filter the owner approved on 2026-11-17 (docs/decisions-2027.md)
 
   test "facets are every workbook filter, in the order of the sheet's # column, with its names, sections and types" do
     expected = DataModel.filters
@@ -87,6 +87,15 @@ class DataModelTest < ActiveSupport::TestCase
     assert_equal "With Digital Asset: Yes", CatalogConfig::Facets.digital_asset_choice("with")
     assert_equal "With Digital Asset: No", CatalogConfig::Facets.digital_asset_choice("without")
     assert_nil CatalogConfig::Facets.digital_asset_choice("other")
+  end
+
+  test "the Place filter is an addition straight after the workbook's Region, out of Advanced search" do
+    order = config.facet_fields.keys
+    assert_equal "place_hierarchy_ssim", order[order.index("region_ssim") + 1]
+    facet = config.facet_fields["place_hierarchy_ssim"]
+    assert_equal config.facet_fields["region_ssim"].group, facet.group
+    assert_equal NexusCcs::PlaceHierarchyFacetComponent, facet.component
+    assert_equal false, facet.include_in_advanced_search
   end
 
   test "Creator role is a workbook filter, between Creator Name and the birth date" do

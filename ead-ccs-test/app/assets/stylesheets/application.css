@@ -65,6 +65,8 @@
 @import url("pages/help.css");
 @import url("pages/indigenous_data.css");
 @import url("components/browse_entities.css");
+@import url("components/discovery_pages.css");
+@import url("components/explore_pages.css");
 @import url("components/debias.css");
 @import url("components/responsive.css");
 @import url("components/film_polish.css");

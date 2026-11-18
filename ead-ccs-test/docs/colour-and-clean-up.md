@@ -1,6 +1,6 @@
 # Explore by colour, Looks similar, and cleaner filters
 
-Approved by the owner on 2026-11-17 (decision 13 in [decisions-2027.md](../../docs/decisions-2027.md)). Inspired by Google Arts &
+Approved by the owner on 2026-11-17 (decision 15 in [decisions-2027.md](../../docs/decisions-2027.md)). Inspired by Google Arts &
 Culture's colour exploration; nothing was copied from it (no code, images, branding or wording).
 
 ## In plain language
