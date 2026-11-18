@@ -44,6 +44,7 @@
 @import url("components/record_page.css");
 @import url("components/record_classic.css");
 @import url("components/object_cards.css");
+@import url("components/colours.css");
 @import url("components/contact_help.css");
 @import url("components/save_control.css");
 @import url("components/saved_bar.css");
@@ -66,6 +67,9 @@
 @import url("pages/indigenous_data.css");
 @import url("components/browse_entities.css");
 @import url("components/discovery_pages.css");
+@import url("components/explore_pages.css");
 @import url("components/debias.css");
 @import url("components/responsive.css");
 @import url("components/film_polish.css");
+/* Last: the card tiles restyle the cards and the home collections, over card_layout.css, explore.css and film_polish.css's masonry */
+@import url("components/card_tiles.css");

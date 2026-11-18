@@ -145,8 +145,9 @@ class PerformanceTest < ActionDispatch::IntegrationTest
     assert_empty site.grep(/openseadragon|stock_/), "the site's pages preload the record viewer"
     assert_not_empty stock.grep(/openseadragon/), "the stock record page needs the viewer"
     # Each Stimulus controller is one small file, so this count grows with features (53 after the selection and media viewer
-    # controllers, 3 Nov 2026; 57 with the Explore disclosure controller; 58 with the record page's sections controller, 11 Nov 2026; 59 with the card rail controller, 17 Nov 2026). The size that matters is the script bytes budget; this only stops a library sneaking in.
-    assert_operator site.size, :<=, 59, "the site's pages preload more scripts than the budget allows"
+    # controllers, 3 Nov 2026; 57 with the Explore disclosure controller; 58 with the record page's sections controller, 11 Nov 2026; 59 with the card rail controller, 17 Nov 2026; 61 with the timeline and place map controllers, 18 Nov 2026). The size that matters is the script bytes budget; this only stops a library sneaking in.
+    assert_operator site.size, :<=, 61, "the site's pages preload more scripts than the budget allows"
+    assert_empty site.grep(/leaflet/), "the map library loads only when a visitor asks for the map"
   end
 
   test "a page does not preload the record viewer" do

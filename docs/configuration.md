@@ -44,13 +44,22 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `JOB_CONCURRENCY` | `1` | `config/queue.yml` | Solid Queue worker processes |
 | `DAM_API_TOKEN` | unset | `Dam::Client` | The Nexus DAM (Acquia DAM) API token. Never in a file: read from the macOS Keychain when the server or task starts. Unset: the DAM sync does nothing. See [dam-sync.md](../ead-ccs-test/docs/dam-sync.md) |
 | `DAM_API_URL` | `https://api.widencollective.com/v2` | `Dam::Client` | The DAM API's address |
-| `DAM_SOLR_URL` | unset | `Dam::SolrWriter`, `dam:*` tasks | The Solr core the DAM sync writes to: a core of its own (never port 8984, the shared Solr). Unset: the sync writes nothing |
+| `DAM_SOLR_URL` | unset | `Dam::SolrWriter`, `dam:*` tasks, `WritableCore` (`colour:*`, `index:normalise`) | The Solr core the DAM sync, the colour tasks and the filter clean-up write to: a core of its own (never port 8984, the shared Solr). Unset: they write nothing and stop with a message. See [colour-and-clean-up.md](../ead-ccs-test/docs/colour-and-clean-up.md) |
 | `DAM_SYNC_EPOCH` | `2010-01-01T00:00:00Z` | `Dam::Sync.epoch` | A full sync reads everything last edited before this in one window, then a month at a time |
 | `FULL` | unset | `dam:sync` | `1` reads every DAM asset (resuming a stopped full run) instead of only what changed |
-| `FRESH` | unset | `dam:sync` | With `FULL=1`, starts again from the beginning instead of resuming |
+| `FRESH` | unset | `dam:sync`, `colour:extract` | With `FULL=1`, starts again from the beginning instead of resuming. For `colour:extract`, works out every record's colours again instead of skipping those done |
+| `LIMIT` | unset | `colour:extract` | Stops after this many images (to try it on a few) |
+| `COLOUR_RATE` | `4` | `Colour::Extractor` | At most this many image requests a second to the DAM during `colour:extract` |
+| `COLOUR_IMAGE_HOSTS` | `unimelbourne.widen.net` | `Colour::Fetcher` | The hosts `colour:extract` may download thumbnails from (https only, comma-separated). The site's own `/digital-assets/` files are always read from disk |
 | `FROM` | `SOLR_URL` | `dam:copy_index` | The core copied from (only read) |
 | `TO` | `DAM_SOLR_URL` | `dam:copy_index` | The core copied into |
 | `OUT` | `tmp/dam_unmatched.csv` | `dam:report` | Where the list of DAM assets that match no record is written |
+| `DRY_RUN` | unset | `geo:geocode` | `1` counts the places that would be looked up and changes nothing. See [time-and-place.md](../ead-ccs-test/docs/time-and-place.md) |
+| `LIMIT` | unset | `geo:geocode` | Stop after this many lookups (a test run); the next run carries on |
+| `GEOCODER_URL` | `https://nominatim.openstreetmap.org/search` | `Geo::Nominatim` | The Nominatim search address `geo:geocode` asks. Only the place text is sent |
+| `GEOCODER_USER_AGENT` | `CollectionsNavigator-PlaceGeocoder/1.0 (...)` | `Geo::Nominatim` | The User-Agent sent to Nominatim: names the application, never a person or email address |
+| `MAP_TILE_URL` | `https://tile.openstreetmap.org/{z}/{x}/{y}.png` | `Explore::MapTiles` | The Explore by place map's tile server, fetched by the visitor's browser only after they press "Show the map". Its host is added to the Content Security Policy. Production should name a service the University has an agreement with |
+| `MAP_TILE_ATTRIBUTION` | the OpenStreetMap credit | `Explore::MapTiles` | The tile provider's required credit (HTML, links only), shown on and under the map |
 | `REDIS_URL` | `redis://localhost:6379/1` | `config/cable.yml` | Action Cable; unused, the app has no cable channel |
 | `CCS_MEDIA_BASE_URL` | `/digital-assets/media` | `Collections::DigitalMedia` | Where the audio, video and PDF files are served from |
 | `SEO_CANONICAL_BASE_URL` | the request's own address | `BotControls.base_url` | The site's address in canonical links, the sitemap and structured data, when a proxy hides the real host |
