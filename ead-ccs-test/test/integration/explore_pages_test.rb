@@ -116,4 +116,29 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     assert_select ".place-hierarchy .selected", minimum: 1
     assert_select ".place-hierarchy .selected", text: /Australia/, minimum: 1
   end
+
+  # Speed: a results page drew every state and town (1,384 values, 412 on a "photograph" search), which took most of its time.
+  # Regions and their countries are drawn; the levels under a country only once it (or something in it) is chosen.
+  test "the Place filter draws regions and countries, and the levels under a country only once it is chosen" do
+    facets = { "place_hierarchy_ssim" => [ "Oceania", 12, "Oceania|Australia", 12, "Oceania|Australia|Victoria", 10,
+                                           "Oceania|Australia|Victoria|Ballarat", 3, "Europe", 4, "Europe|France", 4 ] }
+    answer = canned_response([]).tap { |body| body["facet_counts"]["facet_fields"] = facets }
+    with_seeded_menu_cache do
+      with_canned_search(answer) { get "/catalog", params: { q: "", any_assets: "1" } }
+    end
+
+    assert_response :success
+    assert_select ".place-hierarchy .facet-label", text: "Australia"
+    assert_select ".place-hierarchy .facet-label", text: "France"
+    assert_select ".place-hierarchy .facet-label", text: "Victoria", count: 0
+    assert_select ".place-hierarchy .facet-label", text: "Ballarat", count: 0
+
+    with_seeded_menu_cache do
+      with_canned_search(answer) do
+        get "/catalog", params: { q: "", any_assets: "1", f: { place_hierarchy_ssim: [ "Oceania|Australia|Victoria" ] } }
+      end
+    end
+    assert_select ".place-hierarchy .facet-label", text: "Ballarat"
+    assert_select ".place-hierarchy .facet-label", text: "France"
+  end
 end

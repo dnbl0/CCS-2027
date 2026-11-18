@@ -38,6 +38,8 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `RAILS_LOG_LEVEL` | `info` | same | Production log level |
 | `RAILS_MAX_THREADS` | `3` (Puma), `5` (database pool) | `config/puma.rb`, `config/database.yml` | Threads per Puma process; keep the pool at least as large |
 | `WEB_CONCURRENCY` | unset | `config/puma.rb` | Puma worker processes. More than one process makes the in-memory rate limit per process |
+| `CACHE_WARM` | on | `config/puma.rb`, `CacheWarmer` | `off` stops the server loading the home, Browse, category, explore, theme and story pages itself after it starts and every few minutes, so their cached parts are ready before a visitor asks (the home page needs 53 Solr requests and Browse 85 on an empty cache) |
+| `CACHE_WARM_MINUTES` | `10` | `CacheWarmer` | How often those pages are loaded again (1 to 1440), so a cached part that expires is rebuilt by the server rather than by a visitor |
 | `PORT` | `3000` | `config/puma.rb` | The port Puma listens on |
 | `PIDFILE` | unset | `config/puma.rb` | Puma pid file |
 | `SOLID_QUEUE_IN_PUMA` | unset | `config/puma.rb`, `config/application.rb` | `1` runs Solid Queue inside Puma and sends jobs to it: the DAM sync's recurring jobs (`config/recurring.yml`). See [dam-sync.md](../ead-ccs-test/docs/dam-sync.md) |

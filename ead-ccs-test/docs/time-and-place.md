@@ -64,6 +64,9 @@ The region is the commonest `region_ssim` of the place's records, or, when they 
 place ("[Melbourne]" and "Melbourne") share one lookup. A wrong answer can be corrected in `place_geocodes` (set `source` to
 `manual`) and written again with step 4.
 
+In the search sidebar the Place filter is a drill-down: regions and their countries are drawn, and the states and places under a
+country only once that country (or something in it) is chosen. Drawing every level (1,384 values) took most of a results page's time.
+
 ## Privacy and third parties
 
 - **Geocoding** (owner's machine only): only the place text is sent to Nominatim, at most one request a second, with a User-Agent
