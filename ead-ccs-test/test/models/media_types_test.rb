@@ -8,7 +8,20 @@ class MediaTypesTest < ActiveSupport::TestCase
     end
     %w[video/x-ms-wmv video/x-msvideo video/x-flv audio/x-ms-wma video/3gpp2].each { |type| assert_not MediaTypes.browser_playable?(type), type }
     assert MediaTypes.browser_playable?(nil)
-    assert MediaTypes.browser_playable?("application/octet-stream"), "a DAM file with no known type is left to the browser"
+    assert MediaTypes.browser_playable?("application/octet-stream"), "a DAM file with no known type and no extension is left to the browser"
+  end
+
+  # CCS-481: the audio and video formats the Nexus DAM holds (2026-11-18): wav, mp3, aif/aiff; mp4, wmv, mov, avi, vob, divx, m2t
+  test "the DAM's formats: wav, mp3, mp4 and mov play; aiff, wmv, avi, vob, divx and m2t get the download or request fallback" do
+    { "audio/x-wav" => "/a.wav", "audio/mpeg" => "/a.mp3", "video/mp4" => "/v.mp4", "video/quicktime" => "/v.mov" }.each do |type, url|
+      assert MediaTypes.browser_playable?(type, url), url
+    end
+    { "audio/x-aiff" => "/a.aif", "video/x-ms-wmv" => "/v.wmv", "video/x-msvideo" => "/v.avi" }.each do |type, url|
+      assert_not MediaTypes.browser_playable?(type, url), url
+    end
+    %w[/v.vob /v.divx /v.m2t?u=1].each { |url| assert_not MediaTypes.browser_playable?("application/octet-stream", url), url }
+    assert MediaTypes.browser_playable?("application/octet-stream", "/v.mp4"), "an untyped file with a playable extension keeps its player"
+    assert_equal MediaTypes::UNPLAYABLE_VIEWER, MediaTypes.viewer_for_item(kind: "video", type: "application/octet-stream", url: "/v.vob")
   end
 
   test "a format's short name comes from its MIME type, else the file's extension" do

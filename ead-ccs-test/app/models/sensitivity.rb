@@ -18,8 +18,9 @@ module Sensitivity
   SENSITIVE_NOTE = /\bsensitive\b/i
 
   # document: a SolrDocument (or anything answering #[])
+  # A restricted viewing classification (MA 15+, R 18+, X 18+, RC: ViewingClassification, CCS-44) is asked about the same way
   def self.sensitive?(document)
-    Array(document["restrictions_tsi"]).any? { |note| note.to_s.match?(SENSITIVE_NOTE) }
+    Array(document["restrictions_tsi"]).any? { |note| note.to_s.match?(SENSITIVE_NOTE) } || ViewingClassification.restricted?(document)
   end
 
   # The visitor's choices for this session. Wraps the session hash; a value that is not "view" or "hide" is ignored.

@@ -69,6 +69,7 @@
     <div class="digital-assets__toolbar-inner">
       <div class="digital-assets__chips">
         <p class="digital-assets__access digital-assets__access--<%= tier.to_s.dasherize %>" data-testid="access-chip"><%= access_chip %></p>
+        <%= render NexusCcs::ClassificationBadgeComponent.new(document: @document) %>
         <% if licence %>
           <p class="digital-assets__licence"><%= icon("media-copyright") %><span><span class="visually-hidden">Licence: </span><%= licence %></span></p>
         <% end %>

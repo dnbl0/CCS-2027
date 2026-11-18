@@ -1,0 +1,26 @@
+/* A record's viewing classification (NexusCcs::ClassificationBadgeComponent, CCS-44): the rating in a small bordered box, as
+   Australian ratings are shown; a restricted rating (MA 15+ and above) is filled. Text contrast meets 4.5:1 in both. */
+.classification-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  padding: 0 var(--ccs-space-2);
+  border: 2px solid var(--ccs-text-brand);
+  border-radius: var(--ccs-radius-sm);
+  background: var(--ccs-white);
+  color: var(--ccs-text-brand);
+  font-size: var(--ccs-font-size-sm);
+  font-weight: var(--ccs-font-weight-semibold);
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.classification-badge--restricted { background: var(--ccs-text-brand); color: var(--ccs-white); }
+
+.classification-badge--small { min-height: 1.25rem; padding: 0 var(--ccs-space-1); font-size: var(--ccs-font-size-xs, 0.75rem); }
+
+.result-card .classification-badge { margin-block: var(--ccs-space-1); }
+
+@media (forced-colors: active) {
+  .classification-badge { border-color: CanvasText; }
+}
