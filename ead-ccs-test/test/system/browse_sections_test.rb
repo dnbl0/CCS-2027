@@ -32,7 +32,7 @@ class BrowseSectionsSystemTest < ApplicationSystemTestCase
     assert_not page.evaluate_script("document.documentElement.scrollWidth > window.innerWidth")
   end
 
-  test "each section has its own layout, and the picture is whole on a mat" do
+  test "each section has its own layout, and the picture fills its tile under a navy scrim (card_tiles.css)" do
     page.current_window.resize_to(1440, 900)
     visit "/browse"
 
@@ -41,7 +41,9 @@ class BrowseSectionsSystemTest < ApplicationSystemTestCase
     end
     widths = page.evaluate_script("[...document.querySelectorAll('.browse-object-types .card-layout__item')].map(e => Math.round(e.getBoundingClientRect().width))")
     assert_operator widths.first, :>, widths[1] * 1.8, "the bento's first card is about twice as wide as a small one"
-    assert_equal "contain", page.evaluate_script("getComputedStyle(document.querySelector('.card-layout .result-card__media img')).objectFit")
+    assert_equal "cover", page.evaluate_script("getComputedStyle(document.querySelector('.card-layout .result-card__media img')).objectFit")
+    assert_match(/linear-gradient/, page.evaluate_script("getComputedStyle(document.querySelector('.card-layout .explore-card:not(.explore-card--text) .result-card__content')).backgroundImage"),
+                 "the name sits on a scrim, so its contrast does not depend on the picture")
     assert_selector ".browse-subjects .card-layout__item--panel a", text: "See all subjects"
   end
 
