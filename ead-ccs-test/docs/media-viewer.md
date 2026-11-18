@@ -43,6 +43,25 @@ and name it in `MediaTypes::VIEWERS`.
   (`MediaTypes.browser_playable?`) gets `media_viewers/_unplayable` instead: a line saying so, then **Download** when the file is open,
   or **Ask the collection team for a copy** (the access request form) when it is view-only. MP4 copies from the DAM team would play.
 
+## Audio and video formats in the DAM (CCS-481, tested 2026-11-18)
+
+Counted from the DAM sync (`dam_assets`) and tried in Chrome on localhost. A format web browsers cannot play gets the fallback
+(`media_viewers/_unplayable`): a line saying so, then **Download** when the file is open, or **Ask the collection team for a copy**
+when it is view-only. Whether a file plays is decided by its type, or by its extension when the DAM sync could not tell the type
+(`MediaTypes.browser_playable?`).
+
+| Format | In the DAM | In a browser | On the record page |
+|---|---|---|---|
+| WAV (audio) | 872 | plays (checked: an 18-minute interview) | player |
+| MP3 (audio) | 131 | plays | player |
+| AIF / AIFF (audio) | 113 | Safari only | fallback |
+| MP4 (video) | 308 | plays | player |
+| MOV (video) | 53 | most play (H.264); some codecs do not | player |
+| WMV (video) | 85 | none | fallback (checked) |
+| AVI, VOB, DivX, M2T (video) | 24 | none | fallback (by extension: the sync records no type) |
+
+MP3 or MP4 copies from the DAM team would let the AIFF, WMV and older video files play in the page.
+
 ## What needs a decision
 
 **1. An image server (IIIF Image API).** The app serves static files from `public/digital-assets`; the IIIF Image API needs a

@@ -28,6 +28,7 @@
 @import url("components/card_layout.css");
 @import url("components/browse.css");
 @import url("components/results_toolbar.css");
+@import url("components/classification_badge.css");
 @import url("components/collection_intro.css");
 @import url("components/pagination.css");
 @import url("components/back_to_top.css");
@@ -70,3 +71,5 @@
 @import url("components/debias.css");
 @import url("components/responsive.css");
 @import url("components/film_polish.css");
+/* Last: the card tiles restyle the cards and the home collections, over card_layout.css, explore.css and film_polish.css's masonry */
+@import url("components/card_tiles.css");

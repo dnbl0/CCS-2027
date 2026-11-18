@@ -18,9 +18,13 @@ visit after a day does, and a cache entry that is being rebuilt is still served 
 
 ## Rules every layout follows
 
-- **The picture is whole**, on a mat (`object-fit: contain`), never cropped; no layout needs the picture's shape or size, so the DAM's pictures
-  (whose size is not known) work.
-- **No text over a picture**: the name and description are on the card's own white caption, so contrast does not depend on the image.
+- **The picture fills its tile** (`object-fit: cover`, centred), since 2026-11-18 (Dean asked for picture-led sections like Google Arts &
+  Culture's, in our own words and tokens). No layout needs the picture's size, so the DAM's pictures work. The record page always shows the
+  whole picture. Styles: `components/card_tiles.css`, loaded last in `application.css`.
+- **The name sits on a navy scrim** at the foot of the tile: at least 85% navy wherever there is text, so white text keeps about 12:1 or more
+  contrast whatever the picture. In forced-colours mode the caption takes the system colours.
+- **Sections are centred** (heading and intro) with **See all** under the cards (`CardSectionComponent`). The home Time section is the
+  page's one navy band. The home collections are a mosaic of picture tiles led by a large one (`ExploreComponent`, over `film_polish.css`'s masonry).
 - **A card with no picture** is its name on one of the Explore tints, as large as the cell.
 - **The markup is the same in every layout**: a list of articles, each with one heading link. The wall's panel sits after the first card in
   the source, so the reading order follows what is seen.
@@ -37,6 +41,5 @@ visit after a day does, and a cache entry that is being rebuilt is still served 
 
 ## Not done (yet)
 
-- The fan of overlapping cards with a larger centre card, and a picture wall with no captions, were left out: both depend on motion or
-  on text over pictures.
+- The fan of overlapping cards with a larger centre card was left out: it depends on motion.
 - The home page's collection tiles keep their own design (monogram tiles).

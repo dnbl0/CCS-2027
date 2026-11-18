@@ -49,7 +49,7 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     JS
   end
 
-  test "on a desktop: no axe violations (WCAG 2.2 AA), three collection tiles in a row, targets of 44px, then a mosaic of cards in each of three sections" do
+  test "on a desktop: no axe violations (WCAG 2.2 AA), a mosaic of collection tiles led by a large one, targets of 44px, then a mosaic of cards in each of three sections" do
     keep(counts)
     page.current_window.resize_to(1440, 900)
     visit "/"
@@ -58,9 +58,10 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
     assert_empty small_targets
     assert_not sideways_scroll?
-    tops = page.evaluate_script("[...document.querySelectorAll('ul.explore__tiles > .explore__tile')].map(t => Math.round(t.getBoundingClientRect().top))")
-    assert_equal 1, tops.first(3).uniq.size, "the first three tiles are in one row"
-    assert_operator tops[3], :>, tops[0]
+    boxes = page.evaluate_script("[...document.querySelectorAll('ul.explore__tiles > .explore__tile')].map(t => { const r = t.getBoundingClientRect(); return [Math.round(r.top), Math.round(r.width)] })")
+    assert_operator boxes[0][1], :>, boxes[1][1] * 1.8, "the first collection tile is the large one (card_tiles.css)"
+    assert_equal boxes[0][0], boxes[1][0], "the next tiles start beside it"
+    assert_operator boxes.last[0], :>, boxes[0][0], "the tiles wrap onto a second row"
     assert_selector ".explore-kinds .card-layout--bento, .explore-places .card-layout--rail, .explore-periods .card-layout--strip", count: 3
     assert_selector ".explore-places article.result-card h3 a", text: "Australia"
     colours = page.evaluate_script("['hero','about','explore','explore-kinds','explore-places','explore-periods'].length && [...document.querySelectorAll('main > .ccs-section:not(.ccs-section--hero)')].map(s => getComputedStyle(s).backgroundColor)")
@@ -81,14 +82,14 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     assert_selector ".explore-places article.result-card h3 a", text: "Australia"
   end
 
-  test "with example images the section has no axe violations, the picture is whole and the Indigenous Collections tile is still text only" do
+  test "with example images the section has no axe violations, the picture fills its tile and the Indigenous Collections tile is still text only" do
     keep(counts(with_image: true))
     visit "/"
 
     assert_selector "section.explore img.explore__image", count: 1
     assert_selector "li.explore__tile:nth-child(1) img"
     assert_no_selector "li.explore__tile:nth-child(5) img"
-    assert_equal "contain", page.evaluate_script("getComputedStyle(document.querySelector('.explore__image')).objectFit")
+    assert_equal "cover", page.evaluate_script("getComputedStyle(document.querySelector('.explore__image')).objectFit")
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
   end
 

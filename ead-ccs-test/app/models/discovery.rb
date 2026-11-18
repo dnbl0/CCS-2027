@@ -13,7 +13,7 @@ module Discovery
   # The fields the cards, the eligibility rules and the similarity query need; not the whole record (assets_json is large)
   FIELDS = %w[
     id title_tsim creator_ssim object_type_ssim collection_ssim format thumbnail_path_ssi has_digital_asset_bsi
-    licence_type_ssim digital_asset_metadata_ssm access_condition_ssi restrictions_tsi date_start_isi production_date_ssim
+    licence_type_ssim digital_asset_metadata_ssm access_condition_ssi restrictions_tsi digital_asset_advisory_classification_ssim date_start_isi production_date_ssim
     digital_asset_large_paths_ssim digital_asset_download_paths_ssim
   ].freeze
 
