@@ -48,6 +48,14 @@ module MediaTypes
   # change it here and nowhere else. Absent today, so every image falls back to its plain file.
   IIIF_INFO_FIELD = "iiif_info_urls_ssim"
 
+  # Audio and video a web browser plays itself. The DAM holds videos as WMV (video/x-ms-wmv), which none plays: such a file gets
+  # UNPLAYABLE_VIEWER (the file to download, or a request for a copy) rather than a player that stays blank.
+  BROWSER_PLAYABLE = %w[video/mp4 video/webm video/ogg video/quicktime audio/mpeg audio/mp3 audio/wav audio/x-wav audio/wave
+                        audio/ogg audio/aac audio/mp4 audio/x-m4a audio/flac audio/webm].freeze
+  UNPLAYABLE_VIEWER = "media_viewers/unplayable"
+  # Short names for formats whose MIME subtype is not one
+  FORMAT_NAMES = { "video/x-ms-wmv" => "WMV", "video/x-msvideo" => "AVI", "video/x-flv" => "FLV", "audio/x-ms-wma" => "WMA" }.freeze
+
   module_function
 
   # The Type for a file, from any of what is known about it
@@ -57,6 +65,30 @@ module MediaTypes
   end
 
   def viewer_for(kind) = VIEWERS.fetch(kind.to_sym, UNSUPPORTED_VIEWER)
+
+  # The viewer for one media item (Collections::DigitalMedia.parse): its kind's, unless it is audio or video a browser cannot play
+  def viewer_for_item(item)
+    return UNPLAYABLE_VIEWER if %w[audio video].include?(item[:kind].to_s) && !browser_playable?(item[:type])
+
+    viewer_for(item[:kind])
+  end
+
+  # Whether a browser plays this audio or video type. A blank type, or one that is not audio or video (a DAM file whose type the
+  # sync could not tell), is left for the browser to try.
+  def browser_playable?(mime)
+    type = mime.to_s.downcase.split(";").first.to_s.strip
+    return true unless type.match?(%r{\A(audio|video)/})
+
+    BROWSER_PLAYABLE.include?(type)
+  end
+
+  # "WMV", "AVI", "MP4": a format's short name, from its MIME type or else the file's extension
+  def format_name(mime, url)
+    type = mime.to_s.downcase
+    FORMAT_NAMES[type] || File.extname(URI.parse(url.to_s).path.to_s).delete_prefix(".").upcase.presence || type.split("/").last.to_s.upcase
+  rescue URI::InvalidURIError
+    type.split("/").last.to_s.upcase
+  end
 
   def from_mime(mime)
     case mime.to_s.downcase
