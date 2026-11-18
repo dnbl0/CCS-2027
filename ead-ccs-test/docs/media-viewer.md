@@ -38,9 +38,10 @@ and name it in `MediaTypes::VIEWERS`.
   "original" embed link; they play in the same browser players. A type that is not `audio/*` or `video/*` (for a DAM file name with no
   known extension the sync writes `application/octet-stream`) is left off the `<source>`, so the browser reads the file instead of
   refusing it. `media-src` allows this site, `https://unimelbourne.widen.net` and the host of `CCS_MEDIA_BASE_URL` when that is absolute.
-- **Not checked against the live DAM** (no DAM calls from this work): that the "original" link of an audio or video asset is served
-  inline with its real content type. If it is served as a download, the players will not play it; the fix is in the DAM's embed settings
-  or a different link type in the sync, not here.
+- **Checked against the live DAM (2026-11-18):** WAV audio plays inline from its "original" link. The DAM's videos are WMV
+  (`video/x-ms-wmv`), which no web browser plays, so a player would stay blank. Audio or video in a format browsers cannot play
+  (`MediaTypes.browser_playable?`) gets `media_viewers/_unplayable` instead: a line saying so, then **Download** when the file is open,
+  or **Ask the collection team for a copy** (the access request form) when it is view-only. MP4 copies from the DAM team would play.
 
 ## What needs a decision
 
