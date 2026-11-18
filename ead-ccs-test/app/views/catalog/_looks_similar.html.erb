@@ -1,0 +1,5 @@
+<%# "Looks similar" (docs/colour-and-clean-up.md): an empty lazy frame, filled from /catalog/:id/looks-similar when it nears the screen.
+    Not drawn for a record without an image a visitor may see. document: the record. %>
+<% if LooksSimilar.eligible?(document) %>
+  <turbo-frame id="looks-similar" src="<%= looks_similar_path(document.id) %>" loading="lazy"></turbo-frame>
+<% end %>

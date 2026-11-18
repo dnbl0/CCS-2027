@@ -1,0 +1,21 @@
+# The Materials / Medium filter's terms (rake index:normalise, Normalise::Materials). PLACEHOLDER: for the collections team to review.
+#
+# Each material_ssim value is split on commas, semicolons, " and " and " on " ("oil on canvas" gives "oil" and "canvas"), trimmed and
+# lower-cased. A term in `stop` is left out; a term in `synonyms` is replaced by its preferred form. Edit and run index:normalise again.
+stop:
+  - unknown
+  - various
+  - other
+  - mixed
+  - n/a
+  - na
+  - "?"
+synonyms:
+  oils: oil
+  oil paint: oil
+  water colour: watercolour
+  water-colour: watercolour
+  watercolor: watercolour
+  card: cardboard
+  lead pencil: graphite pencil
+  silver gelatin photograph: gelatin silver photograph

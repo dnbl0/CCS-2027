@@ -1,0 +1,16 @@
+<%# The record page's "Looks similar": a section like More like this, with the record page's own cards (RecordCardComponent), up to eight %>
+<turbo-frame id="looks-similar" target="_top">
+  <div class="more-like-this looks-similar">
+    <div class="more-like-this__inner">
+      <section id="looks-similar-records" class="object-cards" aria-labelledby="looks-similar-heading">
+        <h2 id="looks-similar-heading" class="more-like-this__heading"><%= t("colours.looks_similar.heading") %></h2>
+        <p class="object-cards__description"><%= t("colours.looks_similar.description") %></p>
+        <ul class="object-cards__list">
+          <% @documents.each do |document| %>
+            <li class="object-cards__item"><%= render NexusCcs::RecordCardComponent.new(document: document) %></li>
+          <% end %>
+        </ul>
+      </section>
+    </div>
+  </div>
+</turbo-frame>
