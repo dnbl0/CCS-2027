@@ -29,6 +29,14 @@ module NexusCcs
       chosen.any? { |value| value.start_with?("#{path}#{Geo::Hierarchy::SEPARATOR}") }
     end
 
+    # A region's countries are always drawn; the levels under a country only once it or a place in it is chosen (a drill-down),
+    # so a results page draws a few hundred filter links rather than every state and town (docs/time-and-place.md)
+    def children_shown?(node)
+      return false if node.children.empty?
+
+      Geo::Hierarchy.depth(node.item.value) == 1 || chosen.include?(node.item.value.to_s) || open?(node)
+    end
+
     def chosen = @chosen ||= Array(helpers.search_state.filter(facet_config.key).values).map(&:to_s)
 
     def label(node) = Geo::Hierarchy.label(node.item.value)

@@ -1,7 +1,7 @@
 <%# One level of the Place filter and, in a disclosure, the levels under it (NexusCcs::PlaceHierarchyFacetComponent) %>
 <li>
   <div class="place-hierarchy__row"><%= component.item(node) %></div>
-  <% if node.children.any? %>
+  <% if component.children_shown?(node) %>
     <details<%= " open" if component.open?(node) %>>
       <summary><%= t("nexus_ccs.place_hierarchy.within", place: component.label(node)) %></summary>
       <ul>

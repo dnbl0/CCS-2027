@@ -54,3 +54,11 @@ plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"]
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 # In other environments, only set the PID file if requested.
 pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
+
+# Load the pages that are slow on an empty cache in each process that answers requests, after it boots and every few minutes
+# (app/models/cache_warmer.rb; CACHE_WARM=off turns it off). With several workers, each worker warms its own cache once loaded.
+if ENV.fetch("WEB_CONCURRENCY", 0).to_i > 1
+  before_worker_boot { CacheWarmer.start }
+else
+  after_booted { CacheWarmer.start }
+end
