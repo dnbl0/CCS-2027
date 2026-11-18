@@ -20,6 +20,9 @@ class SeoHeadTest < ActionDispatch::IntegrationTest
     "viewonly" => record("viewonly", "licence_type_ssim" => [ "Copyright - Current" ]),
     "request" => record("request", "licence_type_ssim" => [ "ICIP Rights" ]),
     "sensitive" => record("sensitive", "restrictions_tsi" => [ "Not for publishing. Culturally sensitive images." ]),
+    "dam" => record("dam", "thumbnail_path_ssi" => "https://unimelbourne.widen.net/content/t1/jpeg/dam.jpg?w=800",
+                    "digital_asset_paths_ssim" => [ "https://unimelbourne.widen.net/content/t1/jpeg/dam.jpg?w=800" ],
+                    "digital_asset_large_paths_ssim" => [ "https://unimelbourne.widen.net/content/t1/jpeg/dam.jpg?w=2000" ]),
     "evil" => record("evil", "title_tsim" => [ "\"><script>alert(1)</script>" ], "description_tsim" => [ "</script><script>alert(2)</script>" ])
   }.freeze
 
@@ -36,6 +39,9 @@ class SeoHeadTest < ActionDispatch::IntegrationTest
   end
   teardown { Rails.configuration.x.stock_record_ids = nil }
 
+  SHARE_CARD = "http://www.example.com/share-card.png"
+  SHARE_CARD_ALT = "Collections Navigator, University of Melbourne cultural collections"
+
   def robots_meta = css_select("meta[name=robots]").first&.[]("content")
   def canonical = css_select("link[rel=canonical]").first&.[]("href")
   def meta(name) = css_select("meta[name='#{name}'], meta[property='#{name}']").first&.[]("content")
@@ -49,8 +55,9 @@ class SeoHeadTest < ActionDispatch::IntegrationTest
     assert_match(/cultural collections/, meta("description"))
     assert_equal "website", meta("og:type")
     assert_equal "Collections Navigator - University of Melbourne", meta("og:title")
-    assert_equal "summary", meta("twitter:card")
-    assert_nil meta("og:image")
+    assert_equal SHARE_CARD, meta("og:image"), "a page with no record image shares the site's card"
+    assert_equal SHARE_CARD_ALT, meta("og:image:alt")
+    assert_equal "summary_large_image", meta("twitter:card")
     site = json_ld.sole
     assert_equal "WebSite", site["@type"]
     assert_equal "http://www.example.com/catalog?q={search_term_string}", site.dig("potentialAction", "target", "urlTemplate")
@@ -94,14 +101,27 @@ class SeoHeadTest < ActionDispatch::IntegrationTest
     assert_no_match(/digital-assets\/large/, css_select("head").to_s)
   end
 
-  test "a view-only record is indexed but has no image in any tag" do
+  test "a record whose image is in the DAM shares the DAM's address, with the record's title as the image's text" do
+    with_env(@env) { get "/catalog/dam" }
+
+    assert_equal "https://unimelbourne.widen.net/content/t1/jpeg/dam.jpg?w=800", meta("og:image")
+    assert_equal "https://unimelbourne.widen.net/content/t1/jpeg/dam.jpg?w=800", meta("twitter:image")
+    assert_equal "Record dam", meta("og:image:alt")
+    assert_equal "Record dam", meta("twitter:image:alt")
+    assert_equal "summary_large_image", meta("twitter:card")
+  end
+
+  # A share card's image is copied to the sharing site's servers and shown to anyone there: a reproduction a view-only licence
+  # does not allow. So a view-only record shares the site's card, never its own image.
+  test "a view-only record is indexed and shares the site's card, not its own image" do
     with_env(@env) { get "/catalog/viewonly" }
 
     assert_equal "noai, noimageai", robots_meta
-    assert_nil meta("og:image")
-    assert_nil meta("twitter:image")
-    assert_nil json_ld.sole["image"]
-    assert_equal "summary", meta("twitter:card")
+    assert_equal SHARE_CARD, meta("og:image")
+    assert_equal SHARE_CARD, meta("twitter:image")
+    assert_equal SHARE_CARD_ALT, meta("og:image:alt")
+    assert_nil json_ld.sole["image"], "the structured data names no image: the card is not the record's"
+    assert_no_match(/digital-assets/, css_select("head").to_s)
   end
 
   test "a request-tier record and a sensitive record leak no asset address, are noindex, follow, and have a general description and no JSON-LD" do
@@ -114,7 +134,7 @@ class SeoHeadTest < ActionDispatch::IntegrationTest
       assert_equal "noindex, follow, noai, noimageai", robots_meta, id
       assert_equal "noindex, follow, noai, noimageai", response.headers["X-Robots-Tag"], id
       assert_empty json_ld, id
-      assert_nil meta("og:image"), id
+      assert_equal SHARE_CARD, meta("og:image"), id
       assert_no_match(/A description of/, meta("description"), id)
     end
   end

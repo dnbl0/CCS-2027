@@ -31,7 +31,12 @@ The rules are in `RobotsPolicy`. The result goes out as the `X-Robots-Tag` heade
 | every public page's head | meta description, canonical link, Open Graph and Twitter card tags, JSON-LD (the home page: `WebSite` with a `SearchAction` to `/catalog?q=...`; a record page: `CreativeWork`, or `VisualArtwork` for paintings, prints, photographs and the like) | `PageMeta`, `StructuredData` |
 
 Page titles are the pages' own. A record's image appears in Open Graph, Twitter and JSON-LD only when the record is in the
-`:open` tier, is not sensitive, and has a thumbnail (the 800 px thumbnail, never the large file).
+`:open` tier, is not sensitive, and has a thumbnail (the 800 px thumbnail, never the large file). For a DAM record that is the DAM's
+own thumbnail link, used as it is. The image carries the record's title as its text (`og:image:alt`, `twitter:image:alt`). A view-only
+record never shares its own image: a sharing site copies the picture to its own servers and shows it to anyone, a reproduction that
+tier does not allow. It, and every other page with no open record image, shares the site's card instead (`public/share-card.png`,
+1200 x 630, drawn from `public/share-card.svg`; `PageMeta::SHARE_CARD`), so a link never lands as a bare text card. JSON-LD names
+no image for those pages.
 Canonical links for results pages keep the search words, filters, range and advanced clauses (and the page after the first) and drop
 `sort`, `view`, `per_page`, tracking parameters and anything unknown (`CanonicalUrl`).
 

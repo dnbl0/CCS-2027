@@ -168,7 +168,23 @@ class CatalogController < ApplicationController
   # so it is not listed beside itself
   after_action :remember_viewed_record, only: :show
 
+  # The search box's suggestions: what each one is (a creator, collection, object type or title, CategorisedSuggestions), from facet
+  # values so the index needs no change; Blacklight's own suggester terms when nothing is categorised. Never an error page: a
+  # failing Solr gives an empty list.
+  def suggest
+    @categorised = CategorisedSuggestions.for(params[:q])
+    @suggestions = @categorised.any? ? [] : blacklight_suggestions
+    render "suggest", layout: false
+  end
+
   private
+
+  def blacklight_suggestions
+    suggestions_service.suggestions
+  rescue StandardError => error
+    Rails.logger.warn("Suggestions unavailable: #{error.class}: #{error.message}")
+    []
+  end
 
   def remember_viewed_record
     RecentlyViewed.new(session).record(@document.id) if @document && response.successful?

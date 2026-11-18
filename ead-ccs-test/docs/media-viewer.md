@@ -28,6 +28,21 @@ The mapping lives in `MediaTypes` (`app/models/media_types.rb`): format type (th
 type or file extension, to a kind, and a kind to a viewer partial in `app/views/media_viewers/`. To add a viewer, add a partial
 and name it in `MediaTypes::VIEWERS`.
 
+## DAM media (added 2026-11-18)
+
+- **Images.** The DAM sync writes the DAM's 2000px embed links into `digital_asset_large_paths_ssim`. With no IIIF info.json, **Zoom and
+  pan** opens that image as OpenSeadragon's simple image source (the whole picture, zoomable to 3x its pixels). An image on another host
+  is drawn with OpenSeadragon's canvas drawer and without asking for CORS (its WebGL drawer cannot use an image the host sends without
+  CORS headers). `img-src` already allows any https host.
+- **Audio and video.** The DAM sync writes each file as `kind|type|url|label` in `digital_media_ssim`, the url being the DAM's
+  "original" embed link; they play in the same browser players. A type that is not `audio/*` or `video/*` (for a DAM file name with no
+  known extension the sync writes `application/octet-stream`) is left off the `<source>`, so the browser reads the file instead of
+  refusing it. `media-src` allows this site, `https://unimelbourne.widen.net` and the host of `CCS_MEDIA_BASE_URL` when that is absolute.
+- **Checked against the live DAM (2026-11-18):** WAV audio plays inline from its "original" link. The DAM's videos are WMV
+  (`video/x-ms-wmv`), which no web browser plays, so a player would stay blank. Audio or video in a format browsers cannot play
+  (`MediaTypes.browser_playable?`) gets `media_viewers/_unplayable` instead: a line saying so, then **Download** when the file is open,
+  or **Ask the collection team for a copy** (the access request form) when it is view-only. MP4 copies from the DAM team would play.
+
 ## What needs a decision
 
 **1. An image server (IIIF Image API).** The app serves static files from `public/digital-assets`; the IIIF Image API needs a

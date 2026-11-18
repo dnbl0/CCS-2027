@@ -13,6 +13,13 @@ export function tileSource(source) {
   return source.info ? source.info : { type: "image", url: source.url }
 }
 
+// A plain image on another host (a DAM embed link, 2000px) is drawn as it is, without asking for CORS headers the host may not send.
+// OpenSeadragon's WebGL drawer cannot use such an image (it would warn, then fall back), so the canvas drawer is used from the start.
+export function crossOriginImage(source) {
+  if (source.info) return false
+  try { return new URL(source.url, window.location.href).origin !== window.location.origin } catch { return false }
+}
+
 export function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches
 }
@@ -32,6 +39,7 @@ export async function createViewer(element, source, { label } = {}) {
     constrainDuringPan: true,
     maxZoomPixelRatio: 3,
     crossOriginPolicy: source.info ? "Anonymous" : false,
+    drawer: crossOriginImage(source) ? "canvas" : ["webgl", "canvas", "html"],
     tabIndex: 0
   })
   nameCanvas(viewer, label || source.alt)

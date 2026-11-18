@@ -13,10 +13,17 @@
 #   stock        the record's (a comparison copy)  /catalog/:id (noindex)
 #   browse       Browse::Meta (hubs, entity pages) the page + its letter / page; JSON-LD CollectionPage (noindex when thin, filtered or on page 2 on)
 #
-# No image, and a general description, for a record the policy withholds or that is sensitive.
+# The share image (og:image, twitter:image) is the record's own only when its pictured image is open (StructuredData.image):
+# a sharing site copies the image to its own servers and shows it to anyone, a reproduction a view-only licence does not allow.
+# Every other page, a view-only, withheld or sensitive record included, shares the site's card (SHARE_CARD), so a link never
+# lands as a bare text card. A general description for a record the policy withholds or that is sensitive.
 class PageMeta
   # The path's first segment => the key in seo.description; any other page is described as About
   PAGE_DESCRIPTIONS = { "accessibility" => "accessibility", "privacy" => "privacy", "help" => "help", "language-in-our-records" => "language", "discover" => "discover" }.freeze
+
+  # The site's own share card, 1200 x 630 (public/share-card.png, drawn from public/share-card.svg)
+  SHARE_CARD = "/share-card.png"
+  SHARE_CARD_ALT = "Collections Navigator, University of Melbourne cultural collections"
 
   attr_reader :canonical_url, :robots, :description, :title, :og_image, :json_ld
 
@@ -31,13 +38,18 @@ class PageMeta
     @canonical_url = canonical_for(base_url, path, params)
     @robots = RobotsPolicy.directive(path, params, document: @document, thin: thin_browse_page?(params))
     @description = description_for(params)
-    @og_image = StructuredData.image(@document, base_url) if @document
+    @record_image = StructuredData.image(@document, base_url) if @document
+    @og_image = @record_image || "#{base_url}#{SHARE_CARD}"
     @json_ld = json_ld_for(base_url)
   end
 
   def indexed? = !robots.to_s.include?("noindex")
   def og_type = @type == :record ? "article" : "website"
-  def twitter_card = og_image ? "summary_large_image" : "summary"
+  def twitter_card = "summary_large_image"
+
+  # The shared image's text alternative (read aloud by screen readers on the sites it lands on): the record's title for its own
+  # image, else the card's
+  def og_image_alt = @record_image ? StructuredData::Description.title(@document) : SHARE_CARD_ALT
 
   private
 

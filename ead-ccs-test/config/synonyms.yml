@@ -1,0 +1,11 @@
+# Search synonyms, applied when a visitor searches (QuerySynonyms, through the SearchBuilder): searching any word or phrase of a group
+# also finds records with the others. No Solr schema change, reindex or reload is needed; the app reads this file when it starts.
+#
+# The collections team supplies the terms. Until they do, the list is empty and searches are unchanged. Write each group as a list of
+# words or short phrases that mean the same thing, for example:
+#
+#   groups:
+#     - [ word, another word ]
+#
+# (Solr's own solr/conf/synonyms.txt still applies inside Solr; this list is for terms the team wants to change without the dev team.)
+groups: []
