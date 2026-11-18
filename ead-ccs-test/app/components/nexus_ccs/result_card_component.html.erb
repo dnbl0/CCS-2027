@@ -11,6 +11,7 @@
   <% end %>
   <div class="result-card__content">
     <%= title %>
+    <%= render NexusCcs::ClassificationBadgeComponent.new(document: document, size: :small) %>
     <% if lines.any? %>
       <ul class="result-card__lines">
         <% line_fields.each do |field, line| %><li><%= line_html(field, line) %></li><% end %>

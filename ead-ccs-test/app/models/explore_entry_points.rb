@@ -189,7 +189,7 @@ module ExploreEntryPoints
   # viewable: true (the record types, places and periods) takes any record whose thumbnail a result card would show instead (its asset
   # may be seen, AccessPolicy.view?, and it is not sensitive), the thumbnail being the DAM's own (a full address) or a file held here.
   def self.example_image(group_filter, skip: [], viewable: false)
-    fq = viewable ? [ "thumbnail_path_ssi:*", "-restrictions_tsi:sensitive", group_filter ] : [ FreeReuse.filter_query, "has_digital_asset_bsi:true", "-restrictions_tsi:sensitive", "{!prefix f=thumbnail_path_ssi}#{THUMBNAIL_DIRECTORY}", group_filter ]
+    fq = viewable ? [ "thumbnail_path_ssi:*", "-restrictions_tsi:sensitive", ViewingClassification::EXCLUDE_RESTRICTED, group_filter ] : [ FreeReuse.filter_query, "has_digital_asset_bsi:true", "-restrictions_tsi:sensitive", "{!prefix f=thumbnail_path_ssi}#{THUMBNAIL_DIRECTORY}", group_filter ]
     response = Discovery.search(q: "*:*", sort: "id asc", rows: IMAGE_CANDIDATES, fq: fq)
     response.documents.each do |document|
       next if skip.include?(document.id.to_s)

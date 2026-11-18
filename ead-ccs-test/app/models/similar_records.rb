@@ -33,7 +33,7 @@ class SimilarRecords
   CANDIDATES = 30           # asked for, so that dropping unlistable and weak ones still leaves enough
   SHOWN = 4                 # cards in the section (one row of the record cards)
   # FILM COPY: the section is "Similar objects" and shows only records with an image this visitor may see (record_card_component.rb's rule)
-  ASSET_FILTERS = [ "has_digital_asset_bsi:true", "thumbnail_path_ssi:[* TO *]", "-restrictions_tsi:sensitive" ].freeze
+  ASSET_FILTERS = [ "has_digital_asset_bsi:true", "thumbnail_path_ssi:[* TO *]", "-restrictions_tsi:sensitive", ViewingClassification::EXCLUDE_RESTRICTED ].freeze
   MINIMUM = 2               # fewer than this and the section is not shown
   MIN_SCORE_RATIO = 0.35
   MAX_PER_CREATOR = 3       # so a prolific creator's series does not fill the section

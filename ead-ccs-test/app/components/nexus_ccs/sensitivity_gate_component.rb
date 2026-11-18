@@ -26,8 +26,13 @@ module NexusCcs
     def viewing? = state == :viewing
     def declined? = state == :declined
 
-    def title = t("nexus_ccs.sensitivity.#{state}.title")
-    def body = t("nexus_ccs.sensitivity.#{state}.body")
+    # A record gated for its viewing classification (CCS-44) names the rating; any other sensitive record has the general wording
+    def title = classified? ? t("nexus_ccs.viewing_classification.gate.#{state}.title", rating: rating) : t("nexus_ccs.sensitivity.#{state}.title")
+    def body = classified? ? t("nexus_ccs.viewing_classification.gate.#{state}.body", meaning: meaning) : t("nexus_ccs.sensitivity.#{state}.body")
+
+    def classified? = ViewingClassification.restricted?(@document)
+    def rating = ViewingClassification.rating(@document)
+    def meaning = t("nexus_ccs.viewing_classification.meaning.#{rating.to_s.parameterize(separator: '_')}", default: rating.to_s)
 
     # The buttons for this state: [[label, choice, css class]]
     def choices

@@ -37,8 +37,8 @@ module Categories
   SORTS = %w[count az].freeze
   IMAGE_ROWS = 1000 # records with a thumbnail read for the pictures; values beyond them get a card with no picture
   IMAGE_TAG = "img"
-  IMAGE_FILTERS = [ "{!tag=#{IMAGE_TAG}}thumbnail_path_ssi:*", "{!tag=#{IMAGE_TAG}}-restrictions_tsi:sensitive" ].freeze
-  FIELDS = %w[id title_tsim thumbnail_path_ssi licence_type_ssim digital_asset_metadata_ssm access_condition_ssi restrictions_tsi].freeze
+  IMAGE_FILTERS = [ "{!tag=#{IMAGE_TAG}}thumbnail_path_ssi:*", "{!tag=#{IMAGE_TAG}}-restrictions_tsi:sensitive", "{!tag=#{IMAGE_TAG}}#{ViewingClassification::EXCLUDE_RESTRICTED}" ].freeze
+  FIELDS = %w[id title_tsim thumbnail_path_ssi licence_type_ssim digital_asset_metadata_ssm access_condition_ssi restrictions_tsi digital_asset_advisory_classification_ssim].freeze
 
   def self.all = DIMENSIONS
 

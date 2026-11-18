@@ -68,18 +68,30 @@ module MediaTypes
 
   # The viewer for one media item (Collections::DigitalMedia.parse): its kind's, unless it is audio or video a browser cannot play
   def viewer_for_item(item)
-    return UNPLAYABLE_VIEWER if %w[audio video].include?(item[:kind].to_s) && !browser_playable?(item[:type])
+    return UNPLAYABLE_VIEWER if %w[audio video].include?(item[:kind].to_s) && !browser_playable?(item[:type], item[:url])
 
     viewer_for(item[:kind])
   end
 
-  # Whether a browser plays this audio or video type. A blank type, or one that is not audio or video (a DAM file whose type the
-  # sync could not tell), is left for the browser to try.
-  def browser_playable?(mime)
-    type = mime.to_s.downcase.split(";").first.to_s.strip
-    return true unless type.match?(%r{\A(audio|video)/})
+  # File extensions browsers play, for a file whose type the DAM sync could not tell (application/octet-stream): the DAM holds
+  # .vob, .divx and .m2t videos that way (CCS-481, 2026-11-18), and those must not get a player that stays blank
+  PLAYABLE_EXTENSIONS = %w[mp3 wav m4a aac oga ogg opus flac weba webm mp4 m4v mov ogv].freeze
 
-    BROWSER_PLAYABLE.include?(type)
+  # Whether a browser plays this audio or video. A known audio or video type decides it; otherwise the file's extension does;
+  # a file with neither is left for the browser to try. (CCS-481: the formats the DAM holds and how each is shown are in
+  # docs/media-viewer.md.)
+  def browser_playable?(mime, url = nil)
+    type = mime.to_s.downcase.split(";").first.to_s.strip
+    return BROWSER_PLAYABLE.include?(type) if type.match?(%r{\A(audio|video)/})
+
+    extension = file_extension(url)
+    extension.blank? || PLAYABLE_EXTENSIONS.include?(extension)
+  end
+
+  def file_extension(url)
+    File.extname(URI.parse(url.to_s).path.to_s).delete_prefix(".").downcase
+  rescue URI::InvalidURIError
+    ""
   end
 
   # "WMV", "AVI", "MP4": a format's short name, from its MIME type or else the file's extension
