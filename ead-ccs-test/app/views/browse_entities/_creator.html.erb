@@ -1,0 +1,38 @@
+<%# A maker's page only (Browse::Creator): born, died, nationality and roles when the records say so; their works with pictures; their
+    records by object type; and the makers whose records share their subjects or named collections. Each part is left out when empty. %>
+<% facts = Browse::Creator.facts(entry, result.documents) %>
+<% works = result.documents.select { |document| Showcase.shown?(document) } %>
+<% related = related_entities(Browse::Kind.find("makers"), Browse::Creator.related(entry, result.facets), except: entry) %>
+<% if facts.any? %>
+  <section class="browse-facts creator-facts" aria-labelledby="creator-facts-title">
+    <h2 id="creator-facts-title"><%= t("nexus_ccs.creator.about") %></h2>
+    <dl class="browse-facts__list">
+      <% if facts.born %><div><dt><%= t("nexus_ccs.creator.born") %></dt><dd><%= facts.born %></dd></div><% end %>
+      <% if facts.died %><div><dt><%= t("nexus_ccs.creator.died") %></dt><dd><%= facts.died %></dd></div><% end %>
+      <% if facts.nationality %><div><dt><%= t("nexus_ccs.creator.nationality") %></dt><dd><%= facts.nationality %></dd></div><% end %>
+      <% if facts.roles.any? %><div><dt><%= t("nexus_ccs.creator.roles") %></dt><dd><%= facts.roles.map(&:upcase_first).join(", ") %></dd></div><% end %>
+    </dl>
+  </section>
+<% end %>
+<%= render NexusCcs::RecordCardsComponent.new(id: "creator-works", heading: t("nexus_ccs.creator.works"), documents: works) %>
+<% if result.facets["object_type_ssim"].size > 1 %>
+  <section class="browse-related" aria-labelledby="creator-types-title">
+    <h2 id="creator-types-title"><%= t("nexus_ccs.creator.by_type") %></h2>
+    <ul class="browse-facts__links">
+      <% result.facets["object_type_ssim"].each do |value, count| %>
+        <li><%= link_to value.to_s.upcase_first, search_catalog_path(refine(@search_query, "object_type_ssim", value)) %> <span class="browse-list__count">(<%= number_with_delimiter(count) %>)</span></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
+<% if related.any? %>
+  <section class="browse-related" aria-labelledby="creator-related-title">
+    <h2 id="creator-related-title"><%= t("nexus_ccs.creator.related") %></h2>
+    <p><%= t("nexus_ccs.creator.related_intro") %></p>
+    <ul class="browse-list">
+      <% related.each do |related_entry, count| %>
+        <li><%= link_to related_entry.name, related_entry.path, class: "browse-list__link" %> <span class="browse-list__count"><%= t("browse.records", count: count) %></span></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

@@ -41,6 +41,8 @@
       <p class="browse-facts__action"><%= link_to t("browse.entity.see_all", count: number_with_delimiter(total)), search_catalog_path(@search_query), class: "btn btn-primary" %></p>
     </section>
 
+    <%= render "browse_entities/creator", entry: entry, result: result if entry&.kind&.key == "makers" %>
+
     <section class="browse-records" aria-labelledby="browse-records-title">
       <h2 id="browse-records-title"><%= t("browse.entity.records") %></h2>
       <% if result.documents.empty? %>

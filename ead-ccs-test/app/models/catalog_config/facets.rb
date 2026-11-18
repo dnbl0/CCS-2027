@@ -35,6 +35,7 @@ module CatalogConfig
         options.merge!(limit: 10, more_limit: 40) if filter.solr == "collection_ssim" && ENV["FILM_ALL_COLLECTIONS"].present?
         options[:helper_method] = VALUE_HELPERS[filter.solr] if VALUE_HELPERS.key?(filter.solr)
         config.add_facet_field filter.solr, **options
+        add_place_hierarchy(config, filter) if filter.solr == REGION_FIELD
       end
 
       add_free_reuse_option(config) unless config.facet_fields.key?(FreeReuse::FIELD)
@@ -62,6 +63,18 @@ module CatalogConfig
     # FILM COPY (as CCS-2026 #221): multi-select. The values are alternatives (InclusiveFilterField), the filter query is tagged
     # with the field, and Solr leaves that tag out when it counts the facet's own values, so a chosen collection keeps the others listed.
     MULTI_SELECT = ->(field) { { filter_class: InclusiveFilterField, tag: field, ex: field } }
+
+    REGION_FIELD = "region_ssim"
+    PLACE_HIERARCHY_FIELD = Explore::Places::HIERARCHY_FIELD
+
+    # "Place" (Region > Country > State > Place, written by rake geo:write; docs/time-and-place.md): not a workbook filter, an addition
+    # placed straight after the workbook's Region (#14). Every value is asked for (the tree needs its branches); it shows nothing until
+    # the index has the field. Not on the Advanced search form.
+    def self.add_place_hierarchy(config, region)
+      config.add_facet_field PLACE_HIERARCHY_FIELD, label: I18n.t("nexus_ccs.place_hierarchy.facet"), group: region.group, limit: -1,
+        sort: "count", helper_method: :place_hierarchy_facet_label, component: NexusCcs::PlaceHierarchyFacetComponent,
+        include_in_advanced_search: false
+    end
 
     # "With Digital Asset" (the workbook's filter after Digital Asset Format Type, first asked for by CCS-41): Yes shows the records
     # with an asset a visitor may see (has_digital_asset_bsi), No the rest. filter: its DataModel::Filter (name and section).

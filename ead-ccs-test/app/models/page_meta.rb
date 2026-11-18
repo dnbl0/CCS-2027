@@ -61,7 +61,7 @@ class PageMeta
     in [ "catalog", "show" ] then :record
     in [ "catalog", "advanced_search" ] then :advanced
     in [ "stock_catalog" | "branded_stock_catalog", "show" ] then :stock
-    in [ "browse" | "browse_entities", _ ] then :browse
+    in [ "browse" | "browse_entities" | "categories" | "collection_landings" | "themes" | "stories", _ ] then :browse
     else :other
     end
   end

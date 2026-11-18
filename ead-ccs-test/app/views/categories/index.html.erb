@@ -1,0 +1,15 @@
+<%# Every way of grouping the records, each with its first cards (Categories) and a link to all of them %>
+<% content_for :title, "#{t('nexus_ccs.categories.title')} — Collections Navigator — University of Melbourne" %>
+<% content_for :body_class, "page-browse page-categories" %>
+<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.categories.title"), description: t("nexus_ccs.categories.description")) %>
+<main class="browse browse--hubs" id="main-content">
+  <% Categories.all.each do |dimension| %>
+    <% page = Categories.page(dimension) %>
+    <%= render NexusCcs::CardSectionComponent.new(slug: dimension.slug, prefix: "categories", heading: dimension.title, intro: dimension.intro,
+                                                  see_all: t("browse.cards.see_all", kind: dimension.title.downcase), see_all_path: dimension.path) do %>
+      <% if page&.tiles&.any? %>
+        <%= render NexusCcs::CardLayoutComponent.new(cards: page.tiles.first(4), layout: :grid, label: dimension.title) %>
+      <% end %>
+    <% end %>
+  <% end %>
+</main>

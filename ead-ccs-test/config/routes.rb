@@ -89,6 +89,16 @@ Rails.application.routes.draw do
   get "about", to: "pages#about", as: :about
   # The pages behind the home page's Explore tiles: every object type, place, period, maker and subject
   get "browse", to: "browse#index", as: :browse
+  # Category picture pages, collection and named collection pages, themes and stories (docs/categories-themes-stories.md). Every
+  # list of records on them opens the search page (/catalog) with filters.
+  get "browse/categories", to: "categories#index", as: :categories
+  get "browse/categories/:slug", to: "categories#show", as: :category, constraints: { slug: /[a-z-]+/ }
+  get "browse/:kind/:slug", to: "collection_landings#show", as: :collection_landing,
+                            constraints: { kind: /collections|named-collections/, slug: /[a-z0-9-]+/ }
+  get "themes", to: "themes#index", as: :themes
+  get "themes/:slug", to: "themes#show", as: :theme, constraints: { slug: /[a-z0-9-]+/ }
+  get "stories", to: "stories#index", as: :stories
+  get "stories/:slug", to: "stories#show", as: :story, constraints: { slug: /[a-z0-9-]+/ }
   get "browse/:slug", to: "browse#show", as: :browse_hub
   # Accessibility statement and privacy notice (CCS-148); placeholder wording until the University approves it
   get "accessibility", to: "pages#accessibility", as: :accessibility
@@ -145,6 +155,10 @@ Rails.application.routes.draw do
   get "discover", to: "discover#index", as: :discover
   get "discover/frame", to: "discover#frame", as: :discover_frame
   get "catalog/:id/similar", to: "similar#show", as: :similar, constraints: { id: %r{[^/]+} }, format: false
+
+  # Explore by time and by place (docs/time-and-place.md): lists that open the search with a filter
+  get "explore/time", to: "explore#time", as: :explore_time
+  get "explore/places", to: "explore#places", as: :explore_places
 
   # Entity pages (BrowseEntitiesController), under the browse index pages (BrowseController): one maker, place or subject, one century or decade
   scope "/browse", controller: "browse_entities" do

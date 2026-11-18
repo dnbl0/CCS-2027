@@ -1,0 +1,85 @@
+# The category, collection, theme and story pages and the home page's On this day (docs/categories-themes-stories.md).
+# PLACEHOLDER wording: every string here needs the collections team's approval.
+en:
+  nexus_ccs:
+    placeholder: "Placeholder text, waiting for the collections team's approval."
+    categories:
+      title: "Browse by category"
+      description: "Pictures of the collections grouped by what the records are, what they are made of, where and when they come from, and which collection holds them."
+      intro: "Each card opens the records of that category in the search. The number is how many records it has."
+      sort_label: "Sort categories"
+      sort:
+        count: "Most records"
+        az: "A to Z"
+      showing: "%{count} categories"
+      pagination: "Pages of %{kind}"
+      landing_pages: "Pages about each collection"
+      dimensions:
+        object-types:
+          title: "Object types"
+          intro: "What the records are: works, objects, archives, instruments and more."
+        classifications:
+          title: "Classifications"
+          intro: "The kinds of records the collections use to group them: prints, paintings, documents and more."
+        materials:
+          title: "Materials"
+          intro: "What the objects are made of."
+        regions:
+          title: "Regions"
+          intro: "The parts of the world the objects come from."
+        eras:
+          title: "Eras"
+          intro: "The centuries the objects were made in."
+        collections:
+          title: "Collections"
+          intro: "The University's collections whose records are in Collections Navigator."
+        named-collections:
+          title: "Named collections"
+          intro: "Groups of records within a collection, often a gift or a bequest."
+    showcase:
+      about: "About these records"
+      highlights: "Highlights"
+      see_all: "See all %{count} records"
+      object_types: "Object types"
+      eras: "Eras"
+      named_collections: "Named collections"
+      no_records: "No records match these filters in this copy of the index."
+      none: "None of these records has a picture that can be shown here. The search lists them all."
+      unavailable_title: "This page cannot be shown right now"
+      unavailable: "The collections index is not answering. Please try again in a few minutes."
+      search_all: "Search all records"
+    themes:
+      title: "Themes"
+      description: "Records from across the collections, gathered around a theme."
+      empty: "There are no themes yet."
+    stories:
+      title: "Stories"
+      description: "Stories told with records from the University's collections."
+      empty: "There are no stories yet."
+      by: "By %{author}"
+      published: "Published %{date}"
+      more_results: "See all %{count} results"
+      search_heading: "From the collections"
+      missing_record: "A record shown here is no longer available."
+    creator:
+      about: "About this maker"
+      born: "Born"
+      died: "Died"
+      nationality: "Nationality"
+      roles: "Roles"
+      works: "Works with pictures"
+      by_type: "Records by object type"
+      related: "Related makers"
+      related_intro: "Makers whose records share this maker's subjects or named collections."
+    home_more:
+      on_this_day: "On this day"
+      on_this_day_day: "Records made on %{date} in other years."
+      on_this_day_years: "Records from %{year}, %{count} years ago."
+      ways_in: "More ways in"
+      ways_in_text: "Stories, themes and categories: places to start without a search."
+    lists_help:
+      title: "How saving and sharing work"
+      save: "Select Save on a search result or a record to keep it in Saved records, in this browser."
+      add: "Select Add to list to put a record in one of your own named lists."
+      share: "Open a list and select Share to make a gallery: a link anyone can open to see the list's records. Stop sharing at any time."
+      link: "How saving and sharing work"

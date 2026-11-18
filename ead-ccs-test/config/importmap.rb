@@ -28,3 +28,6 @@ pin "openseadragon", to: "openseadragon.js", preload: STOCK_ENTRIES
 # The openseadragon gem pins its own files for every page; this later pin of the same directory narrows them
 pin_all_from File.join(Gem.loaded_specs.fetch("openseadragon").full_gem_path, "app/javascript/openseadragon-rails"),
   under: "openseadragon-rails", preload: STOCK_ENTRIES
+# Leaflet 1.9.4 (vendored ES module, BSD-2-Clause): the Explore by place map only. Not preloaded: place_map_controller imports it
+# when the visitor asks for the map, so no other page loads it.
+pin "leaflet", to: "leaflet.js", preload: false
