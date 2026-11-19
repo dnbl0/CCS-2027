@@ -1,109 +1,152 @@
-<%# The record page in the CCS 2026 layout (CCS UI "Record-detail", Figma 258:25075): a navy title band, the media on a full-width
-    dark band, a summary (title, creator and date, tags, and the record's actions), then the details as a ruled list in a card with
-    the persistent link card under it, and a Copyright card beside them. The 2027 parts (actions, de-bias and cultural notices,
-    metadata export, browse links) sit in the same places. Private film copy: see docs/handoff-2027.md. %>
+<%# The record page in the approved split layout (Figma "Record page · Approved design (Version 4)", frames 28:2639 and 29:2940):
+    the media on the left, staying in view while the record's column on the right scrolls; one column below 1024px, media first.
+    Related objects, More from the collections and About this record follow at full width (catalog/show). %>
 <%= content_tag @component,
   id: @id,
   data: { "document-id": document.id.to_s.parameterize },
   itemscope: true,
   itemtype: document.itemtype,
-  class: "record record--classic" do %>
-  <div class="record-page" data-controller="record-sections">
-    <section class="record-banner" aria-hidden="true">
-      <div class="record-banner__inner"><p class="record-banner__title"><%= heading %></p></div>
-    </section>
-
-    <div class="record-band<%= ' record-band--empty' unless assets? %>">
-      <div class="record-band__inner">
-        <% if assets? %>
-          <%= render NexusCcs::DigitalAssetsComponent.new(presenter: @presenter) %>
-        <% else %>
-          <%= render NexusCcs::NoImageComponent.new(document: document, url: helpers.solr_document_url(document)) %>
-        <% end %>
-      </div>
+  class: "record record--split" do %>
+  <div class="record-split">
+    <div class="record-split__viewer">
+      <% if assets? %>
+        <%= render NexusCcs::DigitalAssetsComponent.new(presenter: @presenter) %>
+      <% else %>
+        <%= render NexusCcs::NoImageComponent.new(document: document, url: helpers.solr_document_url(document)) %>
+      <% end %>
     </div>
 
-    <div class="record-main">
-      <div class="record-main__inner">
-        <section class="record-summary">
-          <%= render NexusCcs::RecordHeaderComponent.new(document: document, title_markup: title_markup) %>
-          <% if tags.any? %>
-            <ul class="record-summary__tags" aria-label="Tags">
-              <% tags.each do |tag| %>
-                <li><%= link_to tag.value, helpers.search_action_path(filter_query(tag.field, tag.value)), class: "record-tag" %></li>
-              <% end %>
-            </ul>
-          <% end %>
-        </section>
+    <div class="record-split__details">
+      <% if stepper? && (steps = stepper.to_s).strip.present? %><div class="record-split__stepper"><%= steps %></div><% end %>
 
-        <div class="record-main__details">
-          <%= render NexusCcs::CulturalProtocolsNoticeComponent.new(document: document) %>
-          <%= render NexusCcs::DebiasNoticeComponent.new(matches: debias_matches, labels: debias_labels) %>
-          <section class="record-card record-details" aria-labelledby="record-details-title">
-            <h2 class="record-details__title" id="record-details-title"><%= t("nexus_ccs.record_page.sections.object_details") %></h2>
-            <dl class="record-details__list">
-              <% classic_rows.each do |row| %>
-                <div class="record-details__row">
-                  <dt><%= row.label %></dt>
-                  <dd>
-                    <% if row.field == "description_tsim" %>
-                      <% row.values.each_with_index do |value, index| %>
-                        <div class="record-details__truncate" data-controller="truncate">
-                          <span class="record-details__value" data-truncate-target="text"><%= flagged(row, value, index) %></span>
-                          <button type="button" class="record-details__truncate-toggle" data-truncate-target="toggle" data-action="truncate#toggle" hidden>Show more</button>
-                        </div>
-                      <% end %>
-                    <% else %>
-                      <% row.values.each_with_index do |value, index| %>
-                        <span class="record-details__value">
-                          <% if (path = value_link(row, value)) %><%= link_to flagged(row, value, index), path %><% else %><%= flagged(row, value, index) %><% end %>
-                        </span>
-                      <% end %>
+      <header class="record-split__header">
+        <% if collection_name %>
+          <p class="record-split__collection"><%= link_to collection_name, collection_path %></p>
+        <% end %>
+        <h1 class="record-split__title"><%= title_markup %></h1>
+        <% if makers.any? %>
+          <p class="record-split__maker">
+            <% makers.each_with_index do |(name, path), index| %><%= "; " if index.positive? %><% if path %><%= link_to name, path %><% else %><%= name %><% end %><% end %>
+          </p>
+        <% end %>
+        <% if display_date %><p class="record-split__line"><%= display_date %></p><% end %>
+        <% if medium %><p class="record-split__line"><%= medium %></p><% end %>
+      </header>
+
+      <%= render NexusCcs::RecordActionsComponent.new(document: document) %>
+
+      <section class="record-where" aria-labelledby="record-where-heading">
+        <h2 class="record-where__heading" id="record-where-heading">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
+          <%= t("nexus_ccs.record_page.split.where.heading") %>
+        </h2>
+        <p class="record-where__body"><%= where_body %></p>
+        <p class="record-where__action"><a class="record-arrow-link" href="<%= request_to_view_path %>"><%= t("nexus_ccs.record_page.split.where.link") %></a></p>
+      </section>
+
+      <%= render NexusCcs::CulturalProtocolsNoticeComponent.new(document: document) %>
+      <%= render NexusCcs::DebiasNoticeComponent.new(matches: debias_matches, labels: debias_labels) %>
+
+      <% if lead %>
+        <div class="record-split__description">
+          <p class="record-split__lead"><%= lead %></p>
+          <% if description_rest.any? %>
+            <div class="record-details__truncate" data-controller="truncate">
+              <div class="record-split__text" data-truncate-target="text"><% description_rest.each do |paragraph| %><p><%= paragraph %></p><% end %></div>
+              <button type="button" class="record-details__truncate-toggle" data-truncate-target="toggle" data-action="truncate#toggle" hidden>Show more</button>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <section class="record-facts" aria-labelledby="record-details-title">
+        <h2 class="record-facts__heading" id="record-details-title"><%= t("nexus_ccs.record_page.sections.object_details") %></h2>
+        <dl class="record-facts__list">
+          <% detail_rows.each do |row| %>
+            <div class="record-facts__row">
+              <dt><%= row.label %></dt>
+              <dd>
+                <% if term?(row) %>
+                  <ul class="record-terms">
+                    <% row.values.each_with_index do |value, index| %>
+                      <li><% if (path = value_link(row, value)) %><%= link_to flagged(row, value, index), path, class: "record-term" %><% else %><span class="record-term record-term--static"><%= flagged(row, value, index) %></span><% end %></li>
                     <% end %>
-                  </dd>
-                </div>
-              <% end %>
-            </dl>
-            <div class="record-details__export"><%= render NexusCcs::MetadataExportComponent.new(document: document) %></div>
-          </section>
-
-          <section class="record-card record-persistent" aria-labelledby="persistent-link-heading">
-            <%= render NexusCcs::PersistentLinkComponent.new(url: helpers.solr_document_url(document), document: document) %>
-          </section>
-
-          <% partials.each do |partial| %><%= partial %><% end %>
-        </div>
-
-        <div class="record-main__side">
-        <div class="record-summary__actions">
-          <%= render NexusCcs::RecordActionsComponent.new(document: document) %>
-        </div>
-        <aside class="record-card record-copyright" aria-labelledby="record-copyright-title">
-          <h2 class="record-copyright__title" id="record-copyright-title"><%= t("nexus_ccs.record_page.sections.copyright") %></h2>
-          <% unless rights_recorded? %>
-            <p class="record-copyright__none"><%= t("nexus_ccs.rights.none_recorded") %></p>
+                  </ul>
+                <% else %>
+                  <% row.values.each_with_index do |value, index| %>
+                    <span class="record-facts__value"><%= flagged(row, value, index) %></span>
+                  <% end %>
+                <% end %>
+              </dd>
+            </div>
           <% end %>
-          <% if rights_recorded? || dam_caption || responsible_collection %>
-            <dl class="record-copyright__list">
-              <% { t("nexus_ccs.record_page.copyright.credit_line") => credit_line, t("nexus_ccs.record_page.copyright.copyright") => copyright,
-                   t("nexus_ccs.record_page.copyright.licence") => licence, t("nexus_ccs.record_page.copyright.caption") => dam_caption }.each do |label, value| %>
-                <% next if value.blank? %>
-                <div class="record-copyright__item"><dt><%= label %></dt><dd><%= value %></dd></div>
-              <% end %>
-              <% if responsible_collection %>
-                <div class="record-copyright__item">
-                  <dt><%= t("nexus_ccs.record_page.copyright.responsible_collection") %></dt>
-                  <dd><%= link_to responsible_collection, helpers.search_action_path(responsible_collection_query) %></dd>
-                </div>
-              <% end %>
-            </dl>
-          <% end %>
-          <p class="record-copyright__terms"><%= link_to t("nexus_ccs.record_page.copyright.terms"), terms_path %></p>
-          <div class="record-copyright__contact">
+          <div class="record-facts__row" data-controller="clipboard" data-testid="record-identifier">
+            <dt><%= t("nexus_ccs.record_page.split.uom_id") %></dt>
+            <dd class="record-facts__copyable">
+              <span class="record-facts__value" data-clipboard-target="source" data-copy="<%= identifier %>"><%= uom_id %></span>
+              <button type="button" class="record-copy" data-action="clipboard#copy" data-clipboard-target="button" aria-label="<%= t("nexus_ccs.record_page.header.copy_label") %>">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="1" /><path d="M5 15V5a1 1 0 0 1 1-1h10" /></svg>
+                <span data-clipboard-target="label"><%= t("nexus_ccs.record_page.header.copy") %></span>
+              </button>
+              <span class="visually-hidden" role="status" data-clipboard-target="status"></span>
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <div class="record-folds">
+        <details class="record-fold" id="copyright-and-reuse">
+          <summary><h2 class="record-fold__title"><%= t("nexus_ccs.record_page.split.sections.copyright") %></h2></summary>
+          <div class="record-fold__body record-copyright">
+            <% unless rights_recorded? %>
+              <p class="record-copyright__none"><%= t("nexus_ccs.rights.none_recorded") %></p>
+            <% end %>
+            <% if rights_recorded? || dam_caption || responsible_collection %>
+              <dl class="record-fold__list">
+                <% { t("nexus_ccs.record_page.copyright.credit_line") => credit_line, t("nexus_ccs.record_page.copyright.copyright") => copyright,
+                     t("nexus_ccs.record_page.copyright.licence") => licence, t("nexus_ccs.record_page.copyright.caption") => dam_caption }.each do |label, value| %>
+                  <% next if value.blank? %>
+                  <div><dt><%= label %></dt><dd><%= value %></dd></div>
+                <% end %>
+                <% if responsible_collection %>
+                  <div>
+                    <dt><%= t("nexus_ccs.record_page.copyright.responsible_collection") %></dt>
+                    <dd><%= link_to responsible_collection, helpers.search_action_path(responsible_collection_query) %></dd>
+                  </div>
+                <% end %>
+              </dl>
+            <% end %>
+            <p class="record-copyright__terms"><%= link_to t("nexus_ccs.record_page.copyright.terms"), terms_path %></p>
             <%= render NexusCcs::ContactCollectionComponent.new(document: document, url: helpers.solr_document_url(document)) %>
           </div>
-        </aside>
-        </div>
+        </details>
+
+        <% if media_details.any? %>
+          <details class="record-fold" id="media-details">
+            <summary><h2 class="record-fold__title"><%= t("nexus_ccs.record_page.split.sections.media") %></h2></summary>
+            <div class="record-fold__body">
+              <dl class="record-fold__list">
+                <% media_details.each do |label, text| %><div><dt><%= label %></dt><dd><%= text %></dd></div><% end %>
+              </dl>
+            </div>
+          </details>
+        <% end %>
+
+        <details class="record-fold" id="how-to-cite">
+          <summary><h2 class="record-fold__title"><%= t("nexus_ccs.record_page.split.sections.cite") %></h2></summary>
+          <div class="record-fold__body"><%= render NexusCcs::CiteComponent.new(document: document, inline: true) %></div>
+        </details>
+
+        <% if history.any? %>
+          <details class="record-fold" id="acquisition-and-history">
+            <summary><h2 class="record-fold__title"><%= t("nexus_ccs.record_page.split.sections.history") %></h2></summary>
+            <div class="record-fold__body">
+              <dl class="record-fold__list">
+                <% history.each do |label, text| %><div><dt><%= label %></dt><dd><%= text %></dd></div><% end %>
+              </dl>
+            </div>
+          </details>
+        <% end %>
       </div>
     </div>
   </div>

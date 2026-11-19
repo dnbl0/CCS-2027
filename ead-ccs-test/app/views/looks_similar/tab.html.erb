@@ -1,0 +1,4 @@
+<%# The "Looks similar" panel of the record page's "More from the collections" (?tab=1): three result cards, no heading (the tab names it) %>
+<turbo-frame id="more-colours" target="_top">
+  <div class="record-more__cards"><%= render "discover/cards", entries: @documents.first(3).map { |found| FeaturedRecords::Entry.new(document: found, blurb: nil) }, title_tag: :h4 %></div>
+</turbo-frame>

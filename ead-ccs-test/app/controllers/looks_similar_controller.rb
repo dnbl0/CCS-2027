@@ -17,12 +17,13 @@ class LooksSimilarController < CatalogController
     fragment_not_for_indexing
     id = params[:id].to_s
     document = id.length <= 200 ? Discovery.fetch([ id ]).first : nil
-    raise ActionController::RoutingError, "Not Found" unless document
+    return record_not_found! unless document
 
     @documents = LooksSimilar.eligible?(document) ? LooksSimilar.for(document) : []
     return head(:no_content) if @documents.empty?
 
     wrap_documents(@documents)
+    render "looks_similar/tab" if params[:tab] == "1" # a panel of the record page's "More from the collections" tabs
   end
 
   # Blacklight uses #search_action_url for the header's search box

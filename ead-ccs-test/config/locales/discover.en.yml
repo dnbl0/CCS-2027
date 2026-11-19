@@ -18,8 +18,6 @@ en:
           heading: "Trending records"
           description: "The records most viewed in the last %{days} days. The count is of page views only: the site does not record who looked."
     similar:
-      heading: "Similar objects"
-      description: "Objects that share a creator, subject, type of object or place with this one."
       # The labelled rows after it (SimilarRows); %{values} is the record's own values, joined with "or"
       rows:
         or: " or "

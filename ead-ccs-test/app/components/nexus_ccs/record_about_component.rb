@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # "About this record": the persistent link with its Copy link button, who to contact about the record, and a link to suggest a
-  # correction, in one block at the end of the record's details. The correction link goes to the same place as contacting the
-  # team (the collection's email address or its form; the Help page's Contact us section for any other), so it adds no new page.
-  # Its wording is PLACEHOLDER wording (config/locales/record_page.en.yml).
+  # "About this record", the last band of a record page (approved split layout): three rows, each a heading beside its text. Help us
+  # improve this record (the correction link goes where contacting the team does: the collection's email address or its form, or the
+  # Help page's Contact us section, so it adds no new page); Content notice (the advisory every record carries); Use this record (the
+  # persistent link with a Copy button, the details as a spreadsheet when the record may be downloaded, and the IIIF manifest when the
+  # visitor may see its images). Wording marked PLACEHOLDER in config/locales/record_page.en.yml.
   class RecordAboutComponent < ViewComponent::Base
     def initialize(document:, url:)
       @document = document
@@ -22,5 +23,16 @@ module NexusCcs
     end
 
     def correction_new_tab? = contact&.form?
+
+    def advisory = DigitalAssetsComponent::ADVISORY
+
+    # The details as a spreadsheet (CCS-163), offered when the record may be downloaded
+    def export_path = (helpers.metadata_export_path(document.id) if AccessPolicy.download?(document))
+
+    # The IIIF manifest (CCS-57), offered when it would answer: the visitor may see the record's images
+    def manifest_path
+      media = RecordMedia.for(document, session: helpers.session)
+      helpers.manifest_path(document.id) if media.shown? && media.images.any?
+    end
   end
 end

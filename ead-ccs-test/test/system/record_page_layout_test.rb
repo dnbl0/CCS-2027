@@ -1,8 +1,9 @@
 require "application_system_test_case"
 require_relative "../support/stub_records"
 
-# The record page's layout in every variant a record can be in, at a desktop and a phone width: axe (WCAG 2.2 AA rules too), no
-# sideways scroll, one h1, the headings in order, nothing sticky, and targets at least 24px. The records are stand-ins (the Solr core
+# The record page's layout (the approved split layout) in every variant a record can be in, at a desktop and a phone width: axe (WCAG
+# 2.2 AA rules too), no sideways scroll, one h1, the headings in order, nothing sticky but the media column on a wide screen, and
+# targets at least 24px. The records are stand-ins (the Solr core
 # holds no sensitive or withheld record, and no record of each kind by a known id), given to the record page the way the stock pages'
 # test does (accessibility_test.rb): the controller's search service answers with them.
 class RecordPageLayoutSystemTest < ApplicationSystemTestCase
@@ -66,28 +67,29 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
 
   VARIANTS.each do |name, extra|
     WIDTHS.each_key do |width|
-      test "a #{name} record at #{width} width has no axe violations, one h1, ordered headings, no sideways scroll and nothing sticky" do
+      test "a #{name} record at #{width} width has no axe violations, one h1, ordered headings, no sideways scroll and only the media sticky" do
         open_record(extra, width)
 
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
         assert_selector "h1", count: 1
-        assert_selector ".record-page section.record-summary header.record-header h1"
+        assert_selector ".record-split__details header.record-split__header h1"
         assert_equal false, page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
         outline = page.evaluate_script("[...document.querySelectorAll('#main-container h1, #main-container h2, #main-container h3')].filter(e => e.getClientRects().length > 0).map(e => e.tagName + ' ' + e.textContent.trim())")
-        # the media band comes first in this layout, so its (visually hidden) "Digital assets" h2 may precede the title
+        # the media comes first in this layout, so its (visually hidden) "Digital assets" h2 may precede the title
         before_title = outline.take_while { |heading| !heading.start_with?("H1") }
         assert before_title.all? { |heading| heading.match?(/\AH2 Digital assets?\z/) }, outline.inspect
         levels = outline.drop(before_title.size).map { |heading| heading[1].to_i }
         assert levels.each_cons(2).all? { |a, b| b <= a + 1 }, "headings skip a level: #{outline.inspect}"
         assert_includes outline, "H2 Object details"
-        assert_includes outline, "H2 Copyright and use"
+        assert_includes outline, "H2 Copyright and reuse"
 
-        sticky = page.evaluate_script("[...document.querySelectorAll('#main-container *')].filter(e => e.getClientRects().length > 0 && ['sticky', 'fixed'].includes(getComputedStyle(e).position)).map(e => e.tagName + '.' + e.className)")
-        assert_empty sticky
+        # The media column stays in view beside the scrolling details on a wide screen (the approved design); nothing else is sticky
+        sticky = page.evaluate_script("[...document.querySelectorAll('#main-container *')].filter(e => e.getClientRects().length > 0 && ['sticky', 'fixed'].includes(getComputedStyle(e).position)).map(e => e.className)")
+        assert_equal(width == "desktop" ? [ "record-split__viewer" ] : [], sticky)
 
         small = page.evaluate_script(<<~JS)
-          [...document.querySelectorAll('.record-actions button, .record-actions a, .digital-assets__toolbar button, .digital-assets__toolbar a')]
+          [...document.querySelectorAll('.record-actions button, .record-actions a, .digital-assets__controls-row button, .digital-assets__controls-row a, .digital-assets__strip button, .digital-assets__thumb, .result-stepper a, .record-term')]
             .filter(e => e.getClientRects().length > 0).map(e => e.getBoundingClientRect()).filter(r => r.height < 24 || r.width < 24).length
         JS
         assert_equal 0, small, "a control is smaller than 24px"
@@ -111,22 +113,23 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_equal "H1", page.evaluate_script("document.querySelector('#main-container h1, #main-container header h1').tagName")
   end
 
-  test "the media sits on the page, whole, with no dark band and no minimum height; dark only in full screen" do
+  test "the media sits on the page's white, whole, with no dark band and no minimum height; dark only in full screen" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
 
     background = page.evaluate_script("getComputedStyle(document.querySelector('.digital-assets')).backgroundColor")
-    assert_equal "rgba(0, 0, 0, 0)", background
+    assert_includes [ "rgba(0, 0, 0, 0)", "rgb(255, 255, 255)" ], background
     assert_equal "0px", page.evaluate_script("getComputedStyle(document.querySelector('.digital-assets__stage')).minHeight")
     image = page.evaluate_script("(() => { const i = document.querySelector('.digital-assets__image'); return [i.clientHeight, window.innerHeight, getComputedStyle(i).objectFit] })()")
     assert_operator image[0], :<=, image[1] * 0.71
     assert_equal "contain", image[2]
   end
 
-  test "an open record's toolbar has the access chip, the licence, labelled buttons and the one Download link; a view-only record has no download link anywhere" do
+  test "an open record's controls row has the access chip, the licence, named round tools and the one Download; a view-only record has no download link anywhere" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
-    assert_selector ".digital-assets__toolbar .digital-assets__access", text: "Open: view and download"
-    assert_selector ".digital-assets__toolbar a.digital-assets__primary[download]", text: "Download image"
-    assert_selector ".digital-assets__toolbar button", text: "Media information"
+    assert_selector ".digital-assets__controls-row .viewer-chip--open", text: "Open: view and download"
+    assert_selector ".digital-assets__controls-row a.viewer-control[download]", text: "Download image"
+    assert_selector ".digital-assets__controls-row button.viewer-control", text: "Zoom in"
+    assert_selector "details#media-details summary", text: "Media details"
 
     open_record(VARIANTS.fetch("several images, view-only"), "desktop")
     assert_selector ".record-actions .access-notice--view-only"
@@ -141,8 +144,8 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
       assert_selector ".digital-assets__main img[src^='#{LARGE.first}']"
       assert_selector ".digital-assets .access-notice--partly-withheld", text: "1 other digital asset of this record is not shown here"
       assert_selector ".access-notice--partly-withheld a[href='/access_requests/new?document_id=emu-9044']", text: "Request access to it"
-      assert_selector ".digital-assets__toolbar a.digital-assets__primary[download]", text: "Download image"
-      assert_selector ".digital-assets__licence", text: "CC BY"
+      assert_selector ".digital-assets__controls-row a.viewer-control[download]", text: "Download image"
+      assert_selector ".viewer-chip", text: "CC BY"
       notice = page.evaluate_script("(() => { const r = document.querySelector('.access-notice--partly-withheld').getBoundingClientRect(); return [r.left >= 0, r.right <= window.innerWidth] })()")
       assert_equal [ true, true ], notice, "the notice fits the width"
     end
@@ -158,40 +161,41 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
   test "a request-only or sensitive record has no asset address in its page" do
     %w[request-only sensitive].each do |name|
       open_record(VARIANTS.fetch(name), "desktop")
-      assert_no_selector ".record-page img[src*='/digital-assets/']"
-      layout = page.evaluate_script("document.querySelector('.record-page').outerHTML")
+      assert_no_selector ".record-split img[src*='/digital-assets/']"
+      layout = page.evaluate_script("document.querySelector('.record-split').outerHTML")
       assert_not_includes layout, "/digital-assets/"
     end
   end
 
-  test "the media band spans the page; from 1024px the details and the Copyright card are two columns, below it one column in the same order" do
+  test "from 1024px the media is on the left and the record's column on the right, the media staying in view as the column scrolls; below it, one column, media first" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
-    band, details, side = %w[.record-band .record-main__details .record-main__side].map { |selector| page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
-    assert_operator details["top"], :>=, band["bottom"]
-    assert_operator side["left"], :>=, details["right"]
+    rect = ->(selector) { page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
+    viewer, details = rect.call(".record-split__viewer"), rect.call(".record-split__details")
+    assert_operator details["left"], :>=, viewer["right"] - 1
+    assert_in_delta viewer["top"], details["top"], 1
+    page.execute_script("window.scrollTo(0, 600)")
+    assert_in_delta 0, rect.call(".record-split__viewer")["top"], 1, "the media stays in view"
 
     open_record(VARIANTS.fetch("one image, open"), "phone")
-    # one column: summary, actions, details, then the Copyright card
-    details, copyright = %w[.record-main__details .record-copyright].map { |selector| page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
-    assert_operator copyright["top"], :>=, details["bottom"]
+    viewer, details = rect.call(".record-split__viewer"), rect.call(".record-split__details")
+    assert_operator details["top"], :>=, viewer["bottom"] - 1
   end
 
-  test "the Copyright card is always open and states the record's rights, on a phone and a desktop" do
+  test "Copyright and reuse folds open to state the record's rights, on a phone and a desktop" do
     %w[phone desktop].each do |width|
       open_record({}, width)
-      assert_no_selector "details.record-accordion"
-      assert_selector "aside.record-copyright h2", text: "Copyright and use"
-      assert_selector "aside.record-copyright", text: "Rights held by the University"
-      assert_selector "aside.record-copyright a[href='/help#copyright']", text: "About copyright and terms of use"
+      find("details#copyright-and-reuse summary", text: "Copyright and reuse").click
+      assert_selector "details#copyright-and-reuse[open]", text: "Rights held by the University"
+      assert_selector "details#copyright-and-reuse[open] a[href='/help#copyright']", text: "About copyright and terms of use"
     end
   end
 
   test "the Tab key moves through the record page in the order it reads, and each stop shows a focus ring" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
-    # start on the last control before the media band (the band comes first in this layout, then the title and the actions)
+    # start on the last control before the media (it comes first in this layout, then the record's column)
     page.evaluate_script(<<~JS)
       (() => { const all = [...document.querySelectorAll('a[href], button, input, select, summary, [tabindex]:not([tabindex="-1"])')].filter(e => e.getClientRects().length > 0 && !e.disabled),
-                     first = all.findIndex(e => e.closest('.record-band')); all[first - 1].focus() })()
+                     first = all.findIndex(e => e.closest('.record-split__viewer')); all[first - 1].focus() })()
     JS
 
     stops = 16.times.map do
@@ -203,8 +207,8 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     texts = stops.map { |stop| stop["text"] }
 
     assert stops.all? { |stop| stop["ring"] }, stops.reject { |stop| stop["ring"] }.inspect
-    # the media band's buttons and toolbar, then the header (Copy), in that order
-    order = [ "Zoom and pan", "Media information", "Full screen", "Download image", "Copy" ].map { |label| texts.index { |text| text.include?(label) } }
+    # the media's round tools, then the record's column (its collection, then Save), in that order
+    order = [ "Zoom in", "Zoom out", "Full screen", "Download image", "University Art Collection", "Save" ].map { |label| texts.index { |text| text.include?(label) } }
     assert_equal order.compact.sort, order.compact, texts.inspect
     assert_operator order.compact.size, :>=, 4, texts.inspect
   end

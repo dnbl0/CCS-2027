@@ -74,19 +74,18 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
 
     assert_selector ".record-actions .compare-actions a[href='/compare?record=emu-1']", text: "Compare images", visible: :all
     assert_selector ".compare-actions form[action='/compare/items'] button", text: "Add to compare", visible: :all
-    assert_selector ".record-summary__cite .cite__button", visible: :all
-    assert_selector ".record-summary__share .share__button", text: /Share and embed/, visible: :all
+    assert_selector ".record-actions__row .cite__button", visible: :all
+    assert_selector ".record-actions__row .share__button", text: /Share and embed/, visible: :all
     assert_no_selector ".access-notice"
   end
 
-  test "Compare, Cite and Share sit in a More actions disclosure that is closed in the markup; Save and Add to list are outside it" do
+  test "Share and Cite are in one row of actions, always shown (nothing folds them away); Compare sits under the row" do
     render_actions(IMAGES)
 
-    assert_selector "details.record-actions__more:not([open]) > summary", text: "More actions", visible: :all
-    assert_selector "details.record-actions__more .compare-actions", visible: :all
-    assert_selector "details.record-actions__more .record-summary__cite .cite__button", visible: :all
-    assert_selector "details.record-actions__more .record-summary__share .share__button", visible: :all
-    assert_no_selector "details.record-actions__more .record-summary__save", visible: :all
+    assert_no_selector "details", visible: :all
+    assert_selector ".record-actions__row .share__button"
+    assert_selector ".record-actions__row .cite__button"
+    assert_selector ".record-actions__row + .record-actions__compare .compare-actions"
   end
 
   test "a record with one image offers Add to compare but not Compare images" do
@@ -118,20 +117,20 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   end
 
   # --- media: the three tiers, in markup
-  test "an open record has a Download image link, the access chip, the licence, and the labelled media buttons in one toolbar" do
+  test "an open record has a round Download tool, the access chip, the licence and the named round tools in one controls row" do
     render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
-    assert_selector ".digital-assets__toolbar .digital-assets__access--open", text: "Open: view and download"
-    assert_selector ".digital-assets__toolbar a.digital-assets__primary[download][href='/digital-assets/large/a.jpg']", text: "Download image"
-    assert_selector ".digital-assets__toolbar button", text: "Full screen", visible: :all
+    assert_selector ".digital-assets__controls-row .viewer-chip--open", text: "Open: view and download"
+    assert_selector ".digital-assets__controls-row a.viewer-control[download][href='/digital-assets/large/a.jpg']", text: "Download image of"
+    assert_selector ".digital-assets__controls-row button", text: "Full screen", visible: :all
     assert_no_selector ".digital-assets__stage ~ .digital-assets__stage"
   end
 
   test "a view-only record has no download link in its markup, and the image keeps its own shape (width and height held)" do
     render_media(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ]))
 
-    assert_no_selector "a[download], a.digital-assets__primary, a[href*='/digital-assets/']"
-    assert_selector ".digital-assets__access--view-only", text: "View only"
+    assert_no_selector "a[download], a[href*='/digital-assets/']"
+    assert_selector ".viewer-chip--view-only", text: "View only"
     assert_selector "img.digital-assets__image[src='/digital-assets/large/a.jpg']"
   end
 
@@ -178,16 +177,15 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   end
 
   # --- about
-  test "About this record has the persistent link with Copy link, who to contact with the ID, and a correction link" do
+  test "About this record is three rows: a correction link, the content notice, and the permanent link with Copy link" do
     render_inline(NexusCcs::RecordAboutComponent.new(document: doc("collection_ssim" => [ "University Art Collection" ]), url: "http://example.test/catalog/emu-1"))
 
-    assert_selector "details#about-this-record h2", text: "About this record"
-    # closed in the markup (a phone opens it), so look at all of it
-    assert_selector "[data-controller=clipboard] input[readonly][value='http://example.test/catalog/emu-1']", visible: :all
-    assert_selector "button[data-action='clipboard#copy']", text: "Copy link", visible: :all
-    assert_selector "h3", text: "Contact the collection team", visible: :all
-    assert_selector "strong", text: "emu-umc-1", visible: :all
-    assert_selector ".record-about__correction a", text: "Suggest a correction to this record", visible: :all
+    assert_selector "section#about-this-record h2.visually-hidden", text: "About this record"
+    assert_equal [ "Help us improve this record", "Content notice", "Use this record" ], page.all(".record-about-band__heading").map(&:text)
+    assert_selector ".record-about-band__row a.record-arrow-link", text: "Suggest a correction"
+    assert_selector ".record-about-band__row", text: "not appropriate today"
+    assert_selector "[data-controller=clipboard] [data-clipboard-target=source][data-copy='http://example.test/catalog/emu-1']"
+    assert_selector "button[data-action='clipboard#copy']", text: "Copy link"
   end
 
   # --- more like this

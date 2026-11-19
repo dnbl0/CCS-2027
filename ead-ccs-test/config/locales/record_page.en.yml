@@ -3,7 +3,6 @@ en:
     # The record page's layout (NexusCcs::RecordDocumentComponent and the components it draws). Wording marked PLACEHOLDER
     # is for the University and the collection teams to approve.
     record_page:
-      more_actions: "More actions"
       header:
         collection_id: "Collection ID"
         copy: "Copy"
@@ -22,9 +21,7 @@ en:
       sections:
         key_facts: "Key facts"
         object_details: "Object details"
-        copyright: "Copyright and use"
         about: "About this record"
-        actions: "Use this record"
       key_facts:
         date: "Date"
         materials: "Materials"
@@ -41,14 +38,9 @@ en:
         terms: "About copyright and terms of use"
       about:
         persistent_link: "Persistent link"
-        # PLACEHOLDER WORDING, NOT YET APPROVED
-        correction: "Suggest a correction to this record"
-        correction_note: "Records can hold outdated or incorrect information, and terms that are not appropriate today."
       media:
-        information: "Media information"
         full_screen: "Full screen"
         exit_full_screen: "Exit full screen"
-        close_information: "Close media information"
         # Under the media of a record that shows some of its digital assets and withholds others (their own licence does not
         # let them be shown: AccessPolicy.withheld_assets). PLACEHOLDER WORDING, NOT YET APPROVED: the University must approve it.
         partly_withheld:
@@ -60,3 +52,62 @@ en:
             other: "Request access to them"
       more_like_this:
         heading: "More like this"
+      # The approved split layout (Figma "Record page · Approved design", 2026-11-19)
+      split:
+        actions: "Actions for this record"
+        uom_id: "UoM ID"
+        extra:
+          date_era_ssim: "Era"
+          region_ssim: "Region"
+        stepper:
+          label: "Search results"
+          position: "Result %{current} of %{total}"
+          previous: "Previous result"
+          next: "Next result"
+        where:
+          heading: "Where it is"
+          # PLACEHOLDER WORDING, NOT YET APPROVED: the index holds no location or display status
+          body: "Ask the %{collection} team where this object is held and whether you can see it in person."
+          body_no_collection: "Ask the collection team where this object is held and whether you can see it in person."
+          link: "Request to view"
+        sections:
+          copyright: "Copyright and reuse"
+          media: "Media details"
+          cite: "How to cite this record"
+          history: "Acquisition and history"
+        history:
+          credit_line: "Credit line"
+          source_reference: "Source record"
+        viewer:
+          tools: "Image tools"
+          zoom_in: "Zoom in"
+          zoom_out: "Zoom out"
+          thumbnails: "All images of this record"
+          previous: "Previous image"
+          next: "Next image"
+          show_image: "Show image %{position} of %{count}"
+        related:
+          heading: "Related objects"
+        more:
+          heading: "More from the collections"
+          tabs: "Ways to explore"
+          empty: "Nothing to show here yet."
+          tab:
+            creator: "By %{name}"
+            creator_unnamed: "Same maker"
+            period: "Same period"
+            place: "Same place"
+            type: "Same type"
+        about:
+          improve:
+            heading: "Help us improve this record"
+            # PLACEHOLDER WORDING, NOT YET APPROVED
+            body: "Our records are a work in progress and are updated as we learn more. If something is wrong or missing, tell us."
+            link: "Suggest a correction"
+          notice:
+            heading: "Content notice"
+          use:
+            heading: "Use this record"
+            permanent_link: "Permanent link"
+            copy: "Copy link"
+            iiif: "IIIF manifest"

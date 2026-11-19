@@ -7,10 +7,14 @@ module NexusCcs
   # component, as ViewFullRecordComponent's are, and the dialog is controllers/dialog_controller.js (a native modal <dialog>:
   # focus is trapped inside, Escape closes it and focus returns to the button).
   class CiteComponent < ViewComponent::Base
-    def initialize(document:, accessed: Date.current)
+    def initialize(document:, accessed: Date.current, inline: false)
       @document = document
       @accessed = accessed
+      @inline = inline
     end
+
+    # inline: the citations laid out in the page (the record page's "How to cite this record"), with no button or dialog
+    def inline? = @inline
 
     attr_reader :document, :accessed
 

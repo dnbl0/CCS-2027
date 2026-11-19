@@ -2,7 +2,8 @@ require "test_helper"
 require "view_component/test_helpers"
 require "capybara/minitest"
 
-# The media section after the CCS UI "Record-detail" (Figma 258:25197): band, Media metadata panel, toolbar
+# The media in the approved split layout (Figma "Object viewer"): the controls row under the picture (licence and access chips, round
+# tools), the thumbnail strip, and the media metadata the record column's "Media details" section lists
 class MediaSectionTest < ActiveSupport::TestCase
   include ViewComponent::TestHelpers
   include Capybara::Minitest::Assertions
@@ -11,9 +12,9 @@ class MediaSectionTest < ActiveSupport::TestCase
 
   def page = Capybara::Node::Simple.new(rendered_content)
 
-  def render_for(fields)
-    render_inline(NexusCcs::DigitalAssetsComponent.new(presenter: Presenter.new(SolrDocument.new(fields))))
-  end
+  def component(fields) = NexusCcs::DigitalAssetsComponent.new(presenter: Presenter.new(SolrDocument.new(fields)))
+
+  def render_for(fields) = render_inline(component(fields))
 
   FIELDS = {
     "title_tsim" => [ "Kangaroo Pouch" ],
@@ -23,43 +24,41 @@ class MediaSectionTest < ActiveSupport::TestCase
     "rights_ssim" => [ "[In copyright] WARNING This material is All Rights Reserved." ]
   }.freeze
 
-  test "the toolbar has the licence chip, the metadata button and the full screen button" do
+  test "the controls row has the licence chip and round zoom and full screen tools, hidden until the script can work them" do
     render_for(FIELDS)
 
-    assert_selector ".digital-assets__toolbar .digital-assets__licence", text: "In copyright"
-    assert_selector "button[aria-controls=media-metadata][aria-expanded=false]", text: "Media information"
-    assert_selector "button[hidden]", text: "Full screen", visible: :all
+    assert_selector ".digital-assets__controls-row .viewer-chip", text: "In copyright"
+    assert_selector ".digital-assets__tools[role=group][aria-label='Image tools']"
+    %w[Zoom\ in Zoom\ out Full\ screen].each do |name|
+      assert_selector "button.viewer-control[hidden]", text: name, visible: :all
+    end
+    assert_no_selector "button[aria-controls=media-metadata]" # the metadata is the record column's Media details section
   end
 
-  test "the metadata panel is closed until opened, with licence type, advisory and terms of use" do
-    render_for(FIELDS)
+  test "the media metadata lists licence type, advisory and terms of use, without the licence name in brackets" do
+    rows = component(FIELDS).metadata
 
-    assert_selector "aside#media-metadata[aria-hidden=true]:not(.is-open)", visible: :all
-    panel = page.find("aside#media-metadata", visible: :all)
-    assert_equal [ "Licence type", "Advisory", "Terms of use" ], panel.all("dt", visible: :all).map(&:text).map(&:strip).then { |t| t.empty? ? panel.all("dt", visible: :all).map { |n| n.text(:all).strip } : t }
-    assert_includes panel.text(:all), "WARNING This material is All Rights Reserved."
-    assert_not_includes panel.text(:all), "[In copyright]"
+    assert_equal [ "Licence type", "Advisory", "Terms of use" ], rows.map(&:first)
+    assert_includes rows.to_h["Terms of use"], "WARNING This material is All Rights Reserved."
+    assert_not_includes rows.to_h["Terms of use"], "[In copyright]"
   end
 
-  test "a record with no licence still has the advisory panel and no licence chip" do
+  test "a record with no licence still has the advisory and no licence chip" do
     render_for(FIELDS.except("licence_type_ssim", "rights_ssim"))
 
-    assert_no_selector ".digital-assets__licence"
-    assert_includes page.find("aside#media-metadata", visible: :all).text(:all), "not appropriate today"
+    assert_no_selector ".viewer-chip svg" # the licence chip is the one with the Creative Commons mark
+    assert_includes component(FIELDS.except("licence_type_ssim", "rights_ssim")).metadata.to_h["Advisory"], "not appropriate today"
   end
 
-  test "a producer shows as the panel's last row; absent, it just does not appear" do
-    render_for(FIELDS.merge("producer_ssim" => [ "Nexus Digitisation Studio" ]))
-    panel = page.find("aside#media-metadata", visible: :all)
+  test "a producer is the metadata's last row; absent, it just does not appear" do
+    rows = component(FIELDS.merge("producer_ssim" => [ "Nexus Digitisation Studio" ])).metadata
 
-    assert_equal [ "Licence type", "Advisory", "Terms of use", "Producer" ], panel.all("dt", visible: :all).map { |n| n.text(:all).strip }
-    assert_includes panel.text(:all), "Nexus Digitisation Studio"
-
-    render_for(FIELDS)
-    assert_not_includes page.find("aside#media-metadata", visible: :all).text(:all), "Producer"
+    assert_equal [ "Licence type", "Advisory", "Terms of use", "Producer" ], rows.map(&:first)
+    assert_equal "Nexus Digitisation Studio", rows.to_h["Producer"]
+    assert_not_includes component(FIELDS).metadata.map(&:first), "Producer"
   end
 
-  test "icons are inlined in the text colour" do
+  test "glyphs are inlined in the text colour" do
     html = render_for(FIELDS).to_html
 
     assert_includes html, 'stroke="currentColor"'

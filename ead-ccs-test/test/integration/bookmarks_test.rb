@@ -104,7 +104,7 @@ class BookmarksTest < ActionDispatch::IntegrationTest
     get "/catalog/#{id}"
 
     assert_response :success
-    assert_select ".record-summary__save form.save-control .toggle-bookmark-label.checked"
+    assert_select ".record-actions__row form.save-control .toggle-bookmark-label.checked"
     assert_equal 1, saved_bar_count
   end
 

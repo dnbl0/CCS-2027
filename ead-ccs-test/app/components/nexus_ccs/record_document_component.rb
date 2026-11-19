@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # A record's page body: one header block (RecordHeaderComponent), then two columns from 1200px (the media or one plain sentence
-  # about its absence, with the details under it; and a plain column of actions and Key facts) and one column below. After the
-  # Key facts come Object details, Copyright and use, About this record. Registered as the show page's document_component; the
-  # breadcrumb above it is HeaderComponent's. The fields, their labels and their order come from the workbook (config.show_fields,
-  # see DataModel); the Copyright and use section gathers the rights fields.
+  # A record's page body in the approved split layout (Figma "Record page · Approved design", 2026-11-19): the media on the left
+  # and the record's own column on the right from 1024px (one column below, media first), then Related objects, More from the
+  # collections and About this record at full width. Registered as the show page's document_component; the breadcrumb above it is
+  # HeaderComponent's. The fields, their labels and their order come from the workbook (config.show_fields, see DataModel); the
+  # Copyright and reuse section gathers the rights fields.
   class RecordDocumentComponent < Blacklight::DocumentComponent
     include RecordDebias # de-bias notices: the finds in the displayed text, and a value with them marked
 
@@ -14,13 +14,11 @@ module NexusCcs
     # Values that open the search filtered to them (Blacklight's link_to_facet idea), so a visitor can step sideways to more of the same.
     # Creator, place and subject open their browse page instead (BROWSE_KINDS), and the filter when the value has none. Free text
     # (description, credit line, dates) is never a link.
-    LINK_FIELDS = %w[collection_ssim named_collection_ssim object_type_ssim classification_ssim material_ssim].freeze
+    LINK_FIELDS = %w[collection_ssim named_collection_ssim object_type_ssim classification_ssim material_ssim date_era_ssim region_ssim].freeze
+    # Read when the core has them, though the workbook does not list them: shown as their own rows of terms after its fields
+    EXTRA_TERM_FIELDS = %w[date_era_ssim region_ssim].freeze
     # Shown as filters where a browse page does not take them: the field each display field filters on
     FALLBACK_FILTER_FIELDS = { "subject_ssim" => "subject_ssim", "creator_display_ssim" => "creator_ssim" }.freeze
-    # Tags under the byline beside the format and collection: each value its own filtered search (the fields a core may lack yet are
-    # simply absent)
-    TAG_FIELDS = %w[date_era_ssim region_ssim].freeze
-
     Row = Struct.new(:label, :values, :field, :copy, keyword_init: true)
 
     def heading
@@ -118,28 +116,74 @@ module NexusCcs
 
     def terms_path = "/help#copyright"
 
-    # The 2026 layout has no Key facts: its details list is the whole record, title first (the header keeps the Collection ID)
-    def classic_rows
-      @classic_rows ||= begin
-        list = [ Row.new(label: "Title", values: [ heading ], field: "title_tsim") ]
-        @presenter.configuration.show_fields.each_value do |config|
+    # --- The approved split layout (Figma "Record page · Approved design", 2026-11-19) -------------------------------------------
+    # The media on the left (it stays in view on a wide screen), the record's own column on the right: where it is in the visitor's
+    # search, the collection, the title, maker, date and medium, the actions, "Where it is", the description, Object details (label
+    # above value), then four folding sections. Related objects, More from the collections and About this record run full width under.
+
+    renders_one :stepper # the search-result stepper and the selection stepper, from catalog/show (they need the controller's search context)
+
+    DESCRIPTION_FIELD = "description_tsim"
+    # Shown in the column's header lines, so not repeated as rows: the title, and the description (the lead and the text under it)
+    HEADER_FIELDS = %w[title_tsim description_tsim].freeze
+    HISTORY_FIELDS = { "credit_line_tsim" => :credit_line, "source_reference_tsim" => :source_reference }.freeze
+
+    # "University Art Collection", linking to the whole collection
+    def collection_name = responsible_collection
+
+    def collection_path = collection_name && helpers.search_action_path(responsible_collection_query)
+
+    # [[name, browse path or nil]]: the record's makers, as the header used to show them
+    def makers = RecordHeaderComponent.new(document: document).creators
+
+    def display_date = Array(document["date_display_ssm"]).first.presence || Array(document["production_date_ssim"]).first.presence
+
+    def medium = (Array(document["material_display_ssm"]).first.presence || Array(document["material_ssim"]).first.presence)&.to_s&.upcase_first
+
+    # The description's paragraphs: the first is the lead (larger), the rest sit under it
+    def description_paragraphs
+      @description_paragraphs ||= Array(document[DESCRIPTION_FIELD]).flat_map { |text| text.to_s.split(/\n\s*\n/) }.map(&:strip).compact_blank
+    end
+
+    def lead = description_paragraphs.first
+    def description_rest = description_paragraphs.drop(1)
+
+    # Object details: every workbook field the record has a value for, in the workbook's order, except the header's and the rights
+    # fields (in Copyright and reuse); the UoM ID follows them, with a Copy button
+    def detail_rows
+      @detail_rows ||= begin
+        rows = @presenter.configuration.show_fields.each_value.filter_map do |config|
           name = config.field
-          next if COPYRIGHT_FIELDS.include?(name)
+          next if HEADER_FIELDS.include?(name) || COPYRIGHT_FIELDS.include?(name)
 
           values = Array(document[name]).map(&:to_s).compact_blank
-          list << Row.new(label: config.label, values: values, field: name) if values.any?
+          Row.new(label: config.label, values: values, field: name) if values.any?
         end
-        list
+        rows + EXTRA_TERM_FIELDS.filter_map do |name|
+          values = Array(document[name]).map(&:to_s).compact_blank.uniq
+          Row.new(label: t("nexus_ccs.record_page.split.extra.#{name}"), values: values, field: name) if values.any?
+        end
       end
     end
 
-    Tag = Struct.new(:field, :value)
+    # A value shown as a term (an outlined tag that opens its search or browse page): the values that name things
+    def term?(row) = link_to_value?(row) || BROWSE_KINDS.key?(row.field) || FALLBACK_FILTER_FIELDS.key?(row.field)
 
-    # Chips under the byline, as in 2026: the record's format and its collection, then each of its eras and regions, each a link to that filter
-    def tags
-      list = [ Tag.new("format", Array(document["format"]).first), Tag.new(BrowseMenu::COLLECTION_FIELD, Array(document["collection_ssim"]).first) ]
-      TAG_FIELDS.each { |field| Array(document[field]).map(&:to_s).compact_blank.uniq.each { |value| list << Tag.new(field, value) } }
-      list.select { |tag| tag.value.present? }
+    # The folding sections' contents
+    def media_details = assets? ? DigitalAssetsComponent.new(presenter: @presenter).metadata : []
+
+    def history
+      HISTORY_FIELDS.filter_map do |field, key|
+        value = Array(document[field]).first.presence
+        [ t("nexus_ccs.record_page.split.history.#{key}"), value ] if value
+      end
     end
+
+    def where_body
+      key = collection_name ? "body" : "body_no_collection"
+      t("nexus_ccs.record_page.split.where.#{key}", collection: collection_name)
+    end
+
+    def request_to_view_path = AccessPolicy.request_path(document)
   end
 end

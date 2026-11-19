@@ -27,17 +27,16 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     }
   end
 
-  test "the media metadata panel shows the DAM's licence, advisory, terms of use and producer" do
+  test "the media metadata (the record column's Media details) is the DAM's licence, advisory, terms of use and producer" do
     dam = { "licence" => "All Rights reserved (UoM)", "advisory" => "Sensitivity", "terms_of_use" => "Ask the Grainger Museum",
             "producer" => "Lee McRae (Photographer)" }
-    render_for(assets(1).merge("digital_asset_metadata_ssm" => [ dam.to_json ], "rights_ssim" => [ "EMu note" ]))
+    fields = assets(1).merge("digital_asset_metadata_ssm" => [ dam.to_json ], "rights_ssim" => [ "EMu note" ])
+    rows = NexusCcs::DigitalAssetsComponent.new(presenter: Presenter.new(SolrDocument.new(fields))).metadata.to_h
 
-    { "Licence type" => dam["licence"], "Advisory" => dam["advisory"], "Terms of use" => dam["terms_of_use"], "Producer" => dam["producer"] }.each do |label, text|
-      assert_includes page.native.to_html, label
-      assert_includes page.native.to_html, text
-    end
-    assert_not_includes page.native.to_html, "EMu note"
-    assert_not_includes page.native.to_html, "Public domain - Copyright expired"
+    assert_equal({ "Licence type" => dam["licence"], "Advisory" => dam["advisory"], "Terms of use" => dam["terms_of_use"], "Producer" => dam["producer"] }, rows)
+    render_for(fields)
+    assert_not_includes rendered_content, "EMu note"
+    assert_not_includes rendered_content, "Public domain - Copyright expired"
   end
 
   test "a single asset is one large image named for the record" do
@@ -45,17 +44,19 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
 
     assert_selector "section.digital-assets h2.visually-hidden", text: "Digital asset", exact_text: true
     assert_selector "figure.digital-assets__main img[src='/digital-assets/large/a1.jpg'][alt='Cary Pocket microscope']"
-    assert_no_selector ".digital-assets__others"
+    assert_no_selector ".digital-assets__thumbs"
   end
 
-  test "several assets: the first is large and the rest are thumbnails that open the large image" do
+  test "several assets: the first is large, and a strip of every thumbnail (the first marked) swaps the large image" do
     render_for(assets(3))
 
     assert_selector "h2", text: "Digital assets"
     assert_selector "figure img[alt='Cary Pocket microscope, image 1 of 3']"
-    assert_selector ".digital-assets__others li", count: 2
-    assert_selector "a.digital-assets__other[href='/digital-assets/large/a2.jpg'][target=_blank][rel=noopener] img[src='/digital-assets/thumbs/a2.jpg']"
-    assert_selector "a img[alt='Cary Pocket microscope, image 3 of 3 (opens full size in a new tab)']"
+    assert_selector "nav.digital-assets__strip[aria-label='All images of this record'] .digital-assets__thumbs li", count: 3
+    assert_selector "a.digital-assets__thumb[aria-current=true][href='/digital-assets/large/a1.jpg']"
+    assert_selector "a.digital-assets__thumb[href='/digital-assets/large/a2.jpg'][target=_blank][rel=noopener][aria-label='Show image 2 of 3'] img[src='/digital-assets/thumbs/a2.jpg'][alt='']"
+    assert_selector "button.viewer-control--ghost[hidden]", text: "Previous image", visible: :all
+    assert_selector "button.viewer-control--ghost[hidden]", text: "Next image", visible: :all
   end
 
   test "an open record has no notice, and its media can be downloaded" do
@@ -107,14 +108,14 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
                                "digital_media_ssim" => [ "video|video/mp4|/v.mp4|Film", "pdf|application/pdf|/d.pdf|Report" ]))
 
     assert_no_selector ".access-notice" # the notice is in the actions column (RecordActionsComponent)
-    assert_selector ".digital-assets__access--view-only", text: "View only"
-    assert_no_selector ".digital-assets__primary, a[download]"
+    assert_selector ".viewer-chip--view-only", text: "View only"
+    assert_no_selector "a[download]"
     assert_selector "figure.digital-assets__main img[src='/digital-assets/large/a1.jpg']"
     assert_selector "video[controlslist=nodownload]"
     assert_no_selector "video a, a[href='/v.mp4'], a[href='/d.pdf'], .digital-assets__pdf"
     assert_no_selector "a[href*='/digital-assets/']" # thumbnails are buttons, not links to the files
-    assert_selector "button.digital-assets__other[data-media-viewer-large='/digital-assets/large/a2.jpg'] img[alt='Cary Pocket microscope, image 2 of 3']"
-    assert_selector ".digital-assets__licence", text: "Copyright - Current"
+    assert_selector "button.digital-assets__thumb[data-media-viewer-large='/digital-assets/large/a2.jpg'] img[alt='']"
+    assert_selector ".viewer-chip", text: "Copyright - Current"
   end
 
   test "a request record withholds every asset, and its path, but keeps the notice, licence and metadata" do
@@ -122,11 +123,10 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
 
     assert_selector ".access-notice--request", text: "This item is available on request"
     assert_selector ".access-notice a", text: "Request access to this item"
-    assert_no_selector "img, video, audio, figure, .digital-assets__others, [data-media-viewer-target=image]"
+    assert_no_selector "img, video, audio, figure, .digital-assets__thumbs, [data-media-viewer-target=image]"
     assert_no_selector "button", text: "Full screen", visible: :all
-    assert_selector ".digital-assets__licence", text: "ICIP Rights"
-    assert_selector "button[aria-controls=media-metadata]", text: "Media information"
-    assert_selector ".digital-assets__access--request", text: "Available on request"
+    assert_selector ".viewer-chip", text: "ICIP Rights"
+    assert_selector ".viewer-chip--request", text: "Available on request"
     %w[/digital-assets /v.mp4 a1.jpg].each { |path| assert_not_includes rendered_content, path }
   end
 
@@ -146,21 +146,21 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     render_for(dam_record([ [ "unlicensed", "None" ], [ "licensed", "CC BY" ] ]))
 
     assert_selector "figure.digital-assets__main img[src^='#{dam_url('licensed')}'][alt='Cary Pocket microscope']"
-    assert_no_selector ".digital-assets__others"
+    assert_no_selector ".digital-assets__thumbs"
     assert_not_includes rendered_content, "/content/unlicensed/"
     assert_selector ".access-notice--partly-withheld", text: "1 other digital asset of this record is not shown"
     assert_selector ".access-notice--partly-withheld a[href='/access_requests/new?document_id=emu-1']", text: "Request access to it"
-    assert_selector "a.digital-assets__primary[download][href^='#{dam_url('licensed')}']"
-    assert_selector ".digital-assets__licence", text: "CC BY" # the shown asset's licence, not the withheld one's "None"
+    assert_selector "a.viewer-control[download][href^='#{dam_url('licensed')}']"
+    assert_selector ".viewer-chip", text: "CC BY" # the shown asset's licence, not the withheld one's "None"
   end
 
   test "only open assets are offered to download: a view-only image is a button, an open one a link" do
     render_for(dam_record([ [ "open", "CC BY" ], [ "view", "Individual" ], [ "open2", "CC0" ] ]))
 
-    assert_selector "a.digital-assets__primary[href^='#{dam_url('open')}']"
-    assert_selector "button.digital-assets__other[data-media-viewer-large^='#{dam_url('view')}']"
+    assert_selector "a.viewer-control[download][href^='#{dam_url('open')}']"
+    assert_selector "button.digital-assets__thumb[data-media-viewer-large^='#{dam_url('view')}']"
     assert_no_selector "a[href^='#{dam_url('view')}']"
-    assert_selector "a.digital-assets__other[href^='#{dam_url('open2')}']"
+    assert_selector "a.digital-assets__thumb[href^='#{dam_url('open2')}']"
     assert_no_selector ".access-notice"
   end
 
@@ -168,8 +168,8 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     render_for(dam_record([ [ "view", "Individual" ], [ "open", "CC BY" ] ]))
 
     assert_selector "figure.digital-assets__main img[src^='#{dam_url('view')}']"
-    assert_no_selector ".digital-assets__primary"
-    assert_selector "a.digital-assets__other[href^='#{dam_url('open')}']"
+    assert_no_selector "a[download]"
+    assert_selector "a.digital-assets__thumb[href^='#{dam_url('open')}']"
   end
 
   test "media files follow their own licence: an open film can be downloaded, a view-only PDF is left out" do

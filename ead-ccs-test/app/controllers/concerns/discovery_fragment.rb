@@ -23,6 +23,15 @@ module DiscoveryFragment
     head :no_content
   end
 
+  # An id the index does not hold is a 404. Asked from a lazy Turbo frame on a record page, the 404 has no body: the site's error
+  # page carries turbo-visit-control "reload", which would make Turbo replace the whole record page with it (the frame then simply
+  # stays empty, controllers/lazy_frame_controller.js). Asked directly, it is the ordinary Not Found.
+  def record_not_found!
+    return head(:not_found) if request.headers["Turbo-Frame"].present?
+
+    raise ActionController::RoutingError, "Not Found"
+  end
+
   # Blacklight's helpers read the page's documents from @response
   def wrap_documents(documents)
     docs = documents.map(&:_source)

@@ -80,13 +80,10 @@ class ColoursTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "the record page's Looks similar partial is a lazy frame, drawn only for a record with a viewable image" do
-    draw = ->(record) { ApplicationController.render(partial: "catalog/looks_similar", locals: { document: SolrDocument.new(record) }) }
-
-    html = Nokogiri::HTML5.fragment(draw.call(open_record("emu-source")))
-    assert_equal "/catalog/emu-source/looks-similar", html.at_css("turbo-frame#looks-similar[loading=lazy]")["src"]
-    assert_empty draw.call(open_record("emu-c", has_digital_asset_bsi: false)).strip
-    assert_empty draw.call(sensitive_record("emu-sensitive")).strip
-    assert_includes Rails.root.join("app/views/catalog/show.html.erb").read.lines.last, "catalog/looks_similar", "after More like this"
+  test "Looks similar is offered only for a record with a viewable image: a tab of the record page's More from the collections" do
+    assert LooksSimilar.eligible?(SolrDocument.new(open_record("emu-source")))
+    assert_not LooksSimilar.eligible?(SolrDocument.new(open_record("emu-c", has_digital_asset_bsi: false)))
+    assert_not LooksSimilar.eligible?(SolrDocument.new(sensitive_record("emu-sensitive")))
+    assert_includes Rails.root.join("app/components/nexus_ccs/more_from_collections_component.rb").read, "looks_similar_path"
   end
 end

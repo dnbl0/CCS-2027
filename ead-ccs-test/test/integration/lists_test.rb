@@ -228,7 +228,6 @@ class ListsTest < ActionDispatch::IntegrationTest
     needs_solr
     get "/catalog/#{first_ids(1).first}"
 
-    assert_select ".record-summary__save .save-control"
-    assert_select ".record-summary__save .list-menu button.list-menu__button"
+    assert_select ".record-actions__row .save-control + .list-menu button.list-menu__button"
   end
 end

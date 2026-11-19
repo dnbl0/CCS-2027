@@ -53,6 +53,27 @@ class SimilarRowsIntegrationTest < ActionDispatch::IntegrationTest
     assert_response :no_content
   end
 
+  test "with tab=1 a row is a panel of More from the collections: at most three cards and See all, no heading (the tab names it)" do
+    solr { get "/catalog/emu-source/similar", params: { row: "creator", tab: 1 } }
+
+    assert_response :success
+    assert_select "turbo-frame#more-creator[target=_top]" do
+      assert_select "h2", count: 0
+      assert_operator css_select("li.discover-cards__item").size, :<=, 3
+      assert_select "h4 a[href='/catalog/emu-a']"
+      assert_select "a.record-arrow-link[href*='f%5Bcreator_ssim%5D%5B%5D=Lees%2C+Derwent']", text: "See all records for Lees, Derwent"
+    end
+  end
+
+  test "a record the index does not hold is a 404; asked from a lazy frame, the 404 has no body, so the record page is never replaced" do
+    with_seeded_menu_cache { with_canned_search(->(_params) { Blacklight::Solr::Response.new({ "response" => { "docs" => [] } }, {}) }) { get "/catalog/emu-gone/similar", params: { row: "creator", tab: 1 }, headers: { "Turbo-Frame" => "more-creator" } } }
+    assert_response :not_found
+    assert_empty response.body
+
+    with_seeded_menu_cache { with_canned_search(->(_params) { Blacklight::Solr::Response.new({ "response" => { "docs" => [] } }, {}) }) { get "/catalog/emu-gone/similar" } }
+    assert_response :not_found
+  end
+
   test "Solr failing leaves the row out" do
     with_seeded_menu_cache do
       with_canned_search(->(_params) { raise Blacklight::Exceptions::ECONNREFUSED, "down" }) { get "/catalog/emu-source/similar", params: { row: "type" } }
@@ -70,15 +91,16 @@ class SimilarRowsIntegrationTest < ActionDispatch::IntegrationTest
     Blacklight::Solr::Repository.send(:define_method, :find, original) if original
   end
 
-  test "the record page has one empty lazy frame per row the record can have, after Similar objects" do
+  test "the record page has Related objects, then one tab with an empty lazy frame per row the record can have" do
     with_seeded_menu_cache do
       with_found_record(source.merge("region_ssim" => nil, "production_place_ssim" => nil)) { get "/catalog/emu-source" }
     end
 
     assert_response :success
-    frames = css_select("turbo-frame.similar-frame").map { |frame| frame["id"] }
-    assert_equal %w[similar-records similar-creator similar-period similar-type], frames
-    assert_select "turbo-frame#similar-creator[loading=lazy][src='/catalog/emu-source/similar?row=creator']"
-    assert_select "turbo-frame#similar-creator *", count: 0
+    assert_select "turbo-frame#similar-records[loading=lazy]"
+    tabs = css_select("#more-from-the-collections [role=tablist] [role=tab]").map { |tab| tab["id"] }
+    assert_equal %w[record-tab-creator record-tab-period record-tab-type], tabs.first(3)
+    assert_select "turbo-frame#more-creator[loading=lazy][src='/catalog/emu-source/similar?row=creator&tab=1']"
+    assert_select "turbo-frame#more-creator *", count: 0
   end
 end

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # A record's media on its page: the large image on the page itself, shown whole at its own shape (a row of thumbnails under it
-  # when there are several), one slim toolbar under it (the access chip and licence, the "Media information" and "Full screen"
-  # buttons with text labels, and Download when the image shown is an open asset) and a "Media metadata" panel that opens under the
-  # toolbar. Renders nothing for a record without assets. What it shows follows AccessPolicy, asset by asset: the index holds only
+  # A record's media on its page, the left of the approved split layout (Figma "Object viewer"): the large image shown whole at its
+  # own shape, a controls row under it (the licence and access chips on the left; round zoom in, zoom out, full screen and, for an
+  # open image, download on the right) and, when there are several images, a strip of every thumbnail with previous and next. The
+  # media metadata is the record column's "Media details" section (#metadata). Renders nothing for a record without assets. What it shows follows AccessPolicy, asset by asset: the index holds only
   # the assets a visitor may see (Dam::SolrWriter), and of those only an open one is offered to download (its thumbnail links to
   # the file, its player keeps its download button, a PDF is listed); a view-only one is shown without any of that. A record
   # with some assets withheld says so under them, with a request link; a :request record shows none of the assets, only the
@@ -16,7 +16,16 @@ module NexusCcs
     ADVISORY = "Some collection items include terms and views that are not appropriate today. They reflect the " \
                "period in which they were created and are not the views of the University of Melbourne."
 
-    ICONS = %w[media-copyright media-info media-fullscreen].freeze
+    # The round controls' glyphs (24px grid, 2px stroke), as the Figma Media / Control draws them
+    GLYPHS = {
+      plus: '<path d="M12 5v14M5 12h14"/>',
+      minus: '<path d="M5 12h14"/>',
+      maximize: '<path d="M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5"/>',
+      download: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+      chevron_left: '<path d="m15 18-6-6 6-6"/>',
+      chevron_right: '<path d="m9 18 6-6-6-6"/>',
+      creative_commons: '<circle cx="12" cy="12" r="9"/><path d="M10.5 10.2a2.5 2.5 0 1 0 0 3.6M16.5 10.2a2.5 2.5 0 1 0 0 3.6"/>'
+    }.freeze
 
     def initialize(presenter:, document_counter: nil, **)
       @document = presenter.document
@@ -101,7 +110,6 @@ module NexusCcs
     end
 
     def media_title(item) = item[:label].presence || title
-    def others = images.drop(1)
 
     def count = large_paths.size
 
@@ -134,7 +142,7 @@ module NexusCcs
     # The DAM's DA Advisory, else the advisory every record carries
     def advisory = dam_value("advisory") || ADVISORY
 
-    # [label, text] rows of the Media metadata panel
+    # [label, text] rows of the record column's "Media details" section (RecordDocumentComponent)
     def metadata
       [ [ "Licence type", licence ], [ "Advisory", advisory ], [ "Terms of use", terms ], [ "Producer", producer ] ].select { |_, text| text.present? }
     end
@@ -157,21 +165,9 @@ module NexusCcs
     end
     private :dam_value
 
-    def metadata?
-      metadata.any?
-    end
-
-    # An icon from app/assets/images, drawn in the text colour (the files carry the design's fixed navy)
-    def icon(name)
-      raise ArgumentError, name unless ICONS.include?(name)
-
-      File.read(Rails.root.join("app/assets/images/#{name}.svg"))
-          .gsub(/ (width|height|style|preserveAspectRatio|overflow)="[^"]*"/, "")
-          .gsub(/ clip-path="[^"]*"/, "")
-          .gsub(/ id="[^"]*"/, "")
-          .gsub(/(stroke|fill)="#(?:[0-9A-Fa-f]{3,6})"/, '\1="currentColor"')
-          .sub("<svg", '<svg width="1em" height="1em" aria-hidden="true" focusable="false"')
-          .html_safe
+    def glyph(name)
+      body = GLYPHS.fetch(name)
+      %(<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">#{body}</svg>).html_safe # rubocop:disable Rails/OutputSafety
     end
 
     private

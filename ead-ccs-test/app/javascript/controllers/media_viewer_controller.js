@@ -1,51 +1,27 @@
 import { Controller } from "@hotwired/stimulus"
 
-// A record's media: the "Media metadata" panel (opened by the "Media information" button, closed by its own button or Esc, with
-// focus going to the panel's close button and back to the opening button), full screen for the media section, and the
-// thumbnails swapping the large image. Without JavaScript the panel stays closed, the thumbnails are links to
-// the full-size images, and the full screen button never appears.
-//
-// The panel is always rendered (never [hidden]/display:none): it is an absolutely positioned child of the
-// stage's flex layout, and toggling a flex child's display briefly counted it back into the stage's
-// justify-content centring, jolting the large image. Opening and closing it only ever toggles the "is-open"
-// class (transform/visibility, both paint-only) and aria-hidden, which never touches that layout.
+// A record's media (DigitalAssetsComponent, the left of the record page): the round tools under the picture and the thumbnail strip.
+// Zoom in and zoom out are passed to the zoom viewer (deep_zoom_controller listens for media-viewer:zoom), which opens on the first
+// zoom in; full screen is for the media section; a thumbnail swaps the large image and is marked as the one on show, and previous
+// and next step through the thumbnails. Without JavaScript the tools and steps never appear and each thumbnail of an open image is
+// a link to its full size.
 export default class extends Controller {
-  static targets = [ "stage", "image", "panel", "infoButton", "fullscreenButton", "fullscreenLabel" ]
+  static targets = [ "stage", "image", "thumb", "step", "tool", "fullscreenButton", "fullscreenLabel" ]
 
   connect() {
-    this.onKey = (event) => { if (event.key === "Escape" && this.isOpen) this.closePanel() }
     this.onFullscreen = () => this.syncFullscreen()
-    this.element.addEventListener("keydown", this.onKey)
     document.addEventListener("fullscreenchange", this.onFullscreen)
+    this.toolTargets.forEach((tool) => { tool.hidden = false })
+    this.stepTargets.forEach((step) => { step.hidden = false })
     if (this.hasFullscreenButtonTarget && document.fullscreenEnabled) this.fullscreenButtonTarget.hidden = false
   }
 
   disconnect() {
-    this.element.removeEventListener("keydown", this.onKey)
     document.removeEventListener("fullscreenchange", this.onFullscreen)
   }
 
-  get isOpen() {
-    return this.hasPanelTarget && this.panelTarget.classList.contains("is-open")
-  }
-
-  togglePanel() {
-    this.isOpen ? this.closePanel() : this.openPanel()
-  }
-
-  openPanel() {
-    this.panelTarget.classList.add("is-open")
-    this.panelTarget.removeAttribute("aria-hidden")
-    this.infoButtonTarget.setAttribute("aria-expanded", "true")
-    this.panelTarget.querySelector("button")?.focus()
-  }
-
-  closePanel() {
-    this.panelTarget.classList.remove("is-open")
-    this.panelTarget.setAttribute("aria-hidden", "true")
-    this.infoButtonTarget.setAttribute("aria-expanded", "false")
-    this.infoButtonTarget.focus()
-  }
+  zoomIn() { this.dispatch("zoom", { detail: { direction: "in" } }) }
+  zoomOut() { this.dispatch("zoom", { detail: { direction: "out" } }) }
 
   async toggleFullscreen() {
     try {
@@ -57,19 +33,35 @@ export default class extends Controller {
   syncFullscreen() {
     const on = document.fullscreenElement === this.element
     this.element.classList.toggle("is-fullscreen", on)
-    if (this.hasFullscreenButtonTarget) {
+    if (this.hasFullscreenButtonTarget && this.hasFullscreenLabelTarget) {
       const button = this.fullscreenButtonTarget
-      if (this.hasFullscreenLabelTarget) this.fullscreenLabelTarget.textContent = on ? button.dataset.labelOn : button.dataset.labelOff
+      this.fullscreenLabelTarget.textContent = on ? button.dataset.labelOn : button.dataset.labelOff
     }
   }
 
-  // a thumbnail shows its large image in the band (a modified click still opens it in a new tab)
+  // a thumbnail shows its large image on the stage (a modified click still opens it in a new tab)
   show(event) {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.button) return
     event.preventDefault()
-    const link = event.currentTarget
-    this.imageTarget.src = link.dataset.mediaViewerLarge
-    this.imageTarget.alt = link.dataset.mediaViewerAlt
+    this.display(event.currentTarget)
+  }
+
+  previous() { this.step(-1) }
+  next() { this.step(1) }
+
+  step(offset) {
+    const thumbs = this.thumbTargets
+    if (thumbs.length === 0) return
+    const current = Math.max(thumbs.findIndex((thumb) => thumb.getAttribute("aria-current") === "true"), 0)
+    const target = thumbs[(current + offset + thumbs.length) % thumbs.length]
+    this.display(target)
+    target.scrollIntoView({ block: "nearest", inline: "nearest" })
+  }
+
+  display(thumb) {
+    this.imageTarget.src = thumb.dataset.mediaViewerLarge
+    this.imageTarget.alt = thumb.dataset.mediaViewerAlt
+    this.thumbTargets.forEach((other) => { if (other === thumb) other.setAttribute("aria-current", "true"); else other.removeAttribute("aria-current") })
     this.dispatch("shown", { detail: { src: this.imageTarget.getAttribute("src"), alt: this.imageTarget.alt } }) // the zoom viewer follows
   }
 }

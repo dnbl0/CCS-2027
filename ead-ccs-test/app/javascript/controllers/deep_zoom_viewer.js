@@ -61,3 +61,15 @@ export function open(viewer, source, label) {
 export function zoomIn(viewer) { viewer.viewport.zoomBy(1.5); viewer.viewport.applyConstraints() }
 export function zoomOut(viewer) { viewer.viewport.zoomBy(1 / 1.5); viewer.viewport.applyConstraints() }
 export function reset(viewer) { viewer.viewport.goHome() }
+
+// Whether the view shows the whole picture (or less): zooming out from here closes the record page's viewer
+export function atHome(viewer) { return viewer.viewport.getZoom() <= viewer.viewport.getHomeZoom() * 1.01 }
+
+// Resolves when the first image has opened (at once if it already has), so a zoom straight after opening has something to zoom
+export function opened(viewer) {
+  if (viewer.world.getItemCount() > 0) return Promise.resolve()
+  return new Promise((resolve) => {
+    viewer.addOnceHandler("open", () => resolve())
+    viewer.addOnceHandler("open-failed", () => resolve())
+  })
+}

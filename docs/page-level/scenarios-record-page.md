@@ -7,6 +7,7 @@ Source: research agent, 2026-10-12 (code read). Rails: `catalog#show` template (
 > date and Collection ID); the media sits on the page with one toolbar under it; no-image records start at the header and say so in one
 > sentence; actions and Key facts are in a plain right column; Object details, Copyright and use, About this record are sections; More like
 > this has no tabs. Rows below that name the title band, the Copyright card or the media band describe the earlier layout (and the static site).
+> Since 19 Nov 2026 the record page is the approved split layout (ead-ccs-test/docs/styling.md, "The record page layout"): media left and sticky, the record's column right, Related objects, More from the collections (tabs) and About this record below.
 > See ead-ccs-test/docs/styling.md, "The record page layout".
 
 | ID | Page | Scenario | Type | How reached | What the UI shows | Source | R/S/B |

@@ -36,7 +36,7 @@ class RecordValueLinksTest < ActionDispatch::IntegrationTest
   test "object type, classification, material and named collection in the details link to their filtered search" do
     record_page
 
-    assert_select ".record-details__list" do
+    assert_select ".record-facts__list" do
       { "object_type_ssim" => "drawing", "classification_ssim" => "Fine Art", "material_ssim" => "pencil on paper",
         "named_collection_ssim" => "Lees bequest" }.each do |field, value|
         assert_select filter_link(field, value), text: value
@@ -47,16 +47,16 @@ class RecordValueLinksTest < ActionDispatch::IntegrationTest
   test "creator, place and subject still open their browse pages; the description is not a link" do
     record_page
 
-    assert_select ".record-details__list a[href^='/browse/makers/']", text: /Lees, Derwent/
-    assert_select ".record-details__list a[href^='/browse/places/']", text: "London"
-    assert_select ".record-details__list a[href^='/browse/subjects/']", text: "hands"
-    assert_select ".record-details__list a", text: /careful study/, count: 0
+    assert_select ".record-facts__list a[href^='/browse/makers/']", text: /Lees, Derwent/
+    assert_select ".record-facts__list a[href^='/browse/places/']", text: "London"
+    assert_select ".record-facts__list a[href^='/browse/subjects/']", text: "hands"
+    assert_select ".record-facts__list a", text: /careful study/, count: 0
   end
 
-  test "era and region are tags under the title, each value its own filtered search" do
+  test "era and region are rows of terms in Object details, each value its own filtered search" do
     record_page
 
-    assert_select "ul.record-summary__tags" do
+    assert_select ".record-facts__list ul.record-terms" do
       assert_select filter_link("date_era_ssim", "20th century"), text: "20th century"
       assert_select filter_link("region_ssim", "Oceania"), text: "Oceania"
       assert_select filter_link("region_ssim", "Europe"), text: "Europe"
