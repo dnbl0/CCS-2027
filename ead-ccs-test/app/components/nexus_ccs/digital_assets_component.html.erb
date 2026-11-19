@@ -69,7 +69,7 @@
   <% if images.size > 1 %>
     <%# The strip of every image, the one on show marked; previous and next step through them. Without JavaScript each thumbnail of an
         open image is a link to its full size, and the steps never appear. %>
-    <nav class="digital-assets__strip" aria-label="<%= t("nexus_ccs.record_page.split.viewer.thumbnails") %>">
+    <div class="digital-assets__strip" role="group" aria-label="<%= t("nexus_ccs.record_page.split.viewer.thumbnails") %>">
       <button type="button" class="viewer-control viewer-control--ghost" hidden data-media-viewer-target="step" data-action="media-viewer#previous">
         <%= glyph(:chevron_left) %><span class="visually-hidden"><%= t("nexus_ccs.record_page.split.viewer.previous") %></span>
       </button>
@@ -94,7 +94,7 @@
       <button type="button" class="viewer-control viewer-control--ghost" hidden data-media-viewer-target="step" data-action="media-viewer#next">
         <%= glyph(:chevron_right) %><span class="visually-hidden"><%= t("nexus_ccs.record_page.split.viewer.next") %></span>
       </button>
-    </nav>
+    </div>
   <% end %>
 
   <% if withheld_count.positive? %>

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# GET /catalog/:id/looks-similar: the record page's "Looks similar" section, in a lazy Turbo frame (LooksSimilar,
+# GET /catalog/:id/looks-similar: the "Looks similar" panel of the record page's More from the collections tabs, in a lazy Turbo frame (LooksSimilar,
 # docs/colour-and-clean-up.md). 204 No Content (the section stays hidden) when there is nothing to list or Solr or the database fails;
 # 404 for an id not in the index.
 class LooksSimilarController < CatalogController
@@ -23,7 +23,6 @@ class LooksSimilarController < CatalogController
     return head(:no_content) if @documents.empty?
 
     wrap_documents(@documents)
-    render "looks_similar/tab" if params[:tab] == "1" # a panel of the record page's "More from the collections" tabs
   end
 
   # Blacklight uses #search_action_url for the header's search box

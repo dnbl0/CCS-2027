@@ -16,16 +16,6 @@ module NexusCcs
     ADVISORY = "Some collection items include terms and views that are not appropriate today. They reflect the " \
                "period in which they were created and are not the views of the University of Melbourne."
 
-    # The round controls' glyphs (24px grid, 2px stroke), as the Figma Media / Control draws them
-    GLYPHS = {
-      plus: '<path d="M12 5v14M5 12h14"/>',
-      minus: '<path d="M5 12h14"/>',
-      maximize: '<path d="M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5"/>',
-      download: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
-      chevron_left: '<path d="m15 18-6-6 6-6"/>',
-      chevron_right: '<path d="m9 18 6-6-6-6"/>',
-      creative_commons: '<circle cx="12" cy="12" r="9"/><path d="M10.5 10.2a2.5 2.5 0 1 0 0 3.6M16.5 10.2a2.5 2.5 0 1 0 0 3.6"/>'
-    }.freeze
 
     def initialize(presenter:, document_counter: nil, **)
       @document = presenter.document
@@ -165,10 +155,7 @@ module NexusCcs
     end
     private :dam_value
 
-    def glyph(name)
-      body = GLYPHS.fetch(name)
-      %(<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">#{body}</svg>).html_safe # rubocop:disable Rails/OutputSafety
-    end
+    def glyph(name) = Glyphs.svg(name)
 
     private
 

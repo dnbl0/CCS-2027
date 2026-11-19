@@ -52,7 +52,7 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
 
     assert_selector "h2", text: "Digital assets"
     assert_selector "figure img[alt='Cary Pocket microscope, image 1 of 3']"
-    assert_selector "nav.digital-assets__strip[aria-label='All images of this record'] .digital-assets__thumbs li", count: 3
+    assert_selector "div.digital-assets__strip[role=group][aria-label='All images of this record'] .digital-assets__thumbs li", count: 3
     assert_selector "a.digital-assets__thumb[aria-current=true][href='/digital-assets/large/a1.jpg']"
     assert_selector "a.digital-assets__thumb[href='/digital-assets/large/a2.jpg'][target=_blank][rel=noopener][aria-label='Show image 2 of 3'] img[src='/digital-assets/thumbs/a2.jpg'][alt='']"
     assert_selector "button.viewer-control--ghost[hidden]", text: "Previous image", visible: :all

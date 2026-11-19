@@ -1,6 +1,6 @@
 /*
- * The record media viewer's zoom and pan (CCS-57), the compare actions under the media and the comparison page (CCS-58).
- * Used by NexusCcs::DeepZoomComponent, NexusCcs::CompareActionsComponent and views/compare. Buttons are solid dark with a
+ * The record media viewer's zoom and pan stage (CCS-57), the compare actions and the comparison page (CCS-58).
+ * Used by NexusCcs::DeepZoomComponent, NexusCcs::CompareActionsComponent and views/compare (whose zoom buttons are .deep-zoom__button). Buttons are solid dark with a
  * light edge so they read on the dark band, on a pale page and over an image alike (WCAG 1.4.11), and are 44px high.
  */
 
@@ -44,31 +44,9 @@
   border-color: var(--ccs-navy-1200);
 }
 
-/* On the record page: the toggle sits over the image's corner; switched on, the viewer fills the figure */
+/* On the record page the viewer fills the figure (opened by the round Zoom in tool under it, digital_assets.css) */
 .digital-assets__main {
   position: relative;
-}
-
-/* Above the viewer's canvas, so the toggle can still be pressed (mouse and keyboard) once the viewer is on */
-.deep-zoom__toggle {
-  position: absolute;
-  left: var(--ccs-space-2);
-  bottom: var(--ccs-space-2);
-  z-index: 3;
-}
-
-.deep-zoom__controls {
-  position: absolute;
-  top: var(--ccs-space-2);
-  right: var(--ccs-space-2);
-  z-index: 3;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ccs-space-1);
-}
-
-.deep-zoom__controls[hidden] {
-  display: none;
 }
 
 .deep-zoom__stage {

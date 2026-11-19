@@ -1,297 +1,91 @@
 /*
- * A record's media: the large image on the page itself (no dark band, no minimum height), shown whole at its own shape, with a
- * slim toolbar directly under it (the access chip and licence on the left; "Media information", "Full screen" and Download on the
- * right, with text labels) and the "Media metadata" panel opening under the toolbar. With several images the rest are a row of
- * thumbnails under the large one. Dark only in full screen and in the zoom viewer (media_viewer.css).
- * Markup: NexusCcs::DigitalAssetsComponent; behaviour: controllers/media_viewer_controller.js.
+ * A record's media (the Figma "Object viewer"): the large image shown whole at its own shape on the page surface, a controls row
+ * under it (licence and access chips on the left, round tools on the right) and, with several images, a strip of every thumbnail with
+ * previous and next. Dark only in full screen and in the zoom viewer (media_viewer.css). The record page's layout of it is in
+ * record_split.css. Markup: NexusCcs::DigitalAssetsComponent; behaviour: controllers/media_viewer_controller.js.
  */
 .digital-assets {
+  --viewer-control: 2.75rem;  /* 44px round tools */
+  --viewer-thumb: 4rem;       /* 64px thumbnails; 48px on a phone */
   margin: 0;
+  background: var(--ccs-surface-default);
 }
+@media (max-width: 1023px) { .digital-assets { --viewer-thumb: var(--ccs-space-8); } }
 
-.digital-assets__stage {
-  position: relative;
-}
+.digital-assets__stage { position: relative; }
+.digital-assets__media-area { display: flex; flex-direction: column; align-items: center; gap: var(--ccs-space-4); width: 100%; }
+.digital-assets__main { display: flex; justify-content: center; margin: 0; background: transparent; }
 
-.digital-assets__media-area {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ccs-space-4);
-  width: 100%;
-}
-
-.digital-assets__main {
-  display: flex;
-  justify-content: center;
-  margin: 0;
-  background: var(--ccs-surface-subtle); /* the flat tint that holds the image's room until it arrives */
-}
-
-/* Its size is known: the figure keeps the image's shape (and at most 70vh) before and after the image arrives, the image fills it
-   contained, and the zoom viewer fills the same box */
-.digital-assets__main--sized {
-  position: relative;
-  width: 100%;
-  max-height: 70vh;
-  aspect-ratio: var(--digital-assets-ratio);
-}
-
-.digital-assets__main--sized .digital-assets__image {
-  width: 100%;
-  height: 100%;
-  max-height: none;
-}
-
-.digital-assets__main--sized .deep-zoom {
-  position: absolute;
-  inset: 0;
-}
-
-.digital-assets__main--sized .deep-zoom__stage {
-  height: 100%;
-}
-
-.digital-assets__image {
-  display: block;
-  max-width: 100%;
-  max-height: 70vh;
-  width: auto; /* the width and height attributes are for the aspect ratio only (they hold the space before the image loads) */
-  height: auto;
-  object-fit: contain;
-}
-
-/* Thumbnails of the other images, on the band */
-.digital-assets__others {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: var(--ccs-space-2);
-  margin: 0;
-  padding: var(--ccs-space-3) 0 0;
-  list-style: none;
-}
-
-.digital-assets__other {
-  display: block;
-  padding: 0; /* a button when the file may not be opened (AccessPolicy) */
-  background: none;
-  border: 2px solid transparent;
-}
-
-.digital-assets__other:hover,
-.digital-assets__other:focus-visible {
-  border-color: var(--ccs-cyan-400);
-  outline: 0;
-}
-
-.digital-assets__other img {
-  display: block;
-  width: 5rem;
-  height: 5rem;
-  object-fit: cover;
-}
-
-/* Media metadata: a block under the toolbar, shown when the Media information button opens it */
-.digital-assets__panel {
-  display: none;
-  margin-top: var(--ccs-space-3);
-  border: 1px solid var(--ccs-border-panel);
-  background: var(--ccs-white);
-}
-
-.digital-assets__panel.is-open {
-  display: block;
-}
-
-.digital-assets__panel-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--ccs-space-3) var(--ccs-space-3) var(--ccs-space-3) var(--ccs-space-4);
-  border-bottom: 1px solid var(--ccs-border-subtle);
-}
-
-.digital-assets__panel-title {
-  margin: 0;
-  font-family: var(--ccs-font-body);
-  font-size: var(--ccs-heading-card-size);
-  font-weight: var(--ccs-heading-weight-strong);
-  line-height: var(--ccs-line-height-tight);
-  color: var(--ccs-text-primary);
-}
-
-.digital-assets__list {
-  margin: 0;
-}
-
-.digital-assets__item {
-  padding: 0.875rem var(--ccs-space-4);
-  border-bottom: 1px solid var(--ccs-border-subtle);
-}
-
-.digital-assets__item dt {
-  margin-bottom: var(--ccs-space-1);
-  font-size: var(--ccs-font-size-2xs);
-  font-weight: var(--ccs-font-weight-semibold);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--ccs-text-secondary);
-}
-
-.digital-assets__item dd {
-  margin: 0;
-  font-size: var(--ccs-font-size-sm);
-  line-height: 1.5;
-  color: var(--ccs-text-primary);
-  text-wrap: pretty;
-  overflow-wrap: anywhere;
-}
-
-/* Toolbar: directly under the image */
-.digital-assets__toolbar {
-  margin-top: var(--ccs-space-3);
-  border-top: 1px solid var(--ccs-border-subtle);
-  padding-top: var(--ccs-space-3);
-}
-
-.digital-assets__toolbar-inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ccs-space-3);
-}
-
-.digital-assets__chips {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ccs-space-2);
-  min-width: 0;
-}
-
-.digital-assets__access,
-.digital-assets__licence {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ccs-space-2);
-  margin: 0;
-  padding: var(--ccs-space-1) var(--ccs-space-3);
-  background: var(--ccs-surface-subtle);
-  font-size: var(--ccs-font-size-sm);
-  line-height: 1.4;
-  color: var(--ccs-text-primary);
-}
-
-.digital-assets__access {
-  font-weight: var(--ccs-font-weight-semibold);
-}
-
-.digital-assets__controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ccs-space-2);
-}
-
-/* A text button with an icon: 40px high at least, so the target is large and the label is visible */
-.digital-assets__button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ccs-space-2);
-  min-height: 2.5rem;
-  padding: 0 var(--ccs-space-3);
-  border: 1px solid var(--ccs-navy-1100);
-  background: var(--ccs-white);
-  font: inherit;
-  font-size: var(--ccs-font-size-ui);
-  font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-navy-1100);
-  cursor: pointer;
-}
-
-.digital-assets__button svg {
-  flex: none;
-  font-size: var(--ccs-font-size-xl);
-}
-
-.digital-assets__button[hidden] {
-  display: none;
-}
-
-.digital-assets__button:hover {
-  background: var(--ccs-cyan-100);
-}
-
-.digital-assets__button:focus-visible,
-.digital-assets__primary:focus-visible {
-  outline: 3px solid var(--ccs-focus-ring);
-  outline-offset: 2px;
-}
-
-.digital-assets__button[aria-expanded="true"] {
-  background: var(--ccs-navy-200);
-}
-
-/* The one primary action */
-.digital-assets__primary {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.5rem;
-  padding: 0 var(--ccs-space-4);
-  background: var(--ccs-navy-1100);
-  font-size: var(--ccs-font-size-ui);
-  font-weight: var(--ccs-font-weight-semibold);
-  color: var(--ccs-white);
-  text-decoration: none;
-}
-
-.digital-assets__primary:hover {
-  background: var(--ccs-navy-1200);
-  color: var(--ccs-white);
-}
-
-/* Full screen: the section fills the screen on a dark page, and the image is as large as it can be */
-.digital-assets.is-fullscreen {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: var(--ccs-space-4);
-  background: var(--ccs-navy-1200);
-  color: var(--ccs-white);
-}
-
-.digital-assets.is-fullscreen .digital-assets__main {
-  background: transparent;
-}
-
-.digital-assets.is-fullscreen .digital-assets__image,
-.digital-assets.is-fullscreen .digital-assets__main--sized {
-  max-height: calc(100vh - 8rem);
-}
-
-.digital-assets.is-fullscreen .digital-assets__toolbar {
-  border-top-color: var(--ccs-border-panel);
-}
-
-.digital-assets.is-fullscreen .digital-assets__toolbar .digital-assets__button {
-  border-color: var(--ccs-white);
-}
-
-@media (max-width: 575.98px) {
-  .digital-assets__controls {
-    width: 100%;
-  }
-
-  .digital-assets__primary {
-    flex: 1 1 100%;
-    justify-content: center;
-    min-height: 2.75rem;
-  }
-}
+/* Its size is known: the figure keeps the image's shape before and after the image arrives, and the zoom viewer fills the same box */
+.digital-assets__main--sized { position: relative; aspect-ratio: var(--digital-assets-ratio); }
+.digital-assets__main--sized .digital-assets__image { width: 100%; height: 100%; }
+.digital-assets__main--sized .deep-zoom { position: absolute; inset: 0; }
+.digital-assets__main--sized .deep-zoom__stage { height: 100%; }
+/* the width and height attributes are for the shape only (they hold the space before the image loads) */
+.digital-assets__image { display: block; max-width: 100%; width: auto; height: auto; object-fit: contain; }
 
 .digital-assets__media { margin: 0; text-align: center; }
 .digital-assets__video { max-width: 100%; max-height: 70vh; }
 .digital-assets__audio { width: 100%; max-width: 40rem; }
-.digital-assets__media figcaption, .digital-assets__pdf { color: inherit; margin-top: 0.5rem; }
+.digital-assets__media figcaption, .digital-assets__pdf { color: inherit; margin-top: var(--ccs-space-2); }
+
+/* The controls row: chips on the left, round tools on the right */
+.digital-assets__controls-row {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ccs-space-3);
+  padding: var(--ccs-space-2) var(--ccs-space-4);
+}
+@media (min-width: 1024px) { .digital-assets__controls-row { padding-inline: var(--ccs-space-5); } }
+.digital-assets__chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-2); min-width: 0; }
+.digital-assets__chips > * { margin: 0; }
+.viewer-chip {
+  display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: var(--ccs-space-6); margin: 0;
+  padding: 0 var(--ccs-space-3) 0 var(--ccs-space-2); border-radius: var(--ccs-radius-pill); background: var(--ccs-surface-subtle);
+  font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-tight); color: var(--ccs-text-brand);
+}
+.viewer-chip svg { flex: none; width: var(--ccs-font-size-lg); height: var(--ccs-font-size-lg); }
+.viewer-chip:not(:has(svg)) { padding-left: var(--ccs-space-3); }
+.digital-assets__tools { display: flex; align-items: center; gap: var(--ccs-space-3); }
+
+/* The round control (Figma Media / Control): Filled navy, 44px; Ghost in the thumbnail strip, 32px wide and 44px tall (above the
+   24px minimum target, WCAG 2.5.8) */
+.viewer-control {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: var(--viewer-control); height: var(--viewer-control); padding: 0;
+  border: 0; border-radius: var(--ccs-radius-pill); background: var(--ccs-surface-brand); color: var(--ccs-text-inverse);
+  cursor: pointer; text-decoration: none;
+}
+.viewer-control[hidden] { display: none; }
+.viewer-control:hover { background: var(--ccs-surface-brand-strong); color: var(--ccs-text-inverse); }
+.viewer-control:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.viewer-control--ghost { width: var(--ccs-space-6); background: transparent; color: var(--ccs-text-brand); }
+.viewer-control--ghost:hover { background: var(--ccs-surface-raised); color: var(--ccs-text-brand); }
+
+/* The thumbnail strip: the one on show has a 3px border and aria-current */
+.digital-assets__strip {
+  display: flex; align-items: center; justify-content: center; gap: var(--ccs-space-2);
+  padding: var(--ccs-space-3) var(--ccs-space-2); background: var(--ccs-surface-subtle);
+}
+@media (min-width: 1024px) { .digital-assets__strip { padding-inline: var(--ccs-space-5); } }
+.digital-assets__thumbs {
+  display: flex; gap: var(--ccs-space-2); min-width: 0; margin: 0; padding: 2px; list-style: none;
+  overflow-x: auto; scrollbar-width: thin; scroll-snap-type: x proximity;
+}
+.digital-assets__thumbs li { flex: none; scroll-snap-align: start; }
+.digital-assets__thumb {
+  display: block; position: relative; width: var(--viewer-thumb); height: var(--viewer-thumb); padding: 0;
+  border: 0; background: var(--ccs-surface-default); opacity: 0.75; cursor: pointer;
+}
+.digital-assets__thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.digital-assets__thumb::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 0 var(--ccs-border-brand); pointer-events: none; }
+.digital-assets__thumb:hover { opacity: 1; }
+.digital-assets__thumb:hover::after { box-shadow: inset 0 0 0 1px var(--ccs-border-brand); }
+.digital-assets__thumb[aria-current="true"] { opacity: 1; }
+.digital-assets__thumb[aria-current="true"]::after { box-shadow: inset 0 0 0 3px var(--ccs-border-brand); }
+.digital-assets__thumb:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; opacity: 1; }
+
+/* Full screen: the picture fills the screen on a dark surface */
+.digital-assets.is-fullscreen { display: flex; flex-direction: column; background: var(--ccs-surface-brand-strong); }
+.digital-assets.is-fullscreen .digital-assets__stage { flex: 1; display: flex; align-items: center; justify-content: center; background: transparent; }
+.digital-assets.is-fullscreen .digital-assets__image,
+.digital-assets.is-fullscreen .digital-assets__main--sized { max-height: calc(100vh - 10rem); }
+.digital-assets.is-fullscreen .digital-assets__controls-row { background: var(--ccs-surface-default); }

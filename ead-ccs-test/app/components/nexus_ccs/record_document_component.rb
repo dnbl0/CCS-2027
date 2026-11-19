@@ -14,9 +14,9 @@ module NexusCcs
     # Values that open the search filtered to them (Blacklight's link_to_facet idea), so a visitor can step sideways to more of the same.
     # Creator, place and subject open their browse page instead (BROWSE_KINDS), and the filter when the value has none. Free text
     # (description, credit line, dates) is never a link.
-    LINK_FIELDS = %w[collection_ssim named_collection_ssim object_type_ssim classification_ssim material_ssim date_era_ssim region_ssim].freeze
     # Read when the core has them, though the workbook does not list them: shown as their own rows of terms after its fields
     EXTRA_TERM_FIELDS = %w[date_era_ssim region_ssim].freeze
+    LINK_FIELDS = (%w[collection_ssim named_collection_ssim object_type_ssim classification_ssim material_ssim] + EXTRA_TERM_FIELDS).freeze
     # Shown as filters where a browse page does not take them: the field each display field filters on
     FALLBACK_FILTER_FIELDS = { "subject_ssim" => "subject_ssim", "creator_display_ssim" => "creator_ssim" }.freeze
     Row = Struct.new(:label, :values, :field, :copy, keyword_init: true)
@@ -61,7 +61,7 @@ module NexusCcs
     def link_to_value?(row) = row.field.in?(LINK_FIELDS)
 
     # A record's place, subject and creator values link to the browse page for the value (Browse), where one exists
-    BROWSE_KINDS = { "production_place_ssim" => "places", "subject_ssim" => "subjects", "creator_display_ssim" => "makers" }.freeze
+    BROWSE_KINDS = { "production_place_ssim" => "places", "subject_ssim" => "subjects", "creator_display_ssim" => "makers", "creator_ssim" => "makers" }.freeze
 
     def browse_path(row, value)
       kind = BROWSE_KINDS[row.field] or return
@@ -133,8 +133,12 @@ module NexusCcs
 
     def collection_path = collection_name && helpers.search_action_path(responsible_collection_query)
 
-    # [[name, browse path or nil]]: the record's makers, as the header used to show them
-    def makers = RecordHeaderComponent.new(document: document).creators
+    # [[name, browse path or nil]]: the record's first two makers (not "Unknown"), each linking to the maker's browse page where there is one
+    def makers
+      maker_names.first(2).map { |name| [ name, Browse.path_for("makers", name) ] }
+    end
+
+    def maker_names = Array(document["creator_ssim"]).map(&:to_s).compact_blank.reject { |name| name == RecordCardComponent::UNKNOWN_MAKER }
 
     def display_date = Array(document["date_display_ssm"]).first.presence || Array(document["production_date_ssim"]).first.presence
 
@@ -159,11 +163,18 @@ module NexusCcs
           values = Array(document[name]).map(&:to_s).compact_blank
           Row.new(label: config.label, values: values, field: name) if values.any?
         end
+        rows += [ maker_row ].compact if rows.none? { |row| row.field == "creator_display_ssim" }
         rows + EXTRA_TERM_FIELDS.filter_map do |name|
           values = Array(document[name]).map(&:to_s).compact_blank.uniq
           Row.new(label: t("nexus_ccs.record_page.split.extra.#{name}"), values: values, field: name) if values.any?
         end
       end
+    end
+
+    # The Maker row from the record's plain creator names, for a record without the display form (name, dates and role) the
+    # workbook's field holds; each name opens the maker's browse page
+    def maker_row
+      Row.new(label: t("nexus_ccs.record_page.split.extra.creator_ssim"), values: maker_names, field: "creator_ssim") if maker_names.any?
     end
 
     # A value shown as a term (an outlined tag that opens its search or browse page): the values that name things

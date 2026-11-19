@@ -54,14 +54,14 @@ class ColoursTest < ActionDispatch::IntegrationTest
   def records = [ open_record("emu-source"), open_record("emu-a"), open_record("emu-b"), open_record("emu-c", has_digital_asset_bsi: false),
                   withheld_record("emu-withheld"), sensitive_record("emu-sensitive") ]
 
-  test "Looks similar: the closest records by colour as the record page's cards, leaving out any without a viewable image" do
+  test "Looks similar: the closest records by colour as a panel of result cards, leaving out any without a viewable image" do
     looks_like("emu-source", %w[emu-a emu-withheld emu-c emu-sensitive emu-b])
     with_seeded_menu_cache { with_canned_search(discovery_solr(records: records)) { |seen| get "/catalog/emu-source/looks-similar"; @seen = seen } }
 
     assert_response :success
-    assert_select "turbo-frame#looks-similar[target=_top] section#looks-similar-records[aria-labelledby=looks-similar-heading]" do
-      assert_select "h2#looks-similar-heading", "Looks similar"
-      assert_select "li.object-cards__item", 2
+    assert_select "turbo-frame#more-colours[target=_top]" do
+      assert_select "h2", count: 0 # the tab names it
+      assert_select "li.discover-cards__item", 2
       assert_select "a[href=?]", "/catalog/emu-a"
       assert_select "a[href=?]", "/catalog/emu-b"
     end

@@ -3,7 +3,7 @@
 module NexusCcs
   # "More from the collections" (approved split layout): one tab per way the record can be matched (SimilarRows: by its maker, from
   # the same period, the same place, of the same type; and Looks similar, by colour, when the record has an image to compare), each
-  # panel a lazy Turbo frame of three result cards and its See all link (SimilarController / LooksSimilarController with ?tab=1).
+  # panel a lazy Turbo frame of three result cards and its See all link (SimilarController ?row= / LooksSimilarController).
   # A panel loads when it is first shown, so the page makes no request for a tab nobody opens; a tab whose answer is empty says so.
   # Behaviour: controllers/record_tabs_controller.js (ARIA tabs: arrow keys, Home and End). Without JavaScript every panel is
   # shown, one under the other. Nothing for a record that may not have recommendations beside it.
@@ -19,9 +19,9 @@ module NexusCcs
     def tabs
       @tabs ||= begin
         list = SimilarRows.keys_for(@document).map do |key|
-          Tab.new(key, label(key), helpers.similar_path(@document.id, row: key, tab: 1))
+          Tab.new(key, label(key), helpers.similar_path(@document.id, row: key))
         end
-        list << Tab.new("colours", t("colours.looks_similar.heading"), helpers.looks_similar_path(@document.id, tab: 1)) if LooksSimilar.eligible?(@document)
+        list << Tab.new("colours", t("colours.looks_similar.heading"), helpers.looks_similar_path(@document.id)) if LooksSimilar.eligible?(@document)
         list
       end
     end

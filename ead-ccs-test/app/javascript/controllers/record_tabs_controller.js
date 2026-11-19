@@ -10,7 +10,7 @@ export default class extends Controller {
   connect() {
     this.listTarget.hidden = false
     this.panelHeadingTargets.forEach((heading) => { heading.hidden = true })
-    this.panelTargets.forEach((panel) => panel.setAttribute("role", "tabpanel"))
+    this.panelTargets.forEach((panel) => { panel.setAttribute("role", "tabpanel"); panel.tabIndex = 0 })
     this.show(this.tabTargets.findIndex((tab) => tab.getAttribute("aria-selected") === "true"), false)
   }
 

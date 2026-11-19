@@ -59,6 +59,10 @@ export default class extends Controller {
   }
 
   display(thumb) {
+    // the first image's size attributes would hold the next one to its shape: let the new image take its own
+    this.imageTarget.removeAttribute("width")
+    this.imageTarget.removeAttribute("height")
+    this.imageTarget.closest("figure")?.classList.remove("digital-assets__main--sized")
     this.imageTarget.src = thumb.dataset.mediaViewerLarge
     this.imageTarget.alt = thumb.dataset.mediaViewerAlt
     this.thumbTargets.forEach((other) => { if (other === thumb) other.setAttribute("aria-current", "true"); else other.removeAttribute("aria-current") })

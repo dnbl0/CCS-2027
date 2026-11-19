@@ -37,23 +37,6 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
 
   def render_media(extra = {}) = render_inline(NexusCcs::DigitalAssetsComponent.new(presenter: Presenter.new(doc(extra))))
 
-  # --- header
-  test "the header is a kicker (type and collection, plain text), the one h1, the creator as a link with the date, and the Collection ID" do
-    render_inline(NexusCcs::RecordHeaderComponent.new(document: doc))
-
-    assert_selector "header.record-header p.record-header__kicker", text: "Tone tool · Grainger Museum Collection"
-    assert_selector "h1", count: 1, text: "Kangaroo-pouch tone-tool"
-    assert_selector ".record-header__byline", text: "Grainger, Percy Aldridge · 1952"
-    assert_selector "[data-testid=record-identifier] button[aria-label='Copy collection ID']"
-    assert_no_selector ".record-banner, .record-tag"
-  end
-
-  test "an unknown creator is left out of the byline, and a record with no creator or date has no byline" do
-    render_inline(NexusCcs::RecordHeaderComponent.new(document: doc("creator_ssim" => [ "Unknown" ], "production_date_ssim" => [])))
-
-    assert_no_selector ".record-header__byline"
-  end
-
   # --- key facts
   test "Key facts are a description list of the facts the record has, and nothing for a record with none" do
     render_inline(NexusCcs::KeyFactsComponent.new(document: doc))
@@ -177,10 +160,10 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   end
 
   # --- about
-  test "About this record is three rows: a correction link, the content notice, and the permanent link with Copy link" do
+  test "About this record is a band heading and three rows: a correction link, the content notice, and the permanent link with Copy link" do
     render_inline(NexusCcs::RecordAboutComponent.new(document: doc("collection_ssim" => [ "University Art Collection" ]), url: "http://example.test/catalog/emu-1"))
 
-    assert_selector "section#about-this-record h2.visually-hidden", text: "About this record"
+    assert_selector "section#about-this-record h2.record-band-heading", text: "About this record"
     assert_equal [ "Help us improve this record", "Content notice", "Use this record" ], page.all(".record-about-band__heading").map(&:text)
     assert_selector ".record-about-band__row a.record-arrow-link", text: "Suggest a correction"
     assert_selector ".record-about-band__row", text: "not appropriate today"

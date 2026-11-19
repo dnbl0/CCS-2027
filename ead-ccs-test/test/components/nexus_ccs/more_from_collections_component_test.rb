@@ -25,7 +25,7 @@ class MoreFromCollectionsComponentTest < ActiveSupport::TestCase
     assert_equal %w[true], tabs.map { |tab| tab["aria-selected"] }.uniq.first(1)
     assert_equal [ "0" ], [ tabs.first["tabindex"] ]
     assert(tabs.drop(1).all? { |tab| tab["aria-selected"] == "false" && tab["tabindex"] == "-1" })
-    assert_selector "#record-panel-creator[aria-labelledby=record-tab-creator] turbo-frame#more-creator[loading=lazy][src='/catalog/emu-source/similar?row=creator&tab=1'][data-controller=lazy-frame]", visible: :all
+    assert_selector "#record-panel-creator[aria-labelledby=record-tab-creator] turbo-frame#more-creator[loading=lazy][src='/catalog/emu-source/similar?row=creator'][data-controller=lazy-frame]", visible: :all
     # without JavaScript every panel shows under its own heading
     assert_selector ".record-tabs__panel h3", text: "By Lees, Derwent", visible: :all
   end

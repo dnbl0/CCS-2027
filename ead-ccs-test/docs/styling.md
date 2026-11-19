@@ -151,7 +151,7 @@ when that has slid in. Below 1024px it is one column, media first, and nothing i
   and `aria-current`) with round previous and next. A view-only record has no download link in its markup; a request-only or
   not-yet-chosen sensitive record has no asset path in it, and its notice sits where the media would.
 - **The record's column** (`RecordDocumentComponent`): "Result 3 of 120" with round previous and next (`ResultStepperComponent`,
-  Blacklight's search context; at the end of the column on a phone), the collection (a link), the h1 in Fraunces, maker, date and
+  Blacklight's search context; first in the column at every width, so the reading order and the tab order agree), the collection (a link), the h1 in Fraunces, maker, date and
   medium; one row of actions (`RecordActionsComponent`: Save, Add to list, Share and embed, Cite, with Compare under it); "Where it is"
   (placeholder wording: the index holds no location); the notices; the description, its first paragraph as the lead; Object details
   as label above value, names of things as outlined terms that open their search or browse page, the UoM ID with Copy last; then four
@@ -160,5 +160,5 @@ when that has slid in. Below 1024px it is one column, media first, and nothing i
   (`MoreFromCollectionsComponent`, on the grey surface: ARIA tabs, one per way the record matches, each panel a lazy frame of three
   cards and See all; without JavaScript every panel shows under its own heading); About this record (`RecordAboutComponent`: three
   rows, heading beside text). A lazy frame whose answer fails stays empty (`lazy_frame_controller.js`).
-- Headings: h1 the title; h2 Object details, the folding sections, Related objects, More from the collections, About this record;
-  h3 the About rows. Wording marked placeholder is in `config/locales/record_page.en.yml`.
+- Headings: h1 the title; h2 Where it is, Object details, the folding sections, Related objects, More from the collections, About
+  this record; h3 the About rows and the cards in the bands. Wording marked placeholder is in `config/locales/record_page.en.yml`.
