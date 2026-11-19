@@ -82,7 +82,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
         levels = outline.drop(before_title.size).map { |heading| heading[1].to_i }
         assert levels.each_cons(2).all? { |a, b| b <= a + 1 }, "headings skip a level: #{outline.inspect}"
         assert_includes outline, "H2 Object details"
-        assert_includes outline, "H2 Copyright and reuse"
+        assert_includes outline, "H2 Use and access"
 
         # The media column stays in view beside the scrolling details on a wide screen (the approved design); nothing else is sticky
         sticky = page.evaluate_script("[...document.querySelectorAll('#main-container *')].filter(e => e.getClientRects().length > 0 && ['sticky', 'fixed'].includes(getComputedStyle(e).position)).map(e => e.className)")
@@ -129,13 +129,26 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
   test "an open record's controls row has the access chip, the licence, named round tools and the one Download; a view-only record has no download link anywhere" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
     assert_selector ".digital-assets__controls-row .viewer-chip--open", text: "Open: view and download"
-    assert_selector ".digital-assets__controls-row a.viewer-control[download]", text: "Download image"
     assert_selector ".digital-assets__controls-row button.viewer-control", text: "Zoom in"
-    assert_selector "details#media-details summary", text: "Media details"
+    # CCS-67: Download shows the essential information (caption, licence) to copy, then downloads
+    find(".digital-assets__controls-row button.viewer-control", text: "Download image").click
+    assert_selector "dialog[open] h2", text: "Before you download"
+    assert_selector "dialog[open] .digital-assets__essential dt", text: "Caption"
+    assert_selector "dialog[open] a.btn[download]", text: "Download image"
+    find("dialog[open] .modal-footer button", text: "Close").click
+    assert_no_selector "dialog[open]"
+    # CCS-422: the i tool opens the media information over the image; Escape closes it and focus returns to the tool
+    find("button.viewer-control[aria-controls=media-information]").click
+    assert_selector "#media-information h3", text: "Media information"
+    assert_equal "true", find("button.viewer-control[aria-controls=media-information]")["aria-expanded"]
+    page.send_keys(:escape)
+    assert_no_selector "#media-information"
+    assert page.evaluate_script("document.activeElement.getAttribute('aria-controls') === 'media-information'")
 
     open_record(VARIANTS.fetch("several images, view-only"), "desktop")
-    assert_selector ".record-actions .access-notice--view-only"
-    assert_no_selector "a[download]"
+    assert_selector "#use-and-access", text: "Download is not available"
+    assert_selector "#use-and-access a[href='/access_requests/new?document_id=emu-9044']", text: "Request to use this image"
+    assert_no_selector "a[download]", visible: :all
     assert_no_selector ".digital-assets a[href*='/digital-assets/']"
   end
 
@@ -146,7 +159,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
       assert_selector ".digital-assets__main img[src^='#{LARGE.first}']"
       assert_selector ".digital-assets .access-notice--partly-withheld", text: "1 other digital asset of this record is not shown here"
       assert_selector ".access-notice--partly-withheld a[href='/access_requests/new?document_id=emu-9044']", text: "Request access to it"
-      assert_selector ".digital-assets__controls-row a.viewer-control[download]", text: "Download image"
+      assert_selector ".digital-assets__controls-row button.viewer-control", text: "Download image"
       assert_selector ".viewer-chip", text: "CC BY"
       notice = page.evaluate_script("(() => { const r = document.querySelector('.access-notice--partly-withheld').getBoundingClientRect(); return [r.left >= 0, r.right <= window.innerWidth] })()")
       assert_equal [ true, true ], notice, "the notice fits the width"
@@ -176,20 +189,28 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_operator details["left"], :>=, viewer["right"] - 1
     assert_in_delta viewer["top"], details["top"], 1
     page.execute_script("window.scrollTo(0, 600)")
-    assert_in_delta 0, rect.call(".record-split__viewer")["top"], 1, "the media stays in view"
+    # under the sticky search strip once it has slid in (60px), else at the top of the window
+    strip = page.has_selector?(".sticky-search.is-visible", wait: 1) ? 60 : 0
+    assert_in_delta strip, rect.call(".record-split__viewer")["top"], 1, "the media stays in view"
 
     open_record(VARIANTS.fetch("one image, open"), "phone")
     viewer, details = rect.call(".record-split__viewer"), rect.call(".record-split__details")
     assert_operator details["top"], :>=, viewer["bottom"] - 1
   end
 
-  test "Copyright and reuse folds open to state the record's rights, on a phone and a desktop" do
-    %w[phone desktop].each do |width|
+  test "Use and access states the record's rights on a phone and a desktop; the full record is open on a desktop and closed on a phone" do
+    { "phone" => false, "desktop" => true }.each do |width, open|
       open_record({}, width)
-      find("details#copyright-and-reuse summary", text: "Copyright and reuse").click
-      assert_selector "details#copyright-and-reuse[open]", text: "Rights held by the University"
-      assert_selector "details#copyright-and-reuse[open] a[href='/help#copyright']", text: "About copyright and terms of use"
+      assert_selector "#use-and-access h2", text: "Use and access"
+      assert_selector "#use-and-access", text: "Rights held by the University"
+      assert_selector "#use-and-access a[href='/help#copyright']", text: "About copyright and terms of use"
+      assert_equal open, page.evaluate_script("document.getElementById('full-record').open")
+      # Key facts summarise the full record, so they show only while it is closed
+      assert_equal !open, page.has_selector?(".record-facts__key", wait: 0)
     end
+    assert_selector "#full-record[open] .record-full__group-title", text: "The object"
+    find("#full-record summary").click # closing it on a desktop brings the Key facts back
+    assert_selector ".record-facts__key h3", text: "Key facts"
   end
 
   test "the Tab key moves through the record page in the order it reads, and each stop shows a focus ring" do

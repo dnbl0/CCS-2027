@@ -45,11 +45,11 @@ mentioned in the brief was therefore not needed: the shared one was only read.
 
 ### Labelled rows under a record (added 2026-11-18)
 
-Since the approved split layout (19 Nov 2026) the rows are the tabs of the record page's **More from the collections**
-(`MoreFromCollectionsComponent`): **By** the maker, **Same period**, **Same place** and **Same type**, then **Looks similar** (by colour).
-Each panel is a lazy Turbo frame from the same route, `GET /catalog/:id/similar?row=creator|period|place|type` (`SimilarRows`,
-`app/views/similar/tab.html.erb`), loaded when its tab is first shown, so the record page still makes its one Solr request and each row one
-more (two in all: the record, then the row). A panel holds three of the same result cards and, when the row is one value of one filter, a
+Since 20 Nov 2026 the rows are labelled rows, all in view, of the record page's **More from the collections**
+(`MoreFromCollectionsComponent`; they were tabs from 19 Nov): **More by** the maker, **From the same period**, **From the same place** and
+**More of this type**, then **Looks similar** (by colour). Each row is a lazy Turbo frame from the same route,
+`GET /catalog/:id/similar?row=creator|period|place|type` (`SimilarRows`, `app/views/similar/tab.html.erb`), loaded as it nears the screen,
+so the record page still makes its one Solr request and each row one more (two in all: the record, then the row). A row holds three of the same result cards and, when the row is one value of one filter, a
 "See all records for ..." link to the filtered search. Similar objects itself is the page's **Related objects** band.
 
 - **What each row matches on** (the first field the record has a value in; any of up to three values): creator `creator_ssim`; period

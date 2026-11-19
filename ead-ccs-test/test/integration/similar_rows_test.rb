@@ -79,15 +79,15 @@ class SimilarRowsIntegrationTest < ActionDispatch::IntegrationTest
     Blacklight::Solr::Repository.send(:define_method, :find, original) if original
   end
 
-  test "the record page has Related objects, then one tab with an empty lazy frame per row the record can have" do
+  test "the record page has Related objects, then one labelled row with an empty lazy frame per way the record can match" do
     with_seeded_menu_cache do
       with_found_record(source.merge("region_ssim" => nil, "production_place_ssim" => nil)) { get "/catalog/emu-source" }
     end
 
     assert_response :success
     assert_select "turbo-frame#similar-records[loading=lazy]"
-    tabs = css_select("#more-from-the-collections [role=tablist] [role=tab]").map { |tab| tab["id"] }
-    assert_equal %w[record-tab-creator record-tab-period record-tab-type], tabs.first(3)
+    rows = css_select("#more-from-the-collections .record-more__row").map { |row| row["id"] }
+    assert_equal %w[more-row-creator more-row-period more-row-type], rows.first(3)
     assert_select "turbo-frame#more-creator[loading=lazy][src='/catalog/emu-source/similar?row=creator']"
     assert_select "turbo-frame#more-creator *", count: 0
   end

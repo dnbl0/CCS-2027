@@ -1,0 +1,51 @@
+<dl class="record-facts__list">
+  <% rows.each do |row| %>
+    <div class="record-facts__row">
+      <dt><%= row.label %></dt>
+      <dd>
+        <% if record.source_url?(row) %>
+          <div class="record-facts__source persistent-link__browser"><%= render record.view_full_record %></div>
+        <% elsif record.term?(row) %>
+          <ul class="record-terms">
+            <% row.values.each_with_index do |value, index| %>
+              <li>
+                <% if index.positive? && row.join %><span class="record-terms__join" aria-hidden="true"><%= row.join.strip %></span><% end %>
+                <% if (path = record.value_link(row, value)) %><%= link_to record.flagged(row, value, index), path, class: "record-term" %><% else %><span class="record-term record-term--static"><%= record.flagged(row, value, index) %></span><% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <% text_values(row).each do |value| %><span class="record-facts__value"><%= value %></span><% end %>
+        <% end %>
+      </dd>
+    </div>
+  <% end %>
+  <% if id_row? %>
+    <div class="record-facts__row" data-testid="record-identifier">
+      <dt><%= t("nexus_ccs.record_page.split.uom_id") %></dt>
+      <dd class="record-facts__copyable">
+        <span class="record-facts__value"><%= record.uom_id %></span>
+        <%# CCS-22: the two ways to quote the record, side by side %>
+        <span class="record-copy-group">
+          <span data-controller="clipboard">
+            <span hidden data-clipboard-target="source" data-copy="<%= record.identifier %>"></span>
+            <button type="button" class="record-copy" data-action="clipboard#copy" data-clipboard-target="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="1" /><path d="M5 15V5a1 1 0 0 1 1-1h10" /></svg>
+              <span data-clipboard-target="label"><%= t("nexus_ccs.record_page.id.copy_id") %></span>
+            </button>
+            <span class="visually-hidden" role="status" data-clipboard-target="status"></span>
+          </span>
+          <span data-controller="clipboard">
+            <span hidden data-clipboard-target="source" data-copy="<%= record.permalink %>"></span>
+            <button type="button" class="record-copy" data-action="clipboard#copy" data-clipboard-target="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" /></svg>
+              <span data-clipboard-target="label"><%= t("nexus_ccs.record_page.id.copy_permalink") %></span>
+            </button>
+            <span class="visually-hidden" role="status" data-clipboard-target="status"></span>
+          </span>
+          <%= render NexusCcs::HelpTipComponent.new(topic: :persistent_link) %>
+        </span>
+      </dd>
+    </div>
+  <% end %>
+</dl>

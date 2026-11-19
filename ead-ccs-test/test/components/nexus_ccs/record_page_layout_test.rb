@@ -79,10 +79,10 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
     assert_selector ".compare-actions button", text: "Add to compare", visible: :all
   end
 
-  test "a view-only record's access notice is in the actions, with the request link and nothing that downloads" do
+  test "a view-only record's actions hold no access notice (Use and access says it) and nothing that downloads" do
     render_actions(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ]))
 
-    assert_selector ".record-actions .access-notice--view-only a[href='/access_requests/new?document_id=emu-1']", text: "Request access to download this item"
+    assert_no_selector ".access-notice"
     assert_selector ".compare-actions button", text: "Add to compare", visible: :all
     assert_no_selector "a[download]"
   end
@@ -104,7 +104,12 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
     render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
     assert_selector ".digital-assets__controls-row .viewer-chip--open", text: "Open: view and download"
-    assert_selector ".digital-assets__controls-row a.viewer-control[download][href='/digital-assets/large/a.jpg']", text: "Download image of"
+    # CCS-67: the round tool opens the essential information (caption and licence, to copy) before the download
+    assert_selector ".digital-assets__controls-row button.viewer-control[aria-haspopup=dialog]", text: "Download image of"
+    assert_selector "dialog .digital-assets__essential dt", text: "Licence", visible: :all
+    assert_selector "dialog a.btn[download][href='/digital-assets/large/a.jpg']", text: "Download image", visible: :all
+    # CCS-422: the i tool opens the media information over the image
+    assert_selector "button.viewer-control[aria-controls=media-information][aria-expanded=false]", text: "Media information"
     assert_selector ".digital-assets__controls-row button", text: "Full screen", visible: :all
     assert_no_selector ".digital-assets__stage ~ .digital-assets__stage"
   end

@@ -87,3 +87,28 @@
 .digital-assets.is-fullscreen .digital-assets__image,
 .digital-assets.is-fullscreen .digital-assets__main--sized { max-height: calc(100vh - 10rem); }
 .digital-assets.is-fullscreen .digital-assets__controls-row { background: var(--ccs-surface-default); }
+
+/* The licence chip is a link to the Use and access panel */
+a.viewer-chip--link { text-decoration: none; }
+a.viewer-chip--link:hover span { text-decoration: underline; }
+a.viewer-chip--link:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+/* The media information (CCS-422): over the right of the image, under its own close button; a full-width sheet on a phone */
+.digital-assets__stage { position: relative; }
+.digital-assets__panel {
+  position: absolute; inset: var(--ccs-space-3) var(--ccs-space-3) var(--ccs-space-3) auto; z-index: var(--ccs-z-raised);
+  width: min(22rem, calc(100% - 2 * var(--ccs-space-3))); overflow-y: auto; padding: var(--ccs-space-4);
+  background: var(--ccs-surface-default); box-shadow: var(--ccs-shadow-lg); color: var(--ccs-text-primary);
+}
+.digital-assets__panel[hidden] { display: none; }
+.digital-assets__panel-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ccs-space-3); margin-bottom: var(--ccs-space-3); }
+.digital-assets__panel-title { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-heading-weight-strong); color: var(--ccs-text-brand); }
+.digital-assets__panel-list { display: grid; gap: var(--ccs-space-3); margin: 0; font-size: var(--ccs-font-size-ui); }
+.digital-assets__panel-list dt { font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
+.digital-assets__panel-list dd { margin: 0; overflow-wrap: anywhere; }
+
+/* Download (CCS-67): the essential information first */
+.digital-assets__download { display: contents; }
+.digital-assets__essential { display: grid; gap: var(--ccs-space-3); margin: 0 0 var(--ccs-space-4); }
+.digital-assets__essential dt { font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
+.digital-assets__essential dd { margin: 0; overflow-wrap: anywhere; }

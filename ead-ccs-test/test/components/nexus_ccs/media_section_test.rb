@@ -47,6 +47,7 @@ class MediaSectionTest < ActiveSupport::TestCase
     render_for(FIELDS.except("licence_type_ssim", "rights_ssim"))
 
     assert_no_selector ".viewer-chip svg" # the licence chip is the one with the Creative Commons mark
+    assert_selector "a.viewer-chip--link[href='#use-and-access']", text: "Use this image" # without a licence, a plain way to the panel
     assert_includes component(FIELDS.except("licence_type_ssim", "rights_ssim")).metadata.to_h["Advisory"], "not appropriate today"
   end
 

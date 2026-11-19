@@ -2,9 +2,10 @@
 
 module NexusCcs
   # A record's media on its page, the left of the approved split layout (Figma "Object viewer"): the large image shown whole at its
-  # own shape, a controls row under it (the licence and access chips on the left; round zoom in, zoom out, full screen and, for an
-  # open image, download on the right) and, when there are several images, a strip of every thumbnail with previous and next. The
-  # media metadata is the record column's "Media details" section (#metadata). Renders nothing for a record without assets. What it shows follows AccessPolicy, asset by asset: the index holds only
+  # own shape, a controls row under it (the licence, as a link to the Use and access panel, and the access chip on the left; round
+  # media information, zoom in, zoom out, full screen and, for an open image, download on the right) and, when there are several
+  # images, a strip of every thumbnail with previous and next. The media information opens over the right of the image (CCS-422);
+  # Download first shows the essential information (CCS-67). Renders nothing for a record without assets. What it shows follows AccessPolicy, asset by asset: the index holds only
   # the assets a visitor may see (Dam::SolrWriter), and of those only an open one is offered to download (its thumbnail links to
   # the file, its player keeps its download button, a PDF is listed); a view-only one is shown without any of that. A record
   # with some assets withheld says so under them, with a request link; a :request record shows none of the assets, only the
@@ -134,7 +135,7 @@ module NexusCcs
     # The DAM's DA Advisory, else the advisory every record carries
     def advisory = dam_value("advisory") || ADVISORY
 
-    # [label, text] rows of the record column's "Media details" section (RecordDocumentComponent)
+    # [label, text] rows of the media information (CCS-422: the overlay the i tool opens; the data model sheet's DAM fields)
     def metadata
       [ [ "Licence type", licence ], [ "Advisory", advisory ], [ "Terms of use", terms ], [ "Producer", producer ] ].select { |_, text| text.present? }
     end
@@ -158,6 +159,11 @@ module NexusCcs
     private :dam_value
 
     def glyph(name) = Glyphs.svg(name)
+
+    # The essential information before a download (CCS-67): the DA caption, or one built from the record, and the licence
+    def essential_caption = Array(@document["caption_tsim"]).first.presence || StockRecordFields.caption(@document).first
+
+    def essential_text = [ essential_caption, (t("nexus_ccs.record_page.download.licence") + ": " + licence if licence) ].compact.join("\n")
 
     private
 

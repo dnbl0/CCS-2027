@@ -14,22 +14,24 @@ class RecordMediaReflowTest < ApplicationSystemTestCase
 
   def assert_no_sideways_scroll(state)
     scroll, client = page_width
-    assert_operator scroll, :<=, client, "the page is #{scroll}px wide in a #{client}px window with Media details #{state}"
+    assert_operator scroll, :<=, client, "the page is #{scroll}px wide in a #{client}px window with the media information #{state}"
   end
 
-  test "a record page with a digital asset does not scroll sideways at 390px, with Media details closed, open or closed again" do
+  test "a record page with a digital asset does not scroll sideways at 390px, with the media information closed, open or closed again" do
     visit search_catalog_path(f: { has_digital_asset: [ "with" ] }, q: "")
     first("#documents .document-title-heading a").click
     assert_selector ".digital-assets__stage"
 
     assert_no_sideways_scroll("closed")
 
-    find("details#media-details summary").click
-    assert_selector "details#media-details[open]"
+    info = find("button.viewer-control[aria-controls=media-information]")
+    page.execute_script("arguments[0].scrollIntoView({ block: 'center' })", info) # clear of the sticky search strip
+    info.click
+    assert_selector "#media-information"
     assert_no_sideways_scroll("open")
 
-    find("details#media-details summary").click
-    assert_no_selector "details#media-details[open]"
+    find("#media-information button", text: "Close media information").click
+    assert_no_selector "#media-information"
     assert_no_sideways_scroll("closed again")
   end
 end

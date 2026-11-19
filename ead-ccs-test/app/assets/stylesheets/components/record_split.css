@@ -3,7 +3,7 @@
  * 29:2940 mobile, 2026-11-19). From 1024px: the media on the left, staying in view while the record's column on the right scrolls;
  * below, one column with the media first. Then three full-width bands: Related objects, More from the collections (on the grey
  * surface) and About this record (heading beside text). Site tokens only (tokens/semantic.css). The media's own parts are in
- * digital_assets.css, the stepper in result_stepper.css and the tabs in record_tabs.css.
+ * digital_assets.css and the stepper in result_stepper.css.
  * Markup: NexusCcs::RecordDocumentComponent, RecordActionsComponent, MoreFromCollectionsComponent, RecordAboutComponent,
  * similar/show and the tab panels (similar/tab, looks_similar/tab).
  */
@@ -69,7 +69,6 @@
 .record--split .record-actions__row :is(.share__button, .cite__button, .list-menu__button):hover span { text-decoration: underline; }
 .record--split .record-actions__compare .compare-actions { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2) var(--ccs-space-4); }
 .record--split .record-actions__compare .compare-actions__form { display: inline; margin: 0; }
-.record--split .record-actions .access-notice { margin: 0; }
 .record--split .record-actions__compare :is(.compare-actions__link, .compare-actions__button),
 .record-text-button {
   display: inline-flex; align-items: center; min-height: 1.5rem; padding: 0; border: 0; background: none;
@@ -80,14 +79,24 @@
 .record-text-button:hover { color: var(--ccs-text-link-hover); }
 .record-text-button:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
-/* Where it is */
-.record-where { padding: var(--ccs-space-4); background: var(--ccs-surface-subtle); }
-.record-where__heading {
-  display: flex; align-items: center; gap: var(--ccs-space-2); margin: 0 0 var(--ccs-space-2);
-  font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-heading-weight-strong); color: var(--ccs-text-brand);
+/* Use and access (CCS-27, 47, 67, 68, 69): what the visitor may do, the rights items and how to ask */
+.record-use { padding: var(--ccs-space-5); border: 1px solid var(--ccs-border-subtle); background: var(--ccs-surface-subtle); scroll-margin-top: 4.5rem; }
+.record-use:focus { outline: none; }
+.record-use:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.record-use__head { display: flex; align-items: center; gap: var(--ccs-space-2); margin: 0 0 var(--ccs-space-3); }
+.record-use__heading {
+  margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-heading-weight-strong); color: var(--ccs-text-brand);
 }
-.record-where__body { margin: 0 0 var(--ccs-space-2); font-size: var(--ccs-font-size-sm); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-secondary); }
-.record-where__action { margin: 0; font-size: var(--ccs-font-size-ui); }
+.record-use__status { display: grid; gap: var(--ccs-space-1); margin: 0 0 var(--ccs-space-3); padding: 0; list-style: none; font-size: var(--ccs-font-size-ui); }
+.record-use__state { display: flex; align-items: baseline; gap: var(--ccs-space-2); color: var(--ccs-text-primary); }
+.record-use__state--no { color: var(--ccs-text-secondary); }
+.record-use__mark { flex: none; width: 1em; font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-brand); text-align: center; }
+.record-use__note { margin: 0 0 var(--ccs-space-3); font-size: var(--ccs-font-size-sm); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-secondary); }
+.record-use__list { display: grid; gap: var(--ccs-space-3); margin: 0 0 var(--ccs-space-4); padding-top: var(--ccs-space-3); border-top: 1px solid var(--ccs-border-subtle); }
+.record-use__list dt { font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-primary); }
+.record-use__list dd { margin: 0; font-size: var(--ccs-font-size-ui); line-height: var(--ccs-line-height-normal); overflow-wrap: anywhere; }
+.record-use__terms, .record-use__action { margin: 0 0 var(--ccs-space-3); font-size: var(--ccs-font-size-ui); }
+.record-use__contact .contact-collection { margin: 0; }
 
 /* An icon drawn in the text colour from an SVG mask: the arrow after a link, the chevron of a folding section */
 .record-arrow-link::after,
@@ -100,14 +109,14 @@
 .record-arrow-link:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
 /* The description: the first paragraph is the lead */
-/* The description: the first paragraph is the lead; collapsed, the lead is clamped to five lines and the rest hidden
+/* The description: the first paragraph is the lead; collapsed (CCS-413), its first three lines show and the rest is hidden
    (controllers/truncate_controller.js) */
 .record-split__description { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ccs-space-2); }
 .record-split__description-text { display: flex; flex-direction: column; gap: var(--ccs-space-3); }
 .record-split__lead { margin: 0; font-size: var(--ccs-font-size-xl); line-height: 1.55; color: var(--ccs-text-primary); }
 .record-split__paragraph { margin: 0; font-size: var(--ccs-font-size-md); line-height: 1.65; color: var(--ccs-text-secondary); }
 .record--split .record-details__truncate-toggle { font-size: var(--ccs-font-size-md); }
-.record-split__description-text.is-collapsed .record-split__lead { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; line-clamp: 5; overflow: hidden; }
+.record-split__description-text.is-collapsed .record-split__lead { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
 
 /* Object details: label above value, a hairline between rows */
 .record-facts { margin-top: var(--ccs-space-4); }
@@ -116,6 +125,38 @@
   font-weight: var(--ccs-heading-weight); color: var(--ccs-text-brand);
 }
 .record-facts__list { margin: 0; }
+.record-facts__subheading, .record-full__title {
+  margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-heading-weight-strong); color: var(--ccs-text-brand);
+}
+.record-facts__key { margin-bottom: var(--ccs-space-5); }
+/* Key facts summarise the full record, so they show only while it is closed (a phone, at first); open, it holds them in order */
+.record-facts:has(.record-full[open]) .record-facts__key { display: none; }
+.record-facts__key .record-facts__subheading { margin-bottom: var(--ccs-space-2); }
+.record-facts__source .uom-action { margin: 0; }
+.record-terms__join { margin-right: var(--ccs-space-2); color: var(--ccs-text-secondary); }
+
+/* The full record (open from 1024px, closed on a phone: record_full_controller.js), in groups that keep the sheet's sequence */
+.record-full { border-top: 1px solid var(--ccs-border-subtle); border-bottom: 1px solid var(--ccs-border-subtle); }
+.record-full > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--ccs-space-3); min-height: 3.5rem;
+  padding: var(--ccs-space-2) 0; list-style: none; cursor: pointer;
+}
+.record-full > summary::-webkit-details-marker { display: none; }
+.record-full > summary::after {
+  --record-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  content: ""; flex: none; width: var(--ccs-font-size-xl); height: var(--ccs-font-size-xl); background: var(--ccs-text-brand);
+  mask: var(--record-icon) center / contain no-repeat; transition: transform var(--ccs-duration-fast) ease;
+}
+.record-full[open] > summary::after { transform: rotate(180deg); }
+.record-full > summary:hover .record-full__title { text-decoration: underline; }
+.record-full > summary:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.record-full__body { display: grid; gap: var(--ccs-space-5); padding-bottom: var(--ccs-space-5); }
+.record-full__group-title {
+  margin: 0 0 var(--ccs-space-1); font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-heading-weight-strong);
+  color: var(--ccs-text-secondary);
+}
+@media (prefers-reduced-motion: reduce) { .record-full > summary::after { transition: none; } }
+.record-copy-group { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-2) var(--ccs-space-3); }
 .record-facts__row { padding: var(--ccs-space-3) 0; border-top: 1px solid var(--ccs-border-subtle); }
 .record-facts__row dt { margin: 0 0 var(--ccs-space-2); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-primary); }
 .record-facts__row dd { margin: 0; font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); overflow-wrap: anywhere; }
@@ -158,7 +199,6 @@ a.record-term:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-
 .record-fold__list { display: grid; gap: var(--ccs-space-3); margin: 0; }
 .record-fold__list dt { font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
 .record-fold__list dd { margin: 0; overflow-wrap: anywhere; }
-.record-fold .contact-collection { margin: 0; }
 .record-fold .cite--inline .cite__list { display: grid; gap: var(--ccs-space-4); margin: 0; padding: 0; list-style: none; }
 .record-fold .cite--inline .cite__style { margin: 0 0 var(--ccs-space-1); font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
 .record-fold .cite--inline .cite__text { margin: 0 0 var(--ccs-space-2); }
@@ -182,12 +222,18 @@ a.record-term:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-
 .record-more__cards .discover-cards { grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 600px) { .record-more__cards .discover-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1024px) { .record-more__cards .discover-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.record-more__row + .record-more__row { margin-top: var(--ccs-space-7); }
+.record-more__row-heading {
+  margin: 0 0 var(--ccs-space-4); font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-heading-weight-strong);
+  color: var(--ccs-text-brand);
+}
+.record-more__empty { margin: 0; color: var(--ccs-text-secondary); }
 @media (max-width: 599px) {
-  .record-tabs__panel .record-more__cards .discover-cards {
+  .record-more__row .record-more__cards .discover-cards {
     grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 78%; overflow-x: auto; scroll-snap-type: x mandatory;
     padding-bottom: var(--ccs-space-2); scrollbar-width: thin;
   }
-  .record-tabs__panel .record-more__cards .discover-cards > * { scroll-snap-align: start; }
+  .record-more__row .record-more__cards .discover-cards > * { scroll-snap-align: start; }
 }
 /* The cards share one picture shape, the picture whole inside it (cultural objects are never cropped), so a row lines up */
 .record-more__cards .result-card { height: 100%; }

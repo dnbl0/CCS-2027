@@ -1,20 +1,13 @@
-<section class="record-more" id="more-from-the-collections" aria-labelledby="record-more-heading" data-controller="record-tabs">
+<section class="record-more" id="more-from-the-collections" aria-labelledby="record-more-heading">
   <div class="record-more__inner">
     <h2 class="record-band-heading" id="record-more-heading"><%= t("nexus_ccs.record_page.split.more.heading") %></h2>
-    <div class="record-tabs" role="tablist" aria-label="<%= t("nexus_ccs.record_page.split.more.tabs") %>" hidden data-record-tabs-target="list">
-      <% tabs.each_with_index do |tab, index| %>
-        <button type="button" class="record-tabs__tab" role="tab" id="record-tab-<%= tab.key %>" aria-controls="record-panel-<%= tab.key %>"
-                aria-selected="<%= index.zero? %>" tabindex="<%= index.zero? ? 0 : -1 %>"
-                data-record-tabs-target="tab" data-action="record-tabs#select keydown->record-tabs#key"><%= tab.label %></button>
-      <% end %>
-    </div>
-    <% tabs.each_with_index do |tab, index| %>
-      <div class="record-tabs__panel" id="record-panel-<%= tab.key %>" aria-labelledby="record-tab-<%= tab.key %>" data-record-tabs-target="panel">
-        <h3 class="record-tabs__panel-heading" data-record-tabs-target="panelHeading"><%= tab.label %></h3>
-        <turbo-frame id="more-<%= tab.key %>" src="<%= tab.source %>" loading="lazy" data-controller="lazy-frame"
+    <% rows.each do |row| %>
+      <section class="record-more__row" id="more-row-<%= row.key %>" aria-labelledby="more-row-<%= row.key %>-heading">
+        <h3 class="record-more__row-heading" id="more-row-<%= row.key %>-heading"><%= row.label %></h3>
+        <turbo-frame id="more-<%= row.key %>" src="<%= row.source %>" loading="lazy" data-controller="lazy-frame"
                      data-action="turbo:frame-missing->lazy-frame#missing turbo:before-fetch-response->lazy-frame#answered"></turbo-frame>
-        <p class="record-tabs__empty" hidden data-lazy-frame-empty><%= t("nexus_ccs.record_page.split.more.empty") %></p>
-      </div>
+        <p class="record-more__empty" hidden data-lazy-frame-empty><%= t("nexus_ccs.record_page.split.more.empty") %></p>
+      </section>
     <% end %>
   </div>
 </section>

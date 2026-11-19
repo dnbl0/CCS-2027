@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
-// A record's media (DigitalAssetsComponent, the left of the record page): the round tools under the picture and the thumbnail strip.
+// A record's media (DigitalAssetsComponent, the left of the record page): the round tools under the picture, the media information
+// panel (the i tool) and the thumbnail strip.
 // Zoom in and zoom out are passed to the zoom viewer (deep_zoom_controller listens for media-viewer:zoom), which opens on the first
 // zoom in; full screen is for the media section; a thumbnail swaps the large image and is marked as the one on show, and previous
 // and next step through the thumbnails. Without JavaScript the tools and steps never appear and each thumbnail of an open image is
@@ -10,9 +11,11 @@ import { Controller } from "@hotwired/stimulus"
 // (.record-split__viewer.is-sticky, record_split.css): a column made taller by video, audio or a notice scrolls with the page, so
 // every control in it can be reached.
 export default class extends Controller {
-  static targets = [ "stage", "image", "thumb", "step", "tool", "fullscreenButton", "fullscreenLabel" ]
+  static targets = [ "stage", "image", "thumb", "step", "tool", "fullscreenButton", "fullscreenLabel", "panel", "infoButton" ]
 
   connect() {
+    this.onKey = (event) => { if (event.key === "Escape" && this.panelOpen) this.closePanel() }
+    this.element.addEventListener("keydown", this.onKey)
     this.onFullscreen = () => this.syncFullscreen()
     document.addEventListener("fullscreenchange", this.onFullscreen)
     this.toolTargets.forEach((tool) => { tool.hidden = false })
@@ -29,6 +32,7 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.element.removeEventListener("keydown", this.onKey)
     document.removeEventListener("fullscreenchange", this.onFullscreen)
     this.resizeObserver?.disconnect()
     if (this.onResize) window.removeEventListener("resize", this.onResize)
@@ -38,6 +42,23 @@ export default class extends Controller {
   syncSticky() {
     const room = window.innerHeight - 60
     this.column.classList.toggle("is-sticky", this.column.scrollHeight <= room)
+  }
+
+  // The media information (CCS-422): over the right of the image; focus goes to its close button, and back to the i tool on closing
+  get panelOpen() { return this.hasPanelTarget && !this.panelTarget.hidden }
+
+  togglePanel() { this.panelOpen ? this.closePanel() : this.openPanel() }
+
+  openPanel() {
+    this.panelTarget.hidden = false
+    this.infoButtonTarget.setAttribute("aria-expanded", "true")
+    this.panelTarget.querySelector("button")?.focus()
+  }
+
+  closePanel() {
+    this.panelTarget.hidden = true
+    this.infoButtonTarget.setAttribute("aria-expanded", "false")
+    this.infoButtonTarget.focus()
   }
 
   zoomIn() { this.dispatch("zoom", { detail: { direction: "in" } }) }

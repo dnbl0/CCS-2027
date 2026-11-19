@@ -1,7 +1,4 @@
 <div class="record-actions" role="group" aria-label="<%= t("nexus_ccs.record_page.split.actions") %>">
-  <% if notice? %>
-    <%= render NexusCcs::AccessNoticeComponent.new(document: document) %>
-  <% end %>
   <div class="record-actions__row">
     <% if saved_records? %>
       <%= render NexusCcs::SaveControlComponent.new(document: document) %>

@@ -150,14 +150,14 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_not_includes rendered_content, "/content/unlicensed/"
     assert_selector ".access-notice--partly-withheld", text: "1 other digital asset of this record is not shown"
     assert_selector ".access-notice--partly-withheld a[href='/access_requests/new?document_id=emu-1']", text: "Request access to it"
-    assert_selector "a.viewer-control[download][href^='#{dam_url('licensed')}']"
+    assert_selector ".digital-assets__download a.btn[download][href^='#{dam_url('licensed')}']", visible: :all
     assert_selector ".viewer-chip", text: "CC BY" # the shown asset's licence, not the withheld one's "None"
   end
 
   test "only open assets are offered to download: a view-only image is a button, an open one a link" do
     render_for(dam_record([ [ "open", "CC BY" ], [ "view", "Individual" ], [ "open2", "CC0" ] ]))
 
-    assert_selector "a.viewer-control[download][href^='#{dam_url('open')}']"
+    assert_selector ".digital-assets__download a.btn[download][href^='#{dam_url('open')}']", visible: :all
     assert_selector "button.digital-assets__thumb[data-media-viewer-large^='#{dam_url('view')}']"
     assert_no_selector "a[href^='#{dam_url('view')}']"
     assert_selector "a.digital-assets__thumb[href^='#{dam_url('open2')}']"

@@ -22,10 +22,6 @@ module StockRecordFields
   # though the licence is derived from the rights note, and the producer is read if an export ever has it).
   SOLR_FIELDS = { 26 => "licence_type_ssim", 29 => "producer_ssim" }.freeze
 
-  # The sheet's label cell for Measurements (11) carries a note ("... previosly mentioned as Dimensions"); its display
-  # rule 2 says "CCS label will be 'Measurements'".
-  LABELS = { 11 => "Measurements" }.freeze
-
   # Values the sheet or the site's record page derive rather than read from one Solr field.
   DERIVED = {
     # Creator (4): a person is "Full name (b. <born> - d. <died>) role". The exports have no person/organisation flag
@@ -93,7 +89,7 @@ module StockRecordFields
       DERIVED.key?(field.seq) ? "gap_#{field.seq}_derived" : "gap_#{field.seq}"
     end
 
-    def label_for(field) = LABELS.fetch(field.seq, field.label)
+    def label_for(field) = field.display_label
 
     # document => [values] for a field: derived by the sheet's rule, or read from its Solr field
     def values_for(field)

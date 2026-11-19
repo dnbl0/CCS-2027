@@ -3,9 +3,6 @@ en:
     # The record page's layout (NexusCcs::RecordDocumentComponent and the components it draws). Wording marked PLACEHOLDER
     # is for the University and the collection teams to approve.
     record_page:
-      header:
-        copy: "Copy"
-        copy_label: "Copy collection ID"
       no_image:
         # PLACEHOLDER WORDING, NOT YET APPROVED
         sentence: "No image of this record is available online."
@@ -29,15 +26,12 @@ en:
         collection: "Collection"
         credit_line: "Credit line"
       copyright:
-        licence: "Licence"
-        copyright: "Copyright"
-        credit_line: "Credit line"
-        caption: "Caption"
-        responsible_collection: "Responsible collection"
         terms: "About copyright and terms of use"
       about:
         persistent_link: "Persistent link"
       media:
+        information: "Media information"
+        close_information: "Close media information"
         full_screen: "Full screen"
         exit_full_screen: "Exit full screen"
         # Under the media of a record that shows some of its digital assets and withholds others (their own licence does not
@@ -51,15 +45,62 @@ en:
             other: "Request access to them"
       more_like_this:
         heading: "More like this"
+      id:
+        copy_id: "Copy ID"
+        copy_permalink: "Copy permalink"
+      # Use and access (CCS-27, 47, 67, 68, 69, 166). PLACEHOLDER WORDING, NOT YET APPROVED: the University must approve it.
+      use:
+        heading: "Use and access"
+        use_this_image: "Use this image"
+        view:
+          none: "No image of this object is online"
+          open: "You can view the image online"
+          view_only: "You can view the image online"
+          request: "The image is available on request"
+        download:
+          open: "You can download the image"
+          view_only: "Download is not available"
+          request: "Download is not available"
+        note:
+          view_only: "This media file is for viewing purpose only. Please contact Collections team to use this media file."
+          request: "This digital asset is only available on request and approval."
+        sensitive: "This record holds sensitive material: its images are shown only after you choose to view them."
+        request:
+          view_only: "Request to use this image"
+          request: "Request to view this image"
+        accession_number: "Accession number"
+        licence: "Licence"
+        caption: "Caption"
+        credit_line: "Credit line"
+        copyright: "Copyright"
+        terms_of_use: "Terms of use"
+      # Download (CCS-67): the essential information first. PLACEHOLDER WORDING.
+      download:
+        title: "Before you download"
+        intro: "Please include this information when you use the image."
+        caption: "Caption"
+        licence: "Licence"
+        copy: "Copy this information"
+        download: "Download image"
+        close: "Close"
       # The approved split layout (Figma "Record page · Approved design", 2026-11-19)
       split:
         actions: "Actions for this record"
         uom_id: "UoM ID"
+        key_facts: "Key facts"
+        full_record: "Full record"
+        description_label: "Description"
+        # The data carries the parent record only (the data model sheet: "Parent - related record 1")
+        related_parent: "Parent - %{record}"
+        groups:
+          object: "The object"
+          physical: "Physical description"
+          subject: "Subject and classification"
+          collection: "Collection and identifiers"
         description:
           more: "Show more"
           less: "Show less"
         extra:
-          creator_ssim: "Maker"
           date_era_ssim: "Era"
           region_ssim: "Region"
         stepper:
@@ -68,19 +109,10 @@ en:
           previous: "Previous result"
           next: "Next result"
           none: "%{label}: none"
-        where:
-          heading: "Where it is"
-          # PLACEHOLDER WORDING, NOT YET APPROVED: the index holds no location or display status
-          body: "Ask the %{collection} team where this object is held and whether you can see it in person."
-          body_no_collection: "Ask the collection team where this object is held and whether you can see it in person."
-          link: "Request to view"
         sections:
-          copyright: "Copyright and reuse"
-          media: "Media details"
           cite: "How to cite this record"
           history: "Acquisition and history"
         history:
-          credit_line: "Credit line"
           source_reference: "Source record"
         viewer:
           tools: "Image tools"
@@ -94,14 +126,13 @@ en:
           heading: "Related objects"
         more:
           heading: "More from the collections"
-          tabs: "Ways to explore"
           empty: "Nothing to show here yet."
-          tab:
-            creator: "By %{name}"
-            creator_unnamed: "Same maker"
-            period: "Same period"
-            place: "Same place"
-            type: "Same type"
+          row:
+            creator: "More by %{name}"
+            creator_unnamed: "More by the same maker"
+            period: "From the same period"
+            place: "From the same place"
+            type: "More of this type"
         about:
           improve:
             heading: "Help us improve this record"

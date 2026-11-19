@@ -32,19 +32,39 @@
     <% if sensitivity_state == :viewing %>
       <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: :viewing) %>
     <% end %>
+
+    <% if metadata.any? %>
+      <%# CCS-422: the media information, over the right of the image, opened by the i tool and closed with X or Escape %>
+      <aside id="media-information" class="digital-assets__panel" aria-labelledby="media-information-heading" hidden data-media-viewer-target="panel">
+        <div class="digital-assets__panel-head">
+          <h3 id="media-information-heading" class="digital-assets__panel-title"><%= t("nexus_ccs.record_page.media.information") %></h3>
+          <button type="button" class="viewer-control viewer-control--ghost digital-assets__panel-close" data-action="media-viewer#closePanel">
+            <%= glyph(:close) %><span class="visually-hidden"><%= t("nexus_ccs.record_page.media.close_information") %></span>
+          </button>
+        </div>
+        <dl class="digital-assets__panel-list">
+          <% metadata.each do |label, text| %><div><dt><%= label %></dt><dd><%= text %></dd></div><% end %>
+        </dl>
+      </aside>
+    <% end %>
   </div>
 
   <%# The controls row under the picture: the licence and access chips on the left, the round tools on the right (zoom and full screen
       appear once the script can work them; Download only for an open image, so no path to any other file is in the markup) %>
   <div class="digital-assets__controls-row">
     <div class="digital-assets__chips">
-      <% if licence %>
-        <p class="viewer-chip"><%= glyph(:creative_commons) %><span><span class="visually-hidden">Licence: </span><%= licence %></span></p>
-      <% end %>
+      <%# The licence, as a way into the record column's Use and access panel (what the visitor may do with the image) %>
+      <a class="viewer-chip viewer-chip--link" href="#use-and-access"><% if licence %><%= glyph(:creative_commons) %><% end %><span><%= licence.presence || t("nexus_ccs.record_page.use.use_this_image") %><span class="visually-hidden">: <%= t("nexus_ccs.record_page.use.use_this_image") %></span></span></a>
       <p class="viewer-chip viewer-chip--<%= tier.to_s.dasherize %>" data-testid="access-chip"><%= access_chip %></p>
       <%= render NexusCcs::ClassificationBadgeComponent.new(document: @document) %>
     </div>
     <div class="digital-assets__tools" role="group" aria-label="<%= t("nexus_ccs.record_page.split.viewer.tools") %>">
+      <% if metadata.any? %>
+        <button type="button" class="viewer-control" aria-controls="media-information" aria-expanded="false"
+                data-media-viewer-target="infoButton" data-action="media-viewer#togglePanel">
+          <%= glyph(:info) %><span class="visually-hidden"><%= t("nexus_ccs.record_page.media.information") %></span>
+        </button>
+      <% end %>
       <% if assets_shown? && main %>
         <button type="button" class="viewer-control" hidden data-media-viewer-target="tool" data-action="media-viewer#zoomIn">
           <%= glyph(:plus) %><span class="visually-hidden"><%= t("nexus_ccs.record_page.split.viewer.zoom_in") %></span>
@@ -59,9 +79,34 @@
         </button>
       <% end %>
       <% if download_href %>
-        <a class="viewer-control" href="<%= download_href %>" download>
-          <%= glyph(:download) %><span class="visually-hidden"><%= t("nexus_ccs.record_page.access.download_label", title: title) %></span>
-        </a>
+        <%# CCS-67: the essential information (caption and licence) first, to copy, then the download %>
+        <div class="digital-assets__download" data-controller="dialog">
+          <button type="button" class="viewer-control" aria-haspopup="dialog" data-action="dialog#open">
+            <%= glyph(:download) %><span class="visually-hidden"><%= t("nexus_ccs.record_page.access.download_label", title: title) %></span>
+          </button>
+          <dialog class="modal uom-dialog uom-modal digital-assets__download-dialog" data-dialog-target="dialog" data-action="click->dialog#closeOnBackdrop" aria-labelledby="download-dialog-title">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <button type="button" class="modal-close" data-action="dialog#close"><%= t("nexus_ccs.record_page.download.close") %></button>
+                <div class="modal-header"><h2 class="modal-title h5" id="download-dialog-title"><%= t("nexus_ccs.record_page.download.title") %></h2></div>
+                <div class="modal-body" data-controller="clipboard">
+                  <p><%= t("nexus_ccs.record_page.download.intro") %></p>
+                  <dl class="digital-assets__essential">
+                    <% if essential_caption %><div><dt><%= t("nexus_ccs.record_page.download.caption") %></dt><dd><%= essential_caption %></dd></div><% end %>
+                    <% if licence %><div><dt><%= t("nexus_ccs.record_page.download.licence") %></dt><dd><%= licence %></dd></div><% end %>
+                  </dl>
+                  <span hidden data-clipboard-target="source" data-copy="<%= essential_text %>"></span>
+                  <button type="button" class="btn btn-outline-primary" data-action="clipboard#copy" data-clipboard-target="button"><span data-clipboard-target="label"><%= t("nexus_ccs.record_page.download.copy") %></span></button>
+                  <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-primary" data-action="dialog#close"><%= t("nexus_ccs.record_page.download.close") %></button>
+                  <a class="btn btn-primary" href="<%= download_href %>" download><%= t("nexus_ccs.record_page.download.download") %></a>
+                </div>
+              </div>
+            </div>
+          </dialog>
+        </div>
       <% end %>
     </div>
   </div>

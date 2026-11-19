@@ -153,14 +153,21 @@ reached), and sits under the sticky search strip when that has slid in (no trans
   not-yet-chosen sensitive record has no asset path in it, and its notice sits where the media would.
 - **The record's column** (`RecordDocumentComponent`): "Result 3 of 120" with round previous and next (`ResultStepperComponent`,
   Blacklight's search context; first in the column at every width, so the reading order and the tab order agree), the collection (a link), the h1 in Fraunces, maker, date and
-  medium; one row of actions (`RecordActionsComponent`: Save, Add to list, Share and embed, Cite, with Compare under it); "Where it is"
-  (placeholder wording: the index holds no location); the notices; the description, its first paragraph as the lead, collapsed with
-  Show more / Show less (the lead clamped to five lines, the paragraphs after it hidden; `truncate_controller.js`); Object details
-  as label above value, names of things as outlined terms that open their search or browse page, the UoM ID with Copy last; then four
-  folding sections (Copyright and reuse, Media details, How to cite this record, Acquisition and history), closed in the markup.
+  medium; one row of actions (`RecordActionsComponent`: Save, Add to list, Share and embed, Cite, with Compare under it); **Use and access**
+  (can the visitor view and download the image, the view-only or on-request note, the rights items of CCS-27 in its order, the request
+  link and the contact card; the licence chip under the image links to it); the notices; the description, its first paragraph as the
+  lead, collapsed with Show more / Show less (CCS-413: the lead clamped to three lines, the paragraphs after it hidden;
+  `truncate_controller.js`); **Object details** (CCS-400: the data model sheet's fields, labels, order and display rules) as Key facts,
+  then the full record in four groups that keep the sheet's sequence (The object, Physical description, Subject and classification,
+  Collection and identifiers), open from 1024px and closed on a phone (`record_full_controller.js`); Key facts show only while the full
+  record is closed. Rows are label above value (`RecordFactRowsComponent`), names of things as outlined terms that open their search or
+  browse page, Source URL as View full record, the UoM ID last with Copy ID and Copy permalink (CCS-22); then two folding sections (How
+  to cite this record, Acquisition and history), closed in the markup. The round i tool under the image opens the media information
+  over it (CCS-422), and Download shows the caption and licence first (CCS-67).
 - **Bands**: Related objects (`SimilarRecordsComponent`, three result cards in a lazy frame); More from the collections
-  (`MoreFromCollectionsComponent`, on the grey surface: ARIA tabs, one per way the record matches, each panel a lazy frame of three
-  cards and See all; without JavaScript every panel shows under its own heading); About this record (`RecordAboutComponent`: three
+  (`MoreFromCollectionsComponent`, on the grey surface: one labelled row per way the record matches, all in view, each an h3 and a lazy
+  frame of three cards and See all, scrolling sideways on a phone); About this record (`RecordAboutComponent`: three
   rows, heading beside text). A lazy frame whose answer fails stays empty (`lazy_frame_controller.js`).
-- Headings: h1 the title; h2 Where it is, Object details, the folding sections, Related objects, More from the collections, About
-  this record; h3 the About rows and the cards in the bands. Wording marked placeholder is in `config/locales/record_page.en.yml`.
+- Headings: h1 the title; h2 Use and access, Object details, the folding sections, Related objects, More from the collections, About
+  this record; h3 Key facts, Full record, the rows of More from the collections, the About rows and the cards; h4 the full record's
+  groups. Wording marked placeholder is in `config/locales/record_page.en.yml`.
