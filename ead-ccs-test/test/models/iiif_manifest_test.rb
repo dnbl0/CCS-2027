@@ -109,4 +109,16 @@ class IiifManifestTest < ActiveSupport::TestCase
   test "the id of a record with awkward characters is escaped" do
     assert_equal "#{BASE}/catalog/a%20b%2Fc/manifest.json", IiifManifest.new(RecordMedia.new(document("id" => "a b/c")), base_url: BASE, dimensions: SIZES).id
   end
+
+  test "a DAM image's size comes from the DAM when there is no file here, so a record of DAM images has a manifest" do
+    dam = "https://unimelbourne.widen.net/content/zof9bncptw/jpeg/UAC-1982_00221_PF.jpeg?w=2000&u=n4ezdx"
+    remote = ->(url) { url.start_with?("https://unimelbourne.widen.net/") ? [ 2000, 1333 ] : nil }
+    sizes = ->(path) { IiifManifest.image_size(path, remote: remote) }
+    manifest = IiifManifest.new(RecordMedia.new(document("digital_asset_large_paths_ssim" => [ dam ], "digital_asset_paths_ssim" => [ dam ])), base_url: BASE, dimensions: sizes)
+
+    assert manifest.any?
+    canvas = JSON.parse(manifest.as_json.to_json)["items"].first
+    assert_equal [ 2000, 1333 ], [ canvas["width"], canvas["height"] ]
+    assert_equal [ 1279, 1600 ], IiifManifest.image_size("/digital-assets/large/0000_013_1_pf.jpg", remote: ->(_url) { flunk "asked the DAM for a local file" })
+  end
 end

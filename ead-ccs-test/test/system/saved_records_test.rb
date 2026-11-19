@@ -136,13 +136,13 @@ class SavedRecordsTest < ApplicationSystemTestCase
     visit search_catalog_path(any_assets: "1", q: "skull", view: "list")
     visit first(".result-card .document-title-heading a")[:href]
 
-    checkbox = find(".record-summary__save .save-control__input", visible: :all)
+    checkbox = find(".record-actions__row .save-control__input", visible: :all)
     checkbox.execute_script("this.focus()")
-    assert page.evaluate_script("document.activeElement.matches('.record-summary__save input[type=checkbox]')")
-    assert_selector ".record-summary__save .toggle-bookmark-label:has(:focus-visible)"
+    assert page.evaluate_script("document.activeElement.matches('.record-actions__row input[type=checkbox]')")
+    assert_selector ".record-actions__row .toggle-bookmark-label:has(:focus-visible)"
 
-    find(".record-summary__save .toggle-bookmark-label").click
-    assert_selector ".record-summary__save .toggle-bookmark-label.checked", text: "Saved"
+    find(".record-actions__row .toggle-bookmark-label").click
+    assert_selector ".record-actions__row .toggle-bookmark-label.checked", text: "Saved"
     assert_text "1 saved record"
 
     visit root_path

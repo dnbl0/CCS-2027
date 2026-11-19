@@ -34,13 +34,13 @@ class DiscoverTest < ApplicationSystemTestCase
     end
   end
 
-  test "the record page's Similar objects are cards linking to their records, and do not scroll sideways at 390px" do
+  test "the record page's Related objects (computed similar records) are cards linking to their records, and do not scroll sideways at 390px" do
     page.current_window.resize_to(390, 900)
     visit "/catalog/#{first_id('id:(emu-10247 OR emu_mc-10247)')}"
     page.execute_script("document.getElementById('similar-records').scrollIntoView()")
 
     assert_selector "#similar-records li.discover-cards__item", minimum: 2
-    assert_no_selector "#related-objects"
+    assert_selector "#similar-records section#related-objects h2", text: "Related objects" # the one such section: the frame fills it
     assert_selector "#similar-records li.discover-cards__item h3 a[href^='/catalog/']", minimum: 2
     assert page.evaluate_script("document.documentElement.scrollWidth <= window.innerWidth"), "the page scrolls sideways"
     page.execute_script("window.scrollTo(0, 0)")

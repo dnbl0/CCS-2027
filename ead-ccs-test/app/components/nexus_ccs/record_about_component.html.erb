@@ -1,12 +1,33 @@
-<details class="record-about record-section record-accordion" data-record-sections-target="section" id="about-this-record">
-  <summary><h2 id="record-about-heading" class="record-section__heading"><%= t("nexus_ccs.record_page.sections.about") %></h2></summary>
-  <div class="record-section__body">
-  <%= render NexusCcs::PersistentLinkComponent.new(url: url, document: document) %>
-  <%= render NexusCcs::ContactCollectionComponent.new(document: document, url: url) %>
-  <div class="record-about__correction">
-    <p><%= t("nexus_ccs.record_page.about.correction_note") %>
-      <a href="<%= correction_href %>"<% if correction_new_tab? %> target="_blank" rel="noopener"<% end %>><%= t("nexus_ccs.record_page.about.correction") %><% if correction_new_tab? %><span class="visually-hidden"> <%= t("nexus_ccs.record_page.no_image.ask_new_tab") %></span><% end %></a>
-    </p>
+<section class="record-about-band" id="about-this-record" aria-labelledby="record-about-heading">
+  <div class="record-about-band__inner">
+    <h2 class="record-band-heading" id="record-about-heading"><%= t("nexus_ccs.record_page.sections.about") %></h2>
+    <div class="record-about-band__row">
+      <h3 class="record-about-band__heading"><%= t("nexus_ccs.record_page.split.about.improve.heading") %></h3>
+      <div class="record-about-band__content">
+        <p><%= t("nexus_ccs.record_page.split.about.improve.body") %></p>
+        <p><a class="record-arrow-link" href="<%= correction_href %>"<% if correction_new_tab? %> target="_blank" rel="noopener"<% end %>><%= t("nexus_ccs.record_page.split.about.improve.link") %><% if correction_new_tab? %><span class="visually-hidden"> <%= t("nexus_ccs.record_page.no_image.ask_new_tab") %></span><% end %></a></p>
+      </div>
+    </div>
+    <div class="record-about-band__row">
+      <h3 class="record-about-band__heading"><%= t("nexus_ccs.record_page.split.about.notice.heading") %></h3>
+      <div class="record-about-band__content"><p><%= advisory %></p></div>
+    </div>
+    <div class="record-about-band__row">
+      <h3 class="record-about-band__heading"><%= t("nexus_ccs.record_page.split.about.use.heading") %></h3>
+      <div class="record-about-band__content" data-controller="clipboard">
+        <p class="record-about-band__link">
+          <span><%= t("nexus_ccs.record_page.split.about.use.permanent_link") %>:</span>
+          <span class="record-about-band__url" data-clipboard-target="source" data-copy="<%= url %>"><%= url %></span>
+        </p>
+        <ul class="record-about-band__links">
+          <li><button type="button" class="record-text-button" data-action="clipboard#copy" data-clipboard-target="button"><span data-clipboard-target="label"><%= t("nexus_ccs.record_page.split.about.use.copy") %></span></button></li>
+          <% if export_path %><li><a href="<%= export_path %>"><%= t("nexus_ccs.metadata_export.link") %></a></li><% end %>
+          <% if manifest_path %><li><a href="<%= manifest_path %>" type="application/ld+json"><%= t("nexus_ccs.record_page.split.about.use.iiif") %></a></li><% end %>
+        </ul>
+        <%# The record in its source catalogue, behind the leaving-site dialog %>
+        <div class="record-about-band__source persistent-link__browser"><%= render NexusCcs::ViewFullRecordComponent.new(document: document, action: nil) %></div>
+        <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
+      </div>
+    </div>
   </div>
-  </div>
-</details>
+</section>

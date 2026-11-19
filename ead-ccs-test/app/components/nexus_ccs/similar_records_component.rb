@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # The record page's "Similar records": an empty lazy Turbo frame that fetches /catalog/:id/similar when it nears the screen
+  # The record page's "Related objects": an empty lazy Turbo frame that fetches /catalog/:id/similar when it nears the screen
   # (SimilarController). Nothing at all for a record that may not have recommendations beside it (its asset is withheld, or it is
   # sensitive): the section is hidden, and the request is never made. The frame stays empty when the answer is "no content".
-  # After it, one lazy frame per labelled row the record can have (SimilarRows: More by this creator, From the same period, From the
-  # same place, More of this type), each loaded and hidden on its own.
+  # The labelled rows (SimilarRows) are the tabs of "More from the collections" (MoreFromCollectionsComponent).
   class SimilarRecordsComponent < ViewComponent::Base
     def initialize(document:, exclude: [])
       @document = document
@@ -16,10 +15,5 @@ module NexusCcs
 
     # exclude: the ids the page lists as Related objects, which Similar leaves out
     def source = helpers.similar_path(@document.id, exclude: @exclude.presence&.join(","))
-
-    # The rows this record has something to match on, in their order
-    def rows = SimilarRows.keys_for(@document)
-
-    def row_source(key) = helpers.similar_path(@document.id, row: key, exclude: @exclude.presence&.join(","))
   end
 end

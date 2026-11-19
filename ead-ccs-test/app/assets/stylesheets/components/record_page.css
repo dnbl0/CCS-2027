@@ -3,7 +3,7 @@
  * Left: the media, or one plain sentence when the record has none, then the sections (Object details, Copyright and use, About this
  * record). Right: a plain column, not sticky, of the actions and the Key facts. The order in the markup is the order on the page.
  * Below 768px the sections are accordions (controllers/record_sections_controller.js); from 768px they are plain sections.
- * Markup: NexusCcs::RecordHeaderComponent, RecordDocumentComponent, RecordActionsComponent, KeyFactsComponent, RecordAboutComponent.
+ * Markup: NexusCcs::RecordDocumentComponent, RecordActionsComponent, KeyFactsComponent, RecordAboutComponent.
  */
 :root {
   --record-gutter: var(--ccs-space-6); /* 32px beside the 1200px column; 16px on a phone */
@@ -38,30 +38,6 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   max-width: calc(75rem + 2 * var(--record-gutter));
   margin-inline: auto;
   padding: var(--ccs-space-6) var(--record-gutter) var(--ccs-space-8);
-}
-
-/* The header block */
-.record-header {
-  max-width: 50rem;
-  margin-bottom: var(--ccs-space-5);
-}
-
-.record-header__kicker {
-  margin: 0 0 var(--ccs-space-2);
-  font-size: var(--ccs-font-size-md);
-  line-height: var(--ccs-line-height-normal);
-  color: var(--ccs-text-secondary);
-}
-
-.record-header__title {
-  margin: 0;
-  font-family: var(--ccs-font-heading);
-  font-size: var(--ccs-font-size-4xl);
-  font-weight: var(--ccs-heading-weight);
-  line-height: var(--ccs-line-height-tight);
-  text-wrap: balance;
-  overflow-wrap: anywhere;
-  color: var(--ccs-navy-1100);
 }
 
 .record-summary__byline {
@@ -278,14 +254,7 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   overflow-wrap: anywhere;
 }
 
-/* Description: collapsed to a few lines, with a Show more/Show less toggle (controllers/truncate_controller.js) */
-.record-details__truncate {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--ccs-space-1);
-}
-
+/* The description's Show more / Show less button (controllers/truncate_controller.js; the description itself is in record_split.css) */
 .record-details__truncate-toggle {
   min-height: 2.75rem;
   padding: 0;
@@ -604,9 +573,6 @@ body.blacklight-catalog-show #main-container .page-sidebar {
     padding-inline: var(--ccs-space-4);
   }
 
-  .record-header__title {
-    font-size: var(--ccs-font-size-3xl);
-  }
 
   .record-page__inner {
     padding-top: var(--ccs-space-5);

@@ -1,27 +1,24 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # A record's page body: one header block (RecordHeaderComponent), then two columns from 1200px (the media or one plain sentence
-  # about its absence, with the details under it; and a plain column of actions and Key facts) and one column below. After the
-  # Key facts come Object details, Copyright and use, About this record. Registered as the show page's document_component; the
-  # breadcrumb above it is HeaderComponent's. The fields, their labels and their order come from the workbook (config.show_fields,
-  # see DataModel); the Copyright and use section gathers the rights fields.
+  # A record's page body in the approved split layout (Figma "Record page · Approved design", 2026-11-19): the media on the left
+  # and the record's own column on the right from 1024px (one column below, media first), then Related objects, More from the
+  # collections and About this record at full width. Registered as the show page's document_component; the breadcrumb above it is
+  # HeaderComponent's. The fields, their labels and their order come from the workbook (DataModel: the sheet "CCS Field Labels");
+  # the Use and access panel gathers the rights and access information.
   class RecordDocumentComponent < Blacklight::DocumentComponent
     include RecordDebias # de-bias notices: the finds in the displayed text, and a value with them marked
 
-    # Shown in the Copyright card, so not repeated in the details list
-    COPYRIGHT_FIELDS = %w[rights_ssim credit_line_tsim].freeze
     # Values that open the search filtered to them (Blacklight's link_to_facet idea), so a visitor can step sideways to more of the same.
     # Creator, place and subject open their browse page instead (BROWSE_KINDS), and the filter when the value has none. Free text
     # (description, credit line, dates) is never a link.
-    LINK_FIELDS = %w[collection_ssim named_collection_ssim object_type_ssim classification_ssim material_ssim].freeze
+    # Read when the core has them, though the workbook does not list them: shown as rows of terms beside the workbook's date and place
+    EXTRA_TERM_FIELDS = { "date_era_ssim" => 3.5, "region_ssim" => 7.5 }.freeze
+    LINK_FIELDS = (%w[collection_ssim named_collection_ssim object_type_ssim classification_ssim material_ssim] + EXTRA_TERM_FIELDS.keys).freeze
     # Shown as filters where a browse page does not take them: the field each display field filters on
     FALLBACK_FILTER_FIELDS = { "subject_ssim" => "subject_ssim", "creator_display_ssim" => "creator_ssim" }.freeze
-    # Tags under the byline beside the format and collection: each value its own filtered search (the fields a core may lack yet are
-    # simply absent)
-    TAG_FIELDS = %w[date_era_ssim region_ssim].freeze
-
-    Row = Struct.new(:label, :values, :field, :copy, keyword_init: true)
+    # seq: the workbook's FINAL SEQUENCE ORDER (DataModel); join: how the sheet joins several values into one line
+    Row = Struct.new(:label, :values, :field, :seq, :join, :copy, keyword_init: true)
 
     def heading
       Array(document["title_tsim"]).first.presence || @presenter.heading
@@ -43,27 +40,18 @@ module NexusCcs
       WHOLE_SET_FIELDS.include?(field) ? BrowseMenu.query(field, value) : { f: { field => [ value ] } }
     end
 
-    # The details list: every workbook field the record has a value for, except the ones shown elsewhere on the page: the Key facts
-    # (KeyFactsComponent), the Copyright and use section, and the header (the title and the Collection ID, which holds the UoM ID)
-    def rows
-      @rows ||= @presenter.configuration.show_fields.each_value.filter_map do |config|
-        name = config.field
-        next if COPYRIGHT_FIELDS.include?(name) || KeyFactsComponent.fields.include?(name)
-
-        values = Array(document[name]).map(&:to_s).compact_blank
-        Row.new(label: config.label, values: values, field: name) if values.any?
-      end
-    end
-
     # "Grainger Museum Collection, accession number 00.0001, UoM ID emu-umc-400329" (CCS-22)
     def identifier = CollectionIdentifier.new(document).to_s
 
     def uom_id = CollectionIdentifier.uom_id(document.id)
 
+    # The record's permanent address (CCS-22: Copy permalink beside the ID)
+    def permalink = helpers.solr_document_url(document)
+
     def link_to_value?(row) = row.field.in?(LINK_FIELDS)
 
     # A record's place, subject and creator values link to the browse page for the value (Browse), where one exists
-    BROWSE_KINDS = { "production_place_ssim" => "places", "subject_ssim" => "subjects", "creator_display_ssim" => "makers" }.freeze
+    BROWSE_KINDS = { "production_place_ssim" => "places", "subject_ssim" => "subjects", "creator_display_ssim" => "makers", "creator_ssim" => "makers" }.freeze
 
     def browse_path(row, value)
       kind = BROWSE_KINDS[row.field] or return
@@ -91,7 +79,7 @@ module NexusCcs
       helpers.search_action_path(filter_query(field, value)) if value
     end
 
-    # The "Copyright" card
+    # The rights fields (Use and access)
     def credit_line = Array(document["credit_line_tsim"]).first
     def copyright = Array(document["rights_ssim"]).first
     def licence = Array(document["licence_type_ssim"]).first
@@ -99,8 +87,7 @@ module NexusCcs
 
     def responsible_collection_query = filter_query(BrowseMenu::COLLECTION_FIELD, responsible_collection)
 
-    # The caption the DAM supplies, shown in Copyright and use only when there is one: the page's own title, date, creator and
-    # rights are already above it, so a caption built from them would add nothing
+    # The caption the DAM supplies (the essential information CCS-67 names, with the licence); else one is built from the record
     def dam_caption = Array(document["caption_tsim"]).first.presence
 
     # "Title. Date. Creator. Material. © Rights. Collection."
@@ -110,36 +97,157 @@ module NexusCcs
       parts.compact_blank.map { |part| part.to_s.sub(/[.\s]+\z/, "") }.join(". ").then { |text| text.present? ? "#{text}." : nil }
     end
 
-    # Whether the record says anything about its rights. The card is on every record page (CCS-148); when this is false it says so,
-    # rather than saying nothing, so a visitor is never left to think "no card" means "no restriction".
+    # Whether the record says anything about its rights. Use and access is on every record page (CCS-148); when this is false it says
+    # so, rather than saying nothing, so a visitor is never left to think "nothing said" means "no restriction".
     def rights_recorded?
       [ credit_line, copyright, licence ].any?(&:present?)
     end
 
     def terms_path = "/help#copyright"
 
-    # The 2026 layout has no Key facts: its details list is the whole record, title first (the header keeps the Collection ID)
-    def classic_rows
-      @classic_rows ||= begin
-        list = [ Row.new(label: "Title", values: [ heading ], field: "title_tsim") ]
-        @presenter.configuration.show_fields.each_value do |config|
-          name = config.field
-          next if COPYRIGHT_FIELDS.include?(name)
+    # --- The approved split layout (Figma "Record page · Approved design", 2026-11-19) -------------------------------------------
+    # The media on the left (it stays in view on a wide screen), the record's own column on the right: where it is in the visitor's
+    # search, the collection, the title, maker, date and medium, the actions, Use and access, the description, Object details (Key
+    # facts and the grouped full record), then two folding sections. Related objects, More from the collections and About this record run full width under.
 
-          values = Array(document[name]).map(&:to_s).compact_blank
-          list << Row.new(label: config.label, values: values, field: name) if values.any?
+    renders_one :stepper # the search-result stepper and the selection stepper, from catalog/show (they need the controller's search context)
+
+    DESCRIPTION_FIELD = "description_tsim"
+    HISTORY_FIELDS = { "source_reference_tsim" => :source_reference }.freeze # the credit line is in Use and access
+
+    # "University Art Collection", linking to the whole collection
+    def collection_name = responsible_collection
+
+    def collection_path = collection_name && helpers.search_action_path(responsible_collection_query)
+
+    # [[name, browse path or nil]]: the record's first two makers (not "Unknown"), each linking to the maker's browse page where there is one
+    def makers
+      maker_names.first(2).map { |name| [ name, Browse.path_for("makers", name) ] }
+    end
+
+    def maker_names = Array(document["creator_ssim"]).map(&:to_s).compact_blank.reject { |name| name == RecordCardComponent::UNKNOWN_MAKER }
+
+    def display_date = Array(document["date_display_ssm"]).first.presence || Array(document["production_date_ssim"]).first.presence
+
+    def medium = (Array(document["material_display_ssm"]).first.presence || Array(document["material_ssim"]).first.presence)&.to_s&.upcase_first
+
+    # The description's paragraphs: the first is the lead (larger), the rest sit under it
+    def description_paragraphs
+      @description_paragraphs ||= Array(document[DESCRIPTION_FIELD]).flat_map { |text| text.to_s.split(/\n\s*\n/) }.map(&:strip).compact_blank
+    end
+
+    def lead = description_paragraphs.first
+    def description_rest = description_paragraphs.drop(1)
+
+    # --- Object details (CCS-400; the sheet "CCS Field Labels", FINAL SEQUENCE ORDER) ---------------------------------------------
+    # Every display field the record has a value for, in the sheet's sequence and under its label; a field with no value has no row
+    # ("it will be blank and label also does not appear"). The title and the description are the column's own (above), the credit
+    # line and copyright are in Use and access, and the DAM fields (licence type, advisory, terms of use, producer) are the media
+    # information (DigitalAssetsComponent). The sheet's
+    # display rules: Date (3) joined with "; ", Place (7) with ", ", Classification (17) hyphenated; Creator (4) as "Name (b. - d.)
+    # role"; Related Record (25) one line each, marked with its relation (the data carries the parent only); Inscription (12) one
+    # line each (the exports carry no inscription type to group them by).
+    # The title and description (the column's own), and the credit line and copyright (Use and access, CCS-27)
+    OWN_FIELDS = [ 1, 16, 21, 22 ].freeze
+    # Stored under another name in part of the index (the local core, harvested records)
+    VALUE_FALLBACKS = { "creator_display_ssim" => %w[creator_display_ssm], "source_url_ss" => %w[source_url_ssi] }.freeze
+    SOURCE_URL_SEQ = 23
+    RELATED_SEQ = 25
+    CREATOR_SEQ = 4
+
+    # The groups of the full record, each a run of the sheet's sequence, so the order is never broken
+    GROUPS = { object: 2...10, physical: 10...15, subject: 15...18, collection: 18..25 }.freeze
+    # Key facts, before the full record: object type, date, material, measurements, collection, accession number
+    KEY_FACT_SEQS = [ 2, 3, 10, 11, 19, 20 ].freeze
+
+    def detail_rows
+      @detail_rows ||= begin
+        rows = DataModel.fields.filter_map do |field|
+          next if field.source == "DAM" || OWN_FIELDS.include?(field.seq) || !field.available?
+
+          values = field_values(field)
+          Row.new(label: field.display_label, values: values, field: field.solr, seq: field.seq, join: StockRecordFields::JOINS[field.seq]) if values.any?
         end
-        list
+        rows += EXTRA_TERM_FIELDS.filter_map do |name, seq|
+          values = Array(document[name]).map(&:to_s).compact_blank.uniq
+          Row.new(label: I18n.t("nexus_ccs.record_page.split.extra.#{name}"), values: values, field: name, seq: seq) if values.any?
+        end
+        rows.sort_by(&:seq)
       end
     end
 
-    Tag = Struct.new(:field, :value)
+    # What the de-bias notices scan (RecordDebias): the details and the description
+    def rows = detail_rows + [ description_row ].compact
 
-    # Chips under the byline, as in 2026: the record's format and its collection, then each of its eras and regions, each a link to that filter
-    def tags
-      list = [ Tag.new("format", Array(document["format"]).first), Tag.new(BrowseMenu::COLLECTION_FIELD, Array(document["collection_ssim"]).first) ]
-      TAG_FIELDS.each { |field| Array(document[field]).map(&:to_s).compact_blank.uniq.each { |value| list << Tag.new(field, value) } }
-      list.select { |tag| tag.value.present? }
+    def description_row
+      values = Array(document[DESCRIPTION_FIELD]).map(&:to_s).compact_blank
+      Row.new(label: I18n.t("nexus_ccs.record_page.split.description_label"), values: values, field: DESCRIPTION_FIELD, seq: 16) if values.any?
     end
+
+    def key_facts = detail_rows.select { |row| KEY_FACT_SEQS.include?(row.seq) }
+
+    # [[group key, rows]] for the groups that have a row (the collection group always: it holds the UoM ID)
+    def detail_groups
+      GROUPS.filter_map do |key, range|
+        rows = detail_rows.select { |row| range.cover?(row.seq) }
+        [ key, rows ] if rows.any? || key == :collection
+      end
+    end
+
+    def field_values(field)
+      names = [ field.solr ] + VALUE_FALLBACKS.fetch(field.solr, [])
+      values = names.lazy.map { |name| Array(document[name]).map(&:to_s).compact_blank }.find(&:any?) || []
+      case field.seq
+      when CREATOR_SEQ then values.any? ? StockRecordFields::DERIVED[CREATOR_SEQ].call({ "creator_display_ssim" => values }) : maker_names
+      when RELATED_SEQ then values.map { |value| I18n.t("nexus_ccs.record_page.split.related_parent", record: value) }
+      else values
+      end
+    end
+
+    def source_url?(row) = row.seq == SOURCE_URL_SEQ
+
+    # The Source URL row's value (CCS-25): the record on its collection's website, behind the leaving-site dialog
+    def view_full_record = ViewFullRecordComponent.new(document: document, action: nil)
+
+    # A value shown as a term (an outlined tag that opens its search or browse page): the values that name things
+    def term?(row) = link_to_value?(row) || BROWSE_KINDS.key?(row.field) || FALLBACK_FILTER_FIELDS.key?(row.field)
+
+    # --- Use and access (CCS-27, CCS-47, CCS-67, CCS-68, CCS-69, CCS-166) -----------------------------------------------------------
+    # One panel under the actions: can the visitor see the image, can they download it, under what licence, the rights items CCS-27
+    # lists (accession number, caption, credit line, copyright, terms of use, contact) and the way to ask the collection.
+
+    def media_component = @media_component ||= DigitalAssetsComponent.new(presenter: @presenter)
+
+    # :none (no digital asset), :open, :view_only or :request (AccessPolicy)
+    def access_state = assets? ? AccessPolicy.tier(document) : :none
+
+    def sensitive? = assets? && access_state != :request && Sensitivity.sensitive?(document)
+
+    def view_status = I18n.t("nexus_ccs.record_page.use.view.#{access_state}")
+    def download_status = I18n.t("nexus_ccs.record_page.use.download.#{access_state}")
+    def can_view? = %i[open view_only].include?(access_state)
+    def can_download? = access_state == :open
+
+    def use_licence = assets? ? media_component.licence : licence
+
+    # The rights items, [[label, value]], in CCS-27's order (with the licence); caption and terms of use belong to a digital asset
+    def rights_items
+      [ [ I18n.t("nexus_ccs.record_page.use.accession_number"), Array(document["accession_number_ssim"]).first ],
+        [ I18n.t("nexus_ccs.record_page.use.licence"), use_licence ],
+        [ I18n.t("nexus_ccs.record_page.use.caption"), (dam_caption || caption if assets?) ],
+        [ I18n.t("nexus_ccs.record_page.use.credit_line"), credit_line ],
+        [ I18n.t("nexus_ccs.record_page.use.copyright"), copyright ],
+        [ I18n.t("nexus_ccs.record_page.use.terms_of_use"), (media_component.terms if assets?) ] ]
+        .select { |_label, value| value.present? }.uniq { |_label, value| value.to_s.squish } # a DAM often repeats one statement
+    end
+
+    def history
+      HISTORY_FIELDS.filter_map do |field, key|
+        value = Array(document[field]).first.presence
+        [ t("nexus_ccs.record_page.split.history.#{key}"), value ] if value
+      end
+    end
+
+    def request_to_view_path = AccessPolicy.request_path(document)
   end
 end

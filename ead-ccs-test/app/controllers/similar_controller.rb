@@ -6,7 +6,8 @@
 # Solr fails. An id that is not in the index is a 404.
 #
 # ?row=creator|period|place|type answers one of the labelled rows under it instead (SimilarRows): the same frame mechanism, one
-# more Solr request per row, 204 when the row is empty. An unknown row is a 404.
+# more Solr request per row, 204 when the row is empty. An unknown row is a 404. A row is drawn as a panel of the record page's
+# "More from the collections" tabs (MoreFromCollectionsComponent): three cards and See all, no heading.
 class SimilarController < CatalogController
   include DiscoveryFragment
 
@@ -22,7 +23,7 @@ class SimilarController < CatalogController
     raise ActionController::RoutingError, "Not Found" if row && !SimilarRows::KEYS.include?(row)
 
     document = id.length <= 200 ? Discovery.fetch([ id ], fields: row ? SimilarRows::SOURCE_FIELDS : Discovery::FIELDS).first : nil
-    raise ActionController::RoutingError, "Not Found" unless document
+    return record_not_found! unless document
     return show_row(document, row) if row
 
     @documents = SimilarRecords.for(document, exclude: excluded_ids)
@@ -46,7 +47,7 @@ class SimilarController < CatalogController
     @row = SimilarRows.new(document, key)
     wrap_documents(@documents)
     @entries = @documents.map { |found| FeaturedRecords::Entry.new(document: found, blurb: nil) }
-    render "similar/row"
+    render "similar/tab"
   end
 
   # The records the record page already lists as Related objects (?exclude=a,b), so none appears twice

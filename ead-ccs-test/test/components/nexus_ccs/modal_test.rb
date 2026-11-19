@@ -17,7 +17,7 @@ class ModalTest < ActiveSupport::TestCase
   def script(name) = Rails.root.join("app/javascript", name).read
 
   test "the leaving-site dialog is a modal <dialog> with the Gen 3 Close button first and no Bootstrap close icon" do
-    render_inline(NexusCcs::ViewFullRecordComponent.new(document: SolrDocument.new("id" => "x1", "collection_ssim" => [ "Medical History Museum" ]), action: Action.new(:view_full_record)))
+    render_inline(NexusCcs::ViewFullRecordComponent.new(document: SolrDocument.new("id" => "x1", "collection_ssim" => [ "Medical History Museum" ], "source_url_ss" => "https://collections.example.org/objects/x1"), action: Action.new(:view_full_record)))
 
     assert_selector "dialog.modal.uom-modal[aria-labelledby]"
     assert_selector "dialog .modal-content > button.modal-close:first-child", text: "Close"

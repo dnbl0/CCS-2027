@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # A record's media on its page: the large image on the page itself, shown whole at its own shape (a row of thumbnails under it
-  # when there are several), one slim toolbar under it (the access chip and licence, the "Media information" and "Full screen"
-  # buttons with text labels, and Download when the image shown is an open asset) and a "Media metadata" panel that opens under the
-  # toolbar. Renders nothing for a record without assets. What it shows follows AccessPolicy, asset by asset: the index holds only
+  # A record's media on its page, the left of the approved split layout (Figma "Object viewer"): the large image shown whole at its
+  # own shape, a controls row under it (the licence, as a link to the Use and access panel, and the access chip on the left; round
+  # media information, zoom in, zoom out, full screen and, for an open image, download on the right) and, when there are several
+  # images, a strip of every thumbnail with previous and next. The media information opens over the right of the image (CCS-422);
+  # Download first shows the essential information (CCS-67). Renders nothing for a record without assets. What it shows follows AccessPolicy, asset by asset: the index holds only
   # the assets a visitor may see (Dam::SolrWriter), and of those only an open one is offered to download (its thumbnail links to
   # the file, its player keeps its download button, a PDF is listed); a view-only one is shown without any of that. A record
   # with some assets withheld says so under them, with a request link; a :request record shows none of the assets, only the
@@ -16,7 +17,6 @@ module NexusCcs
     ADVISORY = "Some collection items include terms and views that are not appropriate today. They reflect the " \
                "period in which they were created and are not the views of the University of Melbourne."
 
-    ICONS = %w[media-copyright media-info media-fullscreen].freeze
 
     def initialize(presenter:, document_counter: nil, **)
       @document = presenter.document
@@ -88,9 +88,11 @@ module NexusCcs
     # The one primary action: the main image, to download, when it is an open asset (never a view-only or withheld one: no path is in the markup)
     def download_href = (main&.first if assets_shown? && image_downloadable?(0))
 
-    # The image's width and height attributes (nothing when its size cannot be read), so the page holds its space while it loads
+    # The image's width and height attributes (nothing when its size is not known), so the page holds its space while it loads: read
+    # from the file when it is on this server, or the DAM image's size once it has been read for the IIIF manifest (only the kept
+    # size: drawing the page never asks the DAM)
     def image_size(path)
-      width, height = ImageDimensions.for_path(path)
+      width, height = ImageDimensions.for_path(path) || RemoteImageDimensions.cached(path)
       width ? { width: width, height: height } : {}
     end
 
@@ -101,7 +103,6 @@ module NexusCcs
     end
 
     def media_title(item) = item[:label].presence || title
-    def others = images.drop(1)
 
     def count = large_paths.size
 
@@ -134,7 +135,7 @@ module NexusCcs
     # The DAM's DA Advisory, else the advisory every record carries
     def advisory = dam_value("advisory") || ADVISORY
 
-    # [label, text] rows of the Media metadata panel
+    # [label, text] rows of the media information (CCS-422: the overlay the i tool opens; the data model sheet's DAM fields)
     def metadata
       [ [ "Licence type", licence ], [ "Advisory", advisory ], [ "Terms of use", terms ], [ "Producer", producer ] ].select { |_, text| text.present? }
     end
@@ -157,22 +158,12 @@ module NexusCcs
     end
     private :dam_value
 
-    def metadata?
-      metadata.any?
-    end
+    def glyph(name) = Glyphs.svg(name)
 
-    # An icon from app/assets/images, drawn in the text colour (the files carry the design's fixed navy)
-    def icon(name)
-      raise ArgumentError, name unless ICONS.include?(name)
+    # The essential information before a download (CCS-67): the DA caption, or one built from the record, and the licence
+    def essential_caption = Array(@document["caption_tsim"]).first.presence || StockRecordFields.caption(@document).first
 
-      File.read(Rails.root.join("app/assets/images/#{name}.svg"))
-          .gsub(/ (width|height|style|preserveAspectRatio|overflow)="[^"]*"/, "")
-          .gsub(/ clip-path="[^"]*"/, "")
-          .gsub(/ id="[^"]*"/, "")
-          .gsub(/(stroke|fill)="#(?:[0-9A-Fa-f]{3,6})"/, '\1="currentColor"')
-          .sub("<svg", '<svg width="1em" height="1em" aria-hidden="true" focusable="false"')
-          .html_safe
-    end
+    def essential_text = [ essential_caption, (t("nexus_ccs.record_page.download.licence") + ": " + licence if licence) ].compact.join("\n")
 
     private
 

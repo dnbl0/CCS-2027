@@ -19,8 +19,8 @@ fields:
   8:  { solr: series_ssim }
   9:  { gap: "Neither export has an Editions column." }
   10: { solr: material_ssim }                  # EMu "Medium" and "Extent and Medium"; Vernon has none
-  11: { gap: "Neither export has a dimensions column." }
-  12: { gap: "Neither export has an inscription column." }
+  11: { solr: dimensions_ssm }                 # EMu "Dimensions" (stored, display only); Vernon has none
+  12: { solr: inscription_tsim }               # EMu inscriptions (one value each; the exports carry no inscription type)
   13: { gap: "Inventory: language is held by neither M&C nor MDHS; EMu's Language Group column is empty." }
   15: { solr: subject_ssim }                    # EMu only
   16: { solr: description_tsim }               # Vernon only: the EMu export has no description column
@@ -30,7 +30,7 @@ fields:
   20: { solr: accession_number_ssim }
   21: { solr: credit_line_tsim }
   22: { solr: rights_ssim }
-  23: { gap: "No source URL column in either export (the record page uses a placeholder link)." }
+  23: { solr: source_url_ss }                  # the record in the collection's own browser (harvested records: source_url_ssi)
   24: { gap: "Inventory: physical access is held by neither system. EMu's Record Status (access_condition_ssi) is indexed but not shown; it is not an access condition and needs data-owner sign-off." }
   25: { solr: parent_record_ssi }
   26: { gap: "DAM field: no Nexus DAM export yet." }

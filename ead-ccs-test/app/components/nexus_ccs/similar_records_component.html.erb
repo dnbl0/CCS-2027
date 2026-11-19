@@ -1,4 +1,1 @@
-<turbo-frame id="similar-records" class="similar-frame" src="<%= source %>" loading="lazy"></turbo-frame>
-<% rows.each do |key| %>
-  <turbo-frame id="similar-<%= key %>" class="similar-frame" src="<%= row_source(key) %>" loading="lazy"></turbo-frame>
-<% end %>
+<turbo-frame id="similar-records" class="similar-frame" src="<%= source %>" loading="lazy" data-controller="lazy-frame" data-action="turbo:frame-missing->lazy-frame#missing"></turbo-frame>

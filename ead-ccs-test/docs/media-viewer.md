@@ -17,7 +17,7 @@ use to ask; the record page's own component keeps its checks.
 
 | Kind | How | Notes |
 |---|---|---|
-| Image | The large image; **Zoom and pan** swaps it for an OpenSeadragon viewer | The viewer is loaded on first use (a dynamic import), so an ordinary page view costs nothing extra. Buttons Zoom in, Zoom out, Reset view; the viewer's canvas is focusable, arrow keys pan, `=` and `-` zoom, `0` resets. The mouse wheel does not zoom (it would trap page scrolling). Full screen is a labelled button in the toolbar under the image (with Media information and, for an open record, Download image). Reduced motion turns the animation off. |
+| Image | The large image; the round **Zoom in** tool under it swaps it for an OpenSeadragon viewer | The viewer is loaded on first use (a dynamic import), so an ordinary page view costs nothing extra. It opens over the picture's area, keeping its height and taking the column's width, so nothing below it moves; each Zoom in or Zoom out is a 1.5x step from the zoom being moved to, so quick presses add up evenly, and zooming out past the whole picture closes the viewer. The thumbnails and previous/next open their image in it. Zoom in and Zoom out are round tools in the controls row under the image (with Full screen and, for an open image, Download). The viewer's canvas is focusable, arrow keys pan, `=` and `-` zoom, `0` resets. The mouse wheel does not zoom (it would trap page scrolling). The media information (the data model's DAM fields) opens over the right of the image from the round i tool (CCS-422), closing with its X or Escape and handing focus back to the tool. Download first shows the essential information, the caption and licence, with a Copy button (CCS-67). Reduced motion turns the animation off. |
 | Video | The browser's `<video controls>` | Keyboard and screen-reader support are the browser's. A `<track kind="captions">` is added when the record has a captions file. No download button unless the tier is `:open`. |
 | Audio | The browser's `<audio controls>` | As video; a transcript link when the record has one. |
 | PDF | A link that opens the file in a new tab | Only for `:open` records: a PDF cannot be read without being downloadable. An in-page reader would be a new dependency. |
@@ -98,8 +98,14 @@ University as `provider`; the licence as `requiredStatement` always, and as `rig
 RightsStatements.org URI (public domain: CC Public Domain Mark; copyright: In Copyright; the other licences have no URI).
 
 - `:open` and `:view_only` records only. A `:request` record, a sensitive record the visitor has not chosen to view, and a record
-  with no image whose size can be read, give a 404 with nothing of the record in the body. An image whose size cannot be read
-  (only `.jpg` and `.png` files under `public` are measured) is left out, as a canvas needs a size.
+  with no image whose size can be read, give a 404 with nothing of the record in the body. An image whose size cannot be read is
+  left out, as a canvas needs a size.
+- Image sizes. A `.jpg` or `.png` under `public` is measured from its file (`ImageDimensions`). A DAM image (an https link on the
+  allowed image hosts, `COLOUR_IMAGE_HOSTS`, default `unimelbourne.widen.net`) is measured from the first 64 KB of its file, asked
+  for with a Range request (`RemoteImageDimensions`; up to six at once, 3s to connect, 5s to read, no redirects), and the size is kept
+  in the Rails cache for 30 days, so a record of DAM images has a manifest (before 20 Nov 2026 such records answered 404 though the
+  record page linked to the manifest). Drawing the record page never asks the DAM: it reads only a kept size, to give the main image
+  its width and height.
 - `:view_only` records are listed because their images can be viewed; the manifest points to the same files the page does. The
   image files are public static files, so "no download" is a browser-level courtesy on this site, not a protection.
 - Cache and CORS. An ordinary manifest is the same for everyone: `Cache-Control: public, max-age=0, must-revalidate` with an ETag
@@ -127,6 +133,6 @@ RightsStatements.org URI (public domain: CC Public Domain Mark; copyright: In Co
 
 Controls are real buttons with visible text names (so the accessible name is the visible label), at least 44px high, with a
 visible focus ring. The viewer's canvas has `role="group"` and a label with the image's text alternative and the key hints.
-`aria-pressed` on the Zoom and pan toggle; focus moves into the viewer when it opens and back to the toggle when it closes.
+The round tools have accessible names; focus stays on the tool that was pressed, so Zoom in can be pressed again, and the canvas is reached with Tab.
 The system tests (`test/system/media_viewer_test.rb`) run axe on the record page with zoom on and on the comparison page at
 desktop and 320px widths.

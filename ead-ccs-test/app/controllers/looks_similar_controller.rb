@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# GET /catalog/:id/looks-similar: the record page's "Looks similar" section, in a lazy Turbo frame (LooksSimilar,
+# GET /catalog/:id/looks-similar: the "Looks similar" panel of the record page's More from the collections tabs, in a lazy Turbo frame (LooksSimilar,
 # docs/colour-and-clean-up.md). 204 No Content (the section stays hidden) when there is nothing to list or Solr or the database fails;
 # 404 for an id not in the index.
 class LooksSimilarController < CatalogController
@@ -17,7 +17,7 @@ class LooksSimilarController < CatalogController
     fragment_not_for_indexing
     id = params[:id].to_s
     document = id.length <= 200 ? Discovery.fetch([ id ]).first : nil
-    raise ActionController::RoutingError, "Not Found" unless document
+    return record_not_found! unless document
 
     @documents = LooksSimilar.eligible?(document) ? LooksSimilar.for(document) : []
     return head(:no_content) if @documents.empty?

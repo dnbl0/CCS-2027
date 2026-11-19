@@ -10,8 +10,15 @@ class DataModel
   FILTER_ROWS = JSON.parse(Rails.root.join("config/data_model/filters.json").read).freeze
   MAPPING = YAML.safe_load_file(Rails.root.join("config/data_model/solr_mapping.yml")).freeze
 
+  # Labels the sheet's display rules set apart from its label cell: Measurements (11) carries a note in that cell ("... previosly
+  # mentioned as Dimensions") and its rule 2 says "CCS label will be 'Measurements'".
+  DISPLAY_LABELS = { 11 => "Measurements" }.freeze
+
   Field = Data.define(:seq, :label, :source, :solr, :index, :gap) do
     def available? = solr.present?
+
+    # The label a page shows
+    def display_label = DISPLAY_LABELS.fetch(seq, label)
   end
 
   # `type` is :checkbox, :browse (browse and search within the filter), :year (year selector) or :other.

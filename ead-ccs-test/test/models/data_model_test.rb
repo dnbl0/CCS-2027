@@ -24,7 +24,7 @@ class DataModelTest < ActiveSupport::TestCase
   # Fields this app's indexers do not write: the dev team's ingest fills them in the shared index (seen 2026-11-17), so a core
   # built only by `collections:index` lacks them and their filters show no values there
   DEV_TEAM_INGEST = %w[nationality_ssim date_era_ssim region_ssim subject_agent_ssim digital_asset_advisory_classification_ssim
-                       object_access_condition_ssim].freeze
+                       object_access_condition_ssim dimensions_ssm inscription_tsim source_url_ss].freeze
 
   test "every Solr field the model uses is written by an indexer, the DAM sync, or (listed) the dev team's ingest" do
     dam_writer = Rails.root.join("app/models/dam/solr_writer.rb").read
@@ -114,7 +114,8 @@ class DataModelTest < ActiveSupport::TestCase
     expected = DataModel.fields.select(&:available?).reject { |field| field.seq == 1 }
 
     assert_equal expected.map(&:solr), config.show_fields.values.map(&:field)
-    assert_equal expected.map(&:label), config.show_fields.values.map(&:label)
+    assert_equal expected.map(&:display_label), config.show_fields.values.map(&:label)
+    assert_equal "Measurements", DataModel.fields.find { |field| field.seq == 11 }.display_label # the sheet's display rule 2
   end
 
   test "the results list shows the fields the mapping marks for it" do

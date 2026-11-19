@@ -11,8 +11,8 @@ module CatalogConfig
       # access_condition_ssi and restrictions_tsi are deliberately absent.
       # ================================================================
       DataModel.fields.select(&:available?).reject { |field| field.seq == 1 }.each do |field|
-        config.add_index_field field.solr, label: field.label if field.index
-        config.add_show_field field.solr, label: field.label
+        config.add_index_field field.solr, label: field.display_label if field.index
+        config.add_show_field field.solr, label: field.display_label
       end
     end
   end

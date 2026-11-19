@@ -16,11 +16,9 @@ class RecordHeadingsTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", count: 1
-    assert_select "h1.record-summary__title", count: 1
+    assert_select "h1.record-split__title", count: 1
     assert_select "h1.visually-hidden", count: 0
-    assert_select ".record-banner h1", count: 0 # the 2026 layout's banner is the breadcrumb band; the title is the header block's
-    assert_select "header.record-header h1", count: 1
-    assert_select "section.record-summary[aria-label]", count: 0
+    assert_select "header.record-split__header h1", count: 1
     assert_select "main[aria-label]", count: 0
   end
 
@@ -29,8 +27,9 @@ class RecordHeadingsTest < ActionDispatch::IntegrationTest
     get "/catalog/emu-400001"
 
     assert_response :success
-    assert_select ".record-summary__identifier[data-testid=record-identifier]", text: /Grainger Museum Collection, accession number 00\.0001, UoM ID emu-umc-400001/
-    assert_select ".record-summary__identifier [data-copy='Grainger Museum Collection, accession number 00.0001, UoM ID emu-umc-400001']"
-    assert_select ".record-summary__identifier button[aria-label='Copy collection ID']"
+    # The collection and accession number are rows of Object details; the UoM ID row's Copy button copies all three
+    assert_select ".record-facts__row[data-testid=record-identifier]", text: /UoM ID\s+emu-umc-400001/
+    assert_select ".record-facts__row [data-copy='Grainger Museum Collection, accession number 00.0001, UoM ID emu-umc-400001']"
+    assert_select ".record-facts__row button[aria-label='Copy collection ID']"
   end
 end

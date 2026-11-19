@@ -1,21 +1,13 @@
-<div class="record-actions" role="group" aria-label="<%= t("nexus_ccs.record_page.sections.actions") %>">
-  <% if notice? %>
-    <%= render NexusCcs::AccessNoticeComponent.new(document: document) %>
-  <% end %>
+<div class="record-actions" role="group" aria-label="<%= t("nexus_ccs.record_page.split.actions") %>">
   <div class="record-actions__row">
     <% if saved_records? %>
-      <div class="record-summary__save">
-        <%= render NexusCcs::SaveControlComponent.new(document: document) %>
-        <%= render NexusCcs::AddToListComponent.new(document: document) %>
-      </div>
+      <%= render NexusCcs::SaveControlComponent.new(document: document) %>
+      <%= render NexusCcs::AddToListComponent.new(document: document) %>
     <% end %>
-    <details class="record-actions__more" data-record-sections-target="section">
-      <summary><%= t("nexus_ccs.record_page.more_actions") %></summary>
-      <div class="record-actions__more-body">
-        <%= render NexusCcs::CompareActionsComponent.new(document: document, images: compare? ? media.images.size : 0) %>
-        <div class="record-summary__cite"><%= render NexusCcs::CiteComponent.new(document: document) %></div>
-        <div class="record-summary__share"><%= render NexusCcs::ShareDialogComponent.new(kind: :record, document: document) %></div>
-      </div>
-    </details>
+    <%= render NexusCcs::ShareDialogComponent.new(kind: :record, document: document) %>
+    <%= render NexusCcs::CiteComponent.new(document: document) %>
   </div>
+  <% if compare? %>
+    <div class="record-actions__compare"><%= render NexusCcs::CompareActionsComponent.new(document: document, images: media.images.size) %></div>
+  <% end %>
 </div>

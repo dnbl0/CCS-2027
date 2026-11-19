@@ -6,7 +6,8 @@ class RecordContactHelpTest < ApplicationSystemTestCase
     page.driver.set_cookie("country_acknowledged", "1")
     visit search_catalog_path(any_assets: "1", q: "skull")
     first(".result-card .document-title-heading a").click
-    assert_selector ".contact-collection"
+    # The card is in the record column's Use and access panel
+    assert_selector "#use-and-access .contact-collection"
   end
 
   def press(key) = page.driver.browser.keyboard.type(key)

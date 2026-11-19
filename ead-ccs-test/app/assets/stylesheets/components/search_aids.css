@@ -1,5 +1,4 @@
-/* Ways sideways from a search or a record: the one-tap filters above the results (QuickFiltersComponent), the labelled rows under a
-   record (similar/row), the extra help on an empty results page (catalog/_zero_results) and the kind of each suggestion as you
+/* Ways sideways from a search or a record: the one-tap filters above the results (QuickFiltersComponent), the extra help on an empty results page (catalog/_zero_results) and the kind of each suggestion as you
    type (catalog/suggest). Design tokens only; every link is at least 24px high and wraps rather than widening the page. */
 
 /* ---- one-tap filters ---- */
@@ -16,9 +15,6 @@
 .quick-filters__count { color: var(--ccs-text-secondary); font-variant-numeric: tabular-nums; }
 
 /* ---- labelled rows under a record ---- */
-.similar-row__more { margin: var(--ccs-space-4) 0 0; }
-.similar-row__all { display: inline-block; min-height: 1.5rem; color: var(--ccs-text-link); font-weight: var(--ccs-font-weight-semibold); }
-.similar-row__all:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
 /* ---- an empty results page ---- */
 .results-empty__help { margin-block-start: var(--ccs-space-5); }

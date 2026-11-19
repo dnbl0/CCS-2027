@@ -1,0 +1,8 @@
+<%# One row of the record page's "More from the collections" (MoreFromCollectionsComponent, ?row=): three result cards and See all,
+    with no heading (the row names it). %>
+<turbo-frame id="more-<%= @row.key %>" target="_top">
+  <div class="record-more__cards"><%= render "discover/cards", entries: @entries.first(3), title_tag: :h3 %></div>
+  <% if (query = @row.see_all_query) %>
+    <p class="record-more__all"><%= link_to t("nexus_ccs.similar.rows.see_all", values: @row.described.first), search_action_path(query), class: "record-arrow-link" %></p>
+  <% end %>
+</turbo-frame>

@@ -54,14 +54,14 @@ class ColoursTest < ActionDispatch::IntegrationTest
   def records = [ open_record("emu-source"), open_record("emu-a"), open_record("emu-b"), open_record("emu-c", has_digital_asset_bsi: false),
                   withheld_record("emu-withheld"), sensitive_record("emu-sensitive") ]
 
-  test "Looks similar: the closest records by colour as the record page's cards, leaving out any without a viewable image" do
+  test "Looks similar: the closest records by colour as a panel of result cards, leaving out any without a viewable image" do
     looks_like("emu-source", %w[emu-a emu-withheld emu-c emu-sensitive emu-b])
     with_seeded_menu_cache { with_canned_search(discovery_solr(records: records)) { |seen| get "/catalog/emu-source/looks-similar"; @seen = seen } }
 
     assert_response :success
-    assert_select "turbo-frame#looks-similar[target=_top] section#looks-similar-records[aria-labelledby=looks-similar-heading]" do
-      assert_select "h2#looks-similar-heading", "Looks similar"
-      assert_select "li.object-cards__item", 2
+    assert_select "turbo-frame#more-colours[target=_top]" do
+      assert_select "h2", count: 0 # the tab names it
+      assert_select "li.discover-cards__item", 2
       assert_select "a[href=?]", "/catalog/emu-a"
       assert_select "a[href=?]", "/catalog/emu-b"
     end
@@ -80,13 +80,10 @@ class ColoursTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "the record page's Looks similar partial is a lazy frame, drawn only for a record with a viewable image" do
-    draw = ->(record) { ApplicationController.render(partial: "catalog/looks_similar", locals: { document: SolrDocument.new(record) }) }
-
-    html = Nokogiri::HTML5.fragment(draw.call(open_record("emu-source")))
-    assert_equal "/catalog/emu-source/looks-similar", html.at_css("turbo-frame#looks-similar[loading=lazy]")["src"]
-    assert_empty draw.call(open_record("emu-c", has_digital_asset_bsi: false)).strip
-    assert_empty draw.call(sensitive_record("emu-sensitive")).strip
-    assert_includes Rails.root.join("app/views/catalog/show.html.erb").read.lines.last, "catalog/looks_similar", "after More like this"
+  test "Looks similar is offered only for a record with a viewable image: a tab of the record page's More from the collections" do
+    assert LooksSimilar.eligible?(SolrDocument.new(open_record("emu-source")))
+    assert_not LooksSimilar.eligible?(SolrDocument.new(open_record("emu-c", has_digital_asset_bsi: false)))
+    assert_not LooksSimilar.eligible?(SolrDocument.new(sensitive_record("emu-sensitive")))
+    assert_includes Rails.root.join("app/components/nexus_ccs/more_from_collections_component.rb").read, "looks_similar_path"
   end
 end

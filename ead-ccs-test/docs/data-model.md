@@ -44,8 +44,8 @@ and the tests show what else must change. To fill a gap: add the source column t
 | 8 | Series | CMS | `series_ssim` |
 | 9 | Editions | CMS | **gap**: Neither export has an Editions column. |
 | 10 | Material | CMS | `material_ssim` |
-| 11 | Measurements |  | **gap**: Neither export has a dimensions column. |
-| 12 | Inscription | CMS | **gap**: Neither export has an inscription column. |
+| 11 | Measurements |  | `dimensions_ssm` (stored, display only; labelled "Measurements" by the sheet's display rule: `DataModel::DISPLAY_LABELS`) |
+| 12 | Inscription | CMS | `inscription_tsim` (one line each: the data carries no inscription type to group by) |
 | 13 | Language | CMS | **gap**: Inventory: language is held by neither M&C nor MDHS; EMu's Language Group column is empty. |
 | 15 | Subject | CMS | `subject_ssim` |
 | 16 | Description | CMS | `description_tsim` |
@@ -55,7 +55,7 @@ and the tests show what else must change. To fill a gap: add the source column t
 | 20 | Accession Number | CMS | `accession_number_ssim` |
 | 21 | Credit Line | CMS | `credit_line_tsim` |
 | 22 | Copyright | CMS | `rights_ssim` |
-| 23 | Source URL | CMS | **gap**: No source URL column in either export (the record page uses a placeholder link). |
+| 23 | Source URL | CMS | `source_url_ss` (`source_url_ssi` on a harvested record): the View full record button (CCS-25); no button without one |
 | 24 | Access | CMS | **gap**: Inventory: physical access is held by neither system. EMu's Record Status (access_condition_ssi) is indexed but not shown; it is not an access condition and needs data-owner sign-off. |
 | 25 | Related Record |  | `parent_record_ssi` |
 | 26 | Licence Type | DAM (media metadata) | **gap**: DAM field: no Nexus DAM export yet. |

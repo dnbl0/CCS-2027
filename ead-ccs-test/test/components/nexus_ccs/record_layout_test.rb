@@ -28,15 +28,57 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_equal "Kangaroo-pouch tone-tool", component(FIELDS).heading
   end
 
-  test "the details list leaves out what the header, the Key facts and Copyright and use show: no Title, UoM ID, Collection, date or materials" do
-    labels = component(FIELDS).rows.map(&:label)
+  # CCS-400: the sheet "CCS Field Labels", its FINAL SEQUENCE ORDER and display rules
+  SHEET = FIELDS.merge(
+    "description_tsim" => [ "A tool for tuning." ], "accession_number_ssim" => [ "00.0001" ], "creator_display_ssm" => [ "Grainger, Percy Aldridge (1882 – 1961) maker" ],
+    "production_place_ssim" => [ "Australia", "Victoria" ], "classification_ssim" => [ "Music", "Instruments" ], "dimensions_ssm" => [ "10 x 4 cm" ],
+    "inscription_tsim" => [ "Signed lower right" ], "parent_record_ssi" => "[00.0000] tone-tool set", "source_url_ssi" => "https://collections.example.org/1"
+  )
 
-    assert_not_includes labels, "Title"
-    assert_not_includes labels, "UoM ID"
-    assert_not_includes labels, "Collection"
-    assert_not_includes labels, "Date"
-    assert_not_includes labels, "Materials"
-    assert_includes labels, "Object Type"
+  test "the details follow the sheet's sequence and labels, leaving out the title, the description and the rights Use and access shows" do
+    rows = component(SHEET).detail_rows
+
+    assert_equal rows.map(&:seq), rows.map(&:seq).sort
+    labels = rows.map(&:label)
+    assert_equal %w[Object\ Type Date Creator Place Material Measurements Inscription Classification Collection Accession\ Number Source\ URL Related\ Record], labels
+    %w[Title Description Credit\ Line Copyright].each { |label| assert_not_includes labels, label }
+  end
+
+  test "the sheet's display rules: creator in the person form, place and classification joined, the related record marked Parent" do
+    rows = component(SHEET).detail_rows.index_by(&:label)
+
+    assert_equal [ "Grainger, Percy Aldridge (b. 1882 - d. 1961) maker" ], rows["Creator"].values
+    assert_equal ", ", rows["Place"].join
+    assert_equal " - ", rows["Classification"].join
+    assert_equal [ "Parent - [00.0000] tone-tool set" ], rows["Related Record"].values
+    assert_equal [ "10 x 4 cm" ], rows["Measurements"].values
+  end
+
+  test "a field with no value has no row, and a record with no display creator falls back to its names" do
+    labels = component(FIELDS).detail_rows.map(&:label)
+
+    assert_not_includes labels, "Measurements"
+    assert_not_includes labels, "Source URL"
+    assert_equal [ "Grainger, Percy Aldridge" ], component(FIELDS).detail_rows.find { |row| row.label == "Creator" }.values
+  end
+
+  test "the full record's groups keep the sequence, and the collection group is always there for the UoM ID" do
+    groups = component(SHEET).detail_groups.to_h
+
+    assert_equal %i[object physical subject collection], groups.keys
+    assert_equal %w[Material Measurements Inscription], groups[:physical].map(&:label)
+    assert_equal [ :collection ], component({ "title_tsim" => [ "Bare" ] }).detail_groups.map(&:first)
+  end
+
+  test "Key facts are object type, date, material, measurements, collection and accession number" do
+    assert_equal %w[Object\ Type Date Material Measurements Collection Accession\ Number], component(SHEET).key_facts.map(&:label)
+  end
+
+  test "Use and access: the rights items in CCS-27's order; caption and terms only with a digital asset" do
+    items = component(SHEET.merge("rights_ssim" => [ "© Grainger" ])).rights_items.map(&:first)
+
+    assert_equal [ "Accession number", "Credit line", "Copyright" ], items
+    assert_equal :none, component(SHEET).access_state
   end
 
   test "the UoM ID names the EMu system: M&C's EMu records are emu-umc, Vernon ids are unchanged" do

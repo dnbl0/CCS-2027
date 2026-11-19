@@ -1,6 +1,6 @@
 /*
- * The record media viewer's zoom and pan (CCS-57), the compare actions under the media and the comparison page (CCS-58).
- * Used by NexusCcs::DeepZoomComponent, NexusCcs::CompareActionsComponent and views/compare. Buttons are solid dark with a
+ * The record media viewer's zoom and pan stage (CCS-57), the compare actions and the comparison page (CCS-58).
+ * Used by NexusCcs::DeepZoomComponent, NexusCcs::CompareActionsComponent and views/compare (whose zoom buttons are .deep-zoom__button). Buttons are solid dark with a
  * light edge so they read on the dark band, on a pale page and over an image alike (WCAG 1.4.11), and are 44px high.
  */
 
@@ -44,39 +44,29 @@
   border-color: var(--ccs-navy-1200);
 }
 
-/* On the record page: the toggle sits over the image's corner; switched on, the viewer fills the figure */
+/* On the record page the zoom viewer sits exactly over the picture's area (opened by the round Zoom in tool under it). Opening it
+   keeps the area's height (deep_zoom_controller sets --zoom-height from it) and widens it to the column, so nothing below moves; the
+   picture stays in place underneath, hidden. In full screen the viewer fills the screen. */
 .digital-assets__main {
   position: relative;
 }
 
-/* Above the viewer's canvas, so the toggle can still be pressed (mouse and keyboard) once the viewer is on */
-.deep-zoom__toggle {
+.digital-assets__main .deep-zoom {
   position: absolute;
-  left: var(--ccs-space-2);
-  bottom: var(--ccs-space-2);
-  z-index: 3;
+  inset: 0;
+  pointer-events: none;
 }
 
-.deep-zoom__controls {
-  position: absolute;
-  top: var(--ccs-space-2);
-  right: var(--ccs-space-2);
-  z-index: 3;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ccs-space-1);
-}
-
-.deep-zoom__controls[hidden] {
-  display: none;
+.digital-assets__main .deep-zoom.is-active {
+  pointer-events: auto;
 }
 
 .deep-zoom__stage {
   position: relative;
-  z-index: 0; /* the viewer's own layers stay inside it, under the buttons */
+  z-index: 0; /* the viewer's own layers stay inside it */
   width: 100%;
-  height: min(38.5rem, 70vh);
-  background: var(--ccs-navy-1200);
+  height: 100%;
+  background: var(--ccs-surface-subtle);
 }
 
 .deep-zoom__stage[hidden] {
@@ -85,10 +75,17 @@
 
 .digital-assets__main:has(.deep-zoom.is-active) {
   width: 100%;
+  height: var(--zoom-height, min(38.5rem, 70vh));
+  aspect-ratio: auto;
 }
 
 .digital-assets__main:has(.deep-zoom.is-active) .digital-assets__image {
-  display: none;
+  visibility: hidden;
+}
+
+.digital-assets.is-fullscreen .digital-assets__main:has(.deep-zoom.is-active) {
+  height: calc(100vh - 10rem);
+  max-height: none;
 }
 
 .deep-zoom .openseadragon-canvas:focus-visible,

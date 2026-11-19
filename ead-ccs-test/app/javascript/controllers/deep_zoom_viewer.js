@@ -58,6 +58,21 @@ export function open(viewer, source, label) {
   nameCanvas(viewer, label || source.alt)
 }
 
-export function zoomIn(viewer) { viewer.viewport.zoomBy(1.5); viewer.viewport.applyConstraints() }
-export function zoomOut(viewer) { viewer.viewport.zoomBy(1 / 1.5); viewer.viewport.applyConstraints() }
+// Each step is from the zoom being moved to (the target), not the one on screen mid-animation, so quick presses add up evenly
+export function zoomIn(viewer) { viewer.viewport.zoomTo(viewer.viewport.getZoom(true) * 1.5); viewer.viewport.applyConstraints() }
+export function zoomOut(viewer) { viewer.viewport.zoomTo(viewer.viewport.getZoom(true) / 1.5); viewer.viewport.applyConstraints() }
 export function reset(viewer) { viewer.viewport.goHome() }
+
+// Whether the view shows the whole picture (or less): zooming out from here closes the record page's viewer
+export function atHome(viewer) { return viewer.viewport.getZoom(true) <= viewer.viewport.getHomeZoom() * 1.01 }
+
+// Resolves once the first image has opened and the viewer has settled on the whole picture (it fits the image to the box just after
+// the open event), so a zoom made straight after opening is not undone by that fit
+export function opened(viewer) {
+  const settle = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => { viewer.viewport.goHome(true); resolve() })))
+  if (viewer.world.getItemCount() > 0) return settle()
+  return new Promise((resolve) => {
+    viewer.addOnceHandler("open", () => settle().then(resolve))
+    viewer.addOnceHandler("open-failed", () => resolve())
+  })
+}

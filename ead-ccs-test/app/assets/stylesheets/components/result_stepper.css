@@ -1,0 +1,13 @@
+/*
+ * "Result 3 of 120" with round previous and next, at the top of the record's column. Markup: NexusCcs::ResultStepperComponent.
+ */
+.result-stepper { display: flex; align-items: center; justify-content: space-between; gap: var(--ccs-space-3); }
+.result-stepper__position { margin: 0; font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
+.result-stepper__steps { display: flex; gap: var(--ccs-space-2); }
+.result-stepper__step {
+  display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; /* 44px targets */
+  border: 1px solid var(--ccs-border-default); border-radius: var(--ccs-radius-pill); color: var(--ccs-text-brand); text-decoration: none;
+}
+a.result-stepper__step:hover { border-color: var(--ccs-border-brand); background: var(--ccs-surface-raised); }
+a.result-stepper__step:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.result-stepper__step[aria-disabled="true"] { opacity: 0.4; }
