@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # A record's page body in the approved split layout (Figma "Record page · Approved design", 2026-11-19): the media on the left
-  # and the record's own column on the right from 1024px (one column below, media first), then Related objects, More from the
-  # collections and About this record at full width. Registered as the show page's document_component; the breadcrumb above it is
+  # A record's page body in the showcase layout (20 Nov 2026, after the museums' object pages, light theme): the image centred on a
+  # full-width band, then a white card over its lower edge with the record (title, object type and date, the maker and place rows,
+  # the description, Object details, About this record) and, beside it from 1024px, the actions and Use and access. You may also like
+  # and More from the collections follow (catalog/show). Registered as the show page's document_component; the breadcrumb above it is
   # HeaderComponent's. The fields, their labels and their order come from the workbook (DataModel: the sheet "CCS Field Labels");
   # the Use and access panel gathers the rights and access information.
   class RecordDocumentComponent < Blacklight::DocumentComponent
@@ -155,10 +156,8 @@ module NexusCcs
     RELATED_SEQ = 25
     CREATOR_SEQ = 4
 
-    # The groups of the full record, each a run of the sheet's sequence, so the order is never broken
-    GROUPS = { object: 2...10, physical: 10...15, subject: 15...18, collection: 18..25 }.freeze
-    # Key facts, before the full record: object type, date, material, measurements, collection, accession number
-    KEY_FACT_SEQS = [ 2, 3, 10, 11, 19, 20 ].freeze
+    # The key rows under the title, outside Object details: who made it (Creator, 4) and where (Place, 7)
+    LEAD_SEQS = [ 4, 7 ].freeze
 
     def detail_rows
       @detail_rows ||= begin
@@ -176,22 +175,28 @@ module NexusCcs
       end
     end
 
+    # Object details: the sheet's fields after the key rows
+    def object_rows = detail_rows.reject { |row| LEAD_SEQS.include?(row.seq) }
+
+    def lead_rows = detail_rows.select { |row| LEAD_SEQS.include?(row.seq) }
+
+    # Under the title, one line each: what it is and when (the object type and the date as the record gives them)
+    def subtitle_lines = [ Array(document["object_type_ssim"]).first&.to_s&.upcase_first, display_date ].compact_blank
+
+    # The record's source reference ends Object details, after the sheet's fields
+    def history_rows
+      HISTORY_FIELDS.filter_map do |field, key|
+        values = Array(document[field]).map(&:to_s).compact_blank
+        Row.new(label: I18n.t("nexus_ccs.record_page.split.history.#{key}"), values: values, field: field, seq: 100) if values.any?
+      end
+    end
+
     # What the de-bias notices scan (RecordDebias): the details and the description
     def rows = detail_rows + [ description_row ].compact
 
     def description_row
       values = Array(document[DESCRIPTION_FIELD]).map(&:to_s).compact_blank
       Row.new(label: I18n.t("nexus_ccs.record_page.split.description_label"), values: values, field: DESCRIPTION_FIELD, seq: 16) if values.any?
-    end
-
-    def key_facts = detail_rows.select { |row| KEY_FACT_SEQS.include?(row.seq) }
-
-    # [[group key, rows]] for the groups that have a row (the collection group always: it holds the UoM ID)
-    def detail_groups
-      GROUPS.filter_map do |key, range|
-        rows = detail_rows.select { |row| range.cover?(row.seq) }
-        [ key, rows ] if rows.any? || key == :collection
-      end
     end
 
     def field_values(field)
@@ -239,13 +244,6 @@ module NexusCcs
         [ I18n.t("nexus_ccs.record_page.use.copyright"), copyright ],
         [ I18n.t("nexus_ccs.record_page.use.terms_of_use"), (media_component.terms if assets?) ] ]
         .select { |_label, value| value.present? }.uniq { |_label, value| value.to_s.squish } # a DAM often repeats one statement
-    end
-
-    def history
-      HISTORY_FIELDS.filter_map do |field, key|
-        value = Array(document[field]).first.presence
-        [ t("nexus_ccs.record_page.split.history.#{key}"), value ] if value
-      end
     end
 
     def request_to_view_path = AccessPolicy.request_path(document)

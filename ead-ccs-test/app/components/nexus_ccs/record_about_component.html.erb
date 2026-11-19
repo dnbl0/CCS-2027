@@ -1,33 +1,34 @@
-<section class="record-about-band" id="about-this-record" aria-labelledby="record-about-heading">
-  <div class="record-about-band__inner">
-    <h2 class="record-band-heading" id="record-about-heading"><%= t("nexus_ccs.record_page.sections.about") %></h2>
-    <div class="record-about-band__row">
-      <h3 class="record-about-band__heading"><%= t("nexus_ccs.record_page.split.about.improve.heading") %></h3>
-      <div class="record-about-band__content">
-        <p><%= t("nexus_ccs.record_page.split.about.improve.body") %></p>
-        <p><a class="record-arrow-link" href="<%= correction_href %>"<% if correction_new_tab? %> target="_blank" rel="noopener"<% end %>><%= t("nexus_ccs.record_page.split.about.improve.link") %><% if correction_new_tab? %><span class="visually-hidden"> <%= t("nexus_ccs.record_page.no_image.ask_new_tab") %></span><% end %></a></p>
+<section class="record-about" id="about-this-record" aria-labelledby="record-about-heading">
+  <h2 class="record-showcase__section-heading" id="record-about-heading"><%= t("nexus_ccs.record_page.sections.about") %></h2>
+  <div class="record-about__text">
+    <p><%= t("nexus_ccs.record_page.split.about.improve.body") %></p>
+    <p><%= advisory %></p>
+  </div>
+  <p class="record-about__action">
+    <a class="record-about__button" href="<%= correction_href %>"<% if correction_new_tab? %> target="_blank" rel="noopener"<% end %>><%= t("nexus_ccs.record_page.showcase.suggest") %><% if correction_new_tab? %><span class="visually-hidden"> <%= t("nexus_ccs.record_page.no_image.ask_new_tab") %></span><% end %></a>
+  </p>
+
+  <div class="record-about__use" data-controller="clipboard">
+    <dl class="record-facts__list">
+      <div class="record-facts__row">
+        <dt><%= t("nexus_ccs.record_page.showcase.record_url") %></dt>
+        <dd>
+          <span class="record-facts__value record-about__url" data-clipboard-target="source" data-copy="<%= url %>"><%= url %></span>
+          <button type="button" class="record-copy" data-action="clipboard#copy" data-clipboard-target="button"><span data-clipboard-target="label"><%= t("nexus_ccs.record_page.showcase.copy_link") %></span></button>
+        </dd>
       </div>
-    </div>
-    <div class="record-about-band__row">
-      <h3 class="record-about-band__heading"><%= t("nexus_ccs.record_page.split.about.notice.heading") %></h3>
-      <div class="record-about-band__content"><p><%= advisory %></p></div>
-    </div>
-    <div class="record-about-band__row">
-      <h3 class="record-about-band__heading"><%= t("nexus_ccs.record_page.split.about.use.heading") %></h3>
-      <div class="record-about-band__content" data-controller="clipboard">
-        <p class="record-about-band__link">
-          <span><%= t("nexus_ccs.record_page.split.about.use.permanent_link") %>:</span>
-          <span class="record-about-band__url" data-clipboard-target="source" data-copy="<%= url %>"><%= url %></span>
-        </p>
-        <ul class="record-about-band__links">
-          <li><button type="button" class="record-text-button" data-action="clipboard#copy" data-clipboard-target="button"><span data-clipboard-target="label"><%= t("nexus_ccs.record_page.split.about.use.copy") %></span></button></li>
-          <% if export_path %><li><a href="<%= export_path %>"><%= t("nexus_ccs.metadata_export.link") %></a></li><% end %>
-          <% if manifest_path %><li><a href="<%= manifest_path %>" type="application/ld+json"><%= t("nexus_ccs.record_page.split.about.use.iiif") %></a></li><% end %>
-        </ul>
-        <%# The record in its source catalogue, behind the leaving-site dialog %>
-        <div class="record-about-band__source persistent-link__browser"><%= render NexusCcs::ViewFullRecordComponent.new(document: document, action: nil) %></div>
-        <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
-      </div>
-    </div>
+    </dl>
+    <ul class="record-about__links">
+      <li><button type="button" class="record-about__print" data-controller="print" data-action="print#print">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 9V3h12v6M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2" /><path d="M6 14h12v7H6z" /></svg>
+        <span><%= t("nexus_ccs.record_page.showcase.print") %></span></button></li>
+      <% if export_path || manifest_path %>
+        <li class="record-about__downloads"><span><%= t("nexus_ccs.record_page.showcase.download_as") %></span>
+          <% if export_path %><a href="<%= export_path %>"><%= t("nexus_ccs.record_page.showcase.csv") %></a><% end %>
+          <% if manifest_path %><a href="<%= manifest_path %>" type="application/ld+json"><%= t("nexus_ccs.record_page.showcase.iiif") %></a><% end %>
+        </li>
+      <% end %>
+    </ul>
+    <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
   </div>
 </section>

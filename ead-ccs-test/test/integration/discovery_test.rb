@@ -120,7 +120,7 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
     record_page(open_record("emu-source"))
 
     assert_response :success
-    assert_select "turbo-frame#similar-records[loading=lazy][src='/catalog/emu-source/similar']"
+    assert_select "turbo-frame#similar-records[loading=lazy][src='/catalog/emu-source/similar?view=collage']"
     assert_select "turbo-frame#similar-records *", count: 0
     assert_select "#similar-records-heading", count: 0
   end

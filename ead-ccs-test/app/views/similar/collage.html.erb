@@ -1,0 +1,26 @@
+<%# "You may also like" (showcase layout): up to twelve similar records (SimilarRecords) as pictures laid like prints on a table, six at
+    a time, with Shuffle for six others (shuffle_controller.js). Each picture is a link named by the record's title, which shows under it
+    on hover and focus. %>
+<turbo-frame id="similar-records" class="similar-frame" target="_top">
+  <section class="record-also" id="related-objects" aria-labelledby="related-objects-heading" data-controller="shuffle"
+           data-shuffle-message-value="<%= t("nexus_ccs.record_page.showcase.shuffled") %>">
+    <h2 class="record-also__heading" id="related-objects-heading"><%= t("nexus_ccs.record_page.showcase.also_like") %></h2>
+    <ul class="record-also__table">
+      <% @prints.each_with_index do |(found, image, title), index| %>
+        <li class="record-also__item" data-shuffle-target="item"<% if index >= 6 %> hidden<% end %>>
+          <a class="record-also__print" href="<%= solr_document_path(found) %>">
+            <img src="<%= image %>" alt="" loading="lazy" decoding="async">
+            <span class="record-also__title"><%= title %></span>
+          </a>
+        </li>
+      <% end %>
+    </ul>
+    <div class="record-also__shuffle">
+      <button type="button" class="record-also__button" hidden data-shuffle-target="button" data-action="shuffle#shuffle">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" /></svg>
+        <span><%= t("nexus_ccs.record_page.showcase.shuffle") %></span>
+      </button>
+      <p class="visually-hidden" role="status" data-shuffle-target="status"></p>
+    </div>
+  </section>
+</turbo-frame>

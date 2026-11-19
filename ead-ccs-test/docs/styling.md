@@ -139,6 +139,18 @@ were removed on both sites). See `docs/styling-inventory.md`.
 
 ## The record page layout
 
+**Showcase layout (branch `design/record-page-vam`, 20 Nov 2026, proposed).** After the museums' object pages (the V&A's was the
+template), in the site's light theme, in `record_showcase.css`: the image whole and centred on a full-width grey band, its tools and
+thumbnails under it; a white card (75rem) over the band's foot with the record: the collection, the title in Source Sans 3 bold with a
+short navy rule under it, the object type and date on their own lines, the key rows (Creator, Place), the description fading out after
+three lines above Read more (CCS-413), Object details (every data model field the record has, in the sheet's order, letter-spaced
+capital labels beside values on dashed rules, names of things as outlined tags, long texts fading above Read more; open from 1024px,
+closed on a phone), and About this record (centred heading, the text and content notice, Suggest a correction, the record URL with
+Copy link, Print this page, and Download as CSV and IIIF manifest). Beside the record from 1024px, and between its header and Object
+details on a phone, the actions and Use and access. Then You may also like (`similar/collage`, `?view=collage`: up to twelve similar
+records' pictures laid like prints on a table, each a little turned, six at a time, with Shuffle; `shuffle_controller.js`) and More
+from the collections. The split layout below is the version on PR #87.
+
 The approved split layout (Figma "Record page · Approved design (Version 4)", frames 28:2639 desktop and 29:2940 mobile, approved
 19 Nov 2026), in `record_split.css`. From 1024px the media is on the left and the record's own column (33rem) on the right; the media
 column is the page's one sticky element: it stays in view while the column beside it scrolls when it fits the window (`is-sticky`, set

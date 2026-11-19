@@ -25,6 +25,7 @@ class SimilarController < CatalogController
     document = id.length <= 200 ? Discovery.fetch([ id ], fields: row ? SimilarRows::SOURCE_FIELDS : Discovery::FIELDS).first : nil
     return record_not_found! unless document
     return show_row(document, row) if row
+    return show_collage(document) if params[:view] == "collage"
 
     @documents = SimilarRecords.for(document, exclude: excluded_ids)
     return head(:no_content) if @documents.empty?
@@ -38,7 +39,22 @@ class SimilarController < CatalogController
     search_catalog_url(*)
   end
 
+  # The record page's "You may also like" (?view=collage): up to COLLAGE similar records with a picture the visitor may see, six shown
+  # at a time and Shuffle for others (similar/collage)
+  COLLAGE = 12
+
   private
+
+  def show_collage(document)
+    found = SimilarRecords.for(document, shown: COLLAGE, exclude: excluded_ids)
+    @prints = found.filter_map do |record|
+      url = AssetVersion.url(record["thumbnail_path_ssi"].presence) if AccessPolicy.view?(record) && !Sensitivity.sensitive?(record)
+      [ record, url, Array(record["title_tsim"]).first.presence || record.id ] if url.present?
+    end
+    return head(:no_content) if @prints.size < 2
+
+    render "similar/collage"
+  end
 
   def show_row(document, key)
     @documents = SimilarRows.for(document, key, exclude: excluded_ids)

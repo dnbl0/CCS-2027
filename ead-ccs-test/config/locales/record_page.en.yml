@@ -83,23 +83,28 @@ en:
         copy: "Copy this information"
         download: "Download image"
         close: "Close"
+      # The showcase layout (20 Nov 2026)
+      showcase:
+        read_more: "Read more"
+        read_less: "Read less"
+        aside: "Actions and use"
+        record_url: "Record URL"
+        copy_link: "Copy link"
+        print: "Print this page"
+        download_as: "Download as:"
+        csv: "CSV"
+        iiif: "IIIF manifest"
+        suggest: "Suggest a correction"
+        also_like: "You may also like"
+        shuffle: "Shuffle objects"
+        shuffled: "Showing other objects you may like"
       # The approved split layout (Figma "Record page · Approved design", 2026-11-19)
       split:
         actions: "Actions for this record"
         uom_id: "UoM ID"
-        key_facts: "Key facts"
-        full_record: "Full record"
         description_label: "Description"
         # The data carries the parent record only (the data model sheet: "Parent - related record 1")
         related_parent: "Parent - %{record}"
-        groups:
-          object: "The object"
-          physical: "Physical description"
-          subject: "Subject and classification"
-          collection: "Collection and identifiers"
-        description:
-          more: "Show more"
-          less: "Show less"
         extra:
           date_era_ssim: "Era"
           region_ssim: "Region"
@@ -109,9 +114,6 @@ en:
           previous: "Previous result"
           next: "Next result"
           none: "%{label}: none"
-        sections:
-          cite: "How to cite this record"
-          history: "Acquisition and history"
         history:
           source_reference: "Source record"
         viewer:
@@ -135,14 +137,5 @@ en:
             type: "More of this type"
         about:
           improve:
-            heading: "Help us improve this record"
             # PLACEHOLDER WORDING, NOT YET APPROVED
             body: "Our records are a work in progress and are updated as we learn more. If something is wrong or missing, tell us."
-            link: "Suggest a correction"
-          notice:
-            heading: "Content notice"
-          use:
-            heading: "Use this record"
-            permanent_link: "Permanent link"
-            copy: "Copy link"
-            iiif: "IIIF manifest"
