@@ -254,14 +254,7 @@ body.blacklight-catalog-show #main-container .page-sidebar {
   overflow-wrap: anywhere;
 }
 
-/* Description: collapsed to a few lines, with a Show more/Show less toggle (controllers/truncate_controller.js) */
-.record-details__truncate {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--ccs-space-1);
-}
-
+/* The description's Show more / Show less button (controllers/truncate_controller.js; the description itself is in record_split.css) */
 .record-details__truncate-toggle {
   min-height: 2.75rem;
   padding: 0;

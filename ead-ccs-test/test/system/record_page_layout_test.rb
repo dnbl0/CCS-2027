@@ -86,7 +86,9 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
 
         # The media column stays in view beside the scrolling details on a wide screen (the approved design); nothing else is sticky
         sticky = page.evaluate_script("[...document.querySelectorAll('#main-container *')].filter(e => e.getClientRects().length > 0 && ['sticky', 'fixed'].includes(getComputedStyle(e).position)).map(e => e.className)")
-        assert_equal(width == "desktop" ? [ "record-split__viewer" ] : [], sticky)
+        # sticky exactly when it fits the window under the search strip (media_viewer_controller.js); a taller column scrolls
+        fits = page.evaluate_script("(() => { const v = document.querySelector('.record-split__viewer'); return v.scrollHeight <= window.innerHeight - 60 && window.innerWidth >= 1024 && !!v.querySelector('.digital-assets') })()")
+        assert_equal(fits ? [ "record-split__viewer is-sticky" ] : [], sticky)
 
         small = page.evaluate_script(<<~JS)
           [...document.querySelectorAll('.record-actions button, .record-actions a, .digital-assets__controls-row button, .digital-assets__controls-row a, .digital-assets__strip button, .digital-assets__thumb, .result-stepper a, .record-term')]
@@ -211,5 +213,56 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     order = [ "Zoom in", "Zoom out", "Full screen", "Download image", "University Art Collection", "Save" ].map { |label| texts.index { |text| text.include?(label) } }
     assert_equal order.compact.sort, order.compact, texts.inspect
     assert_operator order.compact.size, :>=, 4, texts.inspect
+  end
+
+  test "Zoom in opens the viewer over the picture without moving anything; it follows the thumbnails, and zooming back out closes it" do
+    open_record(VARIANTS.fetch("several images, view-only"), "desktop")
+    rect = ->(selector) { page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
+    # where the controls row sits in the media column (the page may scroll to the button)
+    row_offset = -> { page.evaluate_script("document.querySelector('.digital-assets__controls-row').getBoundingClientRect().top - document.querySelector('.record-split__viewer').getBoundingClientRect().top") }
+    row = row_offset.call
+
+    click_button "Zoom in"
+    assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all, wait: 10 # the viewer's script loads on first use
+    canvas = rect.call(".deep-zoom__stage .openseadragon-canvas")
+    assert_operator canvas["width"], :>, 100
+    assert_in_delta row, row_offset.call, 1, "the controls row did not move"
+
+    find(".digital-assets__thumb:not([aria-current])", match: :first).click
+    assert_selector ".digital-assets__thumb[aria-current=true][aria-label='Show image 2 of #{THUMBS.size}']"
+    assert_match(/image 2 of/, page.evaluate_script("document.querySelector('.deep-zoom__stage .openseadragon-canvas').getAttribute('aria-label')"))
+    assert_operator rect.call(".deep-zoom__stage .openseadragon-canvas")["width"], :>, 100, "the viewer keeps its size on another image"
+
+    6.times do
+      break unless page.has_selector?(".deep-zoom__stage", visible: true, wait: 0)
+
+      click_button "Zoom out"
+      sleep 0.4
+    end
+    assert_no_selector ".deep-zoom__stage", visible: true
+    assert_selector ".digital-assets__image", visible: true
+  end
+
+  test "a long description is collapsed with Show more, and Show less collapses it again, its paragraphs kept" do
+    open_record({ "description_tsim" => [ "#{'A cabinet of drawers. ' * 30}\n\nMade for the specimen collection." ] }, "desktop")
+
+    toggle = find(".record-split__description button[aria-controls=record-description]")
+    assert_equal [ "false", "Show more" ], [ toggle["aria-expanded"], toggle.text ]
+    assert_no_selector ".record-split__paragraph", text: "Made for the specimen collection."
+
+    toggle.click
+    assert_equal [ "true", "Show less" ], [ toggle["aria-expanded"], toggle.text ]
+    assert_selector "p.record-split__paragraph", text: "Made for the specimen collection."
+
+    toggle.click
+    assert_equal "false", toggle["aria-expanded"]
+    assert_no_selector ".record-split__paragraph", text: "Made for the specimen collection."
+  end
+
+  test "a short description has no Show more" do
+    open_record({ "description_tsim" => [ "A cabinet." ] }, "desktop")
+
+    assert_selector ".record-split__lead", text: "A cabinet."
+    assert_no_selector ".record-split__description button", visible: true
   end
 end

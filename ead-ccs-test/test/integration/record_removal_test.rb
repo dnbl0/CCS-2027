@@ -174,6 +174,7 @@ class RecordRemovalTest < ActionDispatch::IntegrationTest
                 "app/models/dam/index_copy.rb" => "copies one core into another, removed records too (removal is a filter, not a deletion)",
                 "lib/tasks/dam.rake" => "dam:report reads accession numbers for a count; shows no record",
                 "app/models/colour/fetcher.rb" => "downloads DAM thumbnails (Net::HTTP), not Solr",
+                "lib/remote_image_dimensions.rb" => "reads the start of a DAM image (Net::HTTP) for its size, not Solr",
                 "app/models/writable_core.rb" => "colour:* and index:normalise write fields to DAM_SOLR_URL; shows no record",
                 "app/models/geo/nominatim.rb" => "OpenStreetMap Nominatim, not Solr (rake geo:geocode)",
                 "app/models/geo/solr_writer.rb" => "writes place fields to DAM_SOLR_URL; a removed record stays filtered when shown",

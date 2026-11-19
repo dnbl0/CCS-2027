@@ -5,6 +5,10 @@ import { Controller } from "@hotwired/stimulus"
 // zoom in; full screen is for the media section; a thumbnail swaps the large image and is marked as the one on show, and previous
 // and next step through the thumbnails. Without JavaScript the tools and steps never appear and each thumbnail of an open image is
 // a link to its full size.
+//
+// On the record page's split layout the media column stays in view beside the scrolling details only while it fits the window
+// (.record-split__viewer.is-sticky, record_split.css): a column made taller by video, audio or a notice scrolls with the page, so
+// every control in it can be reached.
 export default class extends Controller {
   static targets = [ "stage", "image", "thumb", "step", "tool", "fullscreenButton", "fullscreenLabel" ]
 
@@ -14,10 +18,26 @@ export default class extends Controller {
     this.toolTargets.forEach((tool) => { tool.hidden = false })
     this.stepTargets.forEach((step) => { step.hidden = false })
     if (this.hasFullscreenButtonTarget && document.fullscreenEnabled) this.fullscreenButtonTarget.hidden = false
+    this.column = this.element.closest(".record-split__viewer")
+    if (this.column) {
+      this.onResize = () => this.syncSticky()
+      this.resizeObserver = new ResizeObserver(this.onResize)
+      this.resizeObserver.observe(this.column)
+      window.addEventListener("resize", this.onResize)
+      this.syncSticky()
+    }
   }
 
   disconnect() {
     document.removeEventListener("fullscreenchange", this.onFullscreen)
+    this.resizeObserver?.disconnect()
+    if (this.onResize) window.removeEventListener("resize", this.onResize)
+  }
+
+  // the room above it is the sticky search strip's (60px), which may slide in over the page
+  syncSticky() {
+    const room = window.innerHeight - 60
+    this.column.classList.toggle("is-sticky", this.column.scrollHeight <= room)
   }
 
   zoomIn() { this.dispatch("zoom", { detail: { direction: "in" } }) }

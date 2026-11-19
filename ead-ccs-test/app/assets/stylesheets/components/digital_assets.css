@@ -16,11 +16,9 @@
 .digital-assets__media-area { display: flex; flex-direction: column; align-items: center; gap: var(--ccs-space-4); width: 100%; }
 .digital-assets__main { display: flex; justify-content: center; margin: 0; background: transparent; }
 
-/* Its size is known: the figure keeps the image's shape before and after the image arrives, and the zoom viewer fills the same box */
+/* Its size is known: the figure keeps the image's shape before and after the image arrives (the zoom viewer over it: media_viewer.css) */
 .digital-assets__main--sized { position: relative; aspect-ratio: var(--digital-assets-ratio); }
 .digital-assets__main--sized .digital-assets__image { width: 100%; height: 100%; }
-.digital-assets__main--sized .deep-zoom { position: absolute; inset: 0; }
-.digital-assets__main--sized .deep-zoom__stage { height: 100%; }
 /* the width and height attributes are for the shape only (they hold the space before the image loads) */
 .digital-assets__image { display: block; max-width: 100%; width: auto; height: auto; object-fit: contain; }
 

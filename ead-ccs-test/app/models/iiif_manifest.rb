@@ -4,8 +4,8 @@
 # open them. Built from RecordMedia, so only the images the visitor may be shown are in it; for a withheld record it has none
 # and the controller answers 404 (ManifestsController).
 #
-# One canvas per image, sized from the file's header (a file whose size cannot be read is left out: a canvas without a size is
-# not valid for an image). Each canvas has one painting annotation whose body is the image; when the record carries an IIIF
+# One canvas per image, sized from the file's header: a file on this server is read here, a DAM image from the start of its file
+# (RemoteImageDimensions). An image whose size cannot be read is left out (a canvas without a size is not valid for an image). Each canvas has one painting annotation whose body is the image; when the record carries an IIIF
 # Image API info.json (MediaTypes::IIIF_INFO_FIELD) the body also names the image service so the viewer can ask for tiles.
 # `rights` is a URI from Creative Commons or RightsStatements.org, so it is set only for the licences that map to one
 # (RIGHTS_BY_LICENCE); every manifest also has a requiredStatement with the licence in words.
@@ -22,21 +22,46 @@ class IiifManifest
 
   # media: RecordMedia. base_url: "https://host" (no trailing slash), because IIIF ids are absolute URIs.
   # dimensions: ->(path) { [width, height] or nil }
-  def initialize(media, base_url:, dimensions: ImageDimensions.method(:for_path))
+  def initialize(media, base_url:, dimensions: method(:image_size).to_proc)
     @media = media
     @base = base_url.to_s.chomp("/")
     @dimensions = dimensions
   end
+
+  # An image's size: read from its file when it is on this server, else from the DAM (RemoteImageDimensions, allowed hosts only)
+  def self.image_size(path, remote: RemoteImageDimensions.method(:for_url))
+    ImageDimensions.for_path(path) || remote.call(path)
+  end
+
+  def image_size(path) = self.class.image_size(path)
 
   def id = "#{@base}/catalog/#{ERB::Util.url_encode(@media.document.id)}/manifest.json"
   def record_url = "#{@base}/catalog/#{ERB::Util.url_encode(@media.document.id)}"
 
   # The canvases that can be drawn; none means there is nothing to give
   def canvases
-    @canvases ||= @media.images.filter_map.with_index do |image, index|
-      size = @dimensions.call(image.url)
-      canvas(index + 1, image, *size) if size
+    @canvases ||= begin
+      images = @media.images
+      sizes = sizes_for(images.map(&:url))
+      images.each_with_index.filter_map { |image, index| canvas(index + 1, image, *sizes[index]) if sizes[index] }
     end
+  end
+
+  # Reading a DAM image's size is a request to the DAM (about a second each, the first time): up to SIZE_THREADS are read at once,
+  # so a record of many images still answers in a few seconds. Each thread runs inside the Rails executor (the cache it writes to
+  # may use a database connection).
+  SIZE_THREADS = 6
+
+  def sizes_for(urls)
+    return urls.map { |url| @dimensions.call(url) } if urls.size <= 1
+
+    pool = Concurrent::FixedThreadPool.new([ urls.size, SIZE_THREADS ].min)
+    futures = urls.map do |url|
+      Concurrent::Promises.future_on(pool, url) { |each_url| Rails.application.executor.wrap { @dimensions.call(each_url) } }
+    end
+    futures.map { |future| future.value(15) }
+  ensure
+    pool&.shutdown
   end
 
   def any? = canvases.any?

@@ -25,10 +25,12 @@
 
 @media (min-width: 1024px) {
   .record-split { grid-template-columns: minmax(0, 1fr) minmax(22rem, var(--split-details-width)); align-items: start; }
-  /* The media stays in view while the column beside it scrolls; it never scrolls inside itself. When the sticky search strip has
-     slid in (sticky_search.css, 60px high), the media sits under it rather than behind it. */
-  .record-split__viewer { position: sticky; top: 0; transition: top 0.25s ease; }
-  body:has(.sticky-search.is-visible) .record-split__viewer { top: 3.75rem; }
+  /* The media stays in view while the column beside it scrolls, when it fits the window (is-sticky, set by
+     media_viewer_controller.js; a column made taller by video, audio or a notice scrolls with the page, so its controls can always be
+     reached). It never scrolls inside itself. When the sticky search strip has slid in (sticky_search.css, 60px high), the media sits
+     under it rather than behind it. */
+  .record-split__viewer.is-sticky { position: sticky; top: 0; } /* no transition: the tools must not slide out from under a pointer */
+  body:has(.sticky-search.is-visible) .record-split__viewer.is-sticky { top: 3.75rem; }
   .record-split__details { padding-inline: var(--ccs-space-7); }
 }
 
@@ -38,7 +40,6 @@
 .record--split .digital-assets__main--sized { width: min(100%, calc(var(--viewer-image-max) * var(--digital-assets-ratio))); margin-inline: auto; }
 .record--split .digital-assets__image { width: 100%; max-height: var(--viewer-image-max); }
 .record--split .digital-assets__media { width: 100%; padding-inline: var(--ccs-space-4); }
-.record--split .deep-zoom__stage { background: var(--ccs-surface-subtle); }
 .record--split .access-notice--partly-withheld { margin: var(--ccs-space-4); }
 /* No media: the record's one plain sentence, on the grey surface */
 .record--split .record-split__viewer > :not(.digital-assets) { margin: 0; padding: var(--ccs-space-7) var(--ccs-space-5); background: var(--ccs-surface-subtle); }
@@ -99,9 +100,14 @@
 .record-arrow-link:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
 /* The description: the first paragraph is the lead */
-.record-split__description { display: flex; flex-direction: column; gap: var(--ccs-space-3); }
+/* The description: the first paragraph is the lead; collapsed, the lead is clamped to five lines and the rest hidden
+   (controllers/truncate_controller.js) */
+.record-split__description { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ccs-space-2); }
+.record-split__description-text { display: flex; flex-direction: column; gap: var(--ccs-space-3); }
 .record-split__lead { margin: 0; font-size: var(--ccs-font-size-xl); line-height: 1.55; color: var(--ccs-text-primary); }
-.record-split__text p { margin: 0 0 var(--ccs-space-3); font-size: var(--ccs-font-size-md); line-height: 1.65; color: var(--ccs-text-secondary); }
+.record-split__paragraph { margin: 0; font-size: var(--ccs-font-size-md); line-height: 1.65; color: var(--ccs-text-secondary); }
+.record--split .record-details__truncate-toggle { font-size: var(--ccs-font-size-md); }
+.record-split__description-text.is-collapsed .record-split__lead { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; line-clamp: 5; overflow: hidden; }
 
 /* Object details: label above value, a hairline between rows */
 .record-facts { margin-top: var(--ccs-space-4); }
@@ -156,7 +162,7 @@ a.record-term:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-
 .record-fold .cite--inline .cite__list { display: grid; gap: var(--ccs-space-4); margin: 0; padding: 0; list-style: none; }
 .record-fold .cite--inline .cite__style { margin: 0 0 var(--ccs-space-1); font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
 .record-fold .cite--inline .cite__text { margin: 0 0 var(--ccs-space-2); }
-@media (prefers-reduced-motion: reduce) { .record-fold > summary::after, .record-split__viewer { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .record-fold > summary::after { transition: none; } }
 
 /* ---------------------------------------------------------------- The full-width bands */
 .record-band-heading {

@@ -48,14 +48,14 @@
       <%= render NexusCcs::DebiasNoticeComponent.new(matches: debias_matches, labels: debias_labels) %>
 
       <% if lead %>
-        <div class="record-split__description">
-          <p class="record-split__lead"><%= lead %></p>
-          <% if description_rest.any? %>
-            <div class="record-details__truncate" data-controller="truncate">
-              <div class="record-split__text" data-truncate-target="text"><% description_rest.each do |paragraph| %><p><%= paragraph %></p><% end %></div>
-              <button type="button" class="record-details__truncate-toggle" data-truncate-target="toggle" data-action="truncate#toggle" hidden>Show more</button>
-            </div>
-          <% end %>
+        <div class="record-split__description" data-controller="truncate"
+             data-truncate-more-label-value="<%= t("nexus_ccs.record_page.split.description.more") %>" data-truncate-less-label-value="<%= t("nexus_ccs.record_page.split.description.less") %>">
+          <div class="record-split__description-text" id="record-description" data-truncate-target="text">
+            <p class="record-split__lead" data-truncate-target="lead"><%= lead %></p>
+            <% description_rest.each do |paragraph| %><p class="record-split__paragraph" data-truncate-target="more"><%= paragraph %></p><% end %>
+          </div>
+          <button type="button" class="record-details__truncate-toggle" aria-controls="record-description" aria-expanded="true"
+                  data-truncate-target="toggle" data-action="truncate#toggle" hidden><%= t("nexus_ccs.record_page.split.description.more") %></button>
         </div>
       <% end %>
 

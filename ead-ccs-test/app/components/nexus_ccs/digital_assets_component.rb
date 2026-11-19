@@ -87,9 +87,11 @@ module NexusCcs
     # The one primary action: the main image, to download, when it is an open asset (never a view-only or withheld one: no path is in the markup)
     def download_href = (main&.first if assets_shown? && image_downloadable?(0))
 
-    # The image's width and height attributes (nothing when its size cannot be read), so the page holds its space while it loads
+    # The image's width and height attributes (nothing when its size is not known), so the page holds its space while it loads: read
+    # from the file when it is on this server, or the DAM image's size once it has been read for the IIIF manifest (only the kept
+    # size: drawing the page never asks the DAM)
     def image_size(path)
-      width, height = ImageDimensions.for_path(path)
+      width, height = ImageDimensions.for_path(path) || RemoteImageDimensions.cached(path)
       width ? { width: width, height: height } : {}
     end
 

@@ -34,13 +34,18 @@ module ImageDimensions
   def read(file)
     return unless File.file?(file)
 
-    File.open(file, "rb") do |io|
-      head = io.read(8).to_s
-      if head.start_with?("\x89PNG".b) then png(io)
-      elsif head.start_with?("\xFF\xD8".b) then jpeg(io)
-      end
-    end
+    File.open(file, "rb") { |io| from_io(io) }
   rescue SystemCallError, EOFError
+    nil
+  end
+
+  # [width, height] from an open JPEG or PNG (a file, or the start of one fetched from the DAM: RemoteImageDimensions), or nil
+  def from_io(io)
+    head = io.read(8).to_s
+    if head.start_with?("\x89PNG".b) then png(io)
+    elsif head.start_with?("\xFF\xD8".b) then jpeg(io)
+    end
+  rescue EOFError, TypeError, NoMethodError
     nil
   end
 

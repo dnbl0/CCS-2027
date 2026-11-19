@@ -141,8 +141,9 @@ were removed on both sites). See `docs/styling-inventory.md`.
 
 The approved split layout (Figma "Record page · Approved design (Version 4)", frames 28:2639 desktop and 29:2940 mobile, approved
 19 Nov 2026), in `record_split.css`. From 1024px the media is on the left and the record's own column (33rem) on the right; the media
-column is the page's one sticky element: it stays in view while the column beside it scrolls, and sits under the sticky search strip
-when that has slid in. Below 1024px it is one column, media first, and nothing is sticky. Then three full-width bands.
+column is the page's one sticky element: it stays in view while the column beside it scrolls when it fits the window (`is-sticky`, set
+by `media_viewer_controller.js`; a column made taller by video, audio or a notice scrolls with the page, so its tools can always be
+reached), and sits under the sticky search strip when that has slid in (no transition, so a tool never slides from under a pointer). Below 1024px it is one column, media first, and nothing is sticky. Then three full-width bands.
 
 - **Media** (`DigitalAssetsComponent`): the image whole, at its own shape, on the page's white (no dark band; dark only in full
   screen), sized so the whole column fits the window. Under it a controls row: the licence chip (Creative Commons mark) and the access
@@ -153,7 +154,8 @@ when that has slid in. Below 1024px it is one column, media first, and nothing i
 - **The record's column** (`RecordDocumentComponent`): "Result 3 of 120" with round previous and next (`ResultStepperComponent`,
   Blacklight's search context; first in the column at every width, so the reading order and the tab order agree), the collection (a link), the h1 in Fraunces, maker, date and
   medium; one row of actions (`RecordActionsComponent`: Save, Add to list, Share and embed, Cite, with Compare under it); "Where it is"
-  (placeholder wording: the index holds no location); the notices; the description, its first paragraph as the lead; Object details
+  (placeholder wording: the index holds no location); the notices; the description, its first paragraph as the lead, collapsed with
+  Show more / Show less (the lead clamped to five lines, the paragraphs after it hidden; `truncate_controller.js`); Object details
   as label above value, names of things as outlined terms that open their search or browse page, the UoM ID with Copy last; then four
   folding sections (Copyright and reuse, Media details, How to cite this record, Acquisition and history), closed in the markup.
 - **Bands**: Related objects (`SimilarRecordsComponent`, three result cards in a lazy frame); More from the collections

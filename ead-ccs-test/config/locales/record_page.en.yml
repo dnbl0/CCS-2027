@@ -55,6 +55,9 @@ en:
       split:
         actions: "Actions for this record"
         uom_id: "UoM ID"
+        description:
+          more: "Show more"
+          less: "Show less"
         extra:
           creator_ssim: "Maker"
           date_era_ssim: "Era"

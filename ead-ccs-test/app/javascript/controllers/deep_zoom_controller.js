@@ -20,7 +20,8 @@ export default class extends Controller {
     this.destroy()
   }
 
-  get image() { return this.element.closest("figure")?.querySelector("img.digital-assets__image") }
+  get figure() { return this.element.closest("figure") }
+  get image() { return this.figure?.querySelector("img.digital-assets__image") }
   get active() { return this.viewer !== null }
 
   // media-viewer:zoom, from the round tools
@@ -39,6 +40,8 @@ export default class extends Controller {
     this.starting = true
     try {
       this.tools = await import("controllers/deep_zoom_viewer")
+      // the viewer keeps the picture area's height, so opening it moves nothing below (media_viewer.css)
+      this.figure?.style.setProperty("--zoom-height", `${Math.round(this.figure.getBoundingClientRect().height)}px`)
       const source = this.sourceFor(this.image?.getAttribute("src"))
       this.viewer = await this.tools.createViewer(this.stageTarget, source, { label: this.image?.alt })
       this.element.classList.add("is-active")
@@ -48,6 +51,7 @@ export default class extends Controller {
     } catch (_) {
       this.viewer = null // the viewer could not load: the plain image stays
       this.element.classList.remove("is-active")
+      this.figure?.style.removeProperty("--zoom-height")
       return false
     } finally {
       this.starting = false
@@ -58,6 +62,7 @@ export default class extends Controller {
     this.destroy()
     this.element.classList.remove("is-active")
     this.stageTarget.hidden = true
+    this.figure?.style.removeProperty("--zoom-height")
   }
 
   destroy() {
