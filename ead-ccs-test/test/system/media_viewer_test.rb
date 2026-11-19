@@ -21,36 +21,32 @@ class MediaViewerTest < ApplicationSystemTestCase
 
   def sideways_scroll = page.evaluate_script("document.documentElement.scrollWidth - document.documentElement.clientWidth")
 
-  test "Zoom and pan swaps the image for a viewer that the keyboard can operate, and closing it puts the image back" do
+  test "Zoom in swaps the image for a viewer the keyboard can operate; zooming back out past the whole picture puts the image back" do
     visit "/catalog/#{MULTI}"
     assert_no_selector ".deep-zoom__stage", visible: true
-    click_button "Zoom and pan"
+    click_button "Zoom in"
 
     assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all
-    assert_selector "button[aria-pressed=true]", text: "Zoom and pan"
     assert_no_selector ".digital-assets__image", visible: true
     assert_equal "group", page.evaluate_script("document.querySelector('.deep-zoom__stage .openseadragon-canvas').getAttribute('role')")
     assert_match(/Arrow keys pan/, page.evaluate_script("document.querySelector('.deep-zoom__stage .openseadragon-canvas').getAttribute('aria-label')"))
-    assert page.evaluate_script("document.activeElement === document.querySelector('.deep-zoom__stage .openseadragon-canvas')"), "focus moves into the viewer"
-
-    click_button "Zoom in"
-    click_button "Zoom out"
-    click_button "Reset view"
+    assert page.evaluate_script("document.activeElement.matches('.digital-assets__tools button')"), "focus stays on the tool, so it can be pressed again"
     assert_accessible
 
-    click_button "Zoom and pan"
+    click_button "Zoom out" # back to the whole picture
+    click_button "Zoom out" # past it: the viewer closes
     assert_selector ".digital-assets__image", visible: true
-    assert_equal "false", find_button("Zoom and pan")["aria-pressed"]
-    assert page.evaluate_script("document.activeElement === document.querySelector('.deep-zoom__toggle')"), "focus returns to the toggle"
+    assert_no_selector ".deep-zoom__stage", visible: true
   end
 
-  test "the thumbnail of another image opens it in the viewer when zoom is on" do
+  test "the thumbnail of another image opens it in the viewer when zoom is on, and is marked as the one on show" do
     visit "/catalog/#{MULTI}"
-    click_button "Zoom and pan"
+    click_button "Zoom in"
     assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all
-    first(".digital-assets__other").click
+    find(".digital-assets__thumb:not([aria-current])", match: :first).click
     assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all
     assert_match(/image 2 of 2/, page.evaluate_script("document.querySelector('.deep-zoom__stage .openseadragon-canvas').getAttribute('aria-label')"))
+    assert_selector ".digital-assets__thumb[aria-current=true][aria-label='Show image 2 of 2']"
   end
 
   def pane_zoom(index) = page.evaluate_script("Number(document.querySelectorAll('.compare-pane')[#{index}].dataset.zoom || 0)")

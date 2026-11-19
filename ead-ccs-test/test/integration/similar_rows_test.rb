@@ -60,7 +60,7 @@ class SimilarRowsIntegrationTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#more-creator[target=_top]" do
       assert_select "h2", count: 0
       assert_operator css_select("li.discover-cards__item").size, :<=, 3
-      assert_select "h4 a[href='/catalog/emu-a']"
+      assert_select "h3 a[href='/catalog/emu-a']"
       assert_select "a.record-arrow-link[href*='f%5Bcreator_ssim%5D%5B%5D=Lees%2C+Derwent']", text: "See all records for Lees, Derwent"
     end
   end

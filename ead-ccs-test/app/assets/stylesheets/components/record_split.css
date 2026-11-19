@@ -288,3 +288,4 @@ a.record-term:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-
   color: var(--ccs-text-link); text-decoration: underline; cursor: pointer;
 }
 .record--split .record-actions__compare .compare-actions__form { display: inline; margin: 0; }
+.record-about-band__source { margin-top: var(--ccs-space-4); }

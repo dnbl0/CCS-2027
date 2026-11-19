@@ -5,7 +5,7 @@ module NexusCcs
   # improve this record (the correction link goes where contacting the team does: the collection's email address or its form, or the
   # Help page's Contact us section, so it adds no new page); Content notice (the advisory every record carries); Use this record (the
   # persistent link with a Copy button, the details as a spreadsheet when the record may be downloaded, and the IIIF manifest when the
-  # visitor may see its images). Wording marked PLACEHOLDER in config/locales/record_page.en.yml.
+  # visitor may see its images; then View full record, the record in its source catalogue behind the leaving-site dialog). Wording marked PLACEHOLDER in config/locales/record_page.en.yml.
   class RecordAboutComponent < ViewComponent::Base
     def initialize(document:, url:)
       @document = document

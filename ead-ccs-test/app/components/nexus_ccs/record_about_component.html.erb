@@ -24,6 +24,8 @@
           <% if export_path %><li><a href="<%= export_path %>"><%= t("nexus_ccs.metadata_export.link") %></a></li><% end %>
           <% if manifest_path %><li><a href="<%= manifest_path %>" type="application/ld+json"><%= t("nexus_ccs.record_page.split.about.use.iiif") %></a></li><% end %>
         </ul>
+        <%# The record in its source catalogue, behind the leaving-site dialog %>
+        <div class="record-about-band__source persistent-link__browser"><%= render NexusCcs::ViewFullRecordComponent.new(document: document, action: nil) %></div>
         <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
       </div>
     </div>
