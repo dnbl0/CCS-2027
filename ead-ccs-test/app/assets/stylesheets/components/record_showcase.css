@@ -15,16 +15,11 @@
 .record-showcase__stepper-inner { max-width: var(--showcase-width); margin: 0 auto; padding: var(--ccs-space-3) var(--ccs-space-4) 0; }
 .record-showcase__stepper .selection-stepper { margin: var(--ccs-space-2) 0 0; }
 
-/* The band: the image whole and centred, its tools and thumbnails under it */
-.record-showcase__hero { background: var(--ccs-surface-subtle); padding: var(--ccs-space-5) var(--ccs-space-4) calc(var(--ccs-space-8) + var(--ccs-space-6)); }
-.record-showcase__hero-inner { max-width: 60rem; margin: 0 auto; }
-.record--showcase .digital-assets__stage { padding: 0; background: transparent; }
-.record--showcase .digital-assets__main { width: 100%; }
-.record--showcase .digital-assets__main--sized { width: min(100%, calc(min(70vh, 38rem) * var(--digital-assets-ratio))); margin-inline: auto; }
-.record--showcase .digital-assets__image { width: 100%; max-height: min(70vh, 38rem); box-shadow: var(--ccs-shadow-md); background: var(--ccs-surface-default); }
-.record--showcase .digital-assets__controls-row { max-width: 60rem; margin: var(--ccs-space-4) auto 0; }
-.record--showcase .digital-assets__strip { justify-content: center; background: transparent; }
-.record--showcase .record-showcase__hero-inner > :not(.digital-assets) { margin: 0; padding: var(--ccs-space-7) var(--ccs-space-5); background: var(--ccs-surface-default); }
+/* The band: the media viewer (digital_assets.css) edge to edge, then grey room for the card to overlap, so the card never covers
+   the controls bar or the thumbnails */
+.record-showcase__hero { background: var(--ccs-surface-subtle); padding: 0 0 calc(var(--ccs-space-8) + var(--ccs-space-6)); }
+.record-showcase__hero-inner { width: 100%; }
+.record--showcase .record-showcase__hero-inner > :not(.digital-assets) { margin: var(--ccs-space-5) var(--ccs-space-4) 0; padding: var(--ccs-space-7) var(--ccs-space-5); background: var(--ccs-surface-default); }
 
 /* The card, over the band's lower edge */
 .record-showcase__card {

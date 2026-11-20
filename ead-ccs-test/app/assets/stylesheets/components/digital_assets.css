@@ -1,114 +1,197 @@
 /*
- * A record's media (the Figma "Object viewer"): the large image shown whole at its own shape on the page surface, a controls row
- * under it (licence and access chips on the left, round tools on the right) and, with several images, a strip of every thumbnail with
- * previous and next. Dark only in full screen and in the zoom viewer (media_viewer.css). The record page's layout of it is in
- * record_split.css. Markup: NexusCcs::DigitalAssetsComponent; behaviour: controllers/media_viewer_controller.js.
+ * The record's media viewer (Figma "Media viewer", after Europeana's item viewer): the media information on the left at the viewer's
+ * full height, the stage (text/primary) with its controls bar along the bottom, and the numbered thumbnails on the right (a strip
+ * under the stage when the viewer is narrower than 1024px). Sized by the viewer's own width (a container query), not the window's.
+ * Markup: NexusCcs::DigitalAssetsComponent; behaviour: controllers/media_viewer_controller.js and deep_zoom_controller.js.
  */
 .digital-assets {
-  --viewer-control: 2.75rem;  /* 44px round tools */
-  --viewer-thumb: 4rem;       /* 64px thumbnails; 48px on a phone */
+  --mv-height: clamp(20rem, 70vh, 45rem);   /* the viewer at ≥ 1024px: 720px at most */
+  --mv-stage: clamp(16rem, 60cqi, 30rem);  /* the stage below 1024px */
+  --mv-bar: 3.25rem;                        /* 52px: the controls bar and the panels' footers line up */
+  --mv-info: 20rem;                         /* 320px: the media information */
+  --mv-thumbs: 13rem;                       /* 208px: the thumbnails column */
+  --mv-control: 2.5rem;                     /* 40px targets (WCAG 2.5.8) */
+  --mv-bar-border: var(--ccs-navy-600);     /* Figma stroke/strong, the bar's top border */
+  container: media-viewer / inline-size;
   margin: 0;
-  background: var(--ccs-surface-default);
+  background: var(--ccs-surface-subtle);
+  color: var(--ccs-text-primary);
 }
-@media (max-width: 1023px) { .digital-assets { --viewer-thumb: var(--ccs-space-8); } }
 
-.digital-assets__stage { position: relative; }
-.digital-assets__media-area { display: flex; flex-direction: column; align-items: center; gap: var(--ccs-space-4); width: 100%; }
-.digital-assets__main { display: flex; justify-content: center; margin: 0; background: transparent; }
+/* --- Layout: stage | thumbs, with the media information laid over the left ------------------------------------------------
+   The panel slides over the left of the viewer at its full height rather than taking a column, so opening it never moves the image. */
+.media-viewer__body {
+  position: relative;
+  display: grid;
+  grid-template-areas: "stage" "thumbs";
+  grid-template-columns: minmax(0, 1fr);
+}
+.media-viewer__stage { grid-area: stage; height: var(--mv-stage); }
+.media-viewer__thumbs { grid-area: thumbs; }
+.media-viewer--single .media-viewer__body { grid-template-areas: "stage"; }
+.media-viewer__info {
+  position: absolute; top: 0; left: 0; z-index: 2; width: 100%; height: var(--mv-stage);  /* below 600px: covers the stage */
+  box-shadow: var(--ccs-shadow-lg);
+}
+@container media-viewer (min-width: 600px) {
+  .media-viewer__info { width: var(--mv-info); border-right: 1px solid var(--ccs-border-subtle); }
+}
+@container media-viewer (min-width: 1024px) {
+  .media-viewer__body { grid-template-areas: "stage thumbs"; grid-template-columns: minmax(0, 1fr) auto; height: var(--mv-height); }
+  .media-viewer__stage { height: auto; min-height: 0; }
+  .media-viewer__info { height: 100%; }
+  .media-viewer__thumbs { width: var(--mv-thumbs); min-height: 0; border-left: 1px solid var(--ccs-border-subtle); }
+  .media-viewer--single .media-viewer__body { grid-template-areas: "stage"; grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .media-viewer__info:not([hidden]) { animation: media-viewer-info-in 160ms ease-out; }
+}
+@keyframes media-viewer-info-in { from { transform: translateX(-1rem); opacity: 0; } }
 
-/* Its size is known: the figure keeps the image's shape before and after the image arrives (the zoom viewer over it: media_viewer.css) */
-.digital-assets__main--sized { position: relative; aspect-ratio: var(--digital-assets-ratio); }
-.digital-assets__main--sized .digital-assets__image { width: 100%; height: 100%; }
-/* the width and height attributes are for the shape only (they hold the space before the image loads) */
-.digital-assets__image { display: block; max-width: 100%; width: auto; height: auto; object-fit: contain; }
-
+/* --- Stage: the asset, fitted whole, on text/primary, the controls bar along its bottom -------------------------------------- */
+.media-viewer__stage { display: flex; flex-direction: column; min-width: 0; background: var(--ccs-text-primary); color: var(--ccs-text-inverse); }
+.media-viewer__canvas { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.media-viewer .digital-assets__main { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; }
+.media-viewer .digital-assets__image { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+.media-viewer .digital-assets__main:has(.deep-zoom.is-active) { width: auto; height: auto; }
+.media-viewer .deep-zoom__stage { background: transparent; }
+/* A notice, the sensitivity gate or a file's own viewer, centred on the stage in light text */
+.media-viewer__canvas:not(:has(.digital-assets__main)) { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--ccs-space-4); padding: var(--ccs-space-5); overflow-y: auto; }
+.media-viewer__canvas > .access-notice,
+.media-viewer__canvas > .sensitivity-gate { max-width: 32rem; margin: 0; background: var(--ccs-surface-default); color: var(--ccs-text-primary); }
 .digital-assets__media { margin: 0; text-align: center; }
-.digital-assets__video { max-width: 100%; max-height: 70vh; }
-.digital-assets__audio { width: 100%; max-width: 40rem; }
-.digital-assets__media figcaption, .digital-assets__pdf { color: inherit; margin-top: var(--ccs-space-2); }
+.digital-assets__video { max-width: 100%; max-height: 100%; }
+.digital-assets__audio { width: min(100%, 30rem); }
+.digital-assets__media figcaption, .digital-assets__pdf { margin-top: var(--ccs-space-2); color: inherit; }
 
-/* The controls row: chips on the left, round tools on the right */
-.digital-assets__controls-row {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ccs-space-3);
-  padding: var(--ccs-space-2) var(--ccs-space-4);
+/* The zoom readout, top-left of the canvas while zoomed in */
+.media-viewer__readout {
+  position: absolute; top: var(--ccs-space-4); left: var(--ccs-space-4); z-index: 1; display: inline-flex; align-items: center; gap: var(--ccs-space-2);
+  margin: 0; padding: var(--ccs-space-1) var(--ccs-space-2); border-radius: var(--ccs-radius-sm); background: var(--ccs-surface-default);
+  box-shadow: var(--ccs-shadow-md); color: var(--ccs-text-primary); font-size: var(--ccs-font-size-sm); pointer-events: none;
 }
-@media (min-width: 1024px) { .digital-assets__controls-row { padding-inline: var(--ccs-space-5); } }
-.digital-assets__chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-2); min-width: 0; }
-.digital-assets__chips > * { margin: 0; }
+.media-viewer__readout[hidden] { display: none; }
+.media-viewer__readout-level { font-weight: var(--ccs-font-weight-semibold); font-variant-numeric: tabular-nums; }
+.media-viewer__readout-hint { color: var(--ccs-text-secondary); }
+
+/* The controls bar (Figma "Media viewer/Controls bar"): ⋮ | tools centred | end */
+.media-viewer__bar {
+  display: grid; grid-template-columns: var(--mv-control) minmax(0, 1fr) auto; align-items: center; gap: var(--ccs-space-2);
+  min-height: var(--mv-bar); padding: var(--ccs-space-1) var(--ccs-space-2);
+  background: var(--ccs-text-primary); border-top: 1px solid var(--mv-bar-border);
+}
+.media-viewer__bar-start, .media-viewer__bar-end { display: flex; align-items: center; gap: var(--ccs-space-1); }
+.media-viewer__bar-end { min-width: var(--mv-control); justify-content: flex-end; }
+.media-viewer__bar-tools { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; }
+.media-viewer__group { display: flex; align-items: center; gap: var(--ccs-space-1); padding-inline: var(--ccs-space-2); }
+.media-viewer__group[hidden] { display: none; }
+.media-viewer__group + .media-viewer__group { border-left: 1px solid rgb(255 255 255 / 40%); }
+
+/* A control (Figma "Media viewer/Control"): a 24px icon in a 40px target; On dark in the bar, On light in the panels */
+.viewer-control {
+  display: inline-flex; flex: none; align-items: center; justify-content: center; width: var(--mv-control); height: var(--mv-control);
+  padding: 0; border: 0; border-radius: var(--ccs-radius-sm); background: transparent; color: var(--ccs-text-inverse);
+  cursor: pointer; text-decoration: none;
+}
+.viewer-control[hidden] { display: none; }
+.viewer-control:hover { background: rgb(255 255 255 / 16%); color: var(--ccs-text-inverse); }
+.viewer-control:focus-visible { outline: 2px solid var(--ccs-text-inverse); outline-offset: -2px; }
+.viewer-control[aria-disabled="true"] { cursor: not-allowed; }
+.viewer-control[aria-disabled="true"] svg { opacity: 0.4; }
+.viewer-control[aria-disabled="true"]:hover { background: transparent; }
+.viewer-control--light { color: var(--ccs-text-primary); }
+.viewer-control--light:hover { background: var(--ccs-surface-subtle); color: var(--ccs-text-primary); }
+.viewer-control--light:focus-visible { outline-color: var(--ccs-focus-ring); }
+.media-viewer__icon-on, .is-fullscreen .media-viewer__icon-off { display: none; }
+.is-fullscreen .media-viewer__icon-on { display: contents; }
+
+/* --- Media information (Figma "Media viewer/Information panel") ------------------------------------------------------------- */
+.media-viewer__info { display: flex; flex-direction: column; min-height: 0; background: var(--ccs-surface-default); color: var(--ccs-text-primary); }
+.media-viewer__info[hidden] { display: none; }
+.media-viewer__info-heading {
+  margin: 0; padding: var(--ccs-space-5) var(--ccs-space-5) var(--ccs-space-4); border-bottom: 1px solid var(--ccs-border-subtle);
+  font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold);
+}
+.media-viewer__info-heading:focus { outline: none; }
+.media-viewer__info-heading:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: -2px; }
+.media-viewer__fields { flex: 1; min-height: 0; margin: 0; overflow-y: auto; }
+.media-viewer__fields:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: -2px; }
+.media-viewer__field { padding: var(--ccs-space-4) var(--ccs-space-5); border-bottom: 1px solid var(--ccs-border-subtle); }
+.media-viewer__field dt { font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-regular); color: var(--ccs-text-secondary); }
+.media-viewer__field dd { margin: var(--ccs-space-1) 0 0; font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); overflow-wrap: anywhere; }
+.media-viewer__info-footer { display: flex; align-items: center; min-height: var(--mv-bar); padding: var(--ccs-space-1) var(--ccs-space-2); border-top: 1px solid var(--ccs-border-subtle); }
+
+/* --- Thumbnails (Figma "Media viewer/Thumbnails panel" and "Thumbnail") ------------------------------------------------------- */
+.media-viewer__thumbs { display: flex; flex-direction: column; background: var(--ccs-surface-default); border-top: 1px solid var(--ccs-border-subtle); }
+.media-viewer__thumbs[hidden] { display: none; }
+.media-viewer__thumb-list {
+  display: flex; gap: var(--ccs-space-4); margin: 0; padding: var(--ccs-space-4); list-style: none;
+  overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: thin;
+}
+.media-viewer__thumb-list li { flex: none; scroll-snap-align: start; }
+@container media-viewer (min-width: 1024px) {
+  .media-viewer__thumbs { border-top: 0; }
+  .media-viewer__thumb-list { flex: 1; flex-direction: column; min-height: 0; overflow-x: hidden; overflow-y: auto; scroll-snap-type: y proximity; }
+}
+.digital-assets__thumb {
+  position: relative; display: block; width: 11rem; height: 8.25rem; padding: 0; overflow: hidden;
+  border: 0; background: var(--ccs-surface-subtle); color: var(--ccs-text-primary); cursor: pointer;
+}
+@container media-viewer (min-width: 1024px) { .digital-assets__thumb { height: auto; aspect-ratio: auto; } }
+.digital-assets__thumb-image { display: block; width: 100%; height: 100%; object-fit: cover; }
+@container media-viewer (min-width: 1024px) { .digital-assets__thumb-image { height: auto; max-height: 15rem; } }
+/* The one on show: a 4px navy frame inside the picture and a solid navy number, so it reads at a glance; the keyboard focus ring is
+   blue and outside the frame, so the two never look alike and can show together */
+.digital-assets__thumb::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+.digital-assets__thumb:hover::after { box-shadow: inset 0 0 0 2px var(--ccs-border-strong); }
+.digital-assets__thumb[aria-current="true"]::after { box-shadow: inset 0 0 0 4px var(--ccs-text-brand); }
+.digital-assets__thumb[aria-current="true"] .digital-assets__thumb-number { background: var(--ccs-text-brand); color: var(--ccs-text-inverse); }
+.digital-assets__thumb:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
+.digital-assets__thumb-number, .digital-assets__thumb-kind {
+  position: absolute; bottom: var(--ccs-space-2); display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.5rem; height: 1.5rem; padding: 0 var(--ccs-space-2); border-radius: var(--ccs-radius-sm); background: var(--ccs-surface-default);
+  font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); font-variant-numeric: tabular-nums; line-height: 1;
+}
+.digital-assets__thumb-number { left: var(--ccs-space-2); }
+.digital-assets__thumb-kind { right: var(--ccs-space-2); padding: 0; }
+.media-viewer__thumbs-footer {
+  display: flex; align-items: center; justify-content: flex-end; gap: var(--ccs-space-1); min-height: var(--mv-bar);
+  padding: var(--ccs-space-1) var(--ccs-space-2); border-top: 1px solid var(--ccs-border-subtle);
+}
+.media-viewer__thumbs-footer[hidden] { display: none; }
+.media-viewer__divider { width: 1px; height: 1.25rem; margin-inline: var(--ccs-space-1); background: var(--ccs-border-default); }
+
+/* --- Under the viewer: licence, access and classification; other files; the partly-withheld notice ----------------------------- */
+.media-viewer__caption { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-2); padding: var(--ccs-space-3) var(--ccs-space-4); }
+.media-viewer__caption > * { margin: 0; }
+.media-viewer__media { display: grid; gap: var(--ccs-space-4); padding: 0 var(--ccs-space-4) var(--ccs-space-4); }
 .viewer-chip {
   display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: var(--ccs-space-6); margin: 0;
-  padding: 0 var(--ccs-space-3) 0 var(--ccs-space-2); border-radius: var(--ccs-radius-pill); background: var(--ccs-surface-subtle);
+  padding: 0 var(--ccs-space-3) 0 var(--ccs-space-2); border-radius: var(--ccs-radius-pill); background: var(--ccs-surface-default);
   font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-tight); color: var(--ccs-text-brand);
 }
 .viewer-chip svg { flex: none; width: var(--ccs-font-size-lg); height: var(--ccs-font-size-lg); }
 .viewer-chip:not(:has(svg)) { padding-left: var(--ccs-space-3); }
-.digital-assets__tools { display: flex; align-items: center; gap: var(--ccs-space-3); }
-
-/* The round control (Figma Media / Control): Filled navy, 44px; Ghost in the thumbnail strip, 32px wide and 44px tall (above the
-   24px minimum target, WCAG 2.5.8) */
-.viewer-control {
-  display: inline-flex; align-items: center; justify-content: center; flex: none;
-  width: var(--viewer-control); height: var(--viewer-control); padding: 0;
-  border: 0; border-radius: var(--ccs-radius-pill); background: var(--ccs-surface-brand); color: var(--ccs-text-inverse);
-  cursor: pointer; text-decoration: none;
-}
-.viewer-control[hidden] { display: none; }
-.viewer-control:hover { background: var(--ccs-surface-brand-strong); color: var(--ccs-text-inverse); }
-.viewer-control:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
-.viewer-control--ghost { width: var(--ccs-space-6); background: transparent; color: var(--ccs-text-brand); }
-.viewer-control--ghost:hover { background: var(--ccs-surface-raised); color: var(--ccs-text-brand); }
-
-/* The thumbnail strip: the one on show has a 3px border and aria-current */
-.digital-assets__strip {
-  display: flex; align-items: center; justify-content: center; gap: var(--ccs-space-2);
-  padding: var(--ccs-space-3) var(--ccs-space-2); background: var(--ccs-surface-subtle);
-}
-@media (min-width: 1024px) { .digital-assets__strip { padding-inline: var(--ccs-space-5); } }
-.digital-assets__thumbs {
-  display: flex; gap: var(--ccs-space-2); min-width: 0; margin: 0; padding: 2px; list-style: none;
-  overflow-x: auto; scrollbar-width: thin; scroll-snap-type: x proximity;
-}
-.digital-assets__thumbs li { flex: none; scroll-snap-align: start; }
-.digital-assets__thumb {
-  display: block; position: relative; width: var(--viewer-thumb); height: var(--viewer-thumb); padding: 0;
-  border: 0; background: var(--ccs-surface-default); opacity: 0.75; cursor: pointer;
-}
-.digital-assets__thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.digital-assets__thumb::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 0 var(--ccs-border-brand); pointer-events: none; }
-.digital-assets__thumb:hover { opacity: 1; }
-.digital-assets__thumb:hover::after { box-shadow: inset 0 0 0 1px var(--ccs-border-brand); }
-.digital-assets__thumb[aria-current="true"] { opacity: 1; }
-.digital-assets__thumb[aria-current="true"]::after { box-shadow: inset 0 0 0 3px var(--ccs-border-brand); }
-.digital-assets__thumb:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; opacity: 1; }
-
-/* Full screen: the picture fills the screen on a dark surface */
-.digital-assets.is-fullscreen { display: flex; flex-direction: column; background: var(--ccs-surface-brand-strong); }
-.digital-assets.is-fullscreen .digital-assets__stage { flex: 1; display: flex; align-items: center; justify-content: center; background: transparent; }
-.digital-assets.is-fullscreen .digital-assets__image,
-.digital-assets.is-fullscreen .digital-assets__main--sized { max-height: calc(100vh - 10rem); }
-.digital-assets.is-fullscreen .digital-assets__controls-row { background: var(--ccs-surface-default); }
-
-/* The licence chip is a link to the Use and access panel */
 a.viewer-chip--link { text-decoration: none; }
 a.viewer-chip--link:hover span { text-decoration: underline; }
 a.viewer-chip--link:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.media-viewer .access-notice--partly-withheld { margin: 0 var(--ccs-space-4) var(--ccs-space-4); }
 
-/* The media information (CCS-422): over the right of the image, under its own close button; a full-width sheet on a phone */
-.digital-assets__stage { position: relative; }
-.digital-assets__panel {
-  position: absolute; inset: var(--ccs-space-3) var(--ccs-space-3) var(--ccs-space-3) auto; z-index: var(--ccs-z-raised);
-  width: min(22rem, calc(100% - 2 * var(--ccs-space-3))); overflow-y: auto; padding: var(--ccs-space-4);
-  background: var(--ccs-surface-default); box-shadow: var(--ccs-shadow-lg); color: var(--ccs-text-primary);
-}
-.digital-assets__panel[hidden] { display: none; }
-.digital-assets__panel-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ccs-space-3); margin-bottom: var(--ccs-space-3); }
-.digital-assets__panel-title { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-heading-weight-strong); color: var(--ccs-text-brand); }
-.digital-assets__panel-list { display: grid; gap: var(--ccs-space-3); margin: 0; font-size: var(--ccs-font-size-ui); }
-.digital-assets__panel-list dt { font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
-.digital-assets__panel-list dd { margin: 0; overflow-wrap: anywhere; }
+/* --- Full screen: the whole viewer fills the screen ------------------------------------------------------------------------- */
+.digital-assets.is-fullscreen { --mv-height: 100dvh; display: flex; flex-direction: column; overflow: auto; }
+.digital-assets.is-fullscreen .media-viewer__body { flex: 1; height: 100dvh; }
+.digital-assets.is-fullscreen .media-viewer__caption,
+.digital-assets.is-fullscreen .media-viewer__media { display: none; }
 
 /* Download (CCS-67): the essential information first */
 .digital-assets__download { display: contents; }
-.digital-assets__essential { display: grid; gap: var(--ccs-space-3); margin: 0 0 var(--ccs-space-4); }
+.digital-assets__essential { display: grid; gap: var(--ccs-space-3); margin: 0 0 var(--ccs-space-4); color: var(--ccs-text-primary); }
 .digital-assets__essential dt { font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
 .digital-assets__essential dd { margin: 0; overflow-wrap: anywhere; }
+
+@media (forced-colors: active) {
+  .media-viewer__bar { border-top-color: CanvasText; }
+  .viewer-control:focus-visible, .digital-assets__thumb:focus-visible { outline-color: Highlight; }
+  /* shadows are dropped in forced colours: the one on show keeps a visible frame */
+  .digital-assets__thumb[aria-current="true"] { outline: 4px solid Highlight; outline-offset: -4px; }
+}

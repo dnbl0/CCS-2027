@@ -113,32 +113,41 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_equal "H1", page.evaluate_script("document.querySelector('#main-container h1, #main-container header h1').tagName")
   end
 
-  test "the media sits on the page's white, whole, with no dark band and no minimum height; dark only in full screen" do
+  test "the image sits whole on the stage's text/primary, the bar under it with its stroke/strong top border; the viewer is at most 720px tall" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
 
-    background = page.evaluate_script("getComputedStyle(document.querySelector('.digital-assets')).backgroundColor")
-    assert_includes [ "rgba(0, 0, 0, 0)", "rgb(255, 255, 255)" ], background
-    assert_equal "0px", page.evaluate_script("getComputedStyle(document.querySelector('.digital-assets__stage')).minHeight")
+    assert_equal "rgb(34, 34, 34)", page.evaluate_script("getComputedStyle(document.querySelector('.media-viewer__stage')).backgroundColor")
+    assert_equal [ "rgb(101, 108, 139)", "1px" ], page.evaluate_script("(() => { const s = getComputedStyle(document.querySelector('.media-viewer__bar')); return [s.borderTopColor, s.borderTopWidth] })()")
+    assert_operator page.evaluate_script("document.querySelector('.media-viewer__body').getBoundingClientRect().height"), :<=, 720
     image = page.evaluate_script("(() => { const i = document.querySelector('.digital-assets__image'); return [i.clientHeight, window.innerHeight, getComputedStyle(i).objectFit] })()")
     assert_operator image[0], :<=, image[1] * 0.71
     assert_equal "contain", image[2]
   end
 
-  test "an open record's controls row has the access chip, the licence, named round tools and the one Download; a view-only record has no download link anywhere" do
+  test "an open record's controls bar has the named controls and the one Download; a view-only record has no download link anywhere" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
-    assert_selector ".digital-assets__controls-row .viewer-chip--open", text: "Open: view and download"
-    assert_selector ".digital-assets__controls-row button.viewer-control", text: "Zoom in"
+    assert_selector ".media-viewer__caption .viewer-chip--open", text: "Open: view and download"
+    assert_selector ".media-viewer__bar button.viewer-control[aria-label='Zoom in']"
     # CCS-67: Download shows the essential information (caption, licence) to copy, then downloads
-    find(".digital-assets__controls-row button.viewer-control", text: "Download image").click
+    find(".media-viewer__bar button.viewer-control[aria-label^='Download image']").click
     assert_selector "dialog[open] h2", text: "Before you download"
     assert_selector "dialog[open] .digital-assets__essential dt", text: "Caption"
     assert_selector "dialog[open] a.btn[download]", text: "Download image"
     find("dialog[open] .modal-footer button", text: "Close").click
     assert_no_selector "dialog[open]"
-    # CCS-422: the i tool opens the media information over the image; Escape closes it and focus returns to the tool
+    # CCS-422: ⋮ opens the media information over the left of the viewer at its full height; focus moves to its heading; Escape
+    # closes it and focus returns to ⋮
+    image_box = "(() => { const r = document.querySelector('.digital-assets__image').getBoundingClientRect(), v = document.querySelector('.media-viewer__body').getBoundingClientRect(); return [Math.round(r.left - v.left), Math.round(r.top - v.top), Math.round(r.width), Math.round(r.height)] })()"
+    image_before = page.evaluate_script(image_box)
     find("button.viewer-control[aria-controls=media-information]").click
     assert_selector "#media-information h3", text: "Media information"
     assert_equal "true", find("button.viewer-control[aria-controls=media-information]")["aria-expanded"]
+    assert_equal "media-information-heading", page.evaluate_script("document.activeElement.id")
+    panel, body = %w[#media-information .media-viewer__body].map { |sel| page.evaluate_script("document.querySelector('#{sel}').getBoundingClientRect().toJSON()") }
+    assert_in_delta body["height"], panel["height"], 1, "the panel is the viewer's full height"
+    assert_equal 0, page.evaluate_script("document.getElementById('media-information').offsetLeft"), "the panel is on the left (its layout box: the slide-in is a transform)"
+    assert_equal image_before, page.evaluate_script(image_box), "opening the panel does not move the image"
+    assert page.evaluate_script("document.querySelector('[aria-controls=media-information]').inert"), "⋮ is under the panel, so it leaves the tab order"
     page.send_keys(:escape)
     assert_no_selector "#media-information"
     assert page.evaluate_script("document.activeElement.getAttribute('aria-controls') === 'media-information'")
@@ -157,7 +166,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
       assert_selector ".digital-assets__main img[src^='#{LARGE.first}']"
       assert_selector ".digital-assets .access-notice--partly-withheld", text: "1 other digital asset of this record is not shown here"
       assert_selector ".access-notice--partly-withheld a[href='/access_requests/new?document_id=emu-9044']", text: "Request access to it"
-      assert_selector ".digital-assets__controls-row button.viewer-control", text: "Download image"
+      assert_selector ".media-viewer__bar button.viewer-control[aria-label^='Download image']"
       assert_selector ".viewer-chip", text: "CC BY"
       notice = page.evaluate_script("(() => { const r = document.querySelector('.access-notice--partly-withheld').getBoundingClientRect(); return [r.left >= 0, r.right <= window.innerWidth] })()")
       assert_equal [ true, true ], notice, "the notice fits the width"
@@ -231,44 +240,92 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     stops = 16.times.map do
       page.driver.browser.keyboard.type(:Tab)
       page.evaluate_script(<<~JS)
-        (() => { const e = document.activeElement, t = e.type === 'checkbox' ? e.closest('label') : e, s = getComputedStyle(t); return { text: (e.textContent || e.value || '').trim().replace(/\\s+/g, ' ').slice(0, 30), ring: s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) >= 2 } })()
+        (() => { const e = document.activeElement, t = e.type === 'checkbox' ? e.closest('label') : e, s = getComputedStyle(t); return { text: (e.getAttribute('aria-label') || e.textContent || e.value || '').trim().replace(/\\s+/g, ' ').slice(0, 30), ring: s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) >= 2 } })()
       JS
     end
     texts = stops.map { |stop| stop["text"] }
 
     assert stops.all? { |stop| stop["ring"] }, stops.reject { |stop| stop["ring"] }.inspect
-    # the media's round tools, then the record's column (its collection, then Save), in that order
-    order = [ "Zoom in", "Zoom out", "Full screen", "Download image", "University Art Collection", "Save" ].map { |label| texts.index { |text| text.include?(label) } }
+    # the controls bar left to right (⋮, rotate, zoom, full screen, Download), then the record's column (Save), in that order
+    order = [ "Media information", "Rotate left", "Zoom in", "Reset zoom", "Zoom out", "Full screen", "Download image", "Save" ].map { |label| texts.index { |text| text.include?(label) } }
     assert_equal order.compact.sort, order.compact, texts.inspect
     assert_operator order.compact.size, :>=, 4, texts.inspect
   end
 
-  test "Zoom in opens the viewer over the picture without moving anything; it follows the thumbnails, and zooming back out closes it" do
+  test "Zoom in opens the viewer over the picture without moving anything; Reset and Zoom out follow the zoom; another thumbnail starts at the whole picture" do
     open_record(VARIANTS.fetch("several images, view-only"), "desktop")
     rect = ->(selector) { page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
-    # where the controls row sits in the media column (the page may scroll to the button)
-    row_offset = -> { page.evaluate_script("document.querySelector('.digital-assets__controls-row').getBoundingClientRect().top - document.querySelector('.record-showcase__hero').getBoundingClientRect().top") }
-    row = row_offset.call
+    bar = -> { page.evaluate_script("document.querySelector('.media-viewer__bar').getBoundingClientRect().top - document.querySelector('.media-viewer__body').getBoundingClientRect().top") }
+    before = bar.call
+    control = ->(name) { find(".media-viewer__bar button[aria-label='#{name}']") }
+    assert_equal "true", control.call("Reset zoom and rotation")["aria-disabled"]
 
-    click_button "Zoom in"
+    control.call("Zoom in").click
     assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all, wait: 10 # the viewer's script loads on first use
-    canvas = rect.call(".deep-zoom__stage .openseadragon-canvas")
-    assert_operator canvas["width"], :>, 100
-    assert_in_delta row, row_offset.call, 1, "the controls row did not move"
+    assert_operator rect.call(".deep-zoom__stage .openseadragon-canvas")["width"], :>, 100
+    assert_in_delta before, bar.call, 1, "the controls bar did not move"
+    assert_nil control.call("Reset zoom and rotation")["aria-disabled"]
+    assert_selector ".media-viewer__readout", text: /\d+%/, wait: 5
 
+    # Reset returns to the plain image at the whole picture
+    control.call("Reset zoom and rotation").click
+    assert_no_selector ".deep-zoom__stage", visible: true
+    assert_equal "true", control.call("Reset zoom and rotation")["aria-disabled"]
+
+    # another thumbnail starts whole and unrotated, and is announced
+    control.call("Zoom in").click
+    assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all, wait: 10
     find(".digital-assets__thumb:not([aria-current])", match: :first).click
     assert_selector ".digital-assets__thumb[aria-current=true][aria-label='Show image 2 of #{THUMBS.size}']"
-    assert_match(/image 2 of/, page.evaluate_script("document.querySelector('.deep-zoom__stage .openseadragon-canvas').getAttribute('aria-label')"))
-    assert_operator rect.call(".deep-zoom__stage .openseadragon-canvas")["width"], :>, 100, "the viewer keeps its size on another image"
-
-    6.times do
-      break unless page.has_selector?(".deep-zoom__stage", visible: true, wait: 0)
-
-      click_button "Zoom out"
-      sleep 0.4
-    end
     assert_no_selector ".deep-zoom__stage", visible: true
-    assert_selector ".digital-assets__image", visible: true
+    assert_selector "[data-media-viewer-target=status]", text: "Image 2 of #{THUMBS.size} shown", visible: :all
+  end
+
+  test "Rotate right turns the image and says so; Reset turns it back" do
+    open_record(VARIANTS.fetch("one image, open"), "desktop")
+    find(".media-viewer__bar button[aria-label='Rotate right']").click
+    assert_selector ".deep-zoom__stage .openseadragon-canvas", visible: :all, wait: 10
+    assert_selector "[data-media-viewer-target=status]", text: "Rotated 90 degrees", visible: :all, wait: 5
+    assert_nil find(".media-viewer__bar button[aria-label='Reset zoom and rotation']")["aria-disabled"]
+    find(".media-viewer__bar button[aria-label='Reset zoom and rotation']").click
+    assert_no_selector ".deep-zoom__stage", visible: true
+  end
+
+  test "Previous and Next stop at the ends; Hide thumbnails widens the stage, and the choice lasts for the visit" do
+    open_record(VARIANTS.fetch("several images, view-only"), "desktop")
+    page.execute_script("sessionStorage.removeItem('ccs-media-viewer-thumbnails')")
+    open_record(VARIANTS.fetch("several images, view-only"), "desktop")
+    previous, nxt = find("button[aria-label='Previous image']"), find("button[aria-label='Next image']")
+    assert_equal "true", previous["aria-disabled"]
+    # the one on show is unmistakable: a 4px navy frame inside the picture and a solid navy number (the others have neither)
+    frame = ->(selector) { page.evaluate_script("(() => { const t = document.querySelector(\"#{selector}\"); return [getComputedStyle(t, '::after').boxShadow, getComputedStyle(t.querySelector('.digital-assets__thumb-number')).backgroundColor] })()") }
+    current, other = frame.call(".digital-assets__thumb[aria-current=true]"), frame.call(".digital-assets__thumb:not([aria-current])")
+    assert_match(/4px/, current[0]); assert_equal "none", other[0]
+    assert_not_equal current[1], other[1]
+    (THUMBS.size - 1).times { nxt.click }
+    assert_equal "true", nxt["aria-disabled"]
+    assert_nil previous["aria-disabled"]
+    page.send_keys(:home) # arrow keys, Home and End move between thumbnails when one has focus
+    width = page.evaluate_script("document.querySelector('.media-viewer__stage').getBoundingClientRect().width")
+
+    find("button[aria-label='Hide thumbnails']").click
+    assert_no_selector "#media-thumbnails"
+    assert_equal "Show thumbnails", page.evaluate_script("document.activeElement.getAttribute('aria-label')")
+    assert_operator page.evaluate_script("document.querySelector('.media-viewer__stage').getBoundingClientRect().width"), :>, width
+    open_record(VARIANTS.fetch("several images, view-only"), "desktop")
+    assert_no_selector "#media-thumbnails"
+    find("button[aria-label='Show thumbnails']").click
+    assert_selector "#media-thumbnails .digital-assets__thumb", count: THUMBS.size
+  end
+
+  test "with the media information open, the viewer has no axe violations, on a phone (covering the stage) and a desktop" do
+    %w[phone desktop].each do |width|
+      open_record(VARIANTS.fetch("several images, view-only"), width)
+      find("button[aria-label='Media information']").click
+      assert_selector "#media-information"
+      assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
+      find("#media-information button[aria-label='Close media information']").click
+    end
   end
 
   test "a long description fades out above Read more, and Read less collapses it again, its paragraphs kept" do

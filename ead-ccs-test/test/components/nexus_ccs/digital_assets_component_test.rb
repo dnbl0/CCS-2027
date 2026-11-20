@@ -47,16 +47,20 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_no_selector ".digital-assets__thumbs"
   end
 
-  test "several assets: the first is large, and a strip of every thumbnail (the first marked) swaps the large image" do
+  test "several assets: the first is large, and the numbered thumbnails (the first marked) swap the large image" do
     render_for(assets(3))
 
     assert_selector "h2", text: "Digital assets"
     assert_selector "figure img[alt='Cary Pocket microscope, image 1 of 3']"
-    assert_selector "div.digital-assets__strip[role=group][aria-label='All images of this record'] .digital-assets__thumbs li", count: 3
+    assert_selector "nav#media-thumbnails[aria-label='Images of this record'] ol li", count: 3
     assert_selector "a.digital-assets__thumb[aria-current=true][href='/digital-assets/large/a1.jpg']"
     assert_selector "a.digital-assets__thumb[href='/digital-assets/large/a2.jpg'][target=_blank][rel=noopener][aria-label='Show image 2 of 3'] img[src='/digital-assets/thumbs/a2.jpg'][alt='']"
-    assert_selector "button.viewer-control--ghost[hidden]", text: "Previous image", visible: :all
-    assert_selector "button.viewer-control--ghost[hidden]", text: "Next image", visible: :all
+    assert_selector "a.digital-assets__thumb[aria-label='Show image 2 of 3'] .digital-assets__thumb-number[aria-hidden=true]", text: "2"
+    # Previous, Next and Hide thumbnails appear with the script; Previous starts unavailable on the first image
+    assert_selector "[hidden] button[aria-label='Previous image'][aria-disabled=true]", visible: :all
+    assert_selector "[hidden] button[aria-label='Next image']", visible: :all
+    assert_selector "[hidden] button[aria-label='Hide thumbnails'][aria-controls=media-thumbnails]", visible: :all
+    assert_selector "button[aria-label='Show thumbnails'][hidden]", visible: :all
   end
 
   test "an open record has no notice, and its media can be downloaded" do

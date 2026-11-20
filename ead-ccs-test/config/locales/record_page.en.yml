@@ -30,10 +30,6 @@ en:
       about:
         persistent_link: "Persistent link"
       media:
-        information: "Media information"
-        close_information: "Close media information"
-        full_screen: "Full screen"
-        exit_full_screen: "Exit full screen"
         # Under the media of a record that shows some of its digital assets and withholds others (their own licence does not
         # let them be shown: AccessPolicy.withheld_assets). PLACEHOLDER WORDING, NOT YET APPROVED: the University must approve it.
         partly_withheld:
@@ -122,14 +118,33 @@ en:
           none: "%{label}: none"
         history:
           source_reference: "Source record"
+        # The media viewer (Figma "Media viewer", after Europeana's item viewer). PLACEHOLDER WORDING where marked.
         viewer:
           tools: "Image tools"
+          media_information: "Media information"
+          close_information: "Close media information"
+          rotate_left: "Rotate left"
+          rotate_right: "Rotate right"
           zoom_in: "Zoom in"
+          reset_zoom: "Reset zoom and rotation"
           zoom_out: "Zoom out"
-          thumbnails: "All images of this record"
+          full_screen: "Full screen"
+          exit_full_screen: "Exit full screen"
+          show_thumbnails: "Show thumbnails"
+          hide_thumbnails: "Hide thumbnails"
+          thumbnails: "Images of this record"
           previous: "Previous image"
           next: "Next image"
           show_image: "Show image %{position} of %{count}"
+          shown: "Image %{position} of %{count} shown"
+          rotated: "Rotated %{degrees} degrees"
+          zoom_level: "%{percent}%"
+          max_zoom: "Maximum zoom"
+          drag_hint: "Drag or use the arrow keys to move around"
+          at_fit: "Already showing the whole image"
+          at_max: "Already at maximum zoom"
+          at_start: "This is the first image"
+          at_end: "This is the last image"
         related:
           heading: "Related objects"
         more:

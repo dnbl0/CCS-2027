@@ -30,7 +30,7 @@ class RecordMediaReflowTest < ApplicationSystemTestCase
     assert_selector "#media-information"
     assert_no_sideways_scroll("open")
 
-    find("#media-information button", text: "Close media information").click
+    find("#media-information button[aria-label='Close media information']").click
     assert_no_selector "#media-information"
     assert_no_sideways_scroll("closed again")
   end

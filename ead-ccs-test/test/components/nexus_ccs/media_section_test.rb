@@ -24,15 +24,18 @@ class MediaSectionTest < ActiveSupport::TestCase
     "rights_ssim" => [ "[In copyright] WARNING This material is All Rights Reserved." ]
   }.freeze
 
-  test "the controls row has the licence chip and round zoom and full screen tools, hidden until the script can work them" do
+  test "the controls bar has named rotate, zoom and full screen controls, hidden until the script can work them; the licence chip is under the viewer" do
     render_for(FIELDS)
 
-    assert_selector ".digital-assets__controls-row .viewer-chip", text: "In copyright"
-    assert_selector ".digital-assets__tools[role=group][aria-label='Image tools']"
-    %w[Zoom\ in Zoom\ out Full\ screen].each do |name|
-      assert_selector "button.viewer-control[hidden]", text: name, visible: :all
+    assert_selector ".media-viewer__caption .viewer-chip", text: "In copyright"
+    assert_selector ".media-viewer__bar[role=group][aria-label='Image tools']"
+    %w[Rotate\ left Rotate\ right Zoom\ in Reset\ zoom\ and\ rotation Zoom\ out].each do |name|
+      assert_selector "[hidden] button.viewer-control[aria-label='#{name}'][title]", visible: :all
     end
-    assert_no_selector "button[aria-controls=media-metadata]" # the metadata is the record column's Media details section
+    assert_selector "[hidden] button.viewer-control[aria-label='Full screen'][aria-pressed=false]", visible: :all
+    # at fit, Reset and Zoom out start unavailable (aria-disabled, still focusable)
+    assert_selector "button[aria-label='Zoom out'][aria-disabled=true]", visible: :all
+    assert_no_selector ".media-viewer__readout", visible: true # the zoom readout only while zoomed
   end
 
   test "the media metadata lists licence type, advisory and terms of use, without the licence name in brackets" do

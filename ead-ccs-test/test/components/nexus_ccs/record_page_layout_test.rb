@@ -100,18 +100,20 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   end
 
   # --- media: the three tiers, in markup
-  test "an open record has a round Download tool, the access chip, the licence and the named round tools in one controls row" do
+  test "an open record has Download at the end of the controls bar, the media information on ⋮, and the access chip under the viewer" do
     render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
-    assert_selector ".digital-assets__controls-row .viewer-chip--open", text: "Open: view and download"
-    # CCS-67: the round tool opens the essential information (caption and licence, to copy) before the download
-    assert_selector ".digital-assets__controls-row button.viewer-control[aria-haspopup=dialog]", text: "Download image of"
+    assert_selector ".media-viewer__caption .viewer-chip--open", text: "Open: view and download"
+    # CCS-67: Download opens the essential information (caption and licence, to copy) before the download
+    assert_selector ".media-viewer__bar-end button.viewer-control[aria-haspopup=dialog][aria-label^='Download image of']"
     assert_selector "dialog .digital-assets__essential dt", text: "Licence", visible: :all
     assert_selector "dialog a.btn[download][href='/digital-assets/large/a.jpg']", text: "Download image", visible: :all
-    # CCS-422: the i tool opens the media information over the image
-    assert_selector "button.viewer-control[aria-controls=media-information][aria-expanded=false]", text: "Media information"
-    assert_selector ".digital-assets__controls-row button", text: "Full screen", visible: :all
+    # CCS-422: ⋮ opens the media information, on the left at the viewer's full height
+    assert_selector ".media-viewer__bar-start button.viewer-control[aria-controls=media-information][aria-expanded=false][aria-label='Media information']"
+    assert_selector "aside#media-information[hidden] h3#media-information-heading[tabindex='-1']", text: "Media information", visible: :all
+    assert_selector ".media-viewer__bar button[aria-label='Full screen']", visible: :all
     assert_no_selector ".digital-assets__stage ~ .digital-assets__stage"
+    assert_no_text(/Image \d+ of \d+/) # no counter
   end
 
   test "a view-only record has no download link in its markup, and the image keeps its own shape (width and height held)" do
@@ -125,7 +127,7 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   test "a request-only record's markup holds no asset path, and the notice sits where the media would" do
     render_media(IMAGES.merge("licence_type_ssim" => [ "ICIP Rights" ], "digital_media_ssim" => [ "video|video/mp4|/digital-assets/media/v.mp4|Film" ]))
 
-    assert_selector ".digital-assets__media-area .access-notice--request a"
+    assert_selector ".media-viewer__canvas .access-notice--request a"
     assert_no_selector "img, video, a[download]"
     assert_not_includes rendered_content, "/digital-assets/"
   end
@@ -133,7 +135,8 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   test "a sensitive record's markup holds no asset path until the visitor chooses to view it" do
     render_media(IMAGES.merge("restrictions_tsi" => [ "Culturally sensitive images" ]))
 
-    assert_selector ".digital-assets__media-area .sensitivity-gate"
+    assert_selector ".media-viewer__canvas .sensitivity-gate"
+    assert_no_selector ".media-viewer__thumbs", visible: :all # thumbnails would show the images
     assert_not_includes rendered_content, "/digital-assets/"
     assert_no_selector "a[download]"
   end
