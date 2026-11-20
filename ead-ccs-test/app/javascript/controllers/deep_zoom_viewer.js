@@ -63,6 +63,30 @@ export function zoomIn(viewer) { viewer.viewport.zoomTo(viewer.viewport.getZoom(
 export function zoomOut(viewer) { viewer.viewport.zoomTo(viewer.viewport.getZoom(true) / 1.5); viewer.viewport.applyConstraints() }
 export function reset(viewer) { viewer.viewport.goHome() }
 
+// Rotation in 90° steps (the media viewer's Rotate left and right). At the whole picture the turned picture is refitted; zoomed in,
+// the zoom and the centre are kept
+export function rotate(viewer, degrees) {
+  const wasHome = atHome(viewer)
+  const angle = ((viewer.viewport.getRotation() + degrees) % 360 + 360) % 360
+  viewer.viewport.setRotation(angle)
+  if (wasHome) viewer.viewport.goHome()
+  return angle
+}
+
+// What the media viewer's controls need: the zoom as a percent of the whole picture, whether it is at the whole picture or the
+// maximum, and the rotation. Read from where the view is going (not mid-animation), so the controls change as soon as it is pressed.
+export function state(viewer) {
+  const viewport = viewer.viewport
+  const zoom = viewport.getZoom()
+  const home = viewport.getHomeZoom()
+  return {
+    zoom: Math.round((zoom / home) * 100),
+    atHome: zoom <= home * 1.01,
+    atMax: zoom >= viewport.getMaxZoom() * 0.99,
+    rotation: Math.round(((viewport.getRotation() % 360) + 360) % 360)
+  }
+}
+
 // Whether the view shows the whole picture (or less): zooming out from here closes the record page's viewer
 export function atHome(viewer) { return viewer.viewport.getZoom(true) <= viewer.viewport.getHomeZoom() * 1.01 }
 

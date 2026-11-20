@@ -1,5 +1,15 @@
 # Media viewer, IIIF and compare (CCS-57, CCS-58)
 
+**Since 20 Nov 2026 (branch `design/media-viewer`):** the record page's viewer follows the Figma "Media viewer" (after Europeana's item
+viewer): the media information opens on the left at the viewer's full height (⋮; focus moves to its heading, Escape returns it); the
+stage is text/primary with the controls bar along its bottom (1px stroke/strong top border: ⋮ | Rotate left, Rotate right | Zoom in,
+Reset zoom and rotation, Zoom out | Full screen, and Download or Show thumbnails at the end); the thumbnails are a numbered column on the
+right (a strip below 1024px) with Previous, Next (stopping at the ends) and Hide thumbnails (remembered for the visit). No counter.
+Rotation and zoom are OpenSeadragon's (`deep_zoom_controller.js` reports `deep-zoom:state`; the controls are aria-disabled at the limits
+and say why in their tooltip). Sized by container queries (1024px and 600px of the viewer's own width). Markup:
+`DigitalAssetsComponent`; styles: `digital_assets.css`; behaviour: `media_viewer_controller.js`. Tests: `test/system/record_page_layout_test.rb`.
+
+
 ## In plain language
 
 A record's media are shown on its page by the kind of file. Images can be zoomed and panned, audio and video play in the
