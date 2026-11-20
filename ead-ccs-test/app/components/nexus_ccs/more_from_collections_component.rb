@@ -8,6 +8,8 @@ module NexusCcs
   # is empty says so. On a phone a row's cards scroll sideways. Nothing for a record that may not have recommendations beside it.
   class MoreFromCollectionsComponent < ViewComponent::Base
     Row = Struct.new(:key, :label, :source)
+    # Rows shown at first; the others are behind "More ways to explore"
+    FIRST_ROWS = 2
 
     def initialize(document:)
       @document = document

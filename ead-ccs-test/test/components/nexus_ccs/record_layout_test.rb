@@ -71,6 +71,15 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_equal record.object_rows.map(&:seq), record.object_rows.map(&:seq).sort
   end
 
+  test "Object details shows its first six rows, and the rest continue them in the sheet's order; era and region are left out" do
+    record = component(SHEET.merge("date_era_ssim" => [ "20th century" ], "region_ssim" => [ "Oceania" ]))
+
+    assert_equal 6, record.first_detail_rows.size
+    assert_equal record.object_rows, record.first_detail_rows + record.more_detail_rows
+    assert_not_includes record.object_rows.map(&:label), "Era"
+    assert_not_includes record.object_rows.map(&:label), "Region"
+  end
+
   test "under the title, one line for what it is and one for when" do
     assert_equal [ "Tone tool", "1952" ], component(SHEET).subtitle_lines
     assert_equal [], component({ "title_tsim" => [ "Bare" ] }).subtitle_lines

@@ -26,7 +26,6 @@
     <div class="record-showcase__grid">
       <div class="record-showcase__main record-showcase__head">
         <header class="record-showcase__header">
-          <% if collection_name %><p class="record-showcase__collection"><%= link_to collection_name, collection_path %></p><% end %>
           <h1 class="record-showcase__title"><%= title_markup %></h1>
           <% if subtitle_lines.any? %>
             <div class="record-showcase__subtitle">
@@ -63,7 +62,14 @@
             1024px and closed on a phone (record_full_controller.js). %>
         <details class="record-showcase__details" id="object-details" open data-controller="record-full">
           <summary><h2 class="record-showcase__section-heading" id="record-details-title"><%= t("nexus_ccs.record_page.sections.object_details") %></h2></summary>
-          <%= render NexusCcs::RecordFactRowsComponent.new(rows: object_rows + history_rows, record: self, id_row: true) %>
+          <%= render NexusCcs::RecordFactRowsComponent.new(rows: first_detail_rows, record: self, id_row: more_detail_rows.empty?) %>
+          <% if more_detail_rows.any? %>
+            <%# The rest of the sheet's fields continue the list in place, so its order is never broken %>
+            <details class="record-showcase__more" id="more-details">
+              <summary class="record-read-more"><span class="record-showcase__more-show"><%= t("nexus_ccs.record_page.showcase.more_details", count: more_detail_rows.size + 1) %></span><span class="record-showcase__more-hide"><%= t("nexus_ccs.record_page.showcase.fewer_details") %></span></summary>
+              <%= render NexusCcs::RecordFactRowsComponent.new(rows: more_detail_rows, record: self, id_row: true) %>
+            </details>
+          <% end %>
         </details>
 
         <%= render NexusCcs::RecordAboutComponent.new(document: document, url: helpers.solr_document_url(document)) %>
@@ -86,18 +92,23 @@
           </ul>
           <% if sensitive? %><p class="record-use__note"><%= t("nexus_ccs.record_page.use.sensitive") %></p><% end %>
           <% if (note = t("nexus_ccs.record_page.use.note.#{access_state}", default: "")).present? %><p class="record-use__note"><%= note %></p><% end %>
-          <% if rights_items.any? %>
-            <dl class="record-use__list">
-              <% rights_items.each do |label, value| %><div><dt><%= label %></dt><dd><%= value %></dd></div><% end %>
-            </dl>
-          <% else %>
-            <p class="record-use__note"><%= t("nexus_ccs.rights.none_recorded") %></p>
-          <% end %>
-          <p class="record-use__terms"><%= link_to t("nexus_ccs.record_page.copyright.terms"), terms_path %></p>
+          <% if use_licence %><p class="record-use__licence"><span><%= t("nexus_ccs.record_page.use.licence") %></span> <%= use_licence %></p><% end %>
           <% if access_state == :request || access_state == :view_only %>
             <p class="record-use__action"><a class="record-arrow-link" href="<%= request_to_view_path %>"><%= t("nexus_ccs.record_page.use.request.#{access_state}") %></a></p>
           <% end %>
-          <div class="record-use__contact"><%= render NexusCcs::ContactCollectionComponent.new(document: document, url: helpers.solr_document_url(document)) %></div>
+          <%# The rights items (CCS-27), the terms and the contact card (CCS-47), one step away %>
+          <details class="record-use__more">
+            <summary><%= t("nexus_ccs.record_page.showcase.rights_and_contact") %></summary>
+            <% if rights_items.any? %>
+              <dl class="record-use__list">
+                <% rights_items.reject { |label, _| label == t("nexus_ccs.record_page.use.licence") }.each do |label, value| %><div><dt><%= label %></dt><dd><%= value %></dd></div><% end %>
+              </dl>
+            <% else %>
+              <p class="record-use__note"><%= t("nexus_ccs.rights.none_recorded") %></p>
+            <% end %>
+            <p class="record-use__terms"><%= link_to t("nexus_ccs.record_page.copyright.terms"), terms_path %></p>
+            <div class="record-use__contact"><%= render NexusCcs::ContactCollectionComponent.new(document: document, url: helpers.solr_document_url(document)) %></div>
+          </details>
         </section>
       </aside>
     </div>

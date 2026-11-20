@@ -98,6 +98,12 @@ en:
         also_like: "You may also like"
         shuffle: "Shuffle objects"
         shuffled: "Showing other objects you may like"
+        more_details:
+          one: "Show 1 more detail"
+          other: "Show %{count} more details"
+        fewer_details: "Show fewer details"
+        rights_and_contact: "Rights, credit and contact"
+        more_ways: "More ways to explore"
       # The approved split layout (Figma "Record page · Approved design", 2026-11-19)
       split:
         actions: "Actions for this record"

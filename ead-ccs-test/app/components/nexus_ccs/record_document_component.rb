@@ -175,8 +175,14 @@ module NexusCcs
       end
     end
 
-    # Object details: the sheet's fields after the key rows
-    def object_rows = detail_rows.reject { |row| LEAD_SEQS.include?(row.seq) }
+    # Object details: the sheet's own fields after the key rows (not the index's era and region, which repeat the date and the place)
+    def object_rows = detail_rows.reject { |row| LEAD_SEQS.include?(row.seq) || !row.seq.is_a?(Integer) }
+
+    # How many rows Object details shows before "Show all details"; the rest continue the list, in the sheet's order
+    FIRST_DETAILS = 6
+
+    def first_detail_rows = object_rows.first(FIRST_DETAILS)
+    def more_detail_rows = object_rows.drop(FIRST_DETAILS)
 
     def lead_rows = detail_rows.select { |row| LEAD_SEQS.include?(row.seq) }
 

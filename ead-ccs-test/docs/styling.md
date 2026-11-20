@@ -149,7 +149,12 @@ closed on a phone), and About this record (centred heading, the text and content
 Copy link, Print this page, and Download as CSV and IIIF manifest). Beside the record from 1024px, and between its header and Object
 details on a phone, the actions and Use and access. Then You may also like (`similar/collage`, `?view=collage`: up to twelve similar
 records' pictures laid like prints on a table, each a little turned, six at a time, with Shuffle; `shuffle_controller.js`) and More
-from the collections. The split layout below is the version on PR #87.
+from the collections. To keep the load low (20 Nov 2026, after Dean's wireframe): no collection link above the title (it is a row and
+in the breadcrumb); Object details shows its first six rows and "Show N more details" continues the list in place, in the sheet's
+order (era and region are left out: they repeat the date and the place); Use and access is a summary (view and download, the note,
+the licence, the request link) with the rights items, terms and contact card under "Rights, credit and contact"; More from the
+collections shows two rows and the others under "More ways to explore" (their frames load only once it is opened), and a row that
+comes back empty is left out. The split layout below is the version on PR #87.
 
 The approved split layout (Figma "Record page · Approved design (Version 4)", frames 28:2639 desktop and 29:2940 mobile, approved
 19 Nov 2026), in `record_split.css`. From 1024px the media is on the left and the record's own column (33rem) on the right; the media

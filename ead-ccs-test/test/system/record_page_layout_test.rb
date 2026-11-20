@@ -200,11 +200,21 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     { "phone" => false, "desktop" => true }.each do |width, open|
       open_record({}, width)
       assert_selector "#use-and-access h2", text: "Use and access"
+      # the rights, terms and contact are one step away
+      assert_no_selector "#use-and-access", text: "Rights held by the University"
+      find("#use-and-access summary", text: "Rights, credit and contact").click
       assert_selector "#use-and-access", text: "Rights held by the University"
       assert_selector "#use-and-access a[href='/help#copyright']", text: "About copyright and terms of use"
       assert_equal open, page.evaluate_script("document.getElementById('object-details').open")
     end
     assert_selector "#object-details[open] .record-facts__row dt", text: /object type/i # letter-spaced capitals, set in CSS
+    # the first rows, then the rest continue in place, in the sheet's order
+    if page.has_selector?("#more-details summary", wait: 0)
+      shown = page.all("#object-details .record-facts__row dt").size
+      find("#more-details summary").click
+      assert_operator page.all("#object-details .record-facts__row dt").size, :>, shown
+      assert_selector "#more-details[open] [data-testid=record-identifier]"
+    end
     # the key rows under the title: who made it, label beside value
     label, value = page.evaluate_script("(() => { const r = document.querySelector('.record-showcase__lead-rows .record-facts__row'); return [r.querySelector('dt').getBoundingClientRect().toJSON(), r.querySelector('dd').getBoundingClientRect().toJSON()] })()")
     assert_operator value["left"], :>, label["right"]

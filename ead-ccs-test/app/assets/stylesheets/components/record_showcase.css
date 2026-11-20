@@ -202,3 +202,40 @@
   .record-showcase__aside, .record-also, .record-more, .record-read-more, .record-about__links { display: none; }
   .record-fade.is-collapsed .record-showcase__lead, .record-fade.is-collapsed .record-fade__clip { display: block; mask-image: none; }
 }
+
+/* Progressive disclosure: the first rows of Object details, then the rest in place; Use and access as a summary with its rights,
+   terms and contact one step away; two rows of More from the collections, then the others */
+summary.record-read-more { list-style: none; }
+summary.record-read-more::-webkit-details-marker { display: none; }
+details[open] > summary.record-read-more::after { content: "–"; }
+.record-showcase__more > summary { margin-top: var(--ccs-space-3); }
+.record-showcase__more-hide, .record-showcase__more[open] .record-showcase__more-show { display: none; }
+.record-showcase__more[open] .record-showcase__more-hide { display: inline; }
+.record-showcase__more[open] > summary { margin-bottom: var(--ccs-space-3); }
+/* opened, the continuation follows the first rows on one rule (the summary moves under it with order) */
+.record-showcase__more[open] { display: flex; flex-direction: column; }
+.record-showcase__more[open] > summary { order: 2; margin: var(--ccs-space-3) 0 0; }
+.record-showcase__more .record-facts__list { border-top: 0; }
+.record-showcase__details > .record-facts__list:has(+ .record-showcase__more[open]) { border-bottom: 0; }
+
+.record-use__licence { margin: 0 0 var(--ccs-space-3); font-size: var(--ccs-font-size-ui); }
+.record-use__licence span { font-weight: var(--ccs-font-weight-semibold); }
+.record-use__more { margin-top: var(--ccs-space-2); border-top: 1px solid var(--ccs-border-subtle); }
+.record-use__more > summary {
+  display: flex; align-items: center; justify-content: space-between; min-height: 2.75rem; list-style: none; cursor: pointer;
+  font-size: var(--ccs-font-size-ui); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-brand);
+}
+.record-use__more > summary::-webkit-details-marker { display: none; }
+.record-use__more > summary::after { content: "+"; font-size: var(--ccs-font-size-lg); line-height: 1; }
+.record-use__more[open] > summary::after { content: "–"; }
+.record-use__more > summary:hover { text-decoration: underline; }
+.record-use__more > summary:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.record-use__more .record-use__list { margin-top: var(--ccs-space-2); }
+
+.record-more__others { margin-top: var(--ccs-space-7); }
+.record-more__others > summary { justify-content: center; width: 100%; }
+.record-more__others[open] > summary { margin-bottom: var(--ccs-space-6); }
+/* A row that came back empty is left out altogether (no heading over "nothing to show") */
+.record-more__row:has(.record-more__empty:not([hidden])) { display: none; }
+.record-showcase__details:not([open]) > summary { margin-bottom: 0; }
+.record-showcase__details:not([open]) + .record-about { margin-top: var(--ccs-space-7); }
