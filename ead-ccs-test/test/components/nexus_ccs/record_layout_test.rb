@@ -71,18 +71,28 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_equal record.object_rows.map(&:seq), record.object_rows.map(&:seq).sort
   end
 
-  test "Object details shows its first six rows, and the rest continue them in the sheet's order; era and region are left out" do
-    record = component(SHEET.merge("date_era_ssim" => [ "20th century" ], "region_ssim" => [ "Oceania" ]))
-
-    assert_equal 6, record.first_detail_rows.size
-    assert_equal record.object_rows, record.first_detail_rows + record.more_detail_rows
-    assert_not_includes record.object_rows.map(&:label), "Era"
-    assert_not_includes record.object_rows.map(&:label), "Region"
+  test "the card's maker line is the maker with life dates, the most specific place and the date" do
+    assert_equal "Grainger, Percy Aldridge (b. 1882 - d. 1961) maker, Victoria, 1952", component(SHEET).maker_line
+    assert_equal "Grainger, Percy Aldridge", component(FIELDS.except("production_date_ssim")).maker_line
   end
 
-  test "under the title, one line for what it is and one for when" do
-    assert_equal [ "Tone tool", "1952" ], component(SHEET).subtitle_lines
-    assert_equal [], component({ "title_tsim" => [ "Bare" ] }).subtitle_lines
+  test "the facts lines are the material and measurements, the credit line, then the collection and accession number" do
+    lines = component(SHEET).facts_lines
+    assert_equal "Paper, 10 x 4 cm", lines.first
+    assert_includes lines, "Grainger Museum Collection, University of Melbourne."
+    assert_equal "Grainger Museum Collection, accession number 00.0001", lines.last
+  end
+
+  test "Search in the collection: the record's terms as links, places and kinds before makers, no repeats, at most 14" do
+    record = component(SHEET)
+    # the order and the de-duplication are under test here; the links themselves are Object details' (record_value_links_test)
+    record.define_singleton_method(:value_link) { |_row, value| "/catalog?q=#{value}" }
+    terms = record.search_terms
+    labels = terms.map(&:first)
+    assert_equal labels.uniq, labels
+    assert_operator terms.size, :<=, 14
+    assert_operator labels.index("Victoria"), :<, labels.index("Grainger, Percy Aldridge")
+    assert(terms.all? { |_label, path| path.start_with?("/") })
   end
 
   test "Use and access: the rights items in CCS-27's order; caption and terms only with a digital asset" do

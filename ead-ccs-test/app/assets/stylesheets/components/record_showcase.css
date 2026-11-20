@@ -15,44 +15,40 @@
 .record-showcase__stepper-inner { max-width: var(--showcase-width); margin: 0 auto; padding: var(--ccs-space-3) var(--ccs-space-4) 0; }
 .record-showcase__stepper .selection-stepper { margin: var(--ccs-space-2) 0 0; }
 
-/* The band: the media viewer (digital_assets.css) edge to edge, then grey room for the card to overlap, so the card never covers
-   the controls bar or the thumbnails */
-.record-showcase__hero { background: var(--ccs-surface-subtle); padding: 0 0 calc(var(--ccs-space-8) + var(--ccs-space-6)); }
+/* The band: the media viewer (digital_assets.css) edge to edge */
+.record-showcase__hero { background: var(--ccs-surface-subtle); }
 .record-showcase__hero-inner { width: 100%; }
 .record--showcase .record-showcase__hero-inner > :not(.digital-assets) { margin: var(--ccs-space-5) var(--ccs-space-4) 0; padding: var(--ccs-space-7) var(--ccs-space-5); background: var(--ccs-surface-default); }
 
-/* The card, over the band's lower edge */
-.record-showcase__card {
-  position: relative; max-width: var(--showcase-width); margin: calc(-1 * (var(--ccs-space-8) + var(--ccs-space-4))) auto 0;
-  padding: var(--ccs-space-7) var(--ccs-space-4) var(--ccs-space-8); background: var(--ccs-surface-default);
-}
-.record-showcase__grid { display: grid; gap: var(--ccs-space-7); grid-template-columns: minmax(0, 1fr); }
-.record-showcase__main { min-width: 0; max-width: 42rem; }
-.record-showcase__aside { display: flex; flex-direction: column; gap: var(--ccs-space-5); min-width: 0; }
-/* The record's column in two parts, the actions and Use and access between them on a phone (so they come before Object details) and
-   beside both from 1024px */
-.record-showcase__grid { grid-template-areas: "head" "aside" "body"; }
+/* The record, after the Van Gogh Museum's object pages: on the page's grey, a narrow column on the left (the actions and Use and
+   access) and the main column (title, status, maker line, facts, description, folding sections, Search in the collection) */
+.record--showcase { background: var(--ccs-surface-subtle); }
+.record-showcase__card { max-width: var(--showcase-width); margin: 0 auto; padding: var(--ccs-space-8) var(--ccs-space-4) calc(var(--ccs-space-8) * 2); }
+.record-showcase__grid { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "aside" "body"; gap: var(--ccs-space-7); }
 .record-showcase__head { grid-area: head; }
 .record-showcase__body { grid-area: body; }
-.record-showcase__aside { grid-area: aside; }
+.record-showcase__aside { grid-area: aside; display: flex; flex-direction: column; gap: var(--ccs-space-5); min-width: 0; }
+.record-showcase__main { min-width: 0; max-width: 46rem; }
 @media (min-width: 1024px) {
-  .record-showcase__card { padding: var(--ccs-space-8) calc(var(--ccs-space-8) + var(--ccs-space-2)) calc(var(--ccs-space-8) * 2); }
+  .record-showcase__card { padding-inline: var(--ccs-space-6); }
   .record-showcase__grid {
-    grid-template-columns: minmax(0, 42rem) minmax(16rem, 22rem); grid-template-areas: "head aside" "body aside"; grid-template-rows: auto 1fr;
-    justify-content: space-between; column-gap: var(--ccs-space-8); row-gap: 0;
+    grid-template-columns: minmax(16rem, 18rem) minmax(0, 46rem); grid-template-areas: "aside head" "aside body"; grid-template-rows: auto 1fr;
+    column-gap: calc(var(--ccs-space-8) * 2); row-gap: var(--ccs-space-8);
   }
+  .record-showcase__aside { align-self: start; }
 }
 
-/* Title, the short rule under it, then what it is and when */
-.record-showcase__collection { margin: 0 0 var(--ccs-space-3); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
+/* Title, status, the bold maker line, then the facts in plain text */
 .record-showcase__title {
-  margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-4xl); font-weight: var(--ccs-font-weight-bold);
-  line-height: var(--ccs-line-height-tight); letter-spacing: -0.01em; color: var(--ccs-text-primary); text-wrap: balance;
+  margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-4xl); font-weight: var(--ccs-font-weight-regular);
+  line-height: 1.1; color: var(--ccs-text-primary); text-wrap: balance;
 }
-.record-showcase__title::after { content: ""; display: block; width: 3.5rem; height: 4px; margin-top: var(--ccs-space-5); background: var(--ccs-text-brand); }
-@media (min-width: 1024px) { .record-showcase__title { font-size: var(--ccs-font-size-5xl); } }
-.record-showcase__subtitle { margin-top: var(--ccs-space-5); }
-.record-showcase__subtitle p { margin: 0; font-size: var(--ccs-font-size-2xl); line-height: var(--ccs-line-height-snug); color: var(--ccs-text-primary); }
+@media (min-width: 1024px) { .record-showcase__title { font-size: 3.5rem; } }
+.record-showcase__status { display: flex; align-items: center; gap: var(--ccs-space-3); margin: var(--ccs-space-6) 0 0; font-size: var(--ccs-font-size-md); color: var(--ccs-text-primary); }
+.record-showcase__status svg { flex: none; }
+.record-showcase__maker-line { margin: var(--ccs-space-6) 0 0; font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-bold); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); text-wrap: pretty; }
+.record-showcase__facts { margin-top: var(--ccs-space-4); }
+.record-showcase__facts p { margin: 0; font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); text-wrap: pretty; }
 
 /* Label beside value on dashed rules (the key rows, Object details, the record URL); a phone stacks them */
 .record--showcase .record-facts__list { margin: 0; border-bottom: var(--showcase-rule); }
@@ -66,7 +62,6 @@
 }
 .record--showcase .record-facts__row dd { margin: 0; font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-secondary); }
 .record--showcase .record-facts__value + .record-facts__value { margin-top: var(--ccs-space-1); }
-.record-showcase__lead-rows { margin-top: var(--ccs-space-7); }
 
 /* Names of things: outlined tags */
 .record--showcase .record-term {
@@ -76,9 +71,9 @@
 .record--showcase a.record-term:hover { background: var(--ccs-surface-subtle); }
 
 /* The description and long texts: a few lines, fading out, then Read more with a round plus */
-.record-showcase__description { margin-top: var(--ccs-space-7); }
+.record-showcase__description { margin-top: var(--ccs-space-8); }
 .record-showcase__description-text { display: flex; flex-direction: column; gap: var(--ccs-space-4); }
-.record-showcase__description-text p { margin: 0; font-size: var(--ccs-font-size-lg); line-height: 1.65; color: var(--ccs-text-primary); }
+.record-showcase__description-text p { margin: 0; font-size: var(--ccs-font-size-md); line-height: 1.65; color: var(--ccs-text-primary); text-wrap: pretty; }
 .record-fade.is-collapsed .record-showcase__lead,
 .record-fade.is-collapsed .record-fade__clip {
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;
@@ -99,29 +94,47 @@
 .record-read-more:hover { text-decoration: underline; }
 .record-read-more:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
-/* Centred section headings over the record's column */
-.record-showcase__section-heading {
-  margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-3xl); font-weight: var(--ccs-font-weight-semibold);
-  line-height: var(--ccs-line-height-tight); text-align: center; color: var(--ccs-text-primary);
+/* Folding sections (Van Gogh's Object data, Exhibitions, Literature): ruled, a plus on the left that becomes a minus */
+.record-sections { border-top: 1px solid var(--ccs-text-secondary); }
+.record-section { border-bottom: 1px solid var(--ccs-text-secondary); scroll-margin-top: 4.5rem; } /* clear of the sticky search bar */
+.record-section > summary {
+  display: flex; align-items: center; gap: var(--ccs-space-6); min-height: 3.5rem; padding: var(--ccs-space-2) 0; list-style: none; cursor: pointer;
 }
-.record-showcase__details { margin-top: var(--ccs-space-2); }
-@media (min-width: 1024px) { .record-showcase__details { margin-top: var(--ccs-space-8); } }
-.record-showcase__details > summary {
-  display: flex; align-items: center; justify-content: center; gap: var(--ccs-space-3); min-height: 2.75rem; margin-bottom: var(--ccs-space-6);
-  list-style: none; cursor: pointer;
+.record-section > summary::-webkit-details-marker { display: none; }
+.record-section > summary::before {
+  --record-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5'%3E%3Cpath d='M12 3v18M3 12h18'/%3E%3C/svg%3E");
+  content: ""; flex: none; width: 1.25rem; height: 1.25rem; background: var(--ccs-text-primary); mask: var(--record-icon) center / contain no-repeat;
 }
-.record-showcase__details > summary::-webkit-details-marker { display: none; }
-.record-showcase__details > summary::after {
-  --record-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  content: ""; flex: none; width: var(--ccs-font-size-xl); height: var(--ccs-font-size-xl); background: var(--ccs-text-primary);
-  mask: var(--record-icon) center / contain no-repeat; transition: transform var(--ccs-duration-fast) ease;
+.record-section[open] > summary::before { --record-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5'%3E%3Cpath d='M3 12h18'/%3E%3C/svg%3E"); }
+.record-section > summary:hover .record-section__title { text-decoration: underline; }
+.record-section > summary:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.record-section__title { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-regular); color: var(--ccs-text-primary); }
+.record-section__body { padding: 0 0 var(--ccs-space-6) calc(1.25rem + var(--ccs-space-6)); font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); }
+.record-section__body > * + * { margin-top: var(--ccs-space-4); }
+.record-section__list { display: grid; gap: var(--ccs-space-3); margin: 0; }
+.record-section__list dt { font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
+.record-section__list dd { margin: 0; overflow-wrap: anywhere; }
+.record-section .contact-collection { margin: 0; }
+.record-section .cite--inline .cite__list { display: grid; gap: var(--ccs-space-4); margin: 0; padding: 0; list-style: none; }
+.record-section .record-facts__list { border-bottom: 0; }
+
+/* Search in the collection: outlined, square links into the search */
+.record-search { margin-top: var(--ccs-space-8); }
+.record-search__heading { margin: 0 0 var(--ccs-space-4); font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-2xl); font-weight: var(--ccs-font-weight-regular); color: var(--ccs-text-primary); }
+.record-search__list { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2); margin: 0; padding: 0; list-style: none; }
+.record-search__term {
+  display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 var(--ccs-space-5); border: 1px solid var(--ccs-border-default);
+  background: var(--ccs-surface-default); color: var(--ccs-text-primary); font-size: var(--ccs-font-size-md); text-decoration: none;
 }
-.record-showcase__details[open] > summary::after { transform: rotate(180deg); }
-.record-showcase__details > summary:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { .record-showcase__details > summary::after { transition: none; } }
+.record-search__term:hover { border-color: var(--ccs-text-primary); color: var(--ccs-text-primary); }
+.record-search__term:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
 /* About this record: centred heading, the text, a solid button, then the record URL and the print and download line */
 .record-about { margin-top: calc(var(--ccs-space-8) + var(--ccs-space-4)); }
+.record-section .record-about { margin-top: 0; }
+.record-section .record-about__text { margin-top: 0; }
+.record-section .record-about__text p { font-size: var(--ccs-font-size-md); }
+.record-section .record-about__action { margin: var(--ccs-space-4) 0 var(--ccs-space-5); }
 .record-about__text { margin-top: var(--ccs-space-6); }
 .record-about__text p { margin: 0 0 var(--ccs-space-4); font-size: var(--ccs-font-size-lg); line-height: 1.65; color: var(--ccs-text-secondary); }
 .record-about__action { margin: var(--ccs-space-5) 0 var(--ccs-space-8); }
@@ -143,9 +156,10 @@
 .record-about__print:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
 .record-about__downloads a { display: inline-flex; align-items: center; min-height: 2.75rem; }
 
-/* The column beside the record: the actions stacked, then Use and access as a grey box */
-.record--showcase .record-actions { padding-bottom: var(--ccs-space-4); border-bottom: var(--showcase-rule); }
-.record--showcase .record-use { border: 0; }
+/* The narrow column: the actions, then Use and access on white */
+.record--showcase .record-actions { padding-bottom: var(--ccs-space-4); border-bottom: 1px solid var(--ccs-border-default); }
+.record--showcase .record-use { border: 0; background: var(--ccs-surface-default); }
+.record-use__link { margin: var(--ccs-space-3) 0 0; font-size: var(--ccs-font-size-ui); }
 
 /* You may also like: pictures laid like prints on a table, each a little turned, on the grey band; Shuffle under them */
 .record-also { padding: calc(var(--ccs-space-8) + var(--ccs-space-4)) var(--ccs-space-4) var(--ccs-space-8); background: var(--ccs-surface-subtle); }
@@ -198,34 +212,13 @@
   .record-fade.is-collapsed .record-showcase__lead, .record-fade.is-collapsed .record-fade__clip { display: block; mask-image: none; }
 }
 
-/* Progressive disclosure: the first rows of Object details, then the rest in place; Use and access as a summary with its rights,
-   terms and contact one step away; two rows of More from the collections, then the others */
+/* Read more as a <summary> (More from the collections' "More ways to explore") */
 summary.record-read-more { list-style: none; }
 summary.record-read-more::-webkit-details-marker { display: none; }
 details[open] > summary.record-read-more::after { content: "–"; }
-.record-showcase__more > summary { margin-top: var(--ccs-space-3); }
-.record-showcase__more-hide, .record-showcase__more[open] .record-showcase__more-show { display: none; }
-.record-showcase__more[open] .record-showcase__more-hide { display: inline; }
-.record-showcase__more[open] > summary { margin-bottom: var(--ccs-space-3); }
-/* opened, the continuation follows the first rows on one rule (the summary moves under it with order) */
-.record-showcase__more[open] { display: flex; flex-direction: column; }
-.record-showcase__more[open] > summary { order: 2; margin: var(--ccs-space-3) 0 0; }
-.record-showcase__more .record-facts__list { border-top: 0; }
-.record-showcase__details > .record-facts__list:has(+ .record-showcase__more[open]) { border-bottom: 0; }
 
 .record-use__licence { margin: 0 0 var(--ccs-space-3); font-size: var(--ccs-font-size-ui); }
 .record-use__licence span { font-weight: var(--ccs-font-weight-semibold); }
-.record-use__more { margin-top: var(--ccs-space-2); border-top: 1px solid var(--ccs-border-subtle); }
-.record-use__more > summary {
-  display: flex; align-items: center; justify-content: space-between; min-height: 2.75rem; list-style: none; cursor: pointer;
-  font-size: var(--ccs-font-size-ui); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-brand);
-}
-.record-use__more > summary::-webkit-details-marker { display: none; }
-.record-use__more > summary::after { content: "+"; font-size: var(--ccs-font-size-lg); line-height: 1; }
-.record-use__more[open] > summary::after { content: "–"; }
-.record-use__more > summary:hover { text-decoration: underline; }
-.record-use__more > summary:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
-.record-use__more .record-use__list { margin-top: var(--ccs-space-2); }
 
 .record-more__others { margin-top: var(--ccs-space-7); }
 .record-more__others > summary { justify-content: center; width: 100%; }

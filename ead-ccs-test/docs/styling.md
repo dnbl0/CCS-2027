@@ -139,6 +139,15 @@ were removed on both sites). See `docs/styling-inventory.md`.
 
 ## The record page layout
 
+**Record card after the Van Gogh Museum (branch `design/record-card`, 20 Nov 2026, proposed).** Under the media viewer, on the page's
+grey (no white card, no overlap): a narrow column on the left (the actions, then Use and access on white with "All rights and contact
+details", which opens Rights and reuse via `open_details_controller.js`) and the main column (46rem): the title in Source Sans 3
+regular at 3.5rem; an eye-icon status line (what the visitor can do with the image); the maker line in bold (makers with life dates,
+the most specific place, the date); the facts in plain text (material and measurements; credit line; collection and accession
+number); the description (three lines, Read more: CCS-413); folding sections, ruled, the plus on the left, all closed (Object details:
+every data model field in order; Rights and reuse: the CCS-27 items, terms, contact; How to cite; About this record); then Search in
+the collection (up to 14 of the record's terms as outlined, square links into search). On a phone: header, actions, sections.
+
 **Showcase layout (branch `design/record-page-vam`, 20 Nov 2026, proposed).** After the museums' object pages (the V&A's was the
 template), in the site's light theme, in `record_showcase.css`: the image whole and centred on a full-width grey band, its tools and
 thumbnails under it; a white card (75rem) over the band's foot with the record: the collection, the title in Source Sans 3 bold with a

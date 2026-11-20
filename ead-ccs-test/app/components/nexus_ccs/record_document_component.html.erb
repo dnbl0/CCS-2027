@@ -1,7 +1,5 @@
-<%# The record page in the showcase layout (20 Nov 2026; after the museums' object pages, in the site's light theme): the image centred
-    on a full-width band, then a white card over the band's lower edge holding the record (title, rule, object type and date, the key
-    rows, the description, Object details, About this record) with the actions and Use and access beside it from 1024px. You may also
-    like and More from the collections follow (catalog/show). %>
+<%# The record page: the media viewer edge to edge on a grey band (DigitalAssetsComponent), then the record after the Van Gogh Museum's
+    object pages on the same grey (the card below). You may also like and More from the collections follow (catalog/show). %>
 <%= content_tag @component,
   id: @id,
   data: { "document-id": document.id.to_s.parameterize },
@@ -22,22 +20,25 @@
     </div>
   </div>
 
+  <%# The record (after the Van Gogh Museum's object pages): on the page's grey, a narrow column (the actions and Use and access) and the
+      main column: the title, what the visitor can do with the image, the maker line, the medium, measurements and credit, the
+      description, folding sections (Object details, Rights and reuse, How to cite, About this record), and Search in the collection. %>
   <div class="record-showcase__card">
     <div class="record-showcase__grid">
       <div class="record-showcase__main record-showcase__head">
         <header class="record-showcase__header">
           <h1 class="record-showcase__title"><%= title_markup %></h1>
-          <% if subtitle_lines.any? %>
-            <div class="record-showcase__subtitle">
-              <% subtitle_lines.each do |line| %><p><%= line %></p><% end %>
-            </div>
+          <% if assets? %>
+            <p class="record-showcase__status">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="<%= access_state == :request ? "M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.8 11.8 0 0 0 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" : "M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" %>" /></svg>
+              <span><%= view_status %></span>
+            </p>
+          <% end %>
+          <% if maker_line.present? %><p class="record-showcase__maker-line"><%= maker_line %></p><% end %>
+          <% if facts_lines.any? %>
+            <div class="record-showcase__facts"><% facts_lines.each do |line| %><p><%= line %></p><% end %></div>
           <% end %>
         </header>
-
-        <%# The key rows: who made it and where %>
-        <% if lead_rows.any? %>
-          <div class="record-showcase__lead-rows"><%= render NexusCcs::RecordFactRowsComponent.new(rows: lead_rows, record: self) %></div>
-        <% end %>
 
         <%= render NexusCcs::CulturalProtocolsNoticeComponent.new(document: document) %>
         <%= render NexusCcs::DebiasNoticeComponent.new(matches: debias_matches, labels: debias_labels) %>
@@ -54,31 +55,56 @@
                     data-truncate-target="toggle" data-action="truncate#toggle" hidden><%= t("nexus_ccs.record_page.showcase.read_more") %></button>
           </div>
         <% end %>
-
       </div>
 
       <div class="record-showcase__main record-showcase__body">
-        <%# Object details (CCS-400): every field of the data model sheet the record has, in its sequence, label beside value. Open from
-            1024px and closed on a phone (record_full_controller.js). %>
-        <details class="record-showcase__details" id="object-details" open data-controller="record-full">
-          <summary><h2 class="record-showcase__section-heading" id="record-details-title"><%= t("nexus_ccs.record_page.sections.object_details") %></h2></summary>
-          <%= render NexusCcs::RecordFactRowsComponent.new(rows: first_detail_rows, record: self, id_row: more_detail_rows.empty?) %>
-          <% if more_detail_rows.any? %>
-            <%# The rest of the sheet's fields continue the list in place, so its order is never broken %>
-            <details class="record-showcase__more" id="more-details">
-              <summary class="record-read-more"><span class="record-showcase__more-show"><%= t("nexus_ccs.record_page.showcase.more_details", count: more_detail_rows.size + 1) %></span><span class="record-showcase__more-hide"><%= t("nexus_ccs.record_page.showcase.fewer_details") %></span></summary>
-              <%= render NexusCcs::RecordFactRowsComponent.new(rows: more_detail_rows, record: self, id_row: true) %>
-            </details>
-          <% end %>
-        </details>
+        <%# Folding sections, ruled, the plus on the left (closed until opened; each heading is the summary's own h2) %>
+        <div class="record-sections">
+          <details class="record-section" id="object-details">
+            <summary><h2 class="record-section__title" id="record-details-title"><%= t("nexus_ccs.record_page.sections.object_details") %></h2></summary>
+            <div class="record-section__body">
+              <%# CCS-400: every field of the data model sheet the record has, in its sequence %>
+              <%= render NexusCcs::RecordFactRowsComponent.new(rows: lead_rows + object_rows, record: self, id_row: true) %>
+            </div>
+          </details>
+          <details class="record-section" id="rights-and-reuse">
+            <summary><h2 class="record-section__title"><%= t("nexus_ccs.record_page.card.rights") %></h2></summary>
+            <div class="record-section__body">
+              <% if rights_items.any? %>
+                <dl class="record-section__list">
+                  <% rights_items.each do |label, value| %><div><dt><%= label %></dt><dd><%= value %></dd></div><% end %>
+                </dl>
+              <% else %>
+                <p><%= t("nexus_ccs.rights.none_recorded") %></p>
+              <% end %>
+              <p><%= link_to t("nexus_ccs.record_page.copyright.terms"), terms_path %></p>
+              <%= render NexusCcs::ContactCollectionComponent.new(document: document, url: helpers.solr_document_url(document)) %>
+            </div>
+          </details>
+          <details class="record-section" id="how-to-cite">
+            <summary><h2 class="record-section__title"><%= t("nexus_ccs.record_page.card.cite") %></h2></summary>
+            <div class="record-section__body"><%= render NexusCcs::CiteComponent.new(document: document, inline: true) %></div>
+          </details>
+          <details class="record-section" id="about-this-record">
+            <summary><h2 class="record-section__title"><%= t("nexus_ccs.record_page.sections.about") %></h2></summary>
+            <div class="record-section__body"><%= render NexusCcs::RecordAboutComponent.new(document: document, url: helpers.solr_document_url(document), heading: false) %></div>
+          </details>
+        </div>
 
-        <%= render NexusCcs::RecordAboutComponent.new(document: document, url: helpers.solr_document_url(document)) %>
+        <% if search_terms.any? %>
+          <section class="record-search" aria-labelledby="record-search-heading">
+            <h2 class="record-search__heading" id="record-search-heading"><%= t("nexus_ccs.record_page.card.search") %></h2>
+            <ul class="record-search__list">
+              <% search_terms.each do |label, path| %><li><%= link_to label, path, class: "record-search__term" %></li><% end %>
+            </ul>
+          </section>
+        <% end %>
       </div>
 
       <aside class="record-showcase__aside" aria-label="<%= t("nexus_ccs.record_page.showcase.aside") %>">
         <%= render NexusCcs::RecordActionsComponent.new(document: document) %>
 
-        <%# Use and access (CCS-27, 47, 67, 68, 69, 166): what the visitor may do with the object and its image, and how to ask %>
+        <%# Use and access (CCS-27, 47, 67, 68, 69, 166): can the visitor view and download the image, and how to ask %>
         <section class="record-use" id="use-and-access" aria-labelledby="record-use-heading" tabindex="-1">
           <div class="record-use__head">
             <h2 class="record-use__heading" id="record-use-heading"><%= t("nexus_ccs.record_page.use.heading") %></h2>
@@ -96,19 +122,7 @@
           <% if access_state == :request || access_state == :view_only %>
             <p class="record-use__action"><a class="record-arrow-link" href="<%= request_to_view_path %>"><%= t("nexus_ccs.record_page.use.request.#{access_state}") %></a></p>
           <% end %>
-          <%# The rights items (CCS-27), the terms and the contact card (CCS-47), one step away %>
-          <details class="record-use__more">
-            <summary><%= t("nexus_ccs.record_page.showcase.rights_and_contact") %></summary>
-            <% if rights_items.any? %>
-              <dl class="record-use__list">
-                <% rights_items.reject { |label, _| label == t("nexus_ccs.record_page.use.licence") }.each do |label, value| %><div><dt><%= label %></dt><dd><%= value %></dd></div><% end %>
-              </dl>
-            <% else %>
-              <p class="record-use__note"><%= t("nexus_ccs.rights.none_recorded") %></p>
-            <% end %>
-            <p class="record-use__terms"><%= link_to t("nexus_ccs.record_page.copyright.terms"), terms_path %></p>
-            <div class="record-use__contact"><%= render NexusCcs::ContactCollectionComponent.new(document: document, url: helpers.solr_document_url(document)) %></div>
-          </details>
+          <p class="record-use__link"><a href="#rights-and-reuse" data-controller="open-details" data-action="open-details#open"><%= t("nexus_ccs.record_page.card.rights_link") %></a></p>
         </section>
       </aside>
     </div>

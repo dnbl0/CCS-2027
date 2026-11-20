@@ -1,5 +1,5 @@
-<section class="record-about" id="about-this-record" aria-labelledby="record-about-heading">
-  <h2 class="record-showcase__section-heading" id="record-about-heading"><%= t("nexus_ccs.record_page.sections.about") %></h2>
+<%= tag.section class: "record-about", id: (heading? ? "about-this-record" : nil), aria: { labelledby: (heading? ? "record-about-heading" : nil) } do %>
+  <% if heading? %><h2 class="record-showcase__section-heading" id="record-about-heading"><%= t("nexus_ccs.record_page.sections.about") %></h2><% end %>
   <div class="record-about__text">
     <p><%= t("nexus_ccs.record_page.split.about.improve.body") %></p>
     <p><%= advisory %></p>
@@ -31,4 +31,4 @@
     </ul>
     <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
   </div>
-</section>
+<% end %>

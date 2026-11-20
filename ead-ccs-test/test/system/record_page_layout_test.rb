@@ -189,15 +189,13 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     end
   end
 
-  test "the image is centred on its band and the card overlaps the band's foot; from 1024px the actions sit beside the record, on a phone between its header and Object details" do
+  test "the record follows the Van Gogh Museum's layout: from 1024px the actions column on the left, the record on the right; on a phone the header, then the actions, then the sections" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
     rect = ->(selector) { page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
-    hero, card, image = rect.call(".record-showcase__hero"), rect.call(".record-showcase__card"), rect.call(".digital-assets__main")
-    assert_operator card["top"], :<, hero["bottom"], "the card overlaps the band"
-    assert_in_delta (hero["left"] + hero["right"]) / 2, (image["left"] + image["right"]) / 2, 2, "the image is centred"
     head, aside, body = rect.call(".record-showcase__head"), rect.call(".record-showcase__aside"), rect.call(".record-showcase__body")
-    assert_operator aside["left"], :>=, head["right"] - 1
+    assert_operator aside["right"], :<=, head["left"] + 1, "the actions column is left of the record"
     assert_operator body["top"], :>=, head["bottom"] - 1
+    assert_equal "rgb(244, 244, 244)", page.evaluate_script("getComputedStyle(document.querySelector('.record--showcase')).backgroundColor"), "the record sits on the page's grey"
 
     open_record(VARIANTS.fetch("one image, open"), "phone")
     head, aside, body = rect.call(".record-showcase__head"), rect.call(".record-showcase__aside"), rect.call(".record-showcase__body")
@@ -205,28 +203,23 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_operator body["top"], :>=, aside["bottom"] - 1
   end
 
-  test "Use and access states the record's rights on a phone and a desktop; Object details is open on a desktop and closed on a phone" do
-    { "phone" => false, "desktop" => true }.each do |width, open|
-      open_record({}, width)
-      assert_selector "#use-and-access h2", text: "Use and access"
-      # the rights, terms and contact are one step away
-      assert_no_selector "#use-and-access", text: "Rights held by the University"
-      find("#use-and-access summary", text: "Rights, credit and contact").click
-      assert_selector "#use-and-access", text: "Rights held by the University"
-      assert_selector "#use-and-access a[href='/help#copyright']", text: "About copyright and terms of use"
-      assert_equal open, page.evaluate_script("document.getElementById('object-details').open")
-    end
-    assert_selector "#object-details[open] .record-facts__row dt", text: /object type/i # letter-spaced capitals, set in CSS
-    # the first rows, then the rest continue in place, in the sheet's order
-    if page.has_selector?("#more-details summary", wait: 0)
-      shown = page.all("#object-details .record-facts__row dt").size
-      find("#more-details summary").click
-      assert_operator page.all("#object-details .record-facts__row dt").size, :>, shown
-      assert_selector "#more-details[open] [data-testid=record-identifier]"
-    end
-    # the key rows under the title: who made it, label beside value
-    label, value = page.evaluate_script("(() => { const r = document.querySelector('.record-showcase__lead-rows .record-facts__row'); return [r.querySelector('dt').getBoundingClientRect().toJSON(), r.querySelector('dd').getBoundingClientRect().toJSON()] })()")
-    assert_operator value["left"], :>, label["right"]
+  test "under the title: the status, the bold maker line and the facts; the folding sections start closed, and the rights link opens Rights and reuse" do
+    open_record(VARIANTS.fetch("one image, open"), "desktop")
+    assert_selector ".record-showcase__status svg[aria-hidden=true]"
+    assert_selector ".record-showcase__status", text: "You can view the image online"
+    assert_selector ".record-showcase__facts", text: "accession number"
+    %w[object-details rights-and-reuse how-to-cite about-this-record].each { |id| assert_equal false, page.evaluate_script("document.getElementById('#{id}').open"), id }
+    assert_selector "#use-and-access h2", text: "Use and access"
+
+    find("#use-and-access a", text: "All rights and contact details").click
+    assert_selector "#rights-and-reuse[open]", text: "Rights held by the University"
+    assert_selector "#rights-and-reuse a[href='/help#copyright']", text: "About copyright and terms of use"
+    assert_equal "SUMMARY", page.evaluate_script("document.activeElement.tagName")
+
+    find("#object-details summary").click
+    assert_selector "#object-details[open] .record-facts__row dt", text: /object type/i
+    assert_selector "#object-details[open] [data-testid=record-identifier]"
+    assert_selector ".record-search .record-search__term", minimum: 1
   end
 
   test "the Tab key moves through the record page in the order it reads, and each stop shows a focus ring" do

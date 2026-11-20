@@ -178,16 +178,44 @@ module NexusCcs
     # Object details: the sheet's own fields after the key rows (not the index's era and region, which repeat the date and the place)
     def object_rows = detail_rows.reject { |row| LEAD_SEQS.include?(row.seq) || !row.seq.is_a?(Integer) }
 
-    # How many rows Object details shows before "Show all details"; the rest continue the list, in the sheet's order
-    FIRST_DETAILS = 6
-
-    def first_detail_rows = object_rows.first(FIRST_DETAILS)
-    def more_detail_rows = object_rows.drop(FIRST_DETAILS)
 
     def lead_rows = detail_rows.select { |row| LEAD_SEQS.include?(row.seq) }
 
-    # Under the title, one line each: what it is and when (the object type and the date as the record gives them)
-    def subtitle_lines = [ Array(document["object_type_ssim"]).first&.to_s&.upcase_first, display_date ].compact_blank
+    # --- The record card (after the Van Gogh Museum's object pages) -------------------------------------------------------------
+    # The bold line under the title: who made it (with life dates), where (the most specific place) and when
+    def maker_line
+      creators = (detail_rows.find { |row| row.seq == CREATOR_SEQ }&.values || []).first(2)
+      place = Array(document["production_place_ssim"]).map(&:to_s).compact_blank.last
+      [ creators.join("; ").presence, place, display_date ].compact_blank.join(", ")
+    end
+
+    # The lines under it: the material and measurements; the credit line; the collection and accession number
+    def facts_lines
+      measurements = Array(document["dimensions_ssm"]).map(&:to_s).compact_blank.join("; ")
+      accession = Array(document["accession_number_ssim"]).first.presence
+      [ [ medium, measurements.presence ].compact.join(", ").presence,
+        credit_line,
+        [ collection_name, (I18n.t("nexus_ccs.record_page.card.accession", number: accession) if accession) ].compact.join(", ").presence ].compact
+    end
+
+    # "Search in the collection": the record's names and terms, each a link to its search or browse page (as in Object details),
+    # when first, era, place, kind, material and subject, then classification, maker and collections; at most 14, no repeats
+    SEARCH_ORDER = [ 3.5, 7, 2, 10, 15, 17, 4, 18, 19 ].freeze
+
+    def search_terms
+      @search_terms ||= begin
+        rows = detail_rows.select { |row| term?(row) && SEARCH_ORDER.include?(row.seq) }.sort_by { |row| SEARCH_ORDER.index(row.seq) }
+        terms = rows.flat_map do |row|
+          row.values.filter_map do |value|
+            label = row.seq == CREATOR_SEQ ? (creator_name(value) || value.sub(/\s*\(.*\z/, "")) : value
+            path = value_link(row, value)
+            [ label, path ] if path
+          end
+        end
+        terms.uniq(&:first).first(14)
+      end
+    end
+
 
     # The record's source reference ends Object details, after the sheet's fields
     def history_rows

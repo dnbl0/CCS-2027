@@ -79,6 +79,13 @@ en:
         copy: "Copy this information"
         download: "Download image"
         close: "Close"
+      # The record card after the Van Gogh Museum's object pages. PLACEHOLDER WORDING.
+      card:
+        rights: "Rights and reuse"
+        rights_link: "All rights and contact details"
+        cite: "How to cite this record"
+        search: "Search in the collection"
+        accession: "accession number %{number}"
       # The showcase layout (20 Nov 2026)
       showcase:
         read_more: "Read more"
@@ -94,11 +101,6 @@ en:
         also_like: "You may also like"
         shuffle: "Shuffle objects"
         shuffled: "Showing other objects you may like"
-        more_details:
-          one: "Show 1 more detail"
-          other: "Show %{count} more details"
-        fewer_details: "Show fewer details"
-        rights_and_contact: "Rights, credit and contact"
         more_ways: "More ways to explore"
       # The approved split layout (Figma "Record page · Approved design", 2026-11-19)
       split:
