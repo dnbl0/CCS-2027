@@ -18,7 +18,7 @@
 /* The band: the media viewer (digital_assets.css) edge to edge, then grey room for the card to overlap, so the card never covers
    the controls bar or the thumbnails */
 .record-showcase__hero { background: var(--ccs-surface-subtle); padding: 0 0 calc(var(--ccs-space-8) + var(--ccs-space-6)); }
-.record-showcase__hero-inner { max-width: 90rem; margin: 0 auto; }
+.record-showcase__hero-inner { width: 100%; }
 .record--showcase .record-showcase__hero-inner > :not(.digital-assets) { margin: var(--ccs-space-5) var(--ccs-space-4) 0; padding: var(--ccs-space-7) var(--ccs-space-5); background: var(--ccs-surface-default); }
 
 /* The card, over the band's lower edge */

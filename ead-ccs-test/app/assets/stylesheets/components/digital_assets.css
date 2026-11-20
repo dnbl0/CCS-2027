@@ -18,28 +18,35 @@
   color: var(--ccs-text-primary);
 }
 
-/* --- Layout: info | stage | thumbs ------------------------------------------------------------------------------------------- */
+/* --- Layout: stage | thumbs, with the media information laid over the left ------------------------------------------------
+   The panel slides over the left of the viewer at its full height rather than taking a column, so opening it never moves the image. */
 .media-viewer__body {
+  position: relative;
   display: grid;
   grid-template-areas: "stage" "thumbs";
   grid-template-columns: minmax(0, 1fr);
 }
-.media-viewer__info { grid-area: stage; z-index: 1; height: var(--mv-stage); }  /* below 600px it covers the stage, at its height */
 .media-viewer__stage { grid-area: stage; height: var(--mv-stage); }
 .media-viewer__thumbs { grid-area: thumbs; }
 .media-viewer--single .media-viewer__body { grid-template-areas: "stage"; }
-
+.media-viewer__info {
+  position: absolute; top: 0; left: 0; z-index: 2; width: 100%; height: var(--mv-stage);  /* below 600px: covers the stage */
+  box-shadow: var(--ccs-shadow-lg);
+}
 @container media-viewer (min-width: 600px) {
-  .media-viewer__body { grid-template-areas: "info stage" "thumbs thumbs"; grid-template-columns: auto minmax(0, 1fr); }
-  .media-viewer__info { grid-area: info; width: var(--mv-info); height: var(--mv-stage); border-right: 1px solid var(--ccs-border-subtle); }
-  .media-viewer--single .media-viewer__body { grid-template-areas: "info stage"; }
+  .media-viewer__info { width: var(--mv-info); border-right: 1px solid var(--ccs-border-subtle); }
 }
 @container media-viewer (min-width: 1024px) {
-  .media-viewer__body { grid-template-areas: "info stage thumbs"; grid-template-columns: auto minmax(0, 1fr) auto; height: var(--mv-height); }
-  .media-viewer__info, .media-viewer__stage { height: auto; min-height: 0; }
+  .media-viewer__body { grid-template-areas: "stage thumbs"; grid-template-columns: minmax(0, 1fr) auto; height: var(--mv-height); }
+  .media-viewer__stage { height: auto; min-height: 0; }
+  .media-viewer__info { height: 100%; }
   .media-viewer__thumbs { width: var(--mv-thumbs); min-height: 0; border-left: 1px solid var(--ccs-border-subtle); }
-  .media-viewer--single .media-viewer__body { grid-template-areas: "info stage"; grid-template-columns: auto minmax(0, 1fr); }
+  .media-viewer--single .media-viewer__body { grid-template-areas: "stage"; grid-template-columns: minmax(0, 1fr); }
 }
+@media (prefers-reduced-motion: no-preference) {
+  .media-viewer__info:not([hidden]) { animation: media-viewer-info-in 160ms ease-out; }
+}
+@keyframes media-viewer-info-in { from { transform: translateX(-1rem); opacity: 0; } }
 
 /* --- Stage: the asset, fitted whole, on text/primary, the controls bar along its bottom -------------------------------------- */
 .media-viewer__stage { display: flex; flex-direction: column; min-width: 0; background: var(--ccs-text-primary); color: var(--ccs-text-inverse); }
@@ -133,10 +140,13 @@
 @container media-viewer (min-width: 1024px) { .digital-assets__thumb { height: auto; aspect-ratio: auto; } }
 .digital-assets__thumb-image { display: block; width: 100%; height: 100%; object-fit: cover; }
 @container media-viewer (min-width: 1024px) { .digital-assets__thumb-image { height: auto; max-height: 15rem; } }
+/* The one on show: a 4px navy frame inside the picture and a solid navy number, so it reads at a glance; the keyboard focus ring is
+   blue and outside the frame, so the two never look alike and can show together */
 .digital-assets__thumb::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
-.digital-assets__thumb:hover::after { box-shadow: inset 0 0 0 1px var(--ccs-border-strong); }
-.digital-assets__thumb[aria-current="true"] { outline: 2px solid var(--ccs-border-brand); outline-offset: 2px; }
-.digital-assets__thumb:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.digital-assets__thumb:hover::after { box-shadow: inset 0 0 0 2px var(--ccs-border-strong); }
+.digital-assets__thumb[aria-current="true"]::after { box-shadow: inset 0 0 0 4px var(--ccs-text-brand); }
+.digital-assets__thumb[aria-current="true"] .digital-assets__thumb-number { background: var(--ccs-text-brand); color: var(--ccs-text-inverse); }
+.digital-assets__thumb:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
 .digital-assets__thumb-number, .digital-assets__thumb-kind {
   position: absolute; bottom: var(--ccs-space-2); display: inline-flex; align-items: center; justify-content: center;
   min-width: 1.5rem; height: 1.5rem; padding: 0 var(--ccs-space-2); border-radius: var(--ccs-radius-sm); background: var(--ccs-surface-default);
@@ -181,5 +191,7 @@ a.viewer-chip--link:focus-visible { outline: 2px solid var(--ccs-focus-ring); ou
 
 @media (forced-colors: active) {
   .media-viewer__bar { border-top-color: CanvasText; }
-  .viewer-control:focus-visible, .digital-assets__thumb:focus-visible, .digital-assets__thumb[aria-current="true"] { outline-color: Highlight; }
+  .viewer-control:focus-visible, .digital-assets__thumb:focus-visible { outline-color: Highlight; }
+  /* shadows are dropped in forced colours: the one on show keeps a visible frame */
+  .digital-assets__thumb[aria-current="true"] { outline: 4px solid Highlight; outline-offset: -4px; }
 }

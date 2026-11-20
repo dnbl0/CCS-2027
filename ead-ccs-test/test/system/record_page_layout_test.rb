@@ -135,15 +135,19 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_selector "dialog[open] a.btn[download]", text: "Download image"
     find("dialog[open] .modal-footer button", text: "Close").click
     assert_no_selector "dialog[open]"
-    # CCS-422: ⋮ opens the media information on the left at the viewer's full height; focus moves to its heading; Escape closes it
-    # and focus returns to ⋮
+    # CCS-422: ⋮ opens the media information over the left of the viewer at its full height; focus moves to its heading; Escape
+    # closes it and focus returns to ⋮
+    image_box = "(() => { const r = document.querySelector('.digital-assets__image').getBoundingClientRect(), v = document.querySelector('.media-viewer__body').getBoundingClientRect(); return [Math.round(r.left - v.left), Math.round(r.top - v.top), Math.round(r.width), Math.round(r.height)] })()"
+    image_before = page.evaluate_script(image_box)
     find("button.viewer-control[aria-controls=media-information]").click
     assert_selector "#media-information h3", text: "Media information"
     assert_equal "true", find("button.viewer-control[aria-controls=media-information]")["aria-expanded"]
     assert_equal "media-information-heading", page.evaluate_script("document.activeElement.id")
-    panel, body, stage = %w[#media-information .media-viewer__body .media-viewer__stage].map { |sel| page.evaluate_script("document.querySelector('#{sel}').getBoundingClientRect().toJSON()") }
+    panel, body = %w[#media-information .media-viewer__body].map { |sel| page.evaluate_script("document.querySelector('#{sel}').getBoundingClientRect().toJSON()") }
     assert_in_delta body["height"], panel["height"], 1, "the panel is the viewer's full height"
-    assert_operator panel["right"], :<=, stage["left"] + 1, "the panel is on the left and the stage beside it, not under it"
+    assert_equal 0, page.evaluate_script("document.getElementById('media-information').offsetLeft"), "the panel is on the left (its layout box: the slide-in is a transform)"
+    assert_equal image_before, page.evaluate_script(image_box), "opening the panel does not move the image"
+    assert page.evaluate_script("document.querySelector('[aria-controls=media-information]').inert"), "⋮ is under the panel, so it leaves the tab order"
     page.send_keys(:escape)
     assert_no_selector "#media-information"
     assert page.evaluate_script("document.activeElement.getAttribute('aria-controls') === 'media-information'")
@@ -293,6 +297,11 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     open_record(VARIANTS.fetch("several images, view-only"), "desktop")
     previous, nxt = find("button[aria-label='Previous image']"), find("button[aria-label='Next image']")
     assert_equal "true", previous["aria-disabled"]
+    # the one on show is unmistakable: a 4px navy frame inside the picture and a solid navy number (the others have neither)
+    frame = ->(selector) { page.evaluate_script("(() => { const t = document.querySelector(\"#{selector}\"); return [getComputedStyle(t, '::after').boxShadow, getComputedStyle(t.querySelector('.digital-assets__thumb-number')).backgroundColor] })()") }
+    current, other = frame.call(".digital-assets__thumb[aria-current=true]"), frame.call(".digital-assets__thumb:not([aria-current])")
+    assert_match(/4px/, current[0]); assert_equal "none", other[0]
+    assert_not_equal current[1], other[1]
     (THUMBS.size - 1).times { nxt.click }
     assert_equal "true", nxt["aria-disabled"]
     assert_nil previous["aria-disabled"]

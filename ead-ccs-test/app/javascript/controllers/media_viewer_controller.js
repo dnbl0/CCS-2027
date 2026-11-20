@@ -2,8 +2,9 @@ import { Controller } from "@hotwired/stimulus"
 
 // The record's media viewer (DigitalAssetsComponent; Figma "Media viewer", after Europeana's item viewer).
 //
-// - ⋮ opens the media information on the left at the viewer's full height: focus moves to its heading, Close or Escape returns it
-//   to ⋮. Where the viewer is narrow the panel covers the media, so the rest of the viewer is made inert while it is open.
+// - ⋮ opens the media information over the left of the viewer at its full height (the image does not move): focus moves to its
+//   heading, Close or Escape returns it to ⋮. ⋮ is under the panel while it is open, so it leaves the tab order (WCAG 2.4.11); where
+//   the viewer is narrow the panel covers the media, so the rest of the viewer is made inert too.
 // - Rotate, zoom and reset are passed to the zoom viewer (deep_zoom_controller listens for media-viewer:zoom on window), which
 //   reports back with deep-zoom:state; the controls are disabled (aria-disabled, still focusable, the reason in their tooltip)
 //   at the limits, and the readout shows the zoom.
@@ -65,8 +66,9 @@ export default class extends Controller {
     this.panelTarget.hidden = false
     this.element.classList.add("has-information")
     this.infoButtonTarget.setAttribute("aria-expanded", "true")
+    this.infoButtonTarget.inert = true
     if (this.narrow) this.inertBehindPanel(true)
-    this.panelHeadingTarget.focus()
+    this.panelHeadingTarget.focus({ preventScroll: true }) // the panel opens where the visitor is: no jump
   }
 
   closePanel() {
@@ -74,6 +76,7 @@ export default class extends Controller {
     this.panelTarget.hidden = true
     this.element.classList.remove("has-information")
     this.infoButtonTarget.setAttribute("aria-expanded", "false")
+    this.infoButtonTarget.inert = false
     this.inertBehindPanel(false)
     this.infoButtonTarget.focus()
   }
