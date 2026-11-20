@@ -20,9 +20,13 @@ class MoreFromCollectionsComponentTest < ActiveSupport::TestCase
 
     assert_selector "section#more-from-the-collections h2", text: "More from the collections"
     assert_no_selector "[role=tablist], [role=tab], [role=tabpanel]", visible: :all
-    headings = page.all(".record-more__row h3").map(&:text)
+    headings = page.all(".record-more__row h3", visible: :all).map { |heading| heading.text(:all) }
     assert_equal "More by Lees, Derwent", headings.first
     assert_includes headings, "More of this type"
+    # two rows at first; the others behind "More ways to explore", their frames loading only once it is opened
+    assert_equal 2, page.all(".record-more__inner > .record-more__row").size
+    assert_selector "details.record-more__others .record-more__row", visible: :all
+    assert_selector "details.record-more__others summary", text: "More ways to explore"
     assert_selector "section#more-row-creator[aria-labelledby=more-row-creator-heading] turbo-frame#more-creator[loading=lazy][src='/catalog/emu-source/similar?row=creator'][data-controller=lazy-frame]"
   end
 

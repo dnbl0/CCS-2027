@@ -18,6 +18,17 @@ module NexusCcs
 
     def render? = rows.any? || id_row?
 
+    # The mark drawn between a row's terms: a hyphen means something (Classification's primary - secondary), a comma only separates
+    # what the tags already show apart, so it is not drawn
+    def joiner(row) = row.join&.strip.presence&.then { |mark| mark unless mark == "," }
+
+    # A long text (an inscription, a note) fades out after a few lines above Read more, as the description does
+    LONG_TEXT = 280
+
+    def long?(row) = !row.join && row.values.sum(&:length) > LONG_TEXT
+
+    def text_id(row) = "record-text-#{row.field.to_s.parameterize}"
+
     # The values of a text row, each on its own line, or joined into one line where the sheet says so
     def text_values(row)
       flagged = row.values.each_with_index.map { |value, index| record.flagged(row, value, index) }

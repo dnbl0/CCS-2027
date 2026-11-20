@@ -6,7 +6,8 @@ class RecordContactHelpTest < ApplicationSystemTestCase
     page.driver.set_cookie("country_acknowledged", "1")
     visit search_catalog_path(any_assets: "1", q: "skull")
     first(".result-card .document-title-heading a").click
-    # The card is in the record column's Use and access panel
+    # The card is in Use and access, under "Rights, credit and contact"
+    find("#use-and-access summary", text: "Rights, credit and contact").click
     assert_selector "#use-and-access .contact-collection"
   end
 

@@ -1,7 +1,12 @@
 <section class="record-more" id="more-from-the-collections" aria-labelledby="record-more-heading">
   <div class="record-more__inner">
     <h2 class="record-band-heading" id="record-more-heading"><%= t("nexus_ccs.record_page.split.more.heading") %></h2>
-    <% rows.each do |row| %>
+    <% rows.each_with_index do |row, index| %>
+      <% if index == FIRST_ROWS %>
+        <%# The other ways in, one step away: their frames load only once opened %>
+        <details class="record-more__others">
+          <summary class="record-read-more"><%= t("nexus_ccs.record_page.showcase.more_ways") %></summary>
+      <% end %>
       <section class="record-more__row" id="more-row-<%= row.key %>" aria-labelledby="more-row-<%= row.key %>-heading">
         <h3 class="record-more__row-heading" id="more-row-<%= row.key %>-heading"><%= row.label %></h3>
         <turbo-frame id="more-<%= row.key %>" src="<%= row.source %>" loading="lazy" data-controller="lazy-frame"
@@ -9,5 +14,6 @@
         <p class="record-more__empty" hidden data-lazy-frame-empty><%= t("nexus_ccs.record_page.split.more.empty") %></p>
       </section>
     <% end %>
+    <% if rows.size > FIRST_ROWS %></details><% end %>
   </div>
 </section>

@@ -72,7 +72,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
 
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
         assert_selector "h1", count: 1
-        assert_selector ".record-split__details header.record-split__header h1"
+        assert_selector ".record-showcase__card header.record-showcase__header h1"
         assert_equal false, page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
         outline = page.evaluate_script("[...document.querySelectorAll('#main-container h1, #main-container h2, #main-container h3')].filter(e => e.getClientRects().length > 0).map(e => e.tagName + ' ' + e.textContent.trim())")
@@ -84,11 +84,9 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
         assert_includes outline, "H2 Object details"
         assert_includes outline, "H2 Use and access"
 
-        # The media column stays in view beside the scrolling details on a wide screen (the approved design); nothing else is sticky
+        # Nothing in the page sticks (the showcase layout scrolls as one page; the search strip is the header's)
         sticky = page.evaluate_script("[...document.querySelectorAll('#main-container *')].filter(e => e.getClientRects().length > 0 && ['sticky', 'fixed'].includes(getComputedStyle(e).position)).map(e => e.className)")
-        # sticky exactly when it fits the window under the search strip (media_viewer_controller.js); a taller column scrolls
-        fits = page.evaluate_script("(() => { const v = document.querySelector('.record-split__viewer'); return v.scrollHeight <= window.innerHeight - 60 && window.innerWidth >= 1024 && !!v.querySelector('.digital-assets') })()")
-        assert_equal(fits ? [ "record-split__viewer is-sticky" ] : [], sticky)
+        assert_equal [], sticky
 
         small = page.evaluate_script(<<~JS)
           [...document.querySelectorAll('.record-actions button, .record-actions a, .digital-assets__controls-row button, .digital-assets__controls-row a, .digital-assets__strip button, .digital-assets__thumb, .result-stepper a, .record-term')]
@@ -176,41 +174,50 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
   test "a request-only or sensitive record has no asset address in its page" do
     %w[request-only sensitive].each do |name|
       open_record(VARIANTS.fetch(name), "desktop")
-      assert_no_selector ".record-split img[src*='/digital-assets/']"
-      layout = page.evaluate_script("document.querySelector('.record-split').outerHTML")
+      assert_no_selector ".record--showcase img[src*='/digital-assets/']"
+      layout = page.evaluate_script("document.querySelector('.record--showcase').outerHTML")
       assert_not_includes layout, "/digital-assets/"
     end
   end
 
-  test "from 1024px the media is on the left and the record's column on the right, the media staying in view as the column scrolls; below it, one column, media first" do
+  test "the image is centred on its band and the card overlaps the band's foot; from 1024px the actions sit beside the record, on a phone between its header and Object details" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
     rect = ->(selector) { page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
-    viewer, details = rect.call(".record-split__viewer"), rect.call(".record-split__details")
-    assert_operator details["left"], :>=, viewer["right"] - 1
-    assert_in_delta viewer["top"], details["top"], 1
-    page.execute_script("window.scrollTo(0, 600)")
-    # under the sticky search strip once it has slid in (60px), else at the top of the window
-    strip = page.has_selector?(".sticky-search.is-visible", wait: 1) ? 60 : 0
-    assert_in_delta strip, rect.call(".record-split__viewer")["top"], 1, "the media stays in view"
+    hero, card, image = rect.call(".record-showcase__hero"), rect.call(".record-showcase__card"), rect.call(".digital-assets__main")
+    assert_operator card["top"], :<, hero["bottom"], "the card overlaps the band"
+    assert_in_delta (hero["left"] + hero["right"]) / 2, (image["left"] + image["right"]) / 2, 2, "the image is centred"
+    head, aside, body = rect.call(".record-showcase__head"), rect.call(".record-showcase__aside"), rect.call(".record-showcase__body")
+    assert_operator aside["left"], :>=, head["right"] - 1
+    assert_operator body["top"], :>=, head["bottom"] - 1
 
     open_record(VARIANTS.fetch("one image, open"), "phone")
-    viewer, details = rect.call(".record-split__viewer"), rect.call(".record-split__details")
-    assert_operator details["top"], :>=, viewer["bottom"] - 1
+    head, aside, body = rect.call(".record-showcase__head"), rect.call(".record-showcase__aside"), rect.call(".record-showcase__body")
+    assert_operator aside["top"], :>=, head["bottom"] - 1
+    assert_operator body["top"], :>=, aside["bottom"] - 1
   end
 
-  test "Use and access states the record's rights on a phone and a desktop; the full record is open on a desktop and closed on a phone" do
+  test "Use and access states the record's rights on a phone and a desktop; Object details is open on a desktop and closed on a phone" do
     { "phone" => false, "desktop" => true }.each do |width, open|
       open_record({}, width)
       assert_selector "#use-and-access h2", text: "Use and access"
+      # the rights, terms and contact are one step away
+      assert_no_selector "#use-and-access", text: "Rights held by the University"
+      find("#use-and-access summary", text: "Rights, credit and contact").click
       assert_selector "#use-and-access", text: "Rights held by the University"
       assert_selector "#use-and-access a[href='/help#copyright']", text: "About copyright and terms of use"
-      assert_equal open, page.evaluate_script("document.getElementById('full-record').open")
-      # Key facts summarise the full record, so they show only while it is closed
-      assert_equal !open, page.has_selector?(".record-facts__key", wait: 0)
+      assert_equal open, page.evaluate_script("document.getElementById('object-details').open")
     end
-    assert_selector "#full-record[open] .record-full__group-title", text: "The object"
-    find("#full-record summary").click # closing it on a desktop brings the Key facts back
-    assert_selector ".record-facts__key h3", text: "Key facts"
+    assert_selector "#object-details[open] .record-facts__row dt", text: /object type/i # letter-spaced capitals, set in CSS
+    # the first rows, then the rest continue in place, in the sheet's order
+    if page.has_selector?("#more-details summary", wait: 0)
+      shown = page.all("#object-details .record-facts__row dt").size
+      find("#more-details summary").click
+      assert_operator page.all("#object-details .record-facts__row dt").size, :>, shown
+      assert_selector "#more-details[open] [data-testid=record-identifier]"
+    end
+    # the key rows under the title: who made it, label beside value
+    label, value = page.evaluate_script("(() => { const r = document.querySelector('.record-showcase__lead-rows .record-facts__row'); return [r.querySelector('dt').getBoundingClientRect().toJSON(), r.querySelector('dd').getBoundingClientRect().toJSON()] })()")
+    assert_operator value["left"], :>, label["right"]
   end
 
   test "the Tab key moves through the record page in the order it reads, and each stop shows a focus ring" do
@@ -218,7 +225,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     # start on the last control before the media (it comes first in this layout, then the record's column)
     page.evaluate_script(<<~JS)
       (() => { const all = [...document.querySelectorAll('a[href], button, input, select, summary, [tabindex]:not([tabindex="-1"])')].filter(e => e.getClientRects().length > 0 && !e.disabled),
-                     first = all.findIndex(e => e.closest('.record-split__viewer')); all[first - 1].focus() })()
+                     first = all.findIndex(e => e.closest('.record-showcase__hero')); all[first - 1].focus() })()
     JS
 
     stops = 16.times.map do
@@ -240,7 +247,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     open_record(VARIANTS.fetch("several images, view-only"), "desktop")
     rect = ->(selector) { page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
     # where the controls row sits in the media column (the page may scroll to the button)
-    row_offset = -> { page.evaluate_script("document.querySelector('.digital-assets__controls-row').getBoundingClientRect().top - document.querySelector('.record-split__viewer').getBoundingClientRect().top") }
+    row_offset = -> { page.evaluate_script("document.querySelector('.digital-assets__controls-row').getBoundingClientRect().top - document.querySelector('.record-showcase__hero').getBoundingClientRect().top") }
     row = row_offset.call
 
     click_button "Zoom in"
@@ -264,26 +271,45 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_selector ".digital-assets__image", visible: true
   end
 
-  test "a long description is collapsed with Show more, and Show less collapses it again, its paragraphs kept" do
+  test "a long description fades out above Read more, and Read less collapses it again, its paragraphs kept" do
     open_record({ "description_tsim" => [ "#{'A cabinet of drawers. ' * 30}\n\nMade for the specimen collection." ] }, "desktop")
 
-    toggle = find(".record-split__description button[aria-controls=record-description]")
-    assert_equal [ "false", "Show more" ], [ toggle["aria-expanded"], toggle.text ]
-    assert_no_selector ".record-split__paragraph", text: "Made for the specimen collection."
+    toggle = find(".record-showcase__description button[aria-controls=record-description]")
+    assert_equal [ "false", "Read more" ], [ toggle["aria-expanded"], toggle.text ]
+    assert_no_selector ".record-showcase__description-text p", text: "Made for the specimen collection."
+    # CCS-413: three lines while collapsed
+    lines = page.evaluate_script("(() => { const p = document.querySelector('.record-showcase__lead'); return Math.round(p.clientHeight / parseFloat(getComputedStyle(p).lineHeight)) })()")
+    assert_equal 3, lines
 
     toggle.click
-    assert_equal [ "true", "Show less" ], [ toggle["aria-expanded"], toggle.text ]
-    assert_selector "p.record-split__paragraph", text: "Made for the specimen collection."
+    assert_equal [ "true", "Read less" ], [ toggle["aria-expanded"], toggle.text ]
+    assert_selector ".record-showcase__description-text p", text: "Made for the specimen collection."
 
     toggle.click
     assert_equal "false", toggle["aria-expanded"]
-    assert_no_selector ".record-split__paragraph", text: "Made for the specimen collection."
+    assert_no_selector ".record-showcase__description-text p", text: "Made for the specimen collection."
   end
 
   test "a short description has no Show more" do
     open_record({ "description_tsim" => [ "A cabinet." ] }, "desktop")
 
-    assert_selector ".record-split__lead", text: "A cabinet."
-    assert_no_selector ".record-split__description button", visible: true
+    assert_selector ".record-showcase__lead", text: "A cabinet."
+    assert_no_selector ".record-showcase__description button", visible: true
+  end
+
+  test "You may also like lays six similar records' pictures on the grey band, and Shuffle shows others" do
+    open_record(VARIANTS.fetch("one image, open"), "desktop")
+    page.execute_script("document.getElementById('similar-records').scrollIntoView({ behavior: 'instant' })")
+    skip "the core holds no similar records with pictures for this record" unless page.has_selector?("#related-objects", wait: 8)
+
+    assert_selector "#related-objects h2", text: "You may also like"
+    assert_operator page.all(".record-also__item", visible: true).size, :<=, 6
+    page.all(".record-also__print", visible: true).each { |link| assert link.text.strip.present?, "every picture is a link named by its title" }
+    if page.all(".record-also__item", visible: :all).size > 6
+      before = page.all(".record-also__item", visible: true).map(&:text)
+      click_button "Shuffle objects"
+      assert_selector "[data-shuffle-target=status]", text: "Showing other objects", visible: :all
+      assert_not_equal before, page.all(".record-also__item", visible: true).map(&:text)
+    end
   end
 end

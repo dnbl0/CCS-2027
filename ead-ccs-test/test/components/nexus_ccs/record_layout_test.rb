@@ -62,16 +62,27 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_equal [ "Grainger, Percy Aldridge" ], component(FIELDS).detail_rows.find { |row| row.label == "Creator" }.values
   end
 
-  test "the full record's groups keep the sequence, and the collection group is always there for the UoM ID" do
-    groups = component(SHEET).detail_groups.to_h
+  test "who made it and where are the key rows under the title; Object details holds the rest, in the sheet's order" do
+    record = component(SHEET)
 
-    assert_equal %i[object physical subject collection], groups.keys
-    assert_equal %w[Material Measurements Inscription], groups[:physical].map(&:label)
-    assert_equal [ :collection ], component({ "title_tsim" => [ "Bare" ] }).detail_groups.map(&:first)
+    assert_equal %w[Creator Place], record.lead_rows.map(&:label)
+    labels = record.object_rows.map(&:label)
+    assert_equal %w[Object\ Type Date Material Measurements Inscription Classification Collection Accession\ Number Source\ URL Related\ Record], labels
+    assert_equal record.object_rows.map(&:seq), record.object_rows.map(&:seq).sort
   end
 
-  test "Key facts are object type, date, material, measurements, collection and accession number" do
-    assert_equal %w[Object\ Type Date Material Measurements Collection Accession\ Number], component(SHEET).key_facts.map(&:label)
+  test "Object details shows its first six rows, and the rest continue them in the sheet's order; era and region are left out" do
+    record = component(SHEET.merge("date_era_ssim" => [ "20th century" ], "region_ssim" => [ "Oceania" ]))
+
+    assert_equal 6, record.first_detail_rows.size
+    assert_equal record.object_rows, record.first_detail_rows + record.more_detail_rows
+    assert_not_includes record.object_rows.map(&:label), "Era"
+    assert_not_includes record.object_rows.map(&:label), "Region"
+  end
+
+  test "under the title, one line for what it is and one for when" do
+    assert_equal [ "Tone tool", "1952" ], component(SHEET).subtitle_lines
+    assert_equal [], component({ "title_tsim" => [ "Bare" ] }).subtitle_lines
   end
 
   test "Use and access: the rights items in CCS-27's order; caption and terms only with a digital asset" do

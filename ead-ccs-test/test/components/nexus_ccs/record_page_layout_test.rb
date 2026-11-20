@@ -165,15 +165,16 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   end
 
   # --- about
-  test "About this record is a band heading and three rows: a correction link, the content notice, and the permanent link with Copy link" do
+  test "About this record: a centred heading, the text and content notice, Suggest a correction, the record URL with Copy link, Print and the downloads" do
     render_inline(NexusCcs::RecordAboutComponent.new(document: doc("collection_ssim" => [ "University Art Collection" ]), url: "http://example.test/catalog/emu-1"))
 
-    assert_selector "section#about-this-record h2.record-band-heading", text: "About this record"
-    assert_equal [ "Help us improve this record", "Content notice", "Use this record" ], page.all(".record-about-band__heading").map(&:text)
-    assert_selector ".record-about-band__row a.record-arrow-link", text: "Suggest a correction"
-    assert_selector ".record-about-band__row", text: "not appropriate today"
+    assert_selector "section#about-this-record h2.record-showcase__section-heading", text: "About this record"
+    assert_selector ".record-about__text", text: "not appropriate today"
+    assert_selector "a.record-about__button", text: "Suggest a correction"
     assert_selector "[data-controller=clipboard] [data-clipboard-target=source][data-copy='http://example.test/catalog/emu-1']"
-    assert_selector "button[data-action='clipboard#copy']", text: "Copy link"
+    assert_selector ".record-facts__row dt", text: "Record URL"
+    assert_selector "button.record-copy", text: "Copy link"
+    assert_selector "button[data-action='print#print']", text: "Print this page"
   end
 
   # --- more like this
