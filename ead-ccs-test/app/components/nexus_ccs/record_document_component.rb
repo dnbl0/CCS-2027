@@ -114,7 +114,6 @@ module NexusCcs
     renders_one :stepper # the search-result stepper and the selection stepper, from catalog/show (they need the controller's search context)
 
     DESCRIPTION_FIELD = "description_tsim"
-    HISTORY_FIELDS = { "source_reference_tsim" => :source_reference }.freeze # the credit line is in Use and access
 
     # "University Art Collection", linking to the whole collection
     def collection_name = responsible_collection
@@ -181,49 +180,48 @@ module NexusCcs
 
     def lead_rows = detail_rows.select { |row| LEAD_SEQS.include?(row.seq) }
 
-    # --- The record card (after the Van Gogh Museum's object pages) -------------------------------------------------------------
-    # The bold line under the title: who made it (with life dates), where (the most specific place) and when
-    def maker_line
-      creators = (detail_rows.find { |row| row.seq == CREATOR_SEQ }&.values || []).first(2)
-      place = Array(document["production_place_ssim"]).map(&:to_s).compact_blank.last
-      [ creators.join("; ").presence, place, display_date ].compact_blank.join(", ")
-    end
-
-    # The lines under it: the material and measurements; the credit line; the collection and accession number
-    def facts_lines
-      measurements = Array(document["dimensions_ssm"]).map(&:to_s).compact_blank.join("; ")
-      accession = Array(document["accession_number_ssim"]).first.presence
-      [ [ medium, measurements.presence ].compact.join(", ").presence,
-        credit_line,
-        [ collection_name, (I18n.t("nexus_ccs.record_page.card.accession", number: accession) if accession) ].compact.join(", ").presence ].compact
-    end
-
-    # "Search in the collection": the record's names and terms, each a link to its search or browse page (as in Object details),
-    # when first, era, place, kind, material and subject, then classification, maker and collections; at most 14, no repeats
-    SEARCH_ORDER = [ 3.5, 7, 2, 10, 15, 17, 4, 18, 19 ].freeze
-
-    def search_terms
-      @search_terms ||= begin
-        rows = detail_rows.select { |row| term?(row) && SEARCH_ORDER.include?(row.seq) }.sort_by { |row| SEARCH_ORDER.index(row.seq) }
-        terms = rows.flat_map do |row|
-          row.values.filter_map do |value|
-            label = row.seq == CREATOR_SEQ ? (creator_name(value) || value.sub(/\s*\(.*\z/, "")) : value
-            path = value_link(row, value)
-            [ label, path ] if path
-          end
-        end
-        terms.uniq(&:first).first(14)
+    # --- The record card (after the National Gallery of Art's artwork pages) -------------------------------------------------------
+    # Associated names: each maker as a link to their browse page, with what the record says about them (life dates, role) under it.
+    # [[name, path or nil, detail]]
+    def associated_names
+      displays = detail_rows.find { |row| row.seq == CREATOR_SEQ }&.values || []
+      displays.first(6).map do |display|
+        name = creator_name(display) || display.sub(/\s*\(.*\z/, "")
+        detail = display.delete_prefix(name).strip.delete_prefix(",").strip
+        [ name, Browse.path_for("makers", name), detail.presence ]
       end
     end
 
+    # One sentence on what the visitor may do with the image (NGA's line under its image), e.g. "You can view the image online.
+    # Download is not available."
+    def access_sentence
+      return view_status + "." unless assets?
 
-    # The record's source reference ends Object details, after the sheet's fields
-    def history_rows
-      HISTORY_FIELDS.filter_map do |field, key|
-        values = Array(document[field]).map(&:to_s).compact_blank
-        Row.new(label: I18n.t("nexus_ccs.record_page.split.history.#{key}"), values: values, field: field, seq: 100) if values.any?
-      end
+      "#{view_status}. #{download_status}."
     end
+
+    # Object overview (NGA's Artwork overview): the key facts, in the data model sheet's order
+    OVERVIEW_SEQS = [ 2, 7, 10, 11, 17, 19, 20, 21, 22 ].freeze
+
+    def overview_rows
+      rows = detail_rows.select { |row| OVERVIEW_SEQS.include?(row.seq) }
+      rows += [ Row.new(label: I18n.t("nexus_ccs.record_page.use.credit_line"), values: [ credit_line ], field: "credit_line_tsim", seq: 21) ] if credit_line
+      rows += [ Row.new(label: I18n.t("nexus_ccs.record_page.use.copyright"), values: [ copyright ], field: "rights_ssim", seq: 22) ] if copyright
+      rows.sort_by(&:seq)
+    end
+
+    # A fact's values: names of things link to their search or browse page (as in the full record); several values on their own lines,
+    # or joined where the sheet says so
+    def fact_value(row)
+      parts = row.values.each_with_index.map do |value, index|
+        text = flagged(row, value, index)
+        path = term?(row) && value_link(row, value)
+        path ? helpers.link_to(text, path) : text
+      end
+      helpers.safe_join(parts, row.join || helpers.tag.br)
+    end
+
+    def inscriptions = Array(document["inscription_tsim"]).map(&:to_s).compact_blank
 
     # What the de-bias notices scan (RecordDebias): the details and the description
     def rows = detail_rows + [ description_row ].compact

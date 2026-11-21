@@ -24,7 +24,7 @@ class RightsDisplayTest < ActionDispatch::IntegrationTest
 
       assert_response :success, doc["id"]
       assert_select "#use-and-access", 1, doc["id"]
-      card = css_select("#rights-and-reuse").first.text
+      card = css_select("#record-use").first.text
       stated = doc["licence_type_ssim"].present? || doc["rights_ssim"].present? || doc["credit_line_tsim"].present?
       if stated
         assert_not_includes card, NONE, doc["id"]
@@ -32,7 +32,7 @@ class RightsDisplayTest < ActionDispatch::IntegrationTest
       else
         assert_includes card, NONE, doc["id"]
       end
-      assert_select "#rights-and-reuse a[href='/help#copyright']", text: "About copyright and terms of use"
+      assert_select "#record-use a[href='/help#copyright']", text: "About copyright and terms of use"
     end
   end
 

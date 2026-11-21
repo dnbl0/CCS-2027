@@ -16,7 +16,6 @@ en:
         download_label: "Download image of %{title}"
       sections:
         key_facts: "Key facts"
-        object_details: "Object details"
         about: "About this record"
       key_facts:
         date: "Date"
@@ -79,18 +78,20 @@ en:
         copy: "Copy this information"
         download: "Download image"
         close: "Close"
-      # The record card after the Van Gogh Museum's object pages. PLACEHOLDER WORDING.
+      # The record card after the National Gallery of Art's artwork pages. PLACEHOLDER WORDING.
       card:
-        rights: "Rights and reuse"
-        rights_link: "All rights and contact details"
         cite: "How to cite this record"
-        search: "Search in the collection"
-        accession: "accession number %{number}"
+      nga:
+        associated_names: "Associated names"
+        overview: "Object overview"
+        notes: "Record details & notes"
+        full_record: "Full record"
+        inscriptions: "Inscriptions & marks"
+        rights_link: "Rights and reuse"
       # The showcase layout (20 Nov 2026)
       showcase:
         read_more: "Read more"
         read_less: "Read less"
-        aside: "Actions and use"
         record_url: "Record URL"
         copy_link: "Copy link"
         print: "Print this page"
@@ -118,8 +119,6 @@ en:
           previous: "Previous result"
           next: "Next result"
           none: "%{label}: none"
-        history:
-          source_reference: "Source record"
         # The media viewer (Figma "Media viewer", after Europeana's item viewer). PLACEHOLDER WORDING where marked.
         viewer:
           tools: "Image tools"

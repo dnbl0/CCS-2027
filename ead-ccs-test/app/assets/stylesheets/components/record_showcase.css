@@ -20,35 +20,51 @@
 .record-showcase__hero-inner { width: 100%; }
 .record--showcase .record-showcase__hero-inner > :not(.digital-assets) { margin: var(--ccs-space-5) var(--ccs-space-4) 0; padding: var(--ccs-space-7) var(--ccs-space-5); background: var(--ccs-surface-default); }
 
-/* The record, after the Van Gogh Museum's object pages: on the page's grey, a narrow column on the left (the actions and Use and
-   access) and the main column (title, status, maker line, facts, description, folding sections, Search in the collection) */
-.record--showcase { background: var(--ccs-surface-subtle); }
+/* The record, after the National Gallery of Art's artwork pages: on white, a header in two columns (identity | summary), then
+   sections each opened by a full-width rule, the heading on the left (40%) and the content on the right */
+.record--showcase { background: var(--ccs-surface-default); }
 .record-showcase__card { max-width: var(--showcase-width); margin: 0 auto; padding: var(--ccs-space-8) var(--ccs-space-4) calc(var(--ccs-space-8) * 2); }
-.record-showcase__grid { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "aside" "body"; gap: var(--ccs-space-7); }
-.record-showcase__head { grid-area: head; }
-.record-showcase__body { grid-area: body; }
-.record-showcase__aside { grid-area: aside; display: flex; flex-direction: column; gap: var(--ccs-space-5); min-width: 0; }
-.record-showcase__main { min-width: 0; max-width: 46rem; }
-@media (min-width: 1024px) {
-  .record-showcase__card { padding-inline: var(--ccs-space-6); }
-  .record-showcase__grid {
-    grid-template-columns: minmax(16rem, 18rem) minmax(0, 46rem); grid-template-areas: "aside head" "aside body"; grid-template-rows: auto 1fr;
-    column-gap: calc(var(--ccs-space-8) * 2); row-gap: var(--ccs-space-8);
-  }
-  .record-showcase__aside { align-self: start; }
-}
+@media (min-width: 1024px) { .record-showcase__card { padding-inline: var(--ccs-space-6); } }
+.record-nga__header { display: grid; gap: var(--ccs-space-7); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1024px) { .record-nga__header { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); column-gap: var(--ccs-space-8); } }
+.record-nga__identity, .record-nga__summary { min-width: 0; }
+.record-nga__summary { display: flex; flex-direction: column; gap: var(--ccs-space-6); }
 
-/* Title, status, the bold maker line, then the facts in plain text */
+/* Title (the heading serif), then the date and the maker in plain lines */
 .record-showcase__title {
-  margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-4xl); font-weight: var(--ccs-font-weight-regular);
-  line-height: 1.1; color: var(--ccs-text-primary); text-wrap: balance;
+  margin: 0 0 var(--ccs-space-5); font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-4xl); font-weight: var(--ccs-font-weight-semibold);
+  line-height: var(--ccs-line-height-tight); color: var(--ccs-text-primary); text-wrap: balance;
 }
-@media (min-width: 1024px) { .record-showcase__title { font-size: 3.5rem; } }
-.record-showcase__status { display: flex; align-items: center; gap: var(--ccs-space-3); margin: var(--ccs-space-6) 0 0; font-size: var(--ccs-font-size-md); color: var(--ccs-text-primary); }
-.record-showcase__status svg { flex: none; }
-.record-showcase__maker-line { margin: var(--ccs-space-6) 0 0; font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-bold); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); text-wrap: pretty; }
-.record-showcase__facts { margin-top: var(--ccs-space-4); }
-.record-showcase__facts p { margin: 0; font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); text-wrap: pretty; }
+@media (min-width: 1024px) { .record-showcase__title { font-size: var(--ccs-font-size-5xl); } }
+.record-nga__line { margin: 0; font-size: var(--ccs-font-size-lg); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); }
+
+/* Associated names: the name a link, what the record says about them under it */
+.record-nga__names { margin-top: var(--ccs-space-8); }
+.record-nga__names-heading { margin: 0 0 var(--ccs-space-5); font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-bold); color: var(--ccs-text-primary); }
+.record-nga__name-list { display: grid; gap: var(--ccs-space-5); margin: 0; padding: 0; list-style: none; }
+.record-nga__name-list li { display: flex; flex-direction: column; gap: var(--ccs-space-1); }
+.record-nga__name { font-size: var(--ccs-font-size-lg); color: var(--ccs-text-primary); text-decoration: underline; text-decoration-color: var(--ccs-text-brand); text-underline-offset: 0.2em; }
+a.record-nga__name:hover { text-decoration-thickness: 2px; }
+a.record-nga__name:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.record-nga__role { font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
+
+/* The line on what the visitor may do with the image */
+.record-nga__access { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ccs-space-2) var(--ccs-space-3); margin: 0; font-size: var(--ccs-font-size-md); color: var(--ccs-text-primary); scroll-margin-top: 4.5rem; }
+.record-nga__access:focus { outline: none; }
+
+/* Sections: a rule, the heading on the left, the content on the right */
+.record-nga__section { display: grid; gap: var(--ccs-space-6); grid-template-columns: minmax(0, 1fr); margin-top: var(--ccs-space-8); padding-top: var(--ccs-space-8); border-top: 1px solid var(--ccs-border-subtle); }
+@media (min-width: 1024px) { .record-nga__section { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); column-gap: var(--ccs-space-8); margin-top: calc(var(--ccs-space-8) * 1.5); padding-top: var(--ccs-space-8); } }
+.record-nga__section-heading { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-3xl); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-tight); color: var(--ccs-text-primary); }
+@media (min-width: 1024px) { .record-nga__section-heading { font-size: 2.5rem; } }
+
+/* Object overview: the facts in two columns, label above value */
+.record-nga__facts { display: grid; gap: var(--ccs-space-6) var(--ccs-space-6); grid-template-columns: minmax(0, 1fr); margin: 0; }
+@media (min-width: 600px) { .record-nga__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.record-nga__fact dt { margin: 0 0 var(--ccs-space-1); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-bold); color: var(--ccs-text-primary); }
+.record-nga__fact dd { margin: 0; font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); overflow-wrap: anywhere; }
+.record-nga__fact a { color: var(--ccs-text-primary); text-decoration-color: var(--ccs-text-brand); text-underline-offset: 0.2em; }
+.record-nga__fact a:hover { text-decoration-thickness: 2px; }
 
 /* Label beside value on dashed rules (the key rows, Object details, the record URL); a phone stacks them */
 .record--showcase .record-facts__list { margin: 0; border-bottom: var(--showcase-rule); }
@@ -94,40 +110,32 @@
 .record-read-more:hover { text-decoration: underline; }
 .record-read-more:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
-/* Folding sections (Van Gogh's Object data, Exhibitions, Literature): ruled, a plus on the left that becomes a minus */
-.record-sections { border-top: 1px solid var(--ccs-text-secondary); }
-.record-section { border-bottom: 1px solid var(--ccs-text-secondary); scroll-margin-top: 4.5rem; } /* clear of the sticky search bar */
+/* Record details & notes (NGA's Artwork history & notes): ruled folding sections, the label left and a plus on the right */
+.record-sections { border-top: 1px solid var(--ccs-border-default); }
+.record-section { border-bottom: 1px solid var(--ccs-border-default); scroll-margin-top: 4.5rem; } /* clear of the sticky search bar */
 .record-section > summary {
-  display: flex; align-items: center; gap: var(--ccs-space-6); min-height: 3.5rem; padding: var(--ccs-space-2) 0; list-style: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--ccs-space-4); min-height: 4rem; padding: var(--ccs-space-3) 0;
+  list-style: none; cursor: pointer;
 }
 .record-section > summary::-webkit-details-marker { display: none; }
-.record-section > summary::before {
-  --record-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5'%3E%3Cpath d='M12 3v18M3 12h18'/%3E%3C/svg%3E");
+.record-section > summary::after {
+  --record-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5'%3E%3Cpath d='M12 4v16M4 12h16'/%3E%3C/svg%3E");
   content: ""; flex: none; width: 1.25rem; height: 1.25rem; background: var(--ccs-text-primary); mask: var(--record-icon) center / contain no-repeat;
 }
-.record-section[open] > summary::before { --record-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5'%3E%3Cpath d='M3 12h18'/%3E%3C/svg%3E"); }
+.record-section[open] > summary::after { --record-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5'%3E%3Cpath d='M4 12h16'/%3E%3C/svg%3E"); }
 .record-section > summary:hover .record-section__title { text-decoration: underline; }
 .record-section > summary:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
-.record-section__title { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-regular); color: var(--ccs-text-primary); }
-.record-section__body { padding: 0 0 var(--ccs-space-6) calc(1.25rem + var(--ccs-space-6)); font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); }
+.record-section__title { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-regular); color: var(--ccs-text-primary); }
+.record-section__body { padding: 0 0 var(--ccs-space-6); font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); }
 .record-section__body > * + * { margin-top: var(--ccs-space-4); }
+.record-section__body > p { margin-bottom: 0; }
 .record-section__list { display: grid; gap: var(--ccs-space-3); margin: 0; }
 .record-section__list dt { font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
 .record-section__list dd { margin: 0; overflow-wrap: anywhere; }
 .record-section .contact-collection { margin: 0; }
 .record-section .cite--inline .cite__list { display: grid; gap: var(--ccs-space-4); margin: 0; padding: 0; list-style: none; }
 .record-section .record-facts__list { border-bottom: 0; }
-
-/* Search in the collection: outlined, square links into the search */
-.record-search { margin-top: var(--ccs-space-8); }
-.record-search__heading { margin: 0 0 var(--ccs-space-4); font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-2xl); font-weight: var(--ccs-font-weight-regular); color: var(--ccs-text-primary); }
-.record-search__list { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2); margin: 0; padding: 0; list-style: none; }
-.record-search__term {
-  display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 var(--ccs-space-5); border: 1px solid var(--ccs-border-default);
-  background: var(--ccs-surface-default); color: var(--ccs-text-primary); font-size: var(--ccs-font-size-md); text-decoration: none;
-}
-.record-search__term:hover { border-color: var(--ccs-text-primary); color: var(--ccs-text-primary); }
-.record-search__term:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.record-section.record-use, .record-section .record-use { padding-top: 0; background: none; border: 0; }
 
 /* About this record: centred heading, the text, a solid button, then the record URL and the print and download line */
 .record-about { margin-top: calc(var(--ccs-space-8) + var(--ccs-space-4)); }
@@ -156,10 +164,8 @@
 .record-about__print:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
 .record-about__downloads a { display: inline-flex; align-items: center; min-height: 2.75rem; }
 
-/* The narrow column: the actions, then Use and access on white */
-.record--showcase .record-actions { padding-bottom: var(--ccs-space-4); border-bottom: 1px solid var(--ccs-border-default); }
-.record--showcase .record-use { border: 0; background: var(--ccs-surface-default); }
-.record-use__link { margin: var(--ccs-space-3) 0 0; font-size: var(--ccs-font-size-ui); }
+/* The actions in the summary column: one row */
+.record--showcase .record-actions { padding: 0; border: 0; }
 
 /* You may also like: pictures laid like prints on a table, each a little turned, on the grey band; Shuffle under them */
 .record-also { padding: calc(var(--ccs-space-8) + var(--ccs-space-4)) var(--ccs-space-4) var(--ccs-space-8); background: var(--ccs-surface-subtle); }

@@ -72,7 +72,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
 
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
         assert_selector "h1", count: 1
-        assert_selector ".record-showcase__card header.record-showcase__header h1"
+        assert_selector ".record-showcase__card .record-nga__identity h1"
         assert_equal false, page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
         outline = page.evaluate_script("[...document.querySelectorAll('#main-container h1, #main-container h2, #main-container h3')].filter(e => e.getClientRects().length > 0).map(e => e.tagName + ' ' + e.textContent.trim())")
@@ -81,8 +81,8 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
         assert before_title.all? { |heading| heading.match?(/\AH2 Digital assets?\z/) }, outline.inspect
         levels = outline.drop(before_title.size).map { |heading| heading[1].to_i }
         assert levels.each_cons(2).all? { |a, b| b <= a + 1 }, "headings skip a level: #{outline.inspect}"
-        assert_includes outline, "H2 Object details"
-        assert_includes outline, "H2 Use and access"
+        assert_includes outline, "H2 Object overview"
+        assert_includes outline, "H2 Record details & notes"
 
         # Nothing in the page sticks (the showcase layout scrolls as one page; the search strip is the header's)
         sticky = page.evaluate_script("[...document.querySelectorAll('#main-container *')].filter(e => e.getClientRects().length > 0 && ['sticky', 'fixed'].includes(getComputedStyle(e).position)).map(e => e.className)")
@@ -189,37 +189,36 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     end
   end
 
-  test "the record follows the Van Gogh Museum's layout: from 1024px the actions column on the left, the record on the right; on a phone the header, then the actions, then the sections" do
+  test "the record follows the National Gallery of Art's layout: a two-column header, then sections with their heading on the left" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
     rect = ->(selector) { page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
-    head, aside, body = rect.call(".record-showcase__head"), rect.call(".record-showcase__aside"), rect.call(".record-showcase__body")
-    assert_operator aside["right"], :<=, head["left"] + 1, "the actions column is left of the record"
-    assert_operator body["top"], :>=, head["bottom"] - 1
-    assert_equal "rgb(244, 244, 244)", page.evaluate_script("getComputedStyle(document.querySelector('.record--showcase')).backgroundColor"), "the record sits on the page's grey"
+    identity, summary = rect.call(".record-nga__identity"), rect.call(".record-nga__summary")
+    assert_operator summary["left"], :>=, identity["right"] - 1, "the summary is right of the title and names"
+    heading, facts = rect.call("#record-overview-heading"), rect.call(".record-nga__facts")
+    assert_operator facts["left"], :>, heading["right"], "the facts are right of their heading"
+    assert_equal "rgb(255, 255, 255)", page.evaluate_script("getComputedStyle(document.querySelector('.record--showcase')).backgroundColor")
 
     open_record(VARIANTS.fetch("one image, open"), "phone")
-    head, aside, body = rect.call(".record-showcase__head"), rect.call(".record-showcase__aside"), rect.call(".record-showcase__body")
-    assert_operator aside["top"], :>=, head["bottom"] - 1
-    assert_operator body["top"], :>=, aside["bottom"] - 1
+    identity, summary = rect.call(".record-nga__identity"), rect.call(".record-nga__summary")
+    assert_operator summary["top"], :>=, identity["bottom"] - 1
+    assert_equal false, page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
   end
 
-  test "under the title: the status, the bold maker line and the facts; the folding sections start closed, and the rights link opens Rights and reuse" do
+  test "the header: associated names, the access line with its link; Object overview; the details and notes start closed and open" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
-    assert_selector ".record-showcase__status svg[aria-hidden=true]"
-    assert_selector ".record-showcase__status", text: "You can view the image online"
-    assert_selector ".record-showcase__facts", text: "accession number"
-    %w[object-details rights-and-reuse how-to-cite about-this-record].each { |id| assert_equal false, page.evaluate_script("document.getElementById('#{id}').open"), id }
-    assert_selector "#use-and-access h2", text: "Use and access"
+    assert_selector "#record-names-heading", text: "Associated names"
+    assert_selector ".record-nga__access", text: "You can view the image online."
+    assert_selector "#record-overview-heading", text: "Object overview"
+    assert_selector ".record-nga__fact dt", text: "Accession Number"
+    %w[object-details record-use how-to-cite about-this-record].each { |id| assert_equal false, page.evaluate_script("document.getElementById('#{id}').open"), id }
 
-    find("#use-and-access a", text: "All rights and contact details").click
-    assert_selector "#rights-and-reuse[open]", text: "Rights held by the University"
-    assert_selector "#rights-and-reuse a[href='/help#copyright']", text: "About copyright and terms of use"
-    assert_equal "SUMMARY", page.evaluate_script("document.activeElement.tagName")
+    find(".record-nga__access a", text: "Rights and reuse").click
+    assert_selector "#record-use[open]", text: "Rights held by the University"
+    assert_selector "#record-use a[href='/help#copyright']", text: "About copyright and terms of use"
 
     find("#object-details summary").click
     assert_selector "#object-details[open] .record-facts__row dt", text: /object type/i
     assert_selector "#object-details[open] [data-testid=record-identifier]"
-    assert_selector ".record-search .record-search__term", minimum: 1
   end
 
   test "the Tab key moves through the record page in the order it reads, and each stop shows a focus ring" do

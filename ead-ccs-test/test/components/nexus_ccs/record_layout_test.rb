@@ -71,28 +71,19 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_equal record.object_rows.map(&:seq), record.object_rows.map(&:seq).sort
   end
 
-  test "the card's maker line is the maker with life dates, the most specific place and the date" do
-    assert_equal "Grainger, Percy Aldridge (b. 1882 - d. 1961) maker, Victoria, 1952", component(SHEET).maker_line
-    assert_equal "Grainger, Percy Aldridge", component(FIELDS.except("production_date_ssim")).maker_line
+  test "associated names: each maker by name, linked to their browse page where there is one, with the record's dates and role under it" do
+    names = component(SHEET).associated_names
+    assert_equal "Grainger, Percy Aldridge", names.first[0]
+    assert_equal "(b. 1882 - d. 1961) maker", names.first[2]
   end
 
-  test "the facts lines are the material and measurements, the credit line, then the collection and accession number" do
-    lines = component(SHEET).facts_lines
-    assert_equal "Paper, 10 x 4 cm", lines.first
-    assert_includes lines, "Grainger Museum Collection, University of Melbourne."
-    assert_equal "Grainger Museum Collection, accession number 00.0001", lines.last
+  test "Object overview holds the key facts in the sheet's order, the credit line and copyright among them" do
+    labels = component(SHEET.merge("rights_ssim" => [ "© Grainger" ])).overview_rows.map(&:label)
+    assert_equal [ "Object Type", "Place", "Material", "Measurements", "Classification", "Collection", "Accession Number", "Credit line", "Copyright" ], labels
   end
 
-  test "Search in the collection: the record's terms as links, places and kinds before makers, no repeats, at most 14" do
-    record = component(SHEET)
-    # the order and the de-duplication are under test here; the links themselves are Object details' (record_value_links_test)
-    record.define_singleton_method(:value_link) { |_row, value| "/catalog?q=#{value}" }
-    terms = record.search_terms
-    labels = terms.map(&:first)
-    assert_equal labels.uniq, labels
-    assert_operator terms.size, :<=, 14
-    assert_operator labels.index("Victoria"), :<, labels.index("Grainger, Percy Aldridge")
-    assert(terms.all? { |_label, path| path.start_with?("/") })
+  test "the access sentence says what the visitor may do with the image" do
+    assert_equal "No image of this object is online.", component(SHEET).access_sentence
   end
 
   test "Use and access: the rights items in CCS-27's order; caption and terms only with a digital asset" do

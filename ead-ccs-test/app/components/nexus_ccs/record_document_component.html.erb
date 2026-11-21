@@ -1,5 +1,5 @@
-<%# The record page: the media viewer edge to edge on a grey band (DigitalAssetsComponent), then the record after the Van Gogh Museum's
-    object pages on the same grey (the card below). You may also like and More from the collections follow (catalog/show). %>
+<%# The record page: the media viewer edge to edge on a grey band (DigitalAssetsComponent), then the record after the National Gallery
+    of Art's artwork pages (the card below). You may also like and More from the collections follow (catalog/show). %>
 <%= content_tag @component,
   id: @id,
   data: { "document-id": document.id.to_s.parameterize },
@@ -20,29 +20,33 @@
     </div>
   </div>
 
-  <%# The record (after the Van Gogh Museum's object pages): on the page's grey, a narrow column (the actions and Use and access) and the
-      main column: the title, what the visitor can do with the image, the maker line, the medium, measurements and credit, the
-      description, folding sections (Object details, Rights and reuse, How to cite, About this record), and Search in the collection. %>
+  <%# The record (after the National Gallery of Art's artwork pages): a header in two columns (the title, date, maker and associated
+      names; the description, the actions and what the visitor may do with the image), then sections each with its heading on the
+      left: Object overview (the key facts) and Record details & notes (folding sections). %>
   <div class="record-showcase__card">
-    <div class="record-showcase__grid">
-      <div class="record-showcase__main record-showcase__head">
-        <header class="record-showcase__header">
-          <h1 class="record-showcase__title"><%= title_markup %></h1>
-          <% if assets? %>
-            <p class="record-showcase__status">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="<%= access_state == :request ? "M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.8 11.8 0 0 0 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" : "M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" %>" /></svg>
-              <span><%= view_status %></span>
-            </p>
-          <% end %>
-          <% if maker_line.present? %><p class="record-showcase__maker-line"><%= maker_line %></p><% end %>
-          <% if facts_lines.any? %>
-            <div class="record-showcase__facts"><% facts_lines.each do |line| %><p><%= line %></p><% end %></div>
-          <% end %>
-        </header>
+    <div class="record-nga__header">
+      <div class="record-nga__identity">
+        <h1 class="record-showcase__title"><%= title_markup %></h1>
+        <% if display_date %><p class="record-nga__line"><%= display_date %></p><% end %>
+        <% if makers.any? %><p class="record-nga__line"><%= makers.map(&:first).join("; ") %></p><% end %>
+        <% if associated_names.any? %>
+          <section class="record-nga__names" aria-labelledby="record-names-heading">
+            <h2 class="record-nga__names-heading" id="record-names-heading"><%= t("nexus_ccs.record_page.nga.associated_names") %></h2>
+            <ul class="record-nga__name-list">
+              <% associated_names.each do |name, path, detail| %>
+                <li>
+                  <% if path %><%= link_to name, path, class: "record-nga__name" %><% else %><span class="record-nga__name"><%= name %></span><% end %>
+                  <% if detail.present? %><span class="record-nga__role"><%= detail %></span><% end %>
+                </li>
+              <% end %>
+            </ul>
+          </section>
+        <% end %>
+      </div>
 
+      <div class="record-nga__summary">
         <%= render NexusCcs::CulturalProtocolsNoticeComponent.new(document: document) %>
         <%= render NexusCcs::DebiasNoticeComponent.new(matches: debias_matches, labels: debias_labels) %>
-
         <% if lead %>
           <%# CCS-413: the description's first three lines, fading out above Read more %>
           <div class="record-showcase__description" data-controller="truncate"
@@ -55,77 +59,82 @@
                     data-truncate-target="toggle" data-action="truncate#toggle" hidden><%= t("nexus_ccs.record_page.showcase.read_more") %></button>
           </div>
         <% end %>
-      </div>
-
-      <div class="record-showcase__main record-showcase__body">
-        <%# Folding sections, ruled, the plus on the left (closed until opened; each heading is the summary's own h2) %>
-        <div class="record-sections">
-          <details class="record-section" id="object-details">
-            <summary><h2 class="record-section__title" id="record-details-title"><%= t("nexus_ccs.record_page.sections.object_details") %></h2></summary>
-            <div class="record-section__body">
-              <%# CCS-400: every field of the data model sheet the record has, in its sequence %>
-              <%= render NexusCcs::RecordFactRowsComponent.new(rows: lead_rows + object_rows, record: self, id_row: true) %>
-            </div>
-          </details>
-          <details class="record-section" id="rights-and-reuse">
-            <summary><h2 class="record-section__title"><%= t("nexus_ccs.record_page.card.rights") %></h2></summary>
-            <div class="record-section__body">
-              <% if rights_items.any? %>
-                <dl class="record-section__list">
-                  <% rights_items.each do |label, value| %><div><dt><%= label %></dt><dd><%= value %></dd></div><% end %>
-                </dl>
-              <% else %>
-                <p><%= t("nexus_ccs.rights.none_recorded") %></p>
-              <% end %>
-              <p><%= link_to t("nexus_ccs.record_page.copyright.terms"), terms_path %></p>
-              <%= render NexusCcs::ContactCollectionComponent.new(document: document, url: helpers.solr_document_url(document)) %>
-            </div>
-          </details>
-          <details class="record-section" id="how-to-cite">
-            <summary><h2 class="record-section__title"><%= t("nexus_ccs.record_page.card.cite") %></h2></summary>
-            <div class="record-section__body"><%= render NexusCcs::CiteComponent.new(document: document, inline: true) %></div>
-          </details>
-          <details class="record-section" id="about-this-record">
-            <summary><h2 class="record-section__title"><%= t("nexus_ccs.record_page.sections.about") %></h2></summary>
-            <div class="record-section__body"><%= render NexusCcs::RecordAboutComponent.new(document: document, url: helpers.solr_document_url(document), heading: false) %></div>
-          </details>
-        </div>
-
-        <% if search_terms.any? %>
-          <section class="record-search" aria-labelledby="record-search-heading">
-            <h2 class="record-search__heading" id="record-search-heading"><%= t("nexus_ccs.record_page.card.search") %></h2>
-            <ul class="record-search__list">
-              <% search_terms.each do |label, path| %><li><%= link_to label, path, class: "record-search__term" %></li><% end %>
-            </ul>
-          </section>
-        <% end %>
-      </div>
-
-      <aside class="record-showcase__aside" aria-label="<%= t("nexus_ccs.record_page.showcase.aside") %>">
         <%= render NexusCcs::RecordActionsComponent.new(document: document) %>
-
-        <%# Use and access (CCS-27, 47, 67, 68, 69, 166): can the visitor view and download the image, and how to ask %>
-        <section class="record-use" id="use-and-access" aria-labelledby="record-use-heading" tabindex="-1">
-          <div class="record-use__head">
-            <h2 class="record-use__heading" id="record-use-heading"><%= t("nexus_ccs.record_page.use.heading") %></h2>
-            <%= render NexusCcs::HelpTipComponent.new(topic: :copyright) %>
-          </div>
-          <ul class="record-use__status">
-            <li class="record-use__state record-use__state--<%= can_view? ? "yes" : "no" %>"><span class="record-use__mark" aria-hidden="true"><%= can_view? ? "✓" : "–" %></span><span><%= view_status %></span></li>
-            <% if assets? %>
-              <li class="record-use__state record-use__state--<%= can_download? ? "yes" : "no" %>"><span class="record-use__mark" aria-hidden="true"><%= can_download? ? "✓" : "–" %></span><span><%= download_status %></span></li>
-            <% end %>
-          </ul>
-          <% if sensitive? %><p class="record-use__note"><%= t("nexus_ccs.record_page.use.sensitive") %></p><% end %>
-          <% if (note = t("nexus_ccs.record_page.use.note.#{access_state}", default: "")).present? %><p class="record-use__note"><%= note %></p><% end %>
-          <% if use_licence %><p class="record-use__licence"><span><%= t("nexus_ccs.record_page.use.licence") %></span> <%= use_licence %></p><% end %>
+        <%# What the visitor may do with the image (CCS-68, CCS-69), as NGA's line under its image %>
+        <p class="record-nga__access" id="use-and-access" tabindex="-1">
+          <span><%= access_sentence %></span>
           <% if access_state == :request || access_state == :view_only %>
-            <p class="record-use__action"><a class="record-arrow-link" href="<%= request_to_view_path %>"><%= t("nexus_ccs.record_page.use.request.#{access_state}") %></a></p>
+            <a class="record-arrow-link" href="<%= request_to_view_path %>"><%= t("nexus_ccs.record_page.use.request.#{access_state}") %></a>
+          <% else %>
+            <a class="record-arrow-link" href="#record-use" data-controller="open-details" data-action="open-details#open"><%= t("nexus_ccs.record_page.nga.rights_link") %></a>
           <% end %>
-          <p class="record-use__link"><a href="#rights-and-reuse" data-controller="open-details" data-action="open-details#open"><%= t("nexus_ccs.record_page.card.rights_link") %></a></p>
-        </section>
-      </aside>
+        </p>
+      </div>
     </div>
+
+    <%# Object overview (NGA's Artwork overview): the key facts of the data model sheet, two columns %>
+    <section class="record-nga__section" aria-labelledby="record-overview-heading">
+      <h2 class="record-nga__section-heading" id="record-overview-heading"><%= t("nexus_ccs.record_page.nga.overview") %></h2>
+      <dl class="record-nga__facts">
+        <% overview_rows.each do |row| %>
+          <div class="record-nga__fact">
+            <dt><%= row.label %></dt>
+            <dd><%= fact_value(row) %></dd>
+          </div>
+        <% end %>
+      </dl>
+    </section>
+
+    <%# Record details & notes (NGA's Artwork history & notes): folding sections, the plus on the right %>
+    <section class="record-nga__section" aria-labelledby="record-notes-heading">
+      <h2 class="record-nga__section-heading" id="record-notes-heading"><%= t("nexus_ccs.record_page.nga.notes") %></h2>
+      <div class="record-sections">
+        <details class="record-section" id="object-details">
+          <summary><h3 class="record-section__title" id="record-details-title"><%= t("nexus_ccs.record_page.nga.full_record") %></h3></summary>
+          <div class="record-section__body">
+            <%# CCS-400: every field of the data model sheet the record has, in its sequence %>
+            <%= render NexusCcs::RecordFactRowsComponent.new(rows: lead_rows + object_rows, record: self, id_row: true) %>
+          </div>
+        </details>
+        <% if inscriptions.any? %>
+          <details class="record-section" id="inscriptions">
+            <summary><h3 class="record-section__title"><%= t("nexus_ccs.record_page.nga.inscriptions") %></h3></summary>
+            <div class="record-section__body"><% inscriptions.each do |text| %><p><%= text %></p><% end %></div>
+          </details>
+        <% end %>
+        <details class="record-section" id="record-use">
+          <summary><h3 class="record-section__title"><%= t("nexus_ccs.record_page.use.heading") %></h3></summary>
+          <div class="record-section__body record-use">
+            <%# Use and access (CCS-27, 47, 67, 68, 69, 166) %>
+            <ul class="record-use__status">
+              <li class="record-use__state record-use__state--<%= can_view? ? "yes" : "no" %>"><span class="record-use__mark" aria-hidden="true"><%= can_view? ? "✓" : "–" %></span><span><%= view_status %></span></li>
+              <% if assets? %>
+                <li class="record-use__state record-use__state--<%= can_download? ? "yes" : "no" %>"><span class="record-use__mark" aria-hidden="true"><%= can_download? ? "✓" : "–" %></span><span><%= download_status %></span></li>
+              <% end %>
+            </ul>
+            <% if sensitive? %><p class="record-use__note"><%= t("nexus_ccs.record_page.use.sensitive") %></p><% end %>
+            <% if (note = t("nexus_ccs.record_page.use.note.#{access_state}", default: "")).present? %><p class="record-use__note"><%= note %></p><% end %>
+            <% if rights_items.any? %>
+              <dl class="record-section__list">
+                <% rights_items.each do |label, value| %><div><dt><%= label %></dt><dd><%= value %></dd></div><% end %>
+              </dl>
+            <% else %>
+              <p><%= t("nexus_ccs.rights.none_recorded") %></p>
+            <% end %>
+            <p><%= link_to t("nexus_ccs.record_page.copyright.terms"), terms_path %> <%= render NexusCcs::HelpTipComponent.new(topic: :copyright) %></p>
+            <%= render NexusCcs::ContactCollectionComponent.new(document: document, url: helpers.solr_document_url(document)) %>
+          </div>
+        </details>
+        <details class="record-section" id="how-to-cite">
+          <summary><h3 class="record-section__title"><%= t("nexus_ccs.record_page.card.cite") %></h3></summary>
+          <div class="record-section__body"><%= render NexusCcs::CiteComponent.new(document: document, inline: true) %></div>
+        </details>
+        <details class="record-section" id="about-this-record">
+          <summary><h3 class="record-section__title"><%= t("nexus_ccs.record_page.sections.about") %></h3></summary>
+          <div class="record-section__body"><%= render NexusCcs::RecordAboutComponent.new(document: document, url: helpers.solr_document_url(document), heading: false) %></div>
+        </details>
+      </div>
+    </section>
   </div>
 
   <%= footer %>

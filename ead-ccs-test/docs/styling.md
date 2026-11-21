@@ -139,14 +139,14 @@ were removed on both sites). See `docs/styling-inventory.md`.
 
 ## The record page layout
 
-**Record card after the Van Gogh Museum (branch `design/record-card`, 20 Nov 2026, proposed).** Under the media viewer, on the page's
-grey (no white card, no overlap): a narrow column on the left (the actions, then Use and access on white with "All rights and contact
-details", which opens Rights and reuse via `open_details_controller.js`) and the main column (46rem): the title in Source Sans 3
-regular at 3.5rem; an eye-icon status line (what the visitor can do with the image); the maker line in bold (makers with life dates,
-the most specific place, the date); the facts in plain text (material and measurements; credit line; collection and accession
-number); the description (three lines, Read more: CCS-413); folding sections, ruled, the plus on the left, all closed (Object details:
-every data model field in order; Rights and reuse: the CCS-27 items, terms, contact; How to cite; About this record); then Search in
-the collection (up to 14 of the record's terms as outlined, square links into search). On a phone: header, actions, sections.
+**Record card after the National Gallery of Art (branch `design/record-card`, 21 Nov 2026, proposed).** Under the media viewer, on
+white: a header in two columns (2:3 from 1024px; stacked on a phone): the title (Fraunces, 3rem), the date and the maker, then
+Associated names (each maker a link to their browse page, with the record's life dates and role under it); and the description
+(three lines and Read more, CCS-413), the actions, and one line on what the visitor may do with the image with its request or Rights
+and reuse link (`open_details_controller.js` opens the Use and access section). Then sections, each after a full-width rule with its
+serif heading on the left: Object overview (the key data model facts in two columns, names of things linking to their search or
+browse page) and Record details & notes (ruled folding sections, the plus on the right, closed: Full record, Inscriptions & marks,
+Use and access, How to cite, About this record). You may also like and More from the collections follow.
 
 **Showcase layout (branch `design/record-page-vam`, 20 Nov 2026, proposed).** After the museums' object pages (the V&A's was the
 template), in the site's light theme, in `record_showcase.css`: the image whole and centred on a full-width grey band, its tools and
