@@ -13,10 +13,10 @@
 @media (min-width: 1024px) { .record--nga { --nga-columns: minmax(0, 5fr) minmax(0, 7fr); } }
 
 /* Where the record is in the visitor's search, above the header */
-.record-nga__stepper { max-width: var(--showcase-width); margin: 0 auto; padding: var(--ccs-space-3) var(--ccs-space-4) 0; }
+.record-nga__stepper { margin: 0; padding: var(--ccs-space-3) var(--ccs-space-4) 0; }
 .record-nga__stepper .selection-stepper { margin: var(--ccs-space-2) 0 0; }
 
-.record-nga { max-width: var(--showcase-width); margin: 0 auto; padding: var(--ccs-space-5) var(--ccs-space-4) calc(var(--ccs-space-8) * 2); }
+.record-nga { margin: 0; padding: var(--ccs-space-5) var(--ccs-space-4) calc(var(--ccs-space-8) * 2); }
 @media (min-width: 1024px) { .record-nga { padding-inline: var(--ccs-space-7); } }
 .record-nga__notices { display: grid; gap: var(--ccs-space-4); margin-bottom: var(--ccs-space-6); }
 .record-nga__notices > * { margin: 0; }
@@ -69,13 +69,15 @@ a.record-nga__name:focus-visible { outline: 2px solid var(--ccs-focus-ring); out
 /* Object overview: the facts in two columns, label above value */
 .record-nga__facts { display: grid; gap: var(--ccs-space-7) var(--ccs-space-6); grid-template-columns: minmax(0, 1fr); margin: 0; }
 @media (min-width: 600px) { .record-nga__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.record-nga__fact dt { margin: 0 0 var(--ccs-space-1); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-bold); color: var(--ccs-text-primary); }
+/* the labels as NGA's: the heading serif, large and regular */
+.record-nga__fact dt { margin: 0 0 var(--ccs-space-2); font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-2xl); font-weight: var(--ccs-font-weight-regular); line-height: 1.2; color: var(--ccs-text-primary); }
+@media (min-width: 1024px) { .record-nga__fact dt { font-size: 1.875rem; } }
 .record-nga__fact dd { margin: 0; font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); overflow-wrap: anywhere; }
 .record-nga__fact a { color: var(--ccs-text-primary); text-decoration-color: var(--ccs-text-brand); text-underline-offset: 0.25em; }
 .record-nga__fact a:hover { text-decoration-thickness: 2px; }
 
 /* About this object: the description, a few lines then Read more */
-.record-nga__description-text { display: flex; flex-direction: column; gap: var(--ccs-space-4); max-width: 44rem; }
+.record-nga__description-text { display: flex; flex-direction: column; gap: var(--ccs-space-4); }
 .record-nga__description-text p { margin: 0; font-size: var(--ccs-font-size-lg); line-height: 1.65; color: var(--ccs-text-primary); text-wrap: pretty; }
 
 /* Label beside value on dashed rules (the key rows, Object details, the record URL); a phone stacks them */
@@ -222,7 +224,7 @@ a.record-nga__name:focus-visible { outline: 2px solid var(--ccs-focus-ring); out
 /* You may be interested in (NGA): a rule, the serif heading, tabs underlined, then three cards: the picture whole, a serif title
    link, the lines under it in small type. Without JavaScript every panel shows, each under its own heading. */
 .record--nga ~ .record-more { background: var(--ccs-surface-default); border-top: 0; }
-.record--nga ~ .record-more .record-more__inner { max-width: var(--showcase-width, 80rem); margin: 0 auto; padding: 0 var(--ccs-space-4) calc(var(--ccs-space-8) * 2); }
+.record--nga ~ .record-more .record-more__inner { max-width: none; margin: 0; padding: 0 var(--ccs-space-4) calc(var(--ccs-space-8) * 2); }
 @media (min-width: 1024px) { .record--nga ~ .record-more .record-more__inner { padding-inline: var(--ccs-space-7); } }
 .record-more__heading {
   margin: 0; padding-top: calc(var(--ccs-space-8) * 1.5); border-top: 1px solid var(--ccs-border-subtle);
@@ -278,3 +280,29 @@ details[open] > summary.record-read-more::after { content: "–"; }
 .record-more__row:has(.record-more__empty:not([hidden])) { display: none; }
 /* In tabs, a panel that came back empty says so */
 .is-tabbed .record-more__row:not([hidden]):has(.record-more__empty:not([hidden])) { display: block; }
+
+/* NGA's interactive states (nga.gov/artworks/86864): links carry a 1px line that fills the word on hover or focus (the text turns
+   white), 0.4s on NGA's curve; the image stays in view while the record's column scrolls past it (desktop); folding sections ease open */
+.record--nga { --nga-ease: cubic-bezier(0.55, 0.085, 0, 0.99); }
+:is(a.record-nga__name, .record-nga__fact a, .record-nga__collection a.record-arrow-link),
+#more-from-the-collections .result-card .document-title-heading a {
+  color: var(--ccs-text-primary); text-decoration: none;
+  background-image: linear-gradient(var(--ccs-text-brand), var(--ccs-text-brand)); background-position: 0 100%; background-repeat: no-repeat; background-size: 100% 1px;
+}
+:is(a.record-nga__name, .record-nga__fact a, .record-nga__collection a.record-arrow-link):is(:hover, :focus-visible),
+#more-from-the-collections .result-card .document-title-heading a:is(:hover, :focus-visible) { background-size: 100% 100%; color: var(--ccs-text-inverse); text-decoration: none; }
+@media (prefers-reduced-motion: no-preference) {
+  :is(a.record-nga__name, .record-nga__fact a, .record-nga__collection a.record-arrow-link), #more-from-the-collections .result-card .document-title-heading a { transition: background-size 400ms var(--nga-ease), color 400ms var(--nga-ease); }
+  .record-section::details-content { transition: height 400ms var(--nga-ease), content-visibility 400ms allow-discrete; height: 0; overflow: clip; }
+  .record-section[open]::details-content { height: auto; }
+  .record-section { interpolate-size: allow-keywords; }
+  .record-more__tab { transition: border-color 250ms var(--nga-ease); }
+}
+@media (min-width: 1024px) {
+  .record-nga__header { align-items: start; }
+  .record-nga__identity { align-self: stretch; }
+  .record-nga__media { position: sticky; top: 4.5rem; } /* clear of the site's sticky search bar */
+}
+@media (forced-colors: active) {
+  :is(a.record-nga__name, .record-nga__fact a, .record-nga__collection a.record-arrow-link), #more-from-the-collections .result-card .document-title-heading a { text-decoration: underline; }
+}
