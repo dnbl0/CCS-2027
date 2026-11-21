@@ -22,14 +22,15 @@ class MediaViewerComponentTest < ActiveSupport::TestCase
   test "an open record offers zoom and pan, with the image sources the viewer may open, and compare" do
     render_for({ MediaTypes::IIIF_INFO_FIELD => [ "https://iiif.example.org/a/info.json", "" ] })
 
-    # the controls bar's rotate, zoom and reset controls open and drive it (media-viewer:zoom)
+    # Zoom opens the modal; its zoom, rotate and reset controls drive the viewer (media-viewer:zoom)
+    assert_selector "button.round-control[hidden][aria-haspopup=dialog][data-action='media-viewer#openZoom']", visible: :all
     assert_selector "[data-controller=deep-zoom][data-action*='media-viewer:zoom@window->deep-zoom#zoom']", visible: :all
     sources = JSON.parse(page.find("[data-controller=deep-zoom]", visible: :all)["data-deep-zoom-sources-value"])
     assert_equal [ "/digital-assets/large/a.jpg", "/digital-assets/large/b.jpg" ], sources.map { |source| source["url"] }
     assert_equal "https://iiif.example.org/a/info.json", sources.first["info"]
     assert_equal "A portrait, image 1 of 2", sources.first["alt"]
-    { "Zoom in" => "zoomIn", "Zoom out" => "zoomOut", "Reset zoom and rotation" => "reset", "Rotate left" => "rotateLeft", "Rotate right" => "rotateRight" }.each do |name, action|
-      assert_selector ".media-viewer__bar button[aria-label='#{name}'][data-action='media-viewer##{action}']", visible: :all
+    { "Zoom in" => "zoomIn", "Zoom out" => "zoomOut", "Reset zoom and rotation" => "reset", "Rotate" => "rotateRight" }.each do |name, action|
+      assert_selector "dialog.media-zoom .media-zoom__tools button[aria-label='#{name}'][data-action='media-viewer##{action}']", visible: :all
     end
     assert_no_selector ".compare-actions" # Compare is in the actions column (RecordActionsComponent)
   end

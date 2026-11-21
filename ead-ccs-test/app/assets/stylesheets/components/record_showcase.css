@@ -1,96 +1,105 @@
-/* The record page in the showcase layout (RecordDocumentComponent, 20 Nov 2026), after the museums' object pages in the site's light
-   theme: the image centred on a full-width grey band; a white card over the band's lower edge with the record (title, a short rule,
-   object type and date, the key rows, the description, Object details, About this record) and, from 1024px, the actions and Use and
-   access beside it; then You may also like (pictures laid like prints on a table, with Shuffle) and More from the collections.
-   Labels sit beside values on dashed rules; names of things are outlined tags; long texts fade out above Read more. Site tokens only. */
+/* The record page after the National Gallery of Art's artwork pages (RecordDocumentComponent): on white, a header in two columns
+   (the title, date and maker, Associated names, the actions and the collection | the media on its grey panel, digital_assets.css),
+   then sections each opened by a full-width rule with a serif heading on the left (about 40%) and the content on the right; then
+   You may be interested in (tabs of three cards). Site tokens only. */
 
-.record--showcase {
-  --showcase-width: 75rem;
+.record--nga {
+  --showcase-width: 80rem;
   --showcase-label: 11.5rem;
   --showcase-rule: 1px dashed var(--ccs-border-default);
+  --nga-columns: minmax(0, 1fr);
+  background: var(--ccs-surface-default);
 }
+@media (min-width: 1024px) { .record--nga { --nga-columns: minmax(0, 5fr) minmax(0, 7fr); } }
 
-/* Where the record is in the visitor's search, above the band */
-.record-showcase__stepper { background: var(--ccs-surface-subtle); }
-.record-showcase__stepper-inner { max-width: var(--showcase-width); margin: 0 auto; padding: var(--ccs-space-3) var(--ccs-space-4) 0; }
-.record-showcase__stepper .selection-stepper { margin: var(--ccs-space-2) 0 0; }
+/* Where the record is in the visitor's search, above the header */
+.record-nga__stepper { max-width: var(--showcase-width); margin: 0 auto; padding: var(--ccs-space-3) var(--ccs-space-4) 0; }
+.record-nga__stepper .selection-stepper { margin: var(--ccs-space-2) 0 0; }
 
-/* The band: the media viewer (digital_assets.css) edge to edge */
-.record-showcase__hero { background: var(--ccs-surface-subtle); }
-.record-showcase__hero-inner { width: 100%; }
-.record--showcase .record-showcase__hero-inner > :not(.digital-assets) { margin: var(--ccs-space-5) var(--ccs-space-4) 0; padding: var(--ccs-space-7) var(--ccs-space-5); background: var(--ccs-surface-default); }
+.record-nga { max-width: var(--showcase-width); margin: 0 auto; padding: var(--ccs-space-5) var(--ccs-space-4) calc(var(--ccs-space-8) * 2); }
+@media (min-width: 1024px) { .record-nga { padding-inline: var(--ccs-space-7); } }
+.record-nga__notices { display: grid; gap: var(--ccs-space-4); margin-bottom: var(--ccs-space-6); }
+.record-nga__notices > * { margin: 0; }
 
-/* The record, after the National Gallery of Art's artwork pages: on white, a header in two columns (identity | summary), then
-   sections each opened by a full-width rule, the heading on the left (40%) and the content on the right */
-.record--showcase { background: var(--ccs-surface-default); }
-.record-showcase__card { max-width: var(--showcase-width); margin: 0 auto; padding: var(--ccs-space-8) var(--ccs-space-4) calc(var(--ccs-space-8) * 2); }
-@media (min-width: 1024px) { .record-showcase__card { padding-inline: var(--ccs-space-6); } }
-.record-nga__header { display: grid; gap: var(--ccs-space-7); grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 1024px) { .record-nga__header { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); column-gap: var(--ccs-space-8); } }
-.record-nga__identity, .record-nga__summary { min-width: 0; }
-.record-nga__summary { display: flex; flex-direction: column; gap: var(--ccs-space-6); }
-
-/* Title (the heading serif), then the date and the maker in plain lines */
-.record-showcase__title {
-  margin: 0 0 var(--ccs-space-5); font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-4xl); font-weight: var(--ccs-font-weight-semibold);
-  line-height: var(--ccs-line-height-tight); color: var(--ccs-text-primary); text-wrap: balance;
+/* The header: identity left, media right; the identity's collection line sits at the foot, level with the panel's */
+.record-nga__header { display: grid; gap: var(--ccs-space-7) var(--ccs-space-5); grid-template-columns: var(--nga-columns); }
+.record-nga__identity, .record-nga__media { min-width: 0; }
+/* Below 1024px one column: the title, date and maker, then the media, then the names, the actions and the collection */
+@media (max-width: 1023.98px) {
+  .record-nga__header { row-gap: 0; }
+  .record-nga__identity { display: contents; }
+  .record-nga__title, .record-nga__lines { order: 1; }
+  .record-nga__media { order: 2; margin-top: var(--ccs-space-6); }
+  .record-nga__names, .record-nga__actions, .record-nga__collection { order: 3; }
 }
-@media (min-width: 1024px) { .record-showcase__title { font-size: var(--ccs-font-size-5xl); } }
-.record-nga__line { margin: 0; font-size: var(--ccs-font-size-lg); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); }
+@media (min-width: 1024px) { .record-nga__identity { display: flex; flex-direction: column; } }
+@media (min-width: 1024px) { .record-nga__identity { padding-top: calc(var(--ccs-space-8) * 1.5); padding-right: var(--ccs-space-6); } }
+.record-nga__title {
+  margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-4xl); font-weight: var(--ccs-font-weight-bold);
+  line-height: 1.2; color: var(--ccs-text-primary); text-wrap: balance;
+}
+@media (min-width: 1024px) { .record-nga__title { font-size: 2.75rem; } }
+.record-nga__lines { margin-top: var(--ccs-space-6); }
+.record-nga__lines p { margin: 0; font-size: var(--ccs-font-size-lg); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); }
 
-/* Associated names: the name a link, what the record says about them under it */
-.record-nga__names { margin-top: var(--ccs-space-8); }
-.record-nga__names-heading { margin: 0 0 var(--ccs-space-5); font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-bold); color: var(--ccs-text-primary); }
+/* Associated names: the name a link, the role and dates under it */
+.record-nga__names { margin-top: calc(var(--ccs-space-8) + var(--ccs-space-4)); }
+.record-nga__names-heading { margin: 0 0 var(--ccs-space-6); font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-bold); color: var(--ccs-text-primary); }
 .record-nga__name-list { display: grid; gap: var(--ccs-space-5); margin: 0; padding: 0; list-style: none; }
 .record-nga__name-list li { display: flex; flex-direction: column; gap: var(--ccs-space-1); }
-.record-nga__name { font-size: var(--ccs-font-size-lg); color: var(--ccs-text-primary); text-decoration: underline; text-decoration-color: var(--ccs-text-brand); text-underline-offset: 0.2em; }
+.record-nga__name { align-self: flex-start; font-size: var(--ccs-font-size-lg); color: var(--ccs-text-primary); text-decoration: underline; text-decoration-color: var(--ccs-text-brand); text-underline-offset: 0.25em; text-decoration-thickness: 1px; }
 a.record-nga__name:hover { text-decoration-thickness: 2px; }
 a.record-nga__name:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
-.record-nga__role { font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
+.record-nga__role { font-size: var(--ccs-font-size-sm); color: var(--ccs-text-primary); }
 
-/* The line on what the visitor may do with the image */
-.record-nga__access { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ccs-space-2) var(--ccs-space-3); margin: 0; font-size: var(--ccs-font-size-md); color: var(--ccs-text-primary); scroll-margin-top: 4.5rem; }
-.record-nga__access:focus { outline: none; }
+.record-nga__actions { margin-top: var(--ccs-space-7); }
+.record--nga .record-actions { padding: 0; border: 0; }
+.record-nga__collection { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ccs-space-1) var(--ccs-space-4); margin: var(--ccs-space-7) 0 0; font-size: var(--ccs-font-size-sm); }
+.record-nga__collection .record-arrow-link { font-weight: var(--ccs-font-weight-semibold); }
+@media (min-width: 1024px) { .record-nga__collection { margin-top: auto; padding-top: var(--ccs-space-7); } }
+/* The collection line is level with the panel's foot, not with the licence line under it */
+@media (min-width: 1024px) { .record-nga__identity { padding-bottom: 2.5rem; } }
+.record-nga__media > .no-image { margin: 0; }
 
 /* Sections: a rule, the heading on the left, the content on the right */
-.record-nga__section { display: grid; gap: var(--ccs-space-6); grid-template-columns: minmax(0, 1fr); margin-top: var(--ccs-space-8); padding-top: var(--ccs-space-8); border-top: 1px solid var(--ccs-border-subtle); }
-@media (min-width: 1024px) { .record-nga__section { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); column-gap: var(--ccs-space-8); margin-top: calc(var(--ccs-space-8) * 1.5); padding-top: var(--ccs-space-8); } }
-.record-nga__section-heading { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-3xl); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-tight); color: var(--ccs-text-primary); }
-@media (min-width: 1024px) { .record-nga__section-heading { font-size: 2.5rem; } }
+.record-nga__section { display: grid; gap: var(--ccs-space-6) var(--ccs-space-5); grid-template-columns: var(--nga-columns); margin-top: calc(var(--ccs-space-8) * 1.5); padding-top: calc(var(--ccs-space-8) * 1.5); border-top: 1px solid var(--ccs-border-subtle); }
+.record-nga__section-heading { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-3xl); font-weight: var(--ccs-font-weight-semibold); line-height: 1.2; color: var(--ccs-text-primary); text-wrap: balance; }
+@media (min-width: 1024px) { .record-nga__section-heading { font-size: 2.625rem; padding-right: var(--ccs-space-6); } }
 
 /* Object overview: the facts in two columns, label above value */
-.record-nga__facts { display: grid; gap: var(--ccs-space-6) var(--ccs-space-6); grid-template-columns: minmax(0, 1fr); margin: 0; }
+.record-nga__facts { display: grid; gap: var(--ccs-space-7) var(--ccs-space-6); grid-template-columns: minmax(0, 1fr); margin: 0; }
 @media (min-width: 600px) { .record-nga__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .record-nga__fact dt { margin: 0 0 var(--ccs-space-1); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-bold); color: var(--ccs-text-primary); }
 .record-nga__fact dd { margin: 0; font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); overflow-wrap: anywhere; }
-.record-nga__fact a { color: var(--ccs-text-primary); text-decoration-color: var(--ccs-text-brand); text-underline-offset: 0.2em; }
+.record-nga__fact a { color: var(--ccs-text-primary); text-decoration-color: var(--ccs-text-brand); text-underline-offset: 0.25em; }
 .record-nga__fact a:hover { text-decoration-thickness: 2px; }
 
+/* About this object: the description, a few lines then Read more */
+.record-nga__description-text { display: flex; flex-direction: column; gap: var(--ccs-space-4); max-width: 44rem; }
+.record-nga__description-text p { margin: 0; font-size: var(--ccs-font-size-lg); line-height: 1.65; color: var(--ccs-text-primary); text-wrap: pretty; }
+
 /* Label beside value on dashed rules (the key rows, Object details, the record URL); a phone stacks them */
-.record--showcase .record-facts__list { margin: 0; border-bottom: var(--showcase-rule); }
-.record--showcase .record-facts__row {
+.record--nga .record-facts__list { margin: 0; border-bottom: var(--showcase-rule); }
+.record--nga .record-facts__row {
   display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ccs-space-2); padding: var(--ccs-space-4) 0; border-top: var(--showcase-rule);
 }
-@media (min-width: 600px) { .record--showcase .record-facts__row { grid-template-columns: var(--showcase-label) minmax(0, 1fr); gap: var(--ccs-space-5); } }
-.record--showcase .record-facts__row dt {
+@media (min-width: 600px) { .record--nga .record-facts__row { grid-template-columns: var(--showcase-label) minmax(0, 1fr); gap: var(--ccs-space-5); } }
+.record--nga .record-facts__row dt {
   margin: 0; padding-top: 0.2em; font-size: var(--ccs-font-size-xs); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-snug);
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--ccs-text-primary);
 }
-.record--showcase .record-facts__row dd { margin: 0; font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-secondary); }
-.record--showcase .record-facts__value + .record-facts__value { margin-top: var(--ccs-space-1); }
+.record--nga .record-facts__row dd { margin: 0; font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-secondary); }
+.record--nga .record-facts__value + .record-facts__value { margin-top: var(--ccs-space-1); }
 
 /* Names of things: outlined tags */
-.record--showcase .record-term {
+.record--nga .record-term {
   border: 1px solid var(--ccs-border-brand); border-radius: var(--ccs-radius-sm); padding: var(--ccs-space-1) var(--ccs-space-3);
   font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); letter-spacing: 0; text-transform: none; color: var(--ccs-text-brand); background: var(--ccs-surface-default);
 }
-.record--showcase a.record-term:hover { background: var(--ccs-surface-subtle); }
+.record--nga a.record-term:hover { background: var(--ccs-surface-subtle); }
 
 /* The description and long texts: a few lines, fading out, then Read more with a round plus */
-.record-showcase__description { margin-top: var(--ccs-space-8); }
-.record-showcase__description-text { display: flex; flex-direction: column; gap: var(--ccs-space-4); }
-.record-showcase__description-text p { margin: 0; font-size: var(--ccs-font-size-md); line-height: 1.65; color: var(--ccs-text-primary); text-wrap: pretty; }
-.record-fade.is-collapsed .record-showcase__lead,
+.record-fade.is-collapsed .record-nga__lead,
 .record-fade.is-collapsed .record-fade__clip {
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;
   mask-image: linear-gradient(to bottom, #000 45%, transparent);
@@ -165,7 +174,7 @@ a.record-nga__name:focus-visible { outline: 2px solid var(--ccs-focus-ring); out
 .record-about__downloads a { display: inline-flex; align-items: center; min-height: 2.75rem; }
 
 /* The actions in the summary column: one row */
-.record--showcase .record-actions { padding: 0; border: 0; }
+.record--nga .record-actions { padding: 0; border: 0; }
 
 /* You may also like: pictures laid like prints on a table, each a little turned, on the grey band; Shuffle under them */
 .record-also { padding: calc(var(--ccs-space-8) + var(--ccs-space-4)) var(--ccs-space-4) var(--ccs-space-8); background: var(--ccs-surface-subtle); }
@@ -210,12 +219,48 @@ a.record-nga__name:focus-visible { outline: 2px solid var(--ccs-focus-ring); out
 .record-also__button:hover span { text-decoration: underline; }
 .record-also__button:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 4px; }
 
-/* More from the collections follows on white */
-.record--showcase ~ .record-more { background: var(--ccs-surface-default); }
+/* You may be interested in (NGA): a rule, the serif heading, tabs underlined, then three cards: the picture whole, a serif title
+   link, the lines under it in small type. Without JavaScript every panel shows, each under its own heading. */
+.record--nga ~ .record-more { background: var(--ccs-surface-default); border-top: 0; }
+.record--nga ~ .record-more .record-more__inner { max-width: var(--showcase-width, 80rem); margin: 0 auto; padding: 0 var(--ccs-space-4) calc(var(--ccs-space-8) * 2); }
+@media (min-width: 1024px) { .record--nga ~ .record-more .record-more__inner { padding-inline: var(--ccs-space-7); } }
+.record-more__heading {
+  margin: 0; padding-top: calc(var(--ccs-space-8) * 1.5); border-top: 1px solid var(--ccs-border-subtle);
+  font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-3xl); font-weight: var(--ccs-font-weight-semibold); line-height: 1.2; color: var(--ccs-text-primary);
+}
+@media (min-width: 1024px) { .record-more__heading { font-size: 2.625rem; } }
+.record-more__tabs { display: none; }
+.is-tabbed .record-more__tabs { display: flex; gap: var(--ccs-space-5); margin: var(--ccs-space-6) 0 var(--ccs-space-7); overflow-x: auto; border-bottom: 1px solid var(--ccs-border-default); scrollbar-width: none; }
+.record-more__tab {
+  flex: none; min-height: 2.75rem; margin-bottom: -1px; padding: var(--ccs-space-2) 0; font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-regular);
+  color: var(--ccs-text-primary); background: none; border: 0; border-bottom: 3px solid transparent; cursor: pointer;
+}
+.record-more__tab:hover { border-bottom-color: var(--ccs-border-strong); }
+.record-more__tab[aria-selected="true"] { font-weight: var(--ccs-font-weight-bold); border-bottom-color: var(--ccs-text-brand); }
+.record-more__tab:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: -2px; }
+.is-tabbed .record-more__row-heading { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.record-more__row:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 4px; }
+.record-more__row[hidden] { display: none; }
+.record--nga ~ .record-more .record-more__row + .record-more__row { margin-top: var(--ccs-space-7); }
+.is-tabbed .record-more__row + .record-more__row { margin-top: 0; }
+.record--nga ~ .record-more .discover-cards { display: grid; gap: var(--ccs-space-7) var(--ccs-space-5); align-items: start; }
+.record--nga ~ .record-more .result-card, .record--nga ~ .record-more .result-card:hover { height: auto; padding: 0; overflow: visible; background: none; border: 0; box-shadow: none; }
+.record--nga ~ .record-more .result-card__media { aspect-ratio: auto; background: none; }
+.record--nga ~ .record-more .result-card__media img { position: static; width: 100%; height: auto; max-height: 22rem; object-fit: contain; object-position: left top; }
+.record--nga ~ .record-more .result-card__content > * { padding-inline: 0; }
+.record--nga ~ .record-more .result-card__content > :first-child { padding-top: var(--ccs-space-5); }
+.record--nga ~ .record-more .result-card__content > :last-child { padding-bottom: 0; }
+.record--nga ~ .record-more .result-card__lines { display: grid; gap: var(--ccs-space-1); margin: 0; padding-top: 0; list-style: none; }
+.record--nga ~ .record-more .result-card__lines li { margin: 0; padding: 0; }
+.record--nga ~ .record-more .result-card .document-title-heading { margin: 0 0 var(--ccs-space-3); padding: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-regular); line-height: 1.25; }
+/* by id: the site's in-content link rule is scoped by #main-container (links.css) */
+#more-from-the-collections .result-card .document-title-heading a { color: var(--ccs-text-primary); text-decoration: none; }
+#more-from-the-collections .result-card .document-title-heading a:hover { text-decoration: underline; text-decoration-color: var(--ccs-text-brand); text-underline-offset: 0.2em; }
+.record--nga ~ .record-more .result-card__lines { font-size: var(--ccs-font-size-sm); color: var(--ccs-text-primary); }
 
 @media print {
-  .record-showcase__aside, .record-also, .record-more, .record-read-more, .record-about__links { display: none; }
-  .record-fade.is-collapsed .record-showcase__lead, .record-fade.is-collapsed .record-fade__clip { display: block; mask-image: none; }
+  .record-nga__actions, .media-viewer__controls, .record-also, .record-more, .record-read-more, .record-about__links { display: none; }
+  .record-fade.is-collapsed .record-nga__lead, .record-fade.is-collapsed .record-fade__clip { display: block; mask-image: none; }
 }
 
 /* Read more as a <summary> (More from the collections' "More ways to explore") */
@@ -231,5 +276,5 @@ details[open] > summary.record-read-more::after { content: "–"; }
 .record-more__others[open] > summary { margin-bottom: var(--ccs-space-6); }
 /* A row that came back empty is left out altogether (no heading over "nothing to show") */
 .record-more__row:has(.record-more__empty:not([hidden])) { display: none; }
-.record-showcase__details:not([open]) > summary { margin-bottom: 0; }
-.record-showcase__details:not([open]) + .record-about { margin-top: var(--ccs-space-7); }
+/* In tabs, a panel that came back empty says so */
+.is-tabbed .record-more__row:not([hidden]):has(.record-more__empty:not([hidden])) { display: block; }

@@ -74,7 +74,7 @@ class RecordLayoutTest < ActiveSupport::TestCase
   test "associated names: each maker by name, linked to their browse page where there is one, with the record's dates and role under it" do
     names = component(SHEET).associated_names
     assert_equal "Grainger, Percy Aldridge", names.first[0]
-    assert_equal "(b. 1882 - d. 1961) maker", names.first[2]
+    assert_equal "Maker, b. 1882 - d. 1961", names.first[2]
   end
 
   test "Object overview holds the key facts in the sheet's order, the credit line and copyright among them" do
@@ -82,8 +82,12 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_equal [ "Object Type", "Place", "Material", "Measurements", "Classification", "Collection", "Accession Number", "Credit line", "Copyright" ], labels
   end
 
-  test "the access sentence says what the visitor may do with the image" do
-    assert_equal "No image of this object is online.", component(SHEET).access_sentence
+  test "the record's collection, with the way to the rest of it (NGA's location line)" do
+    record = component(SHEET.merge("collection_ssim" => [ "Grainger Museum Collection" ]))
+    record.define_singleton_method(:value_link) { |_row, value| "/catalog?collection=#{value}" }
+    name, path = record.collection_link
+    assert_equal "Grainger Museum Collection", name
+    assert_predicate path, :present?
   end
 
   test "Use and access: the rights items in CCS-27's order; caption and terms only with a digital asset" do

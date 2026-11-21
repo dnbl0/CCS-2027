@@ -139,14 +139,18 @@ were removed on both sites). See `docs/styling-inventory.md`.
 
 ## The record page layout
 
-**Record card after the National Gallery of Art (branch `design/record-card`, 21 Nov 2026, proposed).** Under the media viewer, on
-white: a header in two columns (2:3 from 1024px; stacked on a phone): the title (Fraunces, 3rem), the date and the maker, then
-Associated names (each maker a link to their browse page, with the record's life dates and role under it); and the description
-(three lines and Read more, CCS-413), the actions, and one line on what the visitor may do with the image with its request or Rights
-and reuse link (`open_details_controller.js` opens the Use and access section). Then sections, each after a full-width rule with its
-serif heading on the left: Object overview (the key data model facts in two columns, names of things linking to their search or
-browse page) and Record details & notes (ruled folding sections, the plus on the right, closed: Full record, Inscriptions & marks,
-Use and access, How to cite, About this record). You may also like and More from the collections follow.
+**Record page after the National Gallery of Art (branch `design/record-card`, 21 Nov 2026, proposed).** The whole page follows NGA's
+artwork pages (nga.gov/artworks/132738, /59406), on white. Header in two columns (5:7 from 1024px): the title (Fraunces bold), the
+date and the maker, Associated names (each maker a link to their browse page, role and dates under it), the actions and, at the foot,
+the record's collection with "See more from this collection"; and the media (`DigitalAssetsComponent`) on a light grey panel: the
+image whole, thumbnails under it, round Zoom and Download at the panel's foot and Media information at its end, then one line on the
+licence and what the visitor may do, with Use and access or the request link. Zoom is a full-screen modal `<dialog>` (deep zoom,
+zoom in and out, rotate, reset, previous and next; Escape returns focus to Zoom); Media information is a drawer `<dialog>` from the
+right (CCS-422). On a phone: the title, then the media, then the names. Then sections, each after a full-width rule with its serif
+heading on the left: Object overview (the key facts, two columns), About this object (the description, Read more, CCS-413) and
+Record details & notes (ruled folding sections, the plus on the right: Full record, Inscriptions & marks, Use and access, How to
+cite, About this record). Last, You may be interested in: tabs (`tabs_controller.js`, WAI-ARIA, arrow keys) of Similar objects and
+the SimilarRows ways in, each panel three cards loaded when shown.
 
 **Showcase layout (branch `design/record-page-vam`, 20 Nov 2026, proposed).** After the museums' object pages (the V&A's was the
 template), in the site's light theme, in `record_showcase.css`: the image whole and centred on a full-width grey band, its tools and

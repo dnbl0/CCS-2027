@@ -1,34 +1,34 @@
-<%# The record page: the media viewer edge to edge on a grey band (DigitalAssetsComponent), then the record after the National Gallery
-    of Art's artwork pages (the card below). You may also like and More from the collections follow (catalog/show). %>
+<%# The record page, after the National Gallery of Art's artwork pages: a header in two columns (the title, date and maker, Associated
+    names, the actions and the record's collection; the media on its grey panel), then sections each opened by a rule with the heading
+    on the left: Object overview (the key facts), About this object (the description) and Record details & notes (folding sections).
+    You may be interested in follows (catalog/show). %>
 <%= content_tag @component,
   id: @id,
   data: { "document-id": document.id.to_s.parameterize },
   itemscope: true,
   itemtype: document.itemtype,
-  class: "record record--showcase" do %>
+  class: "record record--nga" do %>
   <% if stepper? && (steps = stepper.to_s).strip.present? %>
-    <div class="record-showcase__stepper"><div class="record-showcase__stepper-inner"><%= steps %></div></div>
+    <div class="record-nga__stepper"><%= steps %></div>
   <% end %>
 
-  <div class="record-showcase__hero">
-    <div class="record-showcase__hero-inner">
-      <% if assets? %>
-        <%= render NexusCcs::DigitalAssetsComponent.new(presenter: @presenter) %>
-      <% else %>
-        <%= render NexusCcs::NoImageComponent.new(document: document, url: helpers.solr_document_url(document)) %>
-      <% end %>
-    </div>
-  </div>
+  <div class="record-nga">
+    <%# Content warnings come before the media %>
+    <% notices = capture do %>
+      <%= render NexusCcs::CulturalProtocolsNoticeComponent.new(document: document) %>
+      <%= render NexusCcs::DebiasNoticeComponent.new(matches: debias_matches, labels: debias_labels) %>
+    <% end %>
+    <% if notices.strip.present? %><div class="record-nga__notices"><%= notices %></div><% end %>
 
-  <%# The record (after the National Gallery of Art's artwork pages): a header in two columns (the title, date, maker and associated
-      names; the description, the actions and what the visitor may do with the image), then sections each with its heading on the
-      left: Object overview (the key facts) and Record details & notes (folding sections). %>
-  <div class="record-showcase__card">
     <div class="record-nga__header">
       <div class="record-nga__identity">
-        <h1 class="record-showcase__title"><%= title_markup %></h1>
-        <% if display_date %><p class="record-nga__line"><%= display_date %></p><% end %>
-        <% if makers.any? %><p class="record-nga__line"><%= makers.map(&:first).join("; ") %></p><% end %>
+        <h1 class="record-nga__title"><%= title_markup %></h1>
+        <% if display_date || makers.any? %>
+          <div class="record-nga__lines">
+            <% if display_date %><p><%= display_date %></p><% end %>
+            <% if makers.any? %><p><%= makers.map(&:first).join("; ") %></p><% end %>
+          </div>
+        <% end %>
         <% if associated_names.any? %>
           <section class="record-nga__names" aria-labelledby="record-names-heading">
             <h2 class="record-nga__names-heading" id="record-names-heading"><%= t("nexus_ccs.record_page.nga.associated_names") %></h2>
@@ -42,33 +42,22 @@
             </ul>
           </section>
         <% end %>
+        <div class="record-nga__actions"><%= render NexusCcs::RecordActionsComponent.new(document: document) %></div>
+        <% if (collection = collection_link) %>
+          <%# Where the object is (NGA's "Not on view · See artworks now on view") %>
+          <p class="record-nga__collection">
+            <span><%= collection.first %></span>
+            <% if collection.last %><%= link_to t("nexus_ccs.record_page.nga.see_collection"), collection.last, class: "record-arrow-link" %><% end %>
+          </p>
+        <% end %>
       </div>
 
-      <div class="record-nga__summary">
-        <%= render NexusCcs::CulturalProtocolsNoticeComponent.new(document: document) %>
-        <%= render NexusCcs::DebiasNoticeComponent.new(matches: debias_matches, labels: debias_labels) %>
-        <% if lead %>
-          <%# CCS-413: the description's first three lines, fading out above Read more %>
-          <div class="record-showcase__description" data-controller="truncate"
-               data-truncate-more-label-value="<%= t("nexus_ccs.record_page.showcase.read_more") %>" data-truncate-less-label-value="<%= t("nexus_ccs.record_page.showcase.read_less") %>">
-            <div class="record-showcase__description-text record-fade" id="record-description" data-truncate-target="text">
-              <p class="record-showcase__lead" data-truncate-target="lead"><%= lead %></p>
-              <% description_rest.each do |paragraph| %><p data-truncate-target="more"><%= paragraph %></p><% end %>
-            </div>
-            <button type="button" class="record-read-more" aria-controls="record-description" aria-expanded="true"
-                    data-truncate-target="toggle" data-action="truncate#toggle" hidden><%= t("nexus_ccs.record_page.showcase.read_more") %></button>
-          </div>
+      <div class="record-nga__media">
+        <% if assets? %>
+          <%= render NexusCcs::DigitalAssetsComponent.new(presenter: @presenter) %>
+        <% else %>
+          <%= render NexusCcs::NoImageComponent.new(document: document, url: helpers.solr_document_url(document)) %>
         <% end %>
-        <%= render NexusCcs::RecordActionsComponent.new(document: document) %>
-        <%# What the visitor may do with the image (CCS-68, CCS-69), as NGA's line under its image %>
-        <p class="record-nga__access" id="use-and-access" tabindex="-1">
-          <span><%= access_sentence %></span>
-          <% if access_state == :request || access_state == :view_only %>
-            <a class="record-arrow-link" href="<%= request_to_view_path %>"><%= t("nexus_ccs.record_page.use.request.#{access_state}") %></a>
-          <% else %>
-            <a class="record-arrow-link" href="#record-use" data-controller="open-details" data-action="open-details#open"><%= t("nexus_ccs.record_page.nga.rights_link") %></a>
-          <% end %>
-        </p>
       </div>
     </div>
 
@@ -84,6 +73,22 @@
         <% end %>
       </dl>
     </section>
+
+    <% if lead %>
+      <%# About this object (NGA's More About this Artwork): the description, three lines then Read more (CCS-413) %>
+      <section class="record-nga__section" aria-labelledby="record-about-object-heading">
+        <h2 class="record-nga__section-heading" id="record-about-object-heading"><%= t("nexus_ccs.record_page.nga.about_object") %></h2>
+        <div class="record-nga__description" data-controller="truncate"
+             data-truncate-more-label-value="<%= t("nexus_ccs.record_page.showcase.read_more") %>" data-truncate-less-label-value="<%= t("nexus_ccs.record_page.showcase.read_less") %>">
+          <div class="record-nga__description-text record-fade" id="record-description" data-truncate-target="text">
+            <p class="record-nga__lead" data-truncate-target="lead"><%= lead %></p>
+            <% description_rest.each do |paragraph| %><p data-truncate-target="more"><%= paragraph %></p><% end %>
+          </div>
+          <button type="button" class="record-read-more" aria-controls="record-description" aria-expanded="true"
+                  data-truncate-target="toggle" data-action="truncate#toggle" hidden><%= t("nexus_ccs.record_page.showcase.read_more") %></button>
+        </div>
+      </section>
+    <% end %>
 
     <%# Record details & notes (NGA's Artwork history & notes): folding sections, the plus on the right %>
     <section class="record-nga__section" aria-labelledby="record-notes-heading">

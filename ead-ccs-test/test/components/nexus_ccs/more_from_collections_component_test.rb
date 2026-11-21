@@ -15,19 +15,21 @@ class MoreFromCollectionsComponentTest < ActiveSupport::TestCase
 
   def source(**extra) = open_record("emu-source", creator_ssim: [ "Lees, Derwent" ], object_type_ssim: [ "drawing" ], **extra)
 
-  test "a labelled row per way the record can match, all in view, each a lazy frame of its cards; no tabs" do
+  test "You may be interested in: a tab per way the record can match, each panel a lazy frame of its cards (NGA)" do
     render_for(source)
 
-    assert_selector "section#more-from-the-collections h2", text: "More from the collections"
-    assert_no_selector "[role=tablist], [role=tab], [role=tabpanel]", visible: :all
-    headings = page.all(".record-more__row h3", visible: :all).map { |heading| heading.text(:all) }
-    assert_equal "More by Lees, Derwent", headings.first
-    assert_includes headings, "More of this type"
-    # two rows at first; the others behind "More ways to explore", their frames loading only once it is opened
-    assert_equal 2, page.all(".record-more__inner > .record-more__row").size
-    assert_selector "details.record-more__others .record-more__row", visible: :all
-    assert_selector "details.record-more__others summary", text: "More ways to explore"
-    assert_selector "section#more-row-creator[aria-labelledby=more-row-creator-heading] turbo-frame#more-creator[loading=lazy][src='/catalog/emu-source/similar?row=creator'][data-controller=lazy-frame]"
+    assert_selector "section#more-from-the-collections h2#record-more-heading", text: "You may be interested in"
+    tabs = page.all("[role=tablist][aria-labelledby=record-more-heading] button[role=tab]")
+    assert_equal [ "Similar objects", "More by Lees, Derwent" ], tabs.first(2).map(&:text)
+    assert_selector "section#more-row-similar turbo-frame#more-similar[loading=lazy][src='/catalog/emu-source/similar?view=tab']"
+    assert_includes tabs.map(&:text), "More of this type"
+    # the first tab is selected and the only one in the tab order (roving tabindex)
+    assert_equal [ "true", "0" ], [ tabs.first["aria-selected"], tabs.first["tabindex"] ]
+    assert_equal [ "false", "-1" ], [ tabs.last["aria-selected"], tabs.last["tabindex"] ]
+    assert_selector "button#more-tab-creator[aria-controls=more-row-creator]"
+    assert_selector "section#more-row-creator[role=tabpanel][aria-labelledby=more-tab-creator] turbo-frame#more-creator[loading=lazy][src='/catalog/emu-source/similar?row=creator'][data-controller=lazy-frame]"
+    # without the script every panel shows under its own heading
+    assert_equal tabs.size, page.all(".record-more__row h3", visible: :all).size
   end
 
   test "a record that may not have recommendations beside it has no section" do

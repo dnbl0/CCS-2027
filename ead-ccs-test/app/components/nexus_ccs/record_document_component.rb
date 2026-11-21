@@ -181,23 +181,29 @@ module NexusCcs
     def lead_rows = detail_rows.select { |row| LEAD_SEQS.include?(row.seq) }
 
     # --- The record card (after the National Gallery of Art's artwork pages) -------------------------------------------------------
-    # Associated names: each maker as a link to their browse page, with what the record says about them (life dates, role) under it.
-    # [[name, path or nil, detail]]
+    # Associated names: each maker as a link to their browse page, with what the record says about them under it, role first as NGA
+    # has it ("Etcher, b. c. 1804 - d. 1888"). [[name, path or nil, detail]]
     def associated_names
       displays = detail_rows.find { |row| row.seq == CREATOR_SEQ }&.values || []
       displays.first(6).map do |display|
         name = creator_name(display) || display.sub(/\s*\(.*\z/, "")
-        detail = display.delete_prefix(name).strip.delete_prefix(",").strip
-        [ name, Browse.path_for("makers", name), detail.presence ]
+        [ name, Browse.path_for("makers", name), name_detail(display.delete_prefix(name).strip.delete_prefix(",").strip) ]
       end
     end
 
-    # One sentence on what the visitor may do with the image (NGA's line under its image), e.g. "You can view the image online.
-    # Download is not available."
-    def access_sentence
-      return view_status + "." unless assets?
+    # "(b. 1882 - d. 1961) maker" -> "Maker, b. 1882 - d. 1961"
+    def name_detail(text)
+      dates, role = text.match(/\A\((.*?)\)\s*(.*)\z/)&.captures || [ nil, text ]
+      [ role.to_s.strip.upcase_first, dates.to_s.strip ].compact_blank.join(", ").presence
+    end
 
-      "#{view_status}. #{download_status}."
+    # The record's collection, with the way to the rest of it (NGA's "Not on view · See artworks now on view"): [name, path or nil]
+    def collection_link
+      row = detail_rows.find { |candidate| candidate.field == "collection_ssim" }
+      return unless row
+
+      name = row.values.first
+      [ name, value_link(row, name) ]
     end
 
     # Object overview (NGA's Artwork overview): the key facts, in the data model sheet's order

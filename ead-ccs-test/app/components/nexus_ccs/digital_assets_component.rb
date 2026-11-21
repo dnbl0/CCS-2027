@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # A record's media viewer (Figma "Media viewer", after Europeana's item viewer): the media information on the left at the
-  # viewer's full height (CCS-422; closed until ⋮), the stage (text/primary) with the controls bar along its bottom (⋮ | rotate |
-  # zoom in, reset, zoom out | full screen, and Download or Show thumbnails), and the numbered thumbnails on the right (a strip
-  # below 1024px), with previous, next and hide. Under it: the licence, the access level and the classification. Download first
-  # shows the essential information (CCS-67). No counter. Renders nothing for a record without assets. What it shows follows AccessPolicy, asset by asset: the index holds only
+  # A record's media, after the National Gallery of Art's artwork pages: the image whole on a light grey panel with the other images
+  # as thumbnails under it; round Zoom (a full-screen modal with deep zoom, CCS-57) and Download (the essential information first,
+  # CCS-67) at the panel's foot, and Media information (CCS-422, a drawer from the right) at its end; under the panel one line on
+  # the licence and what the visitor may do with the image. Renders nothing for a record without assets. What it shows follows AccessPolicy, asset by asset: the index holds only
   # the assets a visitor may see (Dam::SolrWriter), and of those only an open one is offered to download (its thumbnail links to
   # the file, its player keeps its download button, a PDF is listed); a view-only one is shown without any of that. A record
   # with some assets withheld says so under them, with a request link; a :request record shows none of the assets, only the
@@ -84,6 +83,21 @@ module NexusCcs
 
 
     def access_chip = t("nexus_ccs.record_page.access.#{tier}")
+
+    # :view_only or :request when the visitor may ask for the image (the line under the panel then links to the request form)
+    def request_state
+      state = withheld? ? :request : tier
+      state if %i[view_only request].include?(state)
+    end
+
+    # The line under the panel (NGA's "This object's media is free and in the public domain."): the licence, then what the visitor
+    # may do with the image, e.g. "Public domain. You can view the image online. Download is not available."
+    def licence_sentence
+      state = withheld? ? :request : tier
+      parts = [ licence, t("nexus_ccs.record_page.use.view.#{state}") ]
+      parts << t("nexus_ccs.record_page.use.download.#{state}") if images.any? || withheld?
+      parts.compact_blank.map { |part| part.end_with?(".") ? part : "#{part}." }.join(" ")
+    end
 
     # The one primary action: the main image, to download, when it is an open asset (never a view-only or withheld one: no path is in the markup)
     def download_href = (main&.first if assets_shown? && image_downloadable?(0))
@@ -164,18 +178,18 @@ module NexusCcs
 
     VIEWER = "nexus_ccs.record_page.split.viewer"
 
-    # One of the bar's controls: an icon button named by its label (aria-label and a matching tooltip), which the script works
+    # One of the zoom modal's controls: an icon button named by its label (aria-label and a matching tooltip), which the script works
     # (media_viewer_controller, action and target). disabled: starts aria-disabled (still focusable, as at fit), with the reason.
     def control(name, action, disabled: false)
       label = t("#{VIEWER}.#{name}")
-      helpers.tag.button(icon(name), type: "button", class: "viewer-control", title: label,
+      helpers.tag.button(icon(name), type: "button", class: "round-control", title: label,
                          aria: { label: label, disabled: (disabled ? "true" : nil) },
                          data: { action: "media-viewer##{action}", media_viewer_target: action })
     end
 
     # What the script says and shows (announcements, the zoom readout, why a control is unavailable), in the page's language
     def viewer_labels
-      %w[shown rotated zoom_level max_zoom at_fit at_max at_start at_end full_screen exit_full_screen].index_with { |key| t("#{VIEWER}.#{key}") }
+      %w[shown rotated zoom_level max_zoom at_fit at_max at_start at_end].index_with { |key| t("#{VIEWER}.#{key}") }
     end
 
     # The essential information before a download (CCS-67): the DA caption, or one built from the record, and the licence

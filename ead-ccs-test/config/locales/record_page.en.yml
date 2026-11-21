@@ -46,7 +46,6 @@ en:
       # Use and access (CCS-27, 47, 67, 68, 69, 166). PLACEHOLDER WORDING, NOT YET APPROVED: the University must approve it.
       use:
         heading: "Use and access"
-        use_this_image: "Use this image"
         view:
           none: "No image of this object is online"
           open: "You can view the image online"
@@ -87,7 +86,10 @@ en:
         notes: "Record details & notes"
         full_record: "Full record"
         inscriptions: "Inscriptions & marks"
-        rights_link: "Rights and reuse"
+        about_object: "About this object"
+        see_collection: "See more from this collection"
+        interested: "You may be interested in"
+        similar: "Similar objects"
       # The showcase layout (20 Nov 2026)
       showcase:
         read_more: "Read more"
@@ -102,7 +104,6 @@ en:
         also_like: "You may also like"
         shuffle: "Shuffle objects"
         shuffled: "Showing other objects you may like"
-        more_ways: "More ways to explore"
       # The approved split layout (Figma "Record page · Approved design", 2026-11-19)
       split:
         actions: "Actions for this record"
@@ -124,24 +125,22 @@ en:
           tools: "Image tools"
           media_information: "Media information"
           close_information: "Close media information"
-          rotate_left: "Rotate left"
-          rotate_right: "Rotate right"
+          rotate_right: "Rotate"
+          open_zoom: "Zoom into the image"
+          close_zoom: "Close zoom"
+          zoom_heading: "Zoom: %{title}"
+          use_link: "Use and access"
           zoom_in: "Zoom in"
           reset_zoom: "Reset zoom and rotation"
           zoom_out: "Zoom out"
-          full_screen: "Full screen"
-          exit_full_screen: "Exit full screen"
-          show_thumbnails: "Show thumbnails"
-          hide_thumbnails: "Hide thumbnails"
           thumbnails: "Images of this record"
           previous: "Previous image"
           next: "Next image"
           show_image: "Show image %{position} of %{count}"
           shown: "Image %{position} of %{count} shown"
           rotated: "Rotated %{degrees} degrees"
-          zoom_level: "%{percent}%"
+          zoom_level: "Zoom %{percent}%"
           max_zoom: "Maximum zoom"
-          drag_hint: "Drag or use the arrow keys to move around"
           at_fit: "Already showing the whole image"
           at_max: "Already at maximum zoom"
           at_start: "This is the first image"
@@ -149,7 +148,6 @@ en:
         related:
           heading: "Related objects"
         more:
-          heading: "More from the collections"
           empty: "Nothing to show here yet."
           row:
             creator: "More by %{name}"
