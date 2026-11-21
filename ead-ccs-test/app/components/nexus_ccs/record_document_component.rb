@@ -114,7 +114,6 @@ module NexusCcs
     renders_one :stepper # the search-result stepper and the selection stepper, from catalog/show (they need the controller's search context)
 
     DESCRIPTION_FIELD = "description_tsim"
-    HISTORY_FIELDS = { "source_reference_tsim" => :source_reference }.freeze # the credit line is in Use and access
 
     # "University Art Collection", linking to the whole collection
     def collection_name = responsible_collection
@@ -178,24 +177,57 @@ module NexusCcs
     # Object details: the sheet's own fields after the key rows (not the index's era and region, which repeat the date and the place)
     def object_rows = detail_rows.reject { |row| LEAD_SEQS.include?(row.seq) || !row.seq.is_a?(Integer) }
 
-    # How many rows Object details shows before "Show all details"; the rest continue the list, in the sheet's order
-    FIRST_DETAILS = 6
-
-    def first_detail_rows = object_rows.first(FIRST_DETAILS)
-    def more_detail_rows = object_rows.drop(FIRST_DETAILS)
 
     def lead_rows = detail_rows.select { |row| LEAD_SEQS.include?(row.seq) }
 
-    # Under the title, one line each: what it is and when (the object type and the date as the record gives them)
-    def subtitle_lines = [ Array(document["object_type_ssim"]).first&.to_s&.upcase_first, display_date ].compact_blank
-
-    # The record's source reference ends Object details, after the sheet's fields
-    def history_rows
-      HISTORY_FIELDS.filter_map do |field, key|
-        values = Array(document[field]).map(&:to_s).compact_blank
-        Row.new(label: I18n.t("nexus_ccs.record_page.split.history.#{key}"), values: values, field: field, seq: 100) if values.any?
+    # --- The record card (after the National Gallery of Art's artwork pages) -------------------------------------------------------
+    # Associated names: each maker as a link to their browse page, with what the record says about them under it, role first as NGA
+    # has it ("Etcher, b. c. 1804 - d. 1888"). [[name, path or nil, detail]]
+    def associated_names
+      displays = detail_rows.find { |row| row.seq == CREATOR_SEQ }&.values || []
+      displays.first(6).map do |display|
+        name = creator_name(display) || display.sub(/\s*\(.*\z/, "")
+        [ name, Browse.path_for("makers", name), name_detail(display.delete_prefix(name).strip.delete_prefix(",").strip) ]
       end
     end
+
+    # "(b. 1882 - d. 1961) maker" -> "Maker, b. 1882 - d. 1961"
+    def name_detail(text)
+      dates, role = text.match(/\A\((.*?)\)\s*(.*)\z/)&.captures || [ nil, text ]
+      [ role.to_s.strip.upcase_first, dates.to_s.strip ].compact_blank.join(", ").presence
+    end
+
+    # The record's collection, with the way to the rest of it (NGA's "Not on view · See artworks now on view"): [name, path or nil]
+    def collection_link
+      row = detail_rows.find { |candidate| candidate.field == "collection_ssim" }
+      return unless row
+
+      name = row.values.first
+      [ name, value_link(row, name) ]
+    end
+
+    # Object overview (NGA's Artwork overview): the key facts, in the data model sheet's order
+    OVERVIEW_SEQS = [ 2, 7, 10, 11, 17, 19, 20, 21, 22 ].freeze
+
+    def overview_rows
+      rows = detail_rows.select { |row| OVERVIEW_SEQS.include?(row.seq) }
+      rows += [ Row.new(label: I18n.t("nexus_ccs.record_page.use.credit_line"), values: [ credit_line ], field: "credit_line_tsim", seq: 21) ] if credit_line
+      rows += [ Row.new(label: I18n.t("nexus_ccs.record_page.use.copyright"), values: [ copyright ], field: "rights_ssim", seq: 22) ] if copyright
+      rows.sort_by(&:seq)
+    end
+
+    # A fact's values: names of things link to their search or browse page (as in the full record); several values on their own lines,
+    # or joined where the sheet says so
+    def fact_value(row)
+      parts = row.values.each_with_index.map do |value, index|
+        text = flagged(row, value, index)
+        path = term?(row) && value_link(row, value)
+        path ? helpers.link_to(text, path) : text
+      end
+      helpers.safe_join(parts, row.join || helpers.tag.br)
+    end
+
+    def inscriptions = Array(document["inscription_tsim"]).map(&:to_s).compact_blank
 
     # What the de-bias notices scan (RecordDebias): the details and the description
     def rows = detail_rows + [ description_row ].compact

@@ -71,18 +71,23 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_equal record.object_rows.map(&:seq), record.object_rows.map(&:seq).sort
   end
 
-  test "Object details shows its first six rows, and the rest continue them in the sheet's order; era and region are left out" do
-    record = component(SHEET.merge("date_era_ssim" => [ "20th century" ], "region_ssim" => [ "Oceania" ]))
-
-    assert_equal 6, record.first_detail_rows.size
-    assert_equal record.object_rows, record.first_detail_rows + record.more_detail_rows
-    assert_not_includes record.object_rows.map(&:label), "Era"
-    assert_not_includes record.object_rows.map(&:label), "Region"
+  test "associated names: each maker by name, linked to their browse page where there is one, with the record's dates and role under it" do
+    names = component(SHEET).associated_names
+    assert_equal "Grainger, Percy Aldridge", names.first[0]
+    assert_equal "Maker, b. 1882 - d. 1961", names.first[2]
   end
 
-  test "under the title, one line for what it is and one for when" do
-    assert_equal [ "Tone tool", "1952" ], component(SHEET).subtitle_lines
-    assert_equal [], component({ "title_tsim" => [ "Bare" ] }).subtitle_lines
+  test "Object overview holds the key facts in the sheet's order, the credit line and copyright among them" do
+    labels = component(SHEET.merge("rights_ssim" => [ "© Grainger" ])).overview_rows.map(&:label)
+    assert_equal [ "Object Type", "Place", "Material", "Measurements", "Classification", "Collection", "Accession Number", "Credit line", "Copyright" ], labels
+  end
+
+  test "the record's collection, with the way to the rest of it (NGA's location line)" do
+    record = component(SHEET.merge("collection_ssim" => [ "Grainger Museum Collection" ]))
+    record.define_singleton_method(:value_link) { |_row, value| "/catalog?collection=#{value}" }
+    name, path = record.collection_link
+    assert_equal "Grainger Museum Collection", name
+    assert_predicate path, :present?
   end
 
   test "Use and access: the rights items in CCS-27's order; caption and terms only with a digital asset" do

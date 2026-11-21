@@ -1,5 +1,5 @@
 <div class="deep-zoom" data-controller="deep-zoom" data-deep-zoom-sources-value="<%= sources.to_json %>" data-deep-zoom-label-value="<%= label %>"
-     data-action="media-viewer:shown@window->deep-zoom#imageChanged media-viewer:zoom@window->deep-zoom#zoom">
-  <%# Opened by the round Zoom in tool under the picture (DigitalAssetsComponent), closed by zooming back out past the whole picture %>
+     data-action="media-viewer:zoom@window->deep-zoom#zoom">
+  <%# Filled by the zoom viewer when the zoom modal opens (DigitalAssetsComponent) %>
   <div class="deep-zoom__stage" hidden data-deep-zoom-target="stage"></div>
 </div>

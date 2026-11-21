@@ -1,197 +1,105 @@
-/*
- * The record's media viewer (Figma "Media viewer", after Europeana's item viewer): the media information on the left at the viewer's
- * full height, the stage (text/primary) with its controls bar along the bottom, and the numbered thumbnails on the right (a strip
- * under the stage when the viewer is narrower than 1024px). Sized by the viewer's own width (a container query), not the window's.
- * Markup: NexusCcs::DigitalAssetsComponent; behaviour: controllers/media_viewer_controller.js and deep_zoom_controller.js.
- */
-.digital-assets {
-  --mv-height: clamp(20rem, 70vh, 45rem);   /* the viewer at ≥ 1024px: 720px at most */
-  --mv-stage: clamp(16rem, 60cqi, 30rem);  /* the stage below 1024px */
-  --mv-bar: 3.25rem;                        /* 52px: the controls bar and the panels' footers line up */
-  --mv-info: 20rem;                         /* 320px: the media information */
-  --mv-thumbs: 13rem;                       /* 208px: the thumbnails column */
-  --mv-control: 2.5rem;                     /* 40px targets (WCAG 2.5.8) */
-  --mv-bar-border: var(--ccs-navy-600);     /* Figma stroke/strong, the bar's top border */
-  container: media-viewer / inline-size;
-  margin: 0;
-  background: var(--ccs-surface-subtle);
-  color: var(--ccs-text-primary);
-}
+/* The record's media (DigitalAssetsComponent), after the National Gallery of Art's artwork pages: the image whole on a light grey
+   panel, thumbnails under it, round Zoom and Download at the panel's foot with Media information at its end, and one line on the
+   licence under the panel. Zoom is a full-screen modal; Media information a drawer from the right. */
+.digital-assets { display: flex; flex-direction: column; gap: var(--ccs-space-4); min-width: 0; }
+.media-viewer__panel { display: flex; flex-direction: column; background: var(--ccs-surface-subtle); }
 
-/* --- Layout: stage | thumbs, with the media information laid over the left ------------------------------------------------
-   The panel slides over the left of the viewer at its full height rather than taking a column, so opening it never moves the image. */
-.media-viewer__body {
-  position: relative;
-  display: grid;
-  grid-template-areas: "stage" "thumbs";
-  grid-template-columns: minmax(0, 1fr);
+/* The image, whole and centred, never upscaled; the panel keeps a steady height */
+.media-viewer__stage {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--ccs-space-4);
+  min-height: clamp(16rem, 50vh, 34rem); padding: var(--ccs-space-7) var(--ccs-space-5) var(--ccs-space-5);
 }
-.media-viewer__stage { grid-area: stage; height: var(--mv-stage); }
-.media-viewer__thumbs { grid-area: thumbs; }
-.media-viewer--single .media-viewer__body { grid-template-areas: "stage"; }
-.media-viewer__info {
-  position: absolute; top: 0; left: 0; z-index: 2; width: 100%; height: var(--mv-stage);  /* below 600px: covers the stage */
-  box-shadow: var(--ccs-shadow-lg);
-}
-@container media-viewer (min-width: 600px) {
-  .media-viewer__info { width: var(--mv-info); border-right: 1px solid var(--ccs-border-subtle); }
-}
-@container media-viewer (min-width: 1024px) {
-  .media-viewer__body { grid-template-areas: "stage thumbs"; grid-template-columns: minmax(0, 1fr) auto; height: var(--mv-height); }
-  .media-viewer__stage { height: auto; min-height: 0; }
-  .media-viewer__info { height: 100%; }
-  .media-viewer__thumbs { width: var(--mv-thumbs); min-height: 0; border-left: 1px solid var(--ccs-border-subtle); }
-  .media-viewer--single .media-viewer__body { grid-template-areas: "stage"; grid-template-columns: minmax(0, 1fr); }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .media-viewer__info:not([hidden]) { animation: media-viewer-info-in 160ms ease-out; }
-}
-@keyframes media-viewer-info-in { from { transform: translateX(-1rem); opacity: 0; } }
-
-/* --- Stage: the asset, fitted whole, on text/primary, the controls bar along its bottom -------------------------------------- */
-.media-viewer__stage { display: flex; flex-direction: column; min-width: 0; background: var(--ccs-text-primary); color: var(--ccs-text-inverse); }
-.media-viewer__canvas { position: relative; flex: 1; min-height: 0; overflow: hidden; }
-.media-viewer .digital-assets__main { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; }
-.media-viewer .digital-assets__image { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
-.media-viewer .digital-assets__main:has(.deep-zoom.is-active) { width: auto; height: auto; }
-.media-viewer .deep-zoom__stage { background: transparent; }
-/* A notice, the sensitivity gate or a file's own viewer, centred on the stage in light text */
-.media-viewer__canvas:not(:has(.digital-assets__main)) { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--ccs-space-4); padding: var(--ccs-space-5); overflow-y: auto; }
-.media-viewer__canvas > .access-notice,
-.media-viewer__canvas > .sensitivity-gate { max-width: 32rem; margin: 0; background: var(--ccs-surface-default); color: var(--ccs-text-primary); }
-.digital-assets__media { margin: 0; text-align: center; }
-.digital-assets__video { max-width: 100%; max-height: 100%; }
+@media (min-width: 1024px) { .media-viewer__stage { padding: calc(var(--ccs-space-8) * 1.5) var(--ccs-space-8) var(--ccs-space-6); } }
+.digital-assets__main { display: flex; align-items: center; justify-content: center; width: 100%; margin: 0; }
+.digital-assets__image { display: block; width: auto; height: auto; max-width: 100%; max-height: clamp(14rem, 46vh, 30rem); object-fit: contain; }
+.media-viewer__stage > .sensitivity-gate { max-width: 32rem; margin: 0; }
+.digital-assets__media { width: 100%; margin: 0; text-align: center; }
+.digital-assets__video { max-width: 100%; max-height: 30rem; }
 .digital-assets__audio { width: min(100%, 30rem); }
-.digital-assets__media figcaption, .digital-assets__pdf { margin-top: var(--ccs-space-2); color: inherit; }
+.digital-assets__media figcaption, .digital-assets__pdf { margin-top: var(--ccs-space-2); color: var(--ccs-text-secondary); }
 
-/* The zoom readout, top-left of the canvas while zoomed in */
-.media-viewer__readout {
-  position: absolute; top: var(--ccs-space-4); left: var(--ccs-space-4); z-index: 1; display: inline-flex; align-items: center; gap: var(--ccs-space-2);
-  margin: 0; padding: var(--ccs-space-1) var(--ccs-space-2); border-radius: var(--ccs-radius-sm); background: var(--ccs-surface-default);
-  box-shadow: var(--ccs-shadow-md); color: var(--ccs-text-primary); font-size: var(--ccs-font-size-sm); pointer-events: none;
-}
-.media-viewer__readout[hidden] { display: none; }
-.media-viewer__readout-level { font-weight: var(--ccs-font-weight-semibold); font-variant-numeric: tabular-nums; }
-.media-viewer__readout-hint { color: var(--ccs-text-secondary); }
-
-/* The controls bar (Figma "Media viewer/Controls bar"): ⋮ | tools centred | end */
-.media-viewer__bar {
-  display: grid; grid-template-columns: var(--mv-control) minmax(0, 1fr) auto; align-items: center; gap: var(--ccs-space-2);
-  min-height: var(--mv-bar); padding: var(--ccs-space-1) var(--ccs-space-2);
-  background: var(--ccs-text-primary); border-top: 1px solid var(--mv-bar-border);
-}
-.media-viewer__bar-start, .media-viewer__bar-end { display: flex; align-items: center; gap: var(--ccs-space-1); }
-.media-viewer__bar-end { min-width: var(--mv-control); justify-content: flex-end; }
-.media-viewer__bar-tools { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; }
-.media-viewer__group { display: flex; align-items: center; gap: var(--ccs-space-1); padding-inline: var(--ccs-space-2); }
-.media-viewer__group[hidden] { display: none; }
-.media-viewer__group + .media-viewer__group { border-left: 1px solid rgb(255 255 255 / 40%); }
-
-/* A control (Figma "Media viewer/Control"): a 24px icon in a 40px target; On dark in the bar, On light in the panels */
-.viewer-control {
-  display: inline-flex; flex: none; align-items: center; justify-content: center; width: var(--mv-control); height: var(--mv-control);
-  padding: 0; border: 0; border-radius: var(--ccs-radius-sm); background: transparent; color: var(--ccs-text-inverse);
-  cursor: pointer; text-decoration: none;
-}
-.viewer-control[hidden] { display: none; }
-.viewer-control:hover { background: rgb(255 255 255 / 16%); color: var(--ccs-text-inverse); }
-.viewer-control:focus-visible { outline: 2px solid var(--ccs-text-inverse); outline-offset: -2px; }
-.viewer-control[aria-disabled="true"] { cursor: not-allowed; }
-.viewer-control[aria-disabled="true"] svg { opacity: 0.4; }
-.viewer-control[aria-disabled="true"]:hover { background: transparent; }
-.viewer-control--light { color: var(--ccs-text-primary); }
-.viewer-control--light:hover { background: var(--ccs-surface-subtle); color: var(--ccs-text-primary); }
-.viewer-control--light:focus-visible { outline-color: var(--ccs-focus-ring); }
-.media-viewer__icon-on, .is-fullscreen .media-viewer__icon-off { display: none; }
-.is-fullscreen .media-viewer__icon-on { display: contents; }
-
-/* --- Media information (Figma "Media viewer/Information panel") ------------------------------------------------------------- */
-.media-viewer__info { display: flex; flex-direction: column; min-height: 0; background: var(--ccs-surface-default); color: var(--ccs-text-primary); }
-.media-viewer__info[hidden] { display: none; }
-.media-viewer__info-heading {
-  margin: 0; padding: var(--ccs-space-5) var(--ccs-space-5) var(--ccs-space-4); border-bottom: 1px solid var(--ccs-border-subtle);
-  font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold);
-}
-.media-viewer__info-heading:focus { outline: none; }
-.media-viewer__info-heading:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: -2px; }
-.media-viewer__fields { flex: 1; min-height: 0; margin: 0; overflow-y: auto; }
-.media-viewer__fields:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: -2px; }
-.media-viewer__field { padding: var(--ccs-space-4) var(--ccs-space-5); border-bottom: 1px solid var(--ccs-border-subtle); }
-.media-viewer__field dt { font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-regular); color: var(--ccs-text-secondary); }
-.media-viewer__field dd { margin: var(--ccs-space-1) 0 0; font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); overflow-wrap: anywhere; }
-.media-viewer__info-footer { display: flex; align-items: center; min-height: var(--mv-bar); padding: var(--ccs-space-1) var(--ccs-space-2); border-top: 1px solid var(--ccs-border-subtle); }
-
-/* --- Thumbnails (Figma "Media viewer/Thumbnails panel" and "Thumbnail") ------------------------------------------------------- */
-.media-viewer__thumbs { display: flex; flex-direction: column; background: var(--ccs-surface-default); border-top: 1px solid var(--ccs-border-subtle); }
-.media-viewer__thumbs[hidden] { display: none; }
-.media-viewer__thumb-list {
-  display: flex; gap: var(--ccs-space-4); margin: 0; padding: var(--ccs-space-4); list-style: none;
-  overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: thin;
-}
-.media-viewer__thumb-list li { flex: none; scroll-snap-align: start; }
-@container media-viewer (min-width: 1024px) {
-  .media-viewer__thumbs { border-top: 0; }
-  .media-viewer__thumb-list { flex: 1; flex-direction: column; min-height: 0; overflow-x: hidden; overflow-y: auto; scroll-snap-type: y proximity; }
-}
+/* Thumbnails: small, centred; the one on show framed */
+.media-viewer__thumbs { padding: 0 var(--ccs-space-5) var(--ccs-space-4); }
+.media-viewer__thumb-list { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--ccs-space-3); margin: 0; padding: 0; list-style: none; }
 .digital-assets__thumb {
-  position: relative; display: block; width: 11rem; height: 8.25rem; padding: 0; overflow: hidden;
-  border: 0; background: var(--ccs-surface-subtle); color: var(--ccs-text-primary); cursor: pointer;
+  position: relative; display: block; width: 4rem; height: 4rem; padding: 0; overflow: visible; background: var(--ccs-surface-default);
+  border: 0; cursor: pointer;
 }
-@container media-viewer (min-width: 1024px) { .digital-assets__thumb { height: auto; aspect-ratio: auto; } }
 .digital-assets__thumb-image { display: block; width: 100%; height: 100%; object-fit: cover; }
-@container media-viewer (min-width: 1024px) { .digital-assets__thumb-image { height: auto; max-height: 15rem; } }
-/* The one on show: a 4px navy frame inside the picture and a solid navy number, so it reads at a glance; the keyboard focus ring is
-   blue and outside the frame, so the two never look alike and can show together */
-.digital-assets__thumb::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
-.digital-assets__thumb:hover::after { box-shadow: inset 0 0 0 2px var(--ccs-border-strong); }
-.digital-assets__thumb[aria-current="true"]::after { box-shadow: inset 0 0 0 4px var(--ccs-text-brand); }
-.digital-assets__thumb[aria-current="true"] .digital-assets__thumb-number { background: var(--ccs-text-brand); color: var(--ccs-text-inverse); }
-.digital-assets__thumb:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
-.digital-assets__thumb-number, .digital-assets__thumb-kind {
-  position: absolute; bottom: var(--ccs-space-2); display: inline-flex; align-items: center; justify-content: center;
-  min-width: 1.5rem; height: 1.5rem; padding: 0 var(--ccs-space-2); border-radius: var(--ccs-radius-sm); background: var(--ccs-surface-default);
-  font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); font-variant-numeric: tabular-nums; line-height: 1;
-}
-.digital-assets__thumb-number { left: var(--ccs-space-2); }
-.digital-assets__thumb-kind { right: var(--ccs-space-2); padding: 0; }
-.media-viewer__thumbs-footer {
-  display: flex; align-items: center; justify-content: flex-end; gap: var(--ccs-space-1); min-height: var(--mv-bar);
-  padding: var(--ccs-space-1) var(--ccs-space-2); border-top: 1px solid var(--ccs-border-subtle);
-}
-.media-viewer__thumbs-footer[hidden] { display: none; }
-.media-viewer__divider { width: 1px; height: 1.25rem; margin-inline: var(--ccs-space-1); background: var(--ccs-border-default); }
+.digital-assets__thumb::after { content: ""; position: absolute; inset: -4px; border: 2px solid transparent; pointer-events: none; }
+.digital-assets__thumb:hover::after { border-color: var(--ccs-border-strong); }
+.digital-assets__thumb[aria-current="true"]::after { border-color: var(--ccs-text-primary); }
+.digital-assets__thumb:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 6px; }
 
-/* --- Under the viewer: licence, access and classification; other files; the partly-withheld notice ----------------------------- */
-.media-viewer__caption { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-2); padding: var(--ccs-space-3) var(--ccs-space-4); }
-.media-viewer__caption > * { margin: 0; }
-.media-viewer__media { display: grid; gap: var(--ccs-space-4); padding: 0 var(--ccs-space-4) var(--ccs-space-4); }
-.viewer-chip {
-  display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: var(--ccs-space-6); margin: 0;
-  padding: 0 var(--ccs-space-3) 0 var(--ccs-space-2); border-radius: var(--ccs-radius-pill); background: var(--ccs-surface-default);
-  font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-tight); color: var(--ccs-text-brand);
-}
-.viewer-chip svg { flex: none; width: var(--ccs-font-size-lg); height: var(--ccs-font-size-lg); }
-.viewer-chip:not(:has(svg)) { padding-left: var(--ccs-space-3); }
-a.viewer-chip--link { text-decoration: none; }
-a.viewer-chip--link:hover span { text-decoration: underline; }
-a.viewer-chip--link:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
-.media-viewer .access-notice--partly-withheld { margin: 0 var(--ccs-space-4) var(--ccs-space-4); }
-
-/* --- Full screen: the whole viewer fills the screen ------------------------------------------------------------------------- */
-.digital-assets.is-fullscreen { --mv-height: 100dvh; display: flex; flex-direction: column; overflow: auto; }
-.digital-assets.is-fullscreen .media-viewer__body { flex: 1; height: 100dvh; }
-.digital-assets.is-fullscreen .media-viewer__caption,
-.digital-assets.is-fullscreen .media-viewer__media { display: none; }
-
-/* Download (CCS-67): the essential information first */
+/* The panel's foot */
+.media-viewer__controls { display: flex; align-items: center; justify-content: space-between; gap: var(--ccs-space-4); padding: 0 var(--ccs-space-5) var(--ccs-space-5); }
+.media-viewer__controls-start { display: flex; align-items: center; gap: var(--ccs-space-3); }
 .digital-assets__download { display: contents; }
+
+/* Round controls (NGA's zoom and download): white circles with a fine border */
+.round-control {
+  display: inline-flex; align-items: center; justify-content: center; flex: none; width: 3rem; height: 3rem; padding: 0;
+  color: var(--ccs-text-primary); background: var(--ccs-surface-default); border: 1px solid var(--ccs-border-strong); border-radius: 50%;
+  cursor: pointer; box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+}
+.round-control[hidden] { display: none; }
+.round-control svg { width: 1.375rem; height: 1.375rem; }
+.round-control:hover { border-color: var(--ccs-text-primary); }
+.round-control:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.round-control[aria-disabled="true"] { cursor: not-allowed; }
+.round-control[aria-disabled="true"] svg { opacity: 0.35; }
+.round-control[aria-disabled="true"]:hover { border-color: var(--ccs-border-strong); }
+
+.media-viewer__info-button {
+  display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: 2.75rem; padding: 0 var(--ccs-space-2);
+  font-size: var(--ccs-font-size-sm); color: var(--ccs-text-primary); background: none; border: 0; cursor: pointer;
+}
+.media-viewer__info-button svg { width: 1.125rem; height: 1.125rem; }
+.media-viewer__info-button:hover span { text-decoration: underline; }
+.media-viewer__info-button:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+/* The licence line under the panel */
+.media-viewer__licence { margin: 0; font-size: var(--ccs-font-size-sm); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); }
+.media-viewer__licence-mark { display: inline-flex; margin-right: var(--ccs-space-2); vertical-align: -0.25em; }
+.media-viewer__licence-mark svg { width: 1.125rem; height: 1.125rem; }
+.media-viewer__licence .record-arrow-link { display: inline-flex; margin-left: var(--ccs-space-2); font-weight: var(--ccs-font-weight-semibold); }
+.media-viewer__media { display: grid; gap: var(--ccs-space-4); }
+
+/* Zoom: a full-screen modal, the image filling it on the panel grey; close top right, the tools bottom left */
+.media-zoom { width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; background: var(--ccs-surface-subtle); color: var(--ccs-text-primary); }
+.media-zoom::backdrop { background: rgb(0 0 0 / 60%); }
+.media-zoom .deep-zoom, .media-zoom .deep-zoom__stage { position: absolute; inset: 0; }
+.media-zoom .deep-zoom__stage { background: transparent; }
+.media-zoom__close { position: absolute; top: var(--ccs-space-5); right: var(--ccs-space-5); z-index: 2; }
+.media-zoom__tools { position: absolute; left: var(--ccs-space-5); bottom: var(--ccs-space-5); z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-3); max-width: calc(100% - 2 * var(--ccs-space-5)); }
+.media-zoom__divider { width: 1px; height: 1.75rem; background: var(--ccs-border-strong); }
+.media-zoom__readout:empty { display: none; }
+.media-zoom__readout {
+  position: absolute; right: var(--ccs-space-5); bottom: var(--ccs-space-5); z-index: 2; margin: 0; padding: var(--ccs-space-1) var(--ccs-space-3);
+  font-size: var(--ccs-font-size-sm); font-variant-numeric: tabular-nums; background: var(--ccs-surface-default); border-radius: 999px;
+}
+
+/* Media information: a drawer from the right */
+.media-drawer { width: min(28rem, 100vw); max-width: none; height: 100dvh; max-height: none; margin: 0 0 0 auto; padding: 0; border: 0; background: var(--ccs-surface-default); color: var(--ccs-text-primary); box-shadow: -8px 0 24px rgb(0 0 0 / 16%); }
+.media-drawer::backdrop { background: rgb(0 0 0 / 40%); }
+@media (prefers-reduced-motion: no-preference) {
+  .media-drawer[open] { animation: media-drawer-in 200ms ease-out; }
+  @keyframes media-drawer-in { from { transform: translateX(2rem); opacity: 0; } }
+}
+.media-drawer__inner { display: flex; flex-direction: column; gap: var(--ccs-space-6); padding: var(--ccs-space-6); }
+.media-drawer__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--ccs-space-4); }
+.media-drawer__heading { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-2xl); font-weight: var(--ccs-font-weight-semibold); }
+.media-drawer__fields { display: grid; gap: var(--ccs-space-5); margin: 0; }
+.media-drawer__field dt { font-weight: var(--ccs-font-weight-bold); }
+.media-drawer__field dd { margin: var(--ccs-space-1) 0 0; overflow-wrap: anywhere; }
+
+/* Download: the essential information first (CCS-67) */
 .digital-assets__essential { display: grid; gap: var(--ccs-space-3); margin: 0 0 var(--ccs-space-4); color: var(--ccs-text-primary); }
 .digital-assets__essential dt { font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
 .digital-assets__essential dd { margin: 0; overflow-wrap: anywhere; }
+.digital-assets .access-notice--partly-withheld { margin: 0; }
 
 @media (forced-colors: active) {
-  .media-viewer__bar { border-top-color: CanvasText; }
-  .viewer-control:focus-visible, .digital-assets__thumb:focus-visible { outline-color: Highlight; }
-  /* shadows are dropped in forced colours: the one on show keeps a visible frame */
-  .digital-assets__thumb[aria-current="true"] { outline: 4px solid Highlight; outline-offset: -4px; }
+  .digital-assets__thumb[aria-current="true"]::after { border-color: Highlight; }
+  .round-control { border-color: ButtonText; }
 }

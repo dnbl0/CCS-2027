@@ -116,13 +116,12 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
     with_seeded_menu_cache { with_found_record(document) { get "/catalog/#{document['id']}", headers: { "User-Agent" => agent } } }
   end
 
-  test "the record page holds an empty lazy frame that loads the similar records, and no recommendations of its own" do
+  test "the record page holds an empty lazy frame that loads the similar records (the first tab of You may be interested in)" do
     record_page(open_record("emu-source"))
 
     assert_response :success
-    assert_select "turbo-frame#similar-records[loading=lazy][src='/catalog/emu-source/similar?view=collage']"
-    assert_select "turbo-frame#similar-records *", count: 0
-    assert_select "#similar-records-heading", count: 0
+    assert_select "turbo-frame#more-similar[loading=lazy][src='/catalog/emu-source/similar?view=tab']"
+    assert_select "turbo-frame#more-similar *", count: 0
   end
 
   test "a record with a withheld asset, or a sensitive one, has no Similar records section at all" do
@@ -130,7 +129,7 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
       record_page(document)
 
       assert_response :success
-      assert_select "turbo-frame#similar-records", count: 0
+      assert_select "turbo-frame#more-similar", count: 0
     end
   end
 

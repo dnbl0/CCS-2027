@@ -53,11 +53,11 @@ class RecordValueLinksTest < ActionDispatch::IntegrationTest
     assert_select ".record-facts__list a", text: /careful study/, count: 0
   end
 
-  test "era and region are not rows of Object details: they repeat the date and the place (they stay search filters)" do
+  test "era and region are not rows of the full record: they repeat the date and the place (they stay search filters)" do
     record_page
 
-    assert_select filter_link("date_era_ssim", "20th century"), count: 0
-    assert_select filter_link("region_ssim", "Oceania"), count: 0
+    assert_select "#object-details #{filter_link('date_era_ssim', '20th century')}", count: 0
+    assert_select "#object-details #{filter_link('region_ssim', 'Oceania')}", count: 0
   end
 
   test "a record without era or region has no such tags, and nothing breaks" do

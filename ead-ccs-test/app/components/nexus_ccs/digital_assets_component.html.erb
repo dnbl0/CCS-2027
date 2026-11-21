@@ -1,97 +1,74 @@
-<%# The record's media viewer (Figma "Media viewer", after Europeana's item viewer): the media information on the left at the
-    viewer's full height (closed until asked for), the stage with its controls bar along the bottom, and the numbered thumbnails
-    on the right. What it shows follows AccessPolicy asset by asset (see the class). Behaviour: controllers/media_viewer_controller.js
-    and deep_zoom_controller.js; without JavaScript the image, the thumbnails (links to each image) and the information are still
-    there, and the script-only controls never appear. %>
-<section id="digital-assets" class="digital-assets media-viewer<%= ' media-viewer--single' if images.size < 2 %>" aria-labelledby="digital-assets-heading"
+<%# The record's media (after the National Gallery of Art's artwork pages): the image whole on a light grey panel, the other images
+    as small thumbnails under it, and along the panel's foot round Zoom and Download buttons with Media information at the end.
+    Zoom opens the image full screen in a modal (deep zoom: zoom in, zoom out, rotate, reset, and previous and next when there are
+    several images); Media information opens a drawer from the right (CCS-422). Under the panel, one line on the licence and what
+    the visitor may do with the image. What it shows follows AccessPolicy asset by asset (see the class). Behaviour:
+    controllers/media_viewer_controller.js and deep_zoom_controller.js; without JavaScript the image, the thumbnails (links to each
+    open image) and the download are still there, and the script-only controls never appear. %>
+<section id="digital-assets" class="digital-assets media-viewer" aria-labelledby="digital-assets-heading"
          data-controller="media-viewer"
          data-media-viewer-labels-value="<%= viewer_labels.to_json %>"
          data-action="deep-zoom:state->media-viewer#zoomChanged keydown->media-viewer#keydown">
   <h2 id="digital-assets-heading" class="visually-hidden">Digital <%= "asset".pluralize(count + media.size) %></h2>
 
-  <div class="media-viewer__body">
-    <% if metadata.any? %>
-      <%# CCS-422: the media information. Opened by ⋮; focus moves to its heading; Close or Escape returns focus to ⋮. %>
-      <aside id="media-information" class="media-viewer__info" aria-labelledby="media-information-heading" hidden data-media-viewer-target="panel">
-        <h3 id="media-information-heading" class="media-viewer__info-heading" tabindex="-1" data-media-viewer-target="panelHeading"><%= t("nexus_ccs.record_page.split.viewer.media_information") %></h3>
-        <%# scrolls when long, so it takes focus (keyboard users can scroll it, WCAG 2.1.1) %>
-        <dl class="media-viewer__fields" tabindex="0" aria-labelledby="media-information-heading">
-          <% metadata.each do |label, text| %><div class="media-viewer__field"><dt><%= label %></dt><dd><%= text %></dd></div><% end %>
-        </dl>
-        <div class="media-viewer__info-footer">
-          <button type="button" class="viewer-control viewer-control--light" data-action="media-viewer#closePanel" aria-label="<%= t("nexus_ccs.record_page.split.viewer.close_information") %>" title="<%= t("nexus_ccs.record_page.split.viewer.close_information") %>"><%= icon(:close) %></button>
-        </div>
-      </aside>
+  <div class="media-viewer__panel">
+    <div class="media-viewer__stage digital-assets__stage">
+      <% if withheld? %>
+        <%= render NexusCcs::AccessNoticeComponent.new(document: @document) %>
+      <% end %>
+      <% if gated? %>
+        <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: sensitivity_state) %>
+      <% end %>
+      <% if main %>
+        <%# The image fitted whole into the panel and never upscaled; its width and height attributes hold its space while it loads %>
+        <figure class="digital-assets__main">
+          <%= image_tag main.first, alt: alt(1), class: "digital-assets__image", data: { media_viewer_target: "image" },
+                fetchpriority: "high", decoding: "async", **image_size(main.first) %>
+        </figure>
+      <% elsif media.any? %>
+        <% media.each do |item| %>
+          <figure class="digital-assets__media">
+            <%# Each kind of file has its viewer (MediaTypes): one that cannot be previewed, or played by a browser, says so %>
+            <%= helpers.render partial: MediaTypes.viewer_for_item(item), locals: { item: item, title: media_title(item), downloadable: item[:downloadable], request_path: request_path } %>
+            <figcaption><%= media_title(item) %></figcaption>
+          </figure>
+        <% end %>
+      <% end %>
+      <% if sensitivity_state == :viewing %>
+        <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: :viewing) %>
+      <% end %>
+    </div>
+
+    <% if images.size > 1 %>
+      <%# The other images: small thumbnails, the one on show marked. Without JavaScript a thumbnail of an open image links to its file. %>
+      <nav class="media-viewer__thumbs" aria-label="<%= t("#{VIEWER}.thumbnails") %>">
+        <ol class="media-viewer__thumb-list">
+          <% images.each_with_index do |(large, thumbnail), index| %>
+            <li>
+              <% label = t("#{VIEWER}.show_image", position: index + 1, count: images.size) %>
+              <% attrs = { class: "digital-assets__thumb", aria: { current: (index.zero? ? "true" : nil), label: label },
+                           data: { action: "media-viewer#show", media_viewer_target: "thumb", media_viewer_large: large, media_viewer_alt: alt(index + 1), media_viewer_position: index + 1 } } %>
+              <%= content_tag(image_downloadable?(index) ? :a : :button, **attrs, **(image_downloadable?(index) ? { href: large, target: "_blank", rel: "noopener" } : { type: "button" })) do %>
+                <%= image_tag thumbnail, alt: "", loading: "lazy", decoding: "async", class: "digital-assets__thumb-image" %>
+              <% end %>
+            </li>
+          <% end %>
+        </ol>
+      </nav>
     <% end %>
 
-    <div class="media-viewer__stage">
-      <div class="media-viewer__canvas digital-assets__stage" data-media-viewer-target="stage">
-        <% if withheld? %>
-          <%= render NexusCcs::AccessNoticeComponent.new(document: @document) %>
-        <% end %>
-        <% if gated? %>
-          <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: sensitivity_state) %>
-        <% end %>
-        <% if main %>
-          <%# The image is fitted whole into the stage (object-fit: contain) and never upscaled; its width and height attributes hold its space while it loads %>
-          <figure class="digital-assets__main">
-            <%= image_tag main.first, alt: alt(1), class: "digital-assets__image", data: { media_viewer_target: "image" },
-                  fetchpriority: "high", decoding: "async", **image_size(main.first) %>
-            <%= render NexusCcs::DeepZoomComponent.new(sources: zoom_sources, label: alt(1)) %>
-          </figure>
-          <p class="media-viewer__readout" role="status" aria-live="polite" hidden data-media-viewer-target="readout">
-            <span class="media-viewer__readout-level" data-media-viewer-target="readoutLevel"></span>
-            <span class="media-viewer__readout-hint" data-media-viewer-target="readoutHint"><%= t("nexus_ccs.record_page.split.viewer.drag_hint") %></span>
-          </p>
-        <% elsif media.any? %>
-          <% media.each do |item| %>
-            <figure class="digital-assets__media">
-              <%# Each kind of file has its viewer (MediaTypes): one that cannot be previewed, or played by a browser, says so %>
-              <%= helpers.render partial: MediaTypes.viewer_for_item(item), locals: { item: item, title: media_title(item), downloadable: item[:downloadable], request_path: request_path } %>
-              <figcaption><%= media_title(item) %></figcaption>
-            </figure>
-          <% end %>
-        <% end %>
-        <% if sensitivity_state == :viewing %>
-          <%= render NexusCcs::SensitivityGateComponent.new(document: @document, state: :viewing) %>
-        <% end %>
-      </div>
-
-      <%# The controls (Figma "Media viewer/Controls bar"): ⋮ | rotate | zoom in, reset, zoom out | full screen, and Download or Show
-          thumbnails at the end. Rotate, zoom, reset and full screen need the script, so they are hidden until it starts. %>
-      <div class="media-viewer__bar" role="group" aria-label="<%= t("nexus_ccs.record_page.split.viewer.tools") %>">
-        <div class="media-viewer__bar-start">
-          <% if metadata.any? %>
-            <button type="button" class="viewer-control" aria-expanded="false" aria-controls="media-information" data-media-viewer-target="infoButton" data-action="media-viewer#togglePanel"
-                    aria-label="<%= t("nexus_ccs.record_page.split.viewer.media_information") %>" title="<%= t("nexus_ccs.record_page.split.viewer.media_information") %>"><%= icon(:more_vert) %></button>
-          <% end %>
-        </div>
-        <div class="media-viewer__bar-tools">
+    <% if (assets_shown? && main) || download_href || metadata.any? %>
+      <%# The panel's foot: round Zoom and Download on the left, Media information on the right %>
+      <div class="media-viewer__controls">
+        <div class="media-viewer__controls-start">
           <% if assets_shown? && main %>
-            <div class="media-viewer__group" hidden data-media-viewer-target="tool">
-              <%= control(:rotate_left, "rotateLeft") %>
-              <%= control(:rotate_right, "rotateRight") %>
-            </div>
-            <div class="media-viewer__group" hidden data-media-viewer-target="tool">
-              <%= control(:zoom_in, "zoomIn") %>
-              <%= control(:reset_zoom, "reset", disabled: true) %>
-              <%= control(:zoom_out, "zoomOut", disabled: true) %>
-            </div>
+            <button type="button" class="round-control" hidden aria-haspopup="dialog" data-media-viewer-target="zoomButton" data-action="media-viewer#openZoom"
+                    aria-label="<%= t("#{VIEWER}.open_zoom") %>" title="<%= t("#{VIEWER}.open_zoom") %>"><%= icon(:zoom_in) %></button>
           <% end %>
-          <% if assets_shown? && (main || media.any? { |item| item[:kind] == "video" }) %>
-            <div class="media-viewer__group" hidden data-media-viewer-target="fullscreenGroup">
-              <button type="button" class="viewer-control" aria-pressed="false" data-media-viewer-target="fullscreenButton" data-action="media-viewer#toggleFullscreen"
-                      aria-label="<%= t("nexus_ccs.record_page.split.viewer.full_screen") %>" title="<%= t("nexus_ccs.record_page.split.viewer.full_screen") %>">
-                <span class="media-viewer__icon-off"><%= icon(:fullscreen) %></span><span class="media-viewer__icon-on"><%= icon(:fullscreen_exit) %></span>
-              </button>
-            </div>
-          <% end %>
-        </div>
-        <div class="media-viewer__bar-end">
           <% if download_href %>
             <%# CCS-67: the essential information (caption and licence) first, to copy, then the download %>
             <div class="digital-assets__download" data-controller="dialog">
-              <button type="button" class="viewer-control" aria-haspopup="dialog" data-action="dialog#open"
+              <button type="button" class="round-control" aria-haspopup="dialog" data-action="dialog#open"
                       aria-label="<%= t("nexus_ccs.record_page.access.download_label", title: title) %>" title="<%= t("nexus_ccs.record_page.access.download") %>"><%= icon(:download) %></button>
               <dialog class="modal uom-dialog uom-modal digital-assets__download-dialog" data-dialog-target="dialog" data-action="click->dialog#closeOnBackdrop" aria-labelledby="download-dialog-title">
                 <div class="modal-dialog modal-dialog-centered">
@@ -117,57 +94,30 @@
               </dialog>
             </div>
           <% end %>
-          <% if images.size > 1 %>
-            <button type="button" class="viewer-control" hidden aria-expanded="true" aria-controls="media-thumbnails" data-media-viewer-target="showThumbs" data-action="media-viewer#showThumbnails"
-                    aria-label="<%= t("nexus_ccs.record_page.split.viewer.show_thumbnails") %>" title="<%= t("nexus_ccs.record_page.split.viewer.show_thumbnails") %>"><%= icon(:thumbnails) %></button>
-          <% end %>
         </div>
+        <% if metadata.any? %>
+          <button type="button" class="media-viewer__info-button" aria-haspopup="dialog" aria-controls="media-information" data-media-viewer-target="infoButton" data-action="media-viewer#openInfo">
+            <%= glyph(:info) %><span><%= t("#{VIEWER}.media_information") %></span>
+          </button>
+        <% end %>
       </div>
-    </div>
-
-    <% if images.size > 1 %>
-      <%# The thumbnails (Figma "Media viewer/Thumbnails panel"): every image, numbered, the one on show marked. Without JavaScript a
-          thumbnail of an open image is a link to its full size; Previous, Next and Hide appear with the script. %>
-      <nav id="media-thumbnails" class="media-viewer__thumbs" aria-label="<%= t("nexus_ccs.record_page.split.viewer.thumbnails") %>" data-media-viewer-target="thumbs">
-        <ol class="media-viewer__thumb-list" data-media-viewer-target="thumbList">
-          <% images.each_with_index do |(large, thumbnail), index| %>
-            <li>
-              <% label = t("nexus_ccs.record_page.split.viewer.show_image", position: index + 1, count: images.size) %>
-              <% attrs = { class: "digital-assets__thumb", aria: { current: (index.zero? ? "true" : nil), label: label },
-                           data: { action: "media-viewer#show", media_viewer_target: "thumb", media_viewer_large: large, media_viewer_alt: alt(index + 1), media_viewer_position: index + 1 } } %>
-              <%= content_tag(image_downloadable?(index) ? :a : :button, **attrs, **(image_downloadable?(index) ? { href: large, target: "_blank", rel: "noopener" } : { type: "button" })) do %>
-                <%= image_tag thumbnail, alt: "", loading: "lazy", decoding: "async", class: "digital-assets__thumb-image" %>
-                <span class="digital-assets__thumb-number" aria-hidden="true"><%= index + 1 %></span>
-                <span class="digital-assets__thumb-kind" aria-hidden="true"><%= icon(:image, size: 16) %></span>
-              <% end %>
-            </li>
-          <% end %>
-        </ol>
-        <div class="media-viewer__thumbs-footer" hidden data-media-viewer-target="thumbsFooter">
-          <button type="button" class="viewer-control viewer-control--light" data-media-viewer-target="previous" data-action="media-viewer#previous" aria-disabled="true"
-                  aria-label="<%= t("nexus_ccs.record_page.split.viewer.previous") %>" title="<%= t("nexus_ccs.record_page.split.viewer.previous") %>"><%= icon(:previous) %></button>
-          <button type="button" class="viewer-control viewer-control--light" data-media-viewer-target="next" data-action="media-viewer#next"
-                  aria-label="<%= t("nexus_ccs.record_page.split.viewer.next") %>" title="<%= t("nexus_ccs.record_page.split.viewer.next") %>"><%= icon(:next) %></button>
-          <span class="media-viewer__divider" aria-hidden="true"></span>
-          <button type="button" class="viewer-control viewer-control--light" aria-expanded="true" aria-controls="media-thumbnails" data-media-viewer-target="hideThumbs" data-action="media-viewer#hideThumbnails"
-                  aria-label="<%= t("nexus_ccs.record_page.split.viewer.hide_thumbnails") %>" title="<%= t("nexus_ccs.record_page.split.viewer.hide_thumbnails") %>"><%= icon(:close) %></button>
-        </div>
-      </nav>
     <% end %>
   </div>
 
-  <%# Announces what the controls did (image shown, rotation), politely, without moving focus %>
-  <p class="visually-hidden" role="status" aria-live="polite" data-media-viewer-target="status"></p>
-
-  <%# Under the viewer, as on Europeana: the licence (a way to Use and access), the access level and the classification (CCS-44) %>
-  <div class="media-viewer__caption">
-    <a class="viewer-chip viewer-chip--link" href="#use-and-access"><% if licence %><%= glyph(:creative_commons) %><% end %><span><%= licence.presence || t("nexus_ccs.record_page.use.use_this_image") %><span class="visually-hidden">: <%= t("nexus_ccs.record_page.use.use_this_image") %></span></span></a>
-    <p class="viewer-chip viewer-chip--<%= tier.to_s.dasherize %>" data-testid="access-chip"><%= access_chip %></p>
-    <%= render NexusCcs::ClassificationBadgeComponent.new(document: @document) %>
-  </div>
+  <%# Under the panel, as NGA's line on image use: the licence and what the visitor may do, with the way to Use and access %>
+  <p class="media-viewer__licence">
+    <% if licence %><span class="media-viewer__licence-mark" aria-hidden="true"><%= glyph(:creative_commons) %></span><% end %>
+    <span><%= licence_sentence %></span>
+    <% if (state = request_state) %>
+      <%# CCS-68, CCS-69: how to ask for the image (NGA's "Contact us about image usage") %>
+      <a class="record-arrow-link" href="<%= request_path %>"><%= t("nexus_ccs.record_page.use.request.#{state}") %></a>
+    <% else %>
+      <a class="record-arrow-link" href="#record-use" data-controller="open-details" data-action="open-details#open"><%= t("#{VIEWER}.use_link") %></a>
+    <% end %>
+  </p>
 
   <% if main && media.any? %>
-    <%# Audio, video and PDF files of a record that also has images: under the viewer %>
+    <%# Audio, video and PDF files of a record that also has images: under the panel %>
     <div class="media-viewer__media">
       <% media.each do |item| %>
         <figure class="digital-assets__media">
@@ -186,4 +136,45 @@
       <p class="access-notice__action"><a class="access-notice__link" href="<%= request_path %>"><%= t("nexus_ccs.record_page.media.partly_withheld.link", count: withheld_count) %></a></p>
     </div>
   <% end %>
+
+  <% if assets_shown? && main %>
+    <%# Zoom (NGA's zoom modal): the image full screen, zoom and rotate at the bottom left, close at the top right; Escape closes and
+        focus returns to Zoom. The viewer loads on first use (deep_zoom_controller). %>
+    <dialog class="media-zoom" aria-labelledby="media-zoom-heading" data-media-viewer-target="zoomDialog" data-action="close->media-viewer#zoomClosed">
+      <h2 class="visually-hidden" id="media-zoom-heading"><%= t("#{VIEWER}.zoom_heading", title: title) %></h2>
+      <%= render NexusCcs::DeepZoomComponent.new(sources: zoom_sources, label: alt(1)) %>
+      <button type="button" class="round-control media-zoom__close" data-action="media-viewer#closeZoom"
+              aria-label="<%= t("#{VIEWER}.close_zoom") %>" title="<%= t("#{VIEWER}.close_zoom") %>"><%= icon(:close) %></button>
+      <div class="media-zoom__tools" role="group" aria-label="<%= t("#{VIEWER}.tools") %>">
+        <%= control(:zoom_in, "zoomIn") %>
+        <%= control(:zoom_out, "zoomOut", disabled: true) %>
+        <%= control(:rotate_right, "rotateRight") %>
+        <%= control(:reset_zoom, "reset", disabled: true) %>
+        <% if images.size > 1 %>
+          <span class="media-zoom__divider" aria-hidden="true"></span>
+          <%= control(:previous, "previous", disabled: true) %>
+          <%= control(:next, "next") %>
+        <% end %>
+      </div>
+      <p class="media-zoom__readout" role="status" aria-live="polite" data-media-viewer-target="readout"></p>
+    </dialog>
+  <% end %>
+
+  <% if metadata.any? %>
+    <%# CCS-422: the media information, a drawer from the right (NGA's Visual Description); Escape or Close returns focus %>
+    <dialog id="media-information" class="media-drawer" aria-labelledby="media-information-heading" data-media-viewer-target="infoDialog" data-action="click->media-viewer#closeInfoOnBackdrop">
+      <div class="media-drawer__inner">
+        <div class="media-drawer__head">
+          <h2 id="media-information-heading" class="media-drawer__heading"><%= t("#{VIEWER}.media_information") %></h2>
+          <button type="button" class="round-control" data-action="media-viewer#closeInfo" aria-label="<%= t("#{VIEWER}.close_information") %>" title="<%= t("#{VIEWER}.close_information") %>"><%= icon(:close) %></button>
+        </div>
+        <dl class="media-drawer__fields">
+          <% metadata.each do |label, text| %><div class="media-drawer__field"><dt><%= label %></dt><dd><%= text %></dd></div><% end %>
+        </dl>
+      </div>
+    </dialog>
+  <% end %>
+
+  <%# Announces what the controls did (image shown, rotation), politely, without moving focus %>
+  <p class="visually-hidden" role="status" aria-live="polite" data-media-viewer-target="status"></p>
 </section>
