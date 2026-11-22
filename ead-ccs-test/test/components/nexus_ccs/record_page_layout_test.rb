@@ -52,23 +52,28 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   end
 
   # --- actions
-  test "an open record with images offers Compare images, Add to compare, Cite and Share, and no access notice" do
+  test "an open record with images offers Compare images, Add to compare, Share and More, and no access notice" do
     render_actions(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
     assert_selector ".record-actions .compare-actions a[href='/compare?record=emu-1']", text: "Compare images", visible: :all
     assert_selector ".compare-actions form[action='/compare/items'] button", text: "Add to compare", visible: :all
-    assert_selector ".record-actions__row .cite__button", visible: :all
     assert_selector ".record-actions__row .share__button", text: /Share and embed/, visible: :all
+    assert_selector ".record-actions__row .more-actions__button[aria-haspopup=menu][aria-expanded=false][aria-label='More actions']", visible: :all
     assert_no_selector ".access-notice"
   end
 
-  test "Share and Cite are in one row of actions, always shown (nothing folds them away); Compare sits under the row" do
+  test "Figma option A: Share and More in one row, Cite this record and Copy link in More's menu, Compare under the row" do
     render_actions(IMAGES)
 
     assert_no_selector "details", visible: :all
     assert_selector ".record-actions__row .share__button"
-    assert_selector ".record-actions__row .cite__button"
-    assert_selector ".record-actions__row + .record-actions__compare .compare-actions"
+    assert_no_selector ".record-actions__row .cite__button", visible: :all
+    items = page.all(".more-actions__menu[role=menu] [role=menuitem]", visible: :all).map { |item| item.text(:all).strip }
+    assert_includes items, "Cite this record"
+    assert_equal "Copy link", items.last
+    assert_selector "[role=menuitem][data-dialog-id='cite-emu-1']", visible: :all
+    assert_selector "dialog#cite-emu-1.cite__dialog", visible: :all
+    assert_selector ".record-actions__row ~ .record-actions__compare .compare-actions", visible: :all
   end
 
   test "a record with one image offers Add to compare but not Compare images" do
@@ -96,7 +101,7 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
 
     render_actions
     assert_no_selector ".compare-actions, .access-notice", visible: :all
-    assert_selector ".cite__button", visible: :all
+    assert_selector "[role=menuitem]", text: "Cite this record", visible: :all
   end
 
   # --- media: the three tiers, in markup

@@ -105,6 +105,11 @@ en:
         shuffle: "Shuffle objects"
         shuffled: "Showing other objects you may like"
       # The approved split layout (Figma "Record page · Approved design", 2026-11-19)
+      # The actions under the title (Figma Record/Actions, option A)
+      actions:
+        more: "More actions"
+        copy_link: "Copy link"
+        link_copied: "Link copied"
       split:
         actions: "Actions for this record"
         uom_id: "UoM ID"

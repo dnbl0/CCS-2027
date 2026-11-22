@@ -13,10 +13,14 @@ class CitationsSystemTest < ApplicationSystemTestCase
     assert_selector "h1", visible: :all
   end
 
-  test "Cite this record opens a dialog of four styles, is accessible, copies politely, and Escape returns focus to the button" do
+  def open_cite
+    find(".more-actions__button").click
+    find("[role=menuitem]", text: "Cite this record").click
+  end
+
+  test "Cite this record (in More's menu) opens a dialog of four styles, is accessible, copies politely, and Escape returns focus to More" do
     open_first_record
-    button = find(".cite__button")
-    button.click
+    open_cite
 
     assert_selector "dialog.cite__dialog[open]"
     assert_selector ".cite__style", count: 4
@@ -31,12 +35,12 @@ class CitationsSystemTest < ApplicationSystemTestCase
 
     page.driver.browser.keyboard.type(:Escape)
     assert_no_selector "dialog.cite__dialog[open]"
-    assert page.evaluate_script("document.activeElement.classList.contains('cite__button')"), "focus returns to the trigger"
+    assert_selector ".more-actions__button:focus" # focus returns to More
   end
 
   test "the dialog's controls are at least 24px and the button reaches by keyboard" do
     open_first_record
-    find(".cite__button").click
+    open_cite
     sizes = page.evaluate_script("Array.from(document.querySelectorAll('.cite__dialog[open] button')).map(b => { const r = b.getBoundingClientRect(); return [r.width, r.height] })")
     assert sizes.all? { |w, h| w >= 24 && h >= 24 }, sizes.inspect
   end

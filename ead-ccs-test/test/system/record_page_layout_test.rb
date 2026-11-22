@@ -346,4 +346,49 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_no_selector "#more-row-similar", visible: true
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
   end
+
+  # --- Figma Record/Actions, option A: Save, Share, then More (a menu button)
+  test "More is a menu button: Enter opens it on the first item, Up wraps to the last, Escape closes it and returns focus" do
+    open_record(VARIANTS["one image, open"], "desktop")
+    page.execute_script("document.querySelector('.more-actions__button').focus()")
+    page.driver.browser.keyboard.type(:Enter)
+    assert_selector ".more-actions__button[aria-expanded=true]"
+    assert_selector "li:first-child > .more-actions__item:focus", text: "Add to list"
+    assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
+
+    page.driver.browser.keyboard.type(:Up)
+    assert_selector ".more-actions__item:focus", text: "Copy link" # Up from the first wraps to the last
+
+    page.driver.browser.keyboard.type(:Escape)
+    assert_no_selector ".more-actions__menu"
+    assert_selector ".more-actions__button[aria-expanded=false]"
+    assert_selector ".more-actions__button:focus" # Escape returns focus to More
+  end
+
+  test "Cite this record in More's menu opens its dialog, and closing it returns focus to More; Copy link says so politely" do
+    open_record(VARIANTS["one image, open"], "desktop")
+    find(".more-actions__button").click
+    find("[role=menuitem]", text: "Cite this record").click
+    assert_selector "dialog.cite__dialog[open]"
+    assert_selector ".cite__style", count: 4
+    page.driver.browser.keyboard.type(:Escape)
+    assert_no_selector "dialog.cite__dialog[open]"
+    assert_selector ".more-actions__button:focus" # focus returns to More
+
+    find(".more-actions__button").click
+    find("[role=menuitem]", text: "Copy link").click
+    assert_selector ".more-actions [role=status]", text: "Link copied", visible: :all
+    assert_selector ".more-actions__button:focus"
+  end
+
+  test "on a 320px phone Save, Share and More keep to one line, every target at least 44px tall and inside the screen" do
+    open_record(VARIANTS["one image, open"], "narrow")
+    boxes = page.evaluate_script(<<~JS)
+      Array.from(document.querySelectorAll(".record-actions__row > *")).filter(el => el.getClientRects().length)
+        .map(el => { const target = el.querySelector("label, button") || el; const r = target.getBoundingClientRect(); return [Math.round(r.top), Math.round(r.height), Math.round(r.right)] })
+    JS
+    assert_equal 3, boxes.size, boxes.inspect
+    assert_equal 1, boxes.map(&:first).uniq.size, boxes.inspect
+    assert boxes.all? { |_top, height, right| height >= 44 && right <= 320 }, boxes.inspect
+  end
 end

@@ -224,10 +224,13 @@ class ListsTest < ActionDispatch::IntegrationTest
     assert_select ".result-card .toggle-bookmark-label", minimum: 1, message: "Save is still there"
   end
 
-  test "the record page has the Add to list menu beside Save" do
+  test "the record page has Save in its row of actions, and Add to list in More's menu, opening a dialog of the lists" do
     needs_solr
     get "/catalog/#{first_ids(1).first}"
 
-    assert_select ".record-actions__row .save-control + .list-menu button.list-menu__button"
+    assert_select ".record-actions__row .save-control"
+    assert_select ".more-actions__menu [role=menuitem][data-dialog-id^='add-to-list-dialog-']", text: "Add to list"
+    assert_select "dialog.list-dialog .list-menu--panel-only .list-menu__panel"
+    assert_select "dialog.list-dialog .list-menu__button", count: 0
   end
 end
