@@ -426,5 +426,4 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_equal 1, boxes.map(&:first).uniq.size, boxes.inspect
     assert boxes.all? { |_top, height, right| height >= 44 && right <= 320 }, boxes.inspect
   end
-
 end
