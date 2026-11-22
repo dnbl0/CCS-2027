@@ -3,7 +3,7 @@
    from 1024px (the title, date and maker, Associated names, the actions and the collection | the media on its grey panel,
    digital_assets.css); then sections, each after a rule with its heading on the left: Object overview (the key facts), About this
    object (the description) and Record details and notes (an accordion after the design system's); then You may be interested in
-   (the design system's tabs, each panel three cards). Headings follow the site's one scale (--ccs-heading-*), links the one
+   (the design system's tabs, each panel three of the site's result cards). Headings follow the site's one scale (--ccs-heading-*), links the one
    in-content link (links.css) and the arrow link (arrow_link.css), buttons the site's outline button. */
 
 .record, .record ~ .record-more {
@@ -249,17 +249,8 @@
 /* A row that came back empty is left out (no heading over "nothing to show"); in tabs, a panel that came back empty says so */
 .record-more__row:has(> .record-more__empty:not([hidden])) { display: none; }
 .is-tabbed .record-more__row:not([hidden]):has(> .record-more__empty:not([hidden])) { display: block; }
-/* The cards: the picture whole, the title a card-level heading (Source Sans 3 600, 18px), the lines under it */
-.record ~ .record-more .discover-cards { display: grid; gap: var(--ccs-space-7) var(--ccs-space-5); align-items: start; }
-.record ~ .record-more .result-card, .record ~ .record-more .result-card:hover { height: auto; padding: 0; overflow: visible; background: none; border: 0; box-shadow: none; }
-.record ~ .record-more .result-card__media { aspect-ratio: auto; background: var(--ccs-surface-subtle); }
-.record ~ .record-more .result-card__media img { position: static; width: 100%; height: auto; max-height: 22rem; object-fit: contain; }
-.record ~ .record-more .result-card__content > * { padding-inline: 0; }
-.record ~ .record-more .result-card__content > :first-child { padding-top: var(--ccs-space-4); }
-.record ~ .record-more .result-card__content > :last-child { padding-bottom: 0; }
-.record ~ .record-more .result-card__lines { display: grid; gap: var(--ccs-space-1); margin: 0; padding-top: 0; list-style: none; font-size: var(--ccs-font-size-md); color: var(--ccs-text-secondary); }
-.record ~ .record-more .result-card__lines li { margin: 0; padding: 0; }
-.record ~ .record-more .result-card .document-title-heading { margin: 0 0 var(--ccs-space-2); padding: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-heading-card-size); font-weight: var(--ccs-heading-weight-strong); line-height: var(--ccs-line-height-snug); }
+/* The cards are the site's result cards (ResultCardComponent in discover/_cards), styled only by result_card.css and discover.css,
+   exactly as on the search results: nothing here restyles them. */
 
 /* Read more as a <summary> */
 summary.record-read-more { list-style: none; }

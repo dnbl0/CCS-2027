@@ -235,10 +235,11 @@ a.record-term:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-
   }
   .record-more__row .record-more__cards .discover-cards > * { scroll-snap-align: start; }
 }
-/* The cards share one picture shape, the picture whole inside it (cultural objects are never cropped), so a row lines up */
-.record-more__cards .result-card { height: 100%; }
-.record-more__cards .result-card__media { display: block; position: relative; aspect-ratio: 4 / 3; background: var(--ccs-surface-subtle); }
-.record-more__cards .result-card__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+/* The cards are the search results' cards (result_card.css), untouched. A panel holds one row of three, so a plain grid with each
+   card at its own height (its picture at its own shape) looks as the results' mosaic does; the mosaic's script would measure a hidden
+   tab panel as 0 wide */
+.record-more__cards .discover-cards { align-items: start; }
+.record-more__cards .discover-cards__item .result-card { flex: 0 0 auto; }
 .record-more__all { margin: var(--ccs-space-5) 0 0; }
 
 /* About this record: heading beside text, a hairline between rows */
