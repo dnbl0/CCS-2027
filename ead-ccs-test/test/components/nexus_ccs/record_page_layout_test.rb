@@ -105,12 +105,12 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   end
 
   # --- media: the three tiers, in markup
-  test "an open record has round Zoom and Download at the panel's foot, Media information at its end, and the licence line under it" do
+  test "an open record has Zoom and Download on the panel's toolbar, Media information at its end, and the licence line under it" do
     render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
     assert_selector ".media-viewer__licence", text: "Public domain - Copyright expired. You can view the image online. You can download the image."
     # CCS-67: Download opens the essential information (caption and licence, to copy) before the download
-    assert_selector ".media-viewer__controls-start button.round-control[aria-haspopup=dialog][aria-label^='Download image of']"
+    assert_selector ".media-viewer__controls-start button.media-viewer__tool[aria-haspopup=dialog][aria-label^='Download image of']"
     assert_selector "dialog .digital-assets__essential dt", text: "Licence", visible: :all
     assert_selector "dialog a.btn[download][href='/digital-assets/large/a.jpg']", text: "Download image", visible: :all
     # CCS-422: Media information opens a drawer from the right
@@ -147,22 +147,12 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
     assert_selector "dialog .digital-assets__sizes legend", text: "Size", visible: :all
   end
 
-  test "Use with IIIF opens the manifest to copy and links to Mirador, the Universal Viewer, the JSON and What is IIIF, each saying it opens a new tab" do
-    render_media(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ]))
+  test "the panel's toolbar: each tool an icon and its word (Zoom, Download image, Media information), and no IIIF button" do
+    render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
-    assert_selector ".media-viewer__controls-end button[aria-haspopup=dialog]", text: "Use with IIIF"
-    assert_selector "dialog h2#iiif-dialog-title", text: "Use this image with IIIF", visible: :all
-    assert_selector "dialog input#iiif-manifest-link[readonly][value$='/catalog/emu-1/manifest.json']", visible: :all
-    assert_selector "dialog label[for=iiif-manifest-link]", visible: :all
-    links = page.all("dialog .digital-assets__iiif-links a[target=_blank][rel=noopener]", visible: :all)
-    assert_equal [ "Open in Mirador", "Open in the Universal Viewer", "View the manifest (JSON)", "What is IIIF?" ], links.map { |a| a.text(:all).sub("(opens in a new tab)", "").strip }
-    assert_match %r{projectmirador\.org/embed/\?iiif-content=.*manifest\.json}, links.first[:href]
-  end
-
-  test "a sensitive record, a request-only one and an imageless one have no IIIF button (no manifest another viewer could open)" do
-    render_media(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ], "restrictions_tsi" => [ "Culturally sensitive images" ]))
-    assert_no_text "Use with IIIF"
-    render_media(IMAGES.merge("licence_type_ssim" => [ "ICIP Rights" ]))
+    assert_selector ".media-viewer__controls[role=group][aria-label='Image tools']"
+    assert_equal [ "Zoom", "Download image", "Media information" ], page.all(".media-viewer__controls button.media-viewer__tool", visible: :all).map { |b| b.text(:all).strip }
+    assert_no_selector ".media-viewer__controls .round-control", visible: :all
     assert_no_text "Use with IIIF"
   end
 

@@ -137,6 +137,7 @@ en:
         # The media viewer (Figma "Media viewer", after Europeana's item viewer). PLACEHOLDER WORDING where marked.
         viewer:
           tools: "Image tools"
+          zoom: "Zoom"
           media_information: "Media information"
           close_information: "Close media information"
           rotate_right: "Rotate"
@@ -160,17 +161,6 @@ en:
           at_start: "This is the first image"
           at_end: "This is the last image"
           position: "Image %{position} of %{count}"
-          # Figma Record/IIIF reuse
-          iiif_button: "Use with IIIF"
-          iiif_heading: "Use this image with IIIF"
-          iiif_intro: "This image is published with IIIF, an open standard. Copy the link to open it in any IIIF viewer, or use one below."
-          iiif_manifest_label: "IIIF manifest link"
-          copy_manifest: "Copy manifest link"
-          open_mirador: "Open in Mirador"
-          open_uv: "Open in the Universal Viewer"
-          view_manifest: "View the manifest (JSON)"
-          what_is_iiif: "What is IIIF?"
-          new_tab: "(opens in a new tab)"
           # Figma Record/IIIF download
           download_heading: "Download this image"
           download_intro: "Choose a size. Please include the caption and licence when you use the image."

@@ -142,16 +142,19 @@
 .record-accordion__item > summary:hover .record-accordion__title { text-decoration: underline; }
 .record-accordion__item > summary:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: -2px; }
 .record-accordion__title { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-snug); color: var(--ccs-text-link); }
-.record-accordion__panel { padding: var(--ccs-space-4) var(--ccs-space-4) var(--ccs-space-6); font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); background: var(--ccs-surface-subtle); }
-.record-accordion__panel > * + * { margin-top: var(--ccs-space-4); }
-.record-accordion__panel > p { margin-bottom: 0; }
-.record-accordion__list { display: grid; gap: var(--ccs-space-3); margin: 0; }
+/* the open panel: 24px inside on every side, its parts 20px apart (a column gap, so no part's own margins can squash it) */
+.record-accordion__panel { display: flex; flex-direction: column; gap: var(--ccs-space-5); padding: var(--ccs-space-5); font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); background: var(--ccs-surface-subtle); border-top: 1px solid var(--ccs-border-subtle); }
+.record-accordion__panel > * { margin: 0; }
+.record-accordion__list { display: grid; margin: 0; }
 .record-accordion__list dt { font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-semibold); }
 .record-accordion__list dd { margin: 0; overflow-wrap: anywhere; }
 .record-accordion__item .contact-collection { margin: 0; }
 .record-accordion__item .cite--inline .cite__list { display: grid; gap: var(--ccs-space-4); margin: 0; padding: 0; list-style: none; }
 .record-accordion__item .record-facts__list { border-bottom: 0; }
-.record-accordion__item .record-use { padding-top: 0; background: none; border: 0; }
+.record-accordion__panel.record-use { border: 0; border-top: 1px solid var(--ccs-border-subtle); } /* not the old Use and access box */
+.record-accordion__panel .record-use__status { gap: var(--ccs-space-2); font-size: var(--ccs-font-size-md); }
+.record-accordion__panel .record-use__note { font-size: var(--ccs-font-size-md); color: var(--ccs-text-primary); }
+.record-accordion__list { gap: var(--ccs-space-4); }
 @media (prefers-reduced-motion: no-preference) {
   .record-accordion__item { interpolate-size: allow-keywords; }
   .record-accordion__item::details-content { height: 0; overflow: clip; transition: height 200ms ease-out, content-visibility 200ms allow-discrete; }

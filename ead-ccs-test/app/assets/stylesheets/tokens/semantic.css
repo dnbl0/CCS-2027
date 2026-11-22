@@ -23,7 +23,7 @@
 
   /* Surfaces */
   --ccs-surface-default: var(--ccs-white);
-  --ccs-surface-subtle: var(--ccs-neutral-100);
+  --ccs-surface-subtle: var(--ccs-neutral-50); /* the palest grey: panels and open accordion items on white */
   --ccs-surface-panel: var(--ccs-white);
   --ccs-surface-brand: var(--ccs-navy-1100);
   --ccs-surface-brand-strong: var(--ccs-navy-1200);

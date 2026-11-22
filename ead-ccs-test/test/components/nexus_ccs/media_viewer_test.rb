@@ -23,7 +23,7 @@ class MediaViewerComponentTest < ActiveSupport::TestCase
     render_for({ MediaTypes::IIIF_INFO_FIELD => [ "https://iiif.example.org/a/info.json", "" ] })
 
     # Zoom opens the modal; its zoom, rotate and reset controls drive the viewer (media-viewer:zoom)
-    assert_selector "button.round-control[hidden][aria-haspopup=dialog][data-action='media-viewer#openZoom']", visible: :all
+    assert_selector "button.media-viewer__tool[hidden][aria-haspopup=dialog][data-action='media-viewer#openZoom']", visible: :all
     assert_selector "[data-controller=deep-zoom][data-action*='media-viewer:zoom@window->deep-zoom#zoom']", visible: :all
     sources = JSON.parse(page.find("[data-controller=deep-zoom]", visible: :all)["data-deep-zoom-sources-value"])
     assert_equal [ "/digital-assets/large/a.jpg", "/digital-assets/large/b.jpg" ], sources.map { |source| source["url"] }

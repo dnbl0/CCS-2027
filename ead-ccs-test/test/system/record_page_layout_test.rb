@@ -127,16 +127,16 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
   test "an open record's panel has round Zoom and Download and Media information; a view-only record has no download link anywhere" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
     assert_selector ".media-viewer__licence", text: "You can download the image."
-    assert_selector ".media-viewer__controls button.round-control[aria-label='Zoom into the image']"
+    assert_selector ".media-viewer__controls button.media-viewer__tool[aria-label='Zoom into the image']"
     # CCS-67: Download shows the essential information (caption, licence) to copy, then downloads
-    find(".media-viewer__controls button.round-control[aria-label^='Download image']").click
+    find(".media-viewer__controls button.media-viewer__tool[aria-label^='Download image']").click
     assert_selector "dialog[open] h2", text: "Download this image"
     assert_selector "dialog[open] .digital-assets__essential dt", text: "Caption"
     assert_selector "dialog[open] a.btn[download]", text: "Download image"
     find("dialog[open] .modal-footer button", text: "Cancel").click
     assert_no_selector "dialog[open]"
     # CCS-422: Media information opens a drawer from the right; Escape closes it and focus returns to the button
-    find("button.media-viewer__info-button:not(.media-viewer__iiif-button)").click
+    find("button.media-viewer__info-button").click
     assert_selector "dialog#media-information[open] h2", text: "Media information"
     page.evaluate_async_script("const done = arguments[0]; Promise.all(document.getElementById('media-information').getAnimations().map((a) => a.finished)).then(() => done())")
     drawer = page.evaluate_script("document.getElementById('media-information').getBoundingClientRect().toJSON()")
@@ -160,7 +160,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
       assert_selector ".digital-assets__main img[src^='#{LARGE.first}']"
       assert_selector ".digital-assets .access-notice--partly-withheld", text: "1 other digital asset of this record is not shown here"
       assert_selector ".access-notice--partly-withheld a[href='/access_requests/new?document_id=emu-9044']", text: "Request access to it"
-      assert_selector ".media-viewer__controls button.round-control[aria-label^='Download image']"
+      assert_selector ".media-viewer__controls button.media-viewer__tool[aria-label^='Download image']"
       assert_selector ".media-viewer__licence", text: "CC BY."
       notice = page.evaluate_script("(() => { const r = document.querySelector('.access-notice--partly-withheld').getBoundingClientRect(); return [r.left >= 0, r.right <= window.innerWidth] })()")
       assert_equal [ true, true ], notice, "the notice fits the width"
@@ -292,7 +292,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
   test "with the zoom modal or the media information open, the page has no axe violations, on a phone and a desktop" do
     %w[phone desktop].each do |width|
       open_record(VARIANTS.fetch("several images, view-only"), width)
-      find("button.media-viewer__info-button:not(.media-viewer__iiif-button)").click
+      find("button.media-viewer__info-button").click
       assert_selector "dialog#media-information[open]"
       assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
       find("#media-information button[aria-label='Close media information']").click
@@ -306,12 +306,36 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
       assert_selector ".media-zoom .media-zoom__position", text: "Image 2 of #{THUMBS.size}"
       page.send_keys(:escape)
       assert_selector ".media-viewer__counter", text: "Image 2 of #{THUMBS.size}"
-      # Use this image with IIIF
-      find(".media-viewer__iiif-button").click
-      assert_selector "dialog[open] h2", text: "Use this image with IIIF"
-      assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
-      page.send_keys(:escape)
     end
+  end
+
+  test "an open accordion item keeps its content clear of its title: 24px inside the panel, on the pale grey, at every width" do
+    %w[desktop narrow].each do |width|
+      open_record(VARIANTS.fetch("several images, view-only"), width)
+      page.execute_script("document.getElementById('record-use').open = true")
+      gaps = page.evaluate_script(<<~JS)
+        (() => { const item = document.getElementById("record-use"), summary = item.querySelector("summary"), panel = item.querySelector(".record-accordion__panel");
+                 const first = panel.firstElementChild, style = getComputedStyle(panel);
+                 return [Math.round(first.getBoundingClientRect().top - summary.getBoundingClientRect().bottom), parseFloat(style.paddingLeft), style.backgroundColor] })()
+      JS
+      assert_operator gaps[0], :>=, 24, "#{width}: #{gaps.inspect}"
+      assert_operator gaps[1], :>=, 24, "#{width}: #{gaps.inspect}"
+      assert_equal "rgb(248, 248, 248)", gaps[2]
+    end
+  end
+
+  test "the panel's tools sit on a toolbar joined to the panel (a rule above them), one style, no IIIF button" do
+    open_record(VARIANTS.fetch("one image, open"), "desktop")
+    bar = page.evaluate_script(<<~JS)
+      (() => { const bar = document.querySelector(".media-viewer__controls"), panel = bar.closest(".media-viewer__panel"); const s = getComputedStyle(bar);
+               return [s.borderTopWidth, s.backgroundColor, Math.round(panel.getBoundingClientRect().bottom - bar.getBoundingClientRect().bottom),
+                       [...bar.querySelectorAll("button")].filter(b => b.offsetParent).map(b => getComputedStyle(b).boxShadow)] })()
+    JS
+    assert_equal "1px", bar[0]
+    assert_equal "rgb(255, 255, 255)", bar[1]
+    assert_operator bar[2], :<=, 1, "the bar is the panel's foot"
+    assert bar[3].all? { |shadow| shadow == "none" }, bar.inspect
+    assert_no_text "Use with IIIF"
   end
 
   test "a long description fades out above Read more, and Read less collapses it again, its paragraphs kept" do

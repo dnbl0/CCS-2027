@@ -28,7 +28,7 @@ class MediaSectionTest < ActiveSupport::TestCase
     render_for(FIELDS)
 
     assert_selector ".media-viewer__licence", text: "In copyright."
-    assert_selector "button.round-control[hidden][aria-label='Zoom into the image']", visible: :all
+    assert_selector "button.media-viewer__tool[hidden][aria-label='Zoom into the image']", visible: :all
     assert_selector "dialog.media-zoom[aria-labelledby=media-zoom-heading] .media-zoom__tools[role=group][aria-label='Image tools']", visible: :all
     [ "Zoom in", "Zoom out", "Rotate", "Reset zoom and rotation" ].each do |name|
       assert_selector "dialog.media-zoom button.round-control[aria-label='#{name}'][title]", visible: :all
