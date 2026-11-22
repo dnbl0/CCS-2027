@@ -118,7 +118,52 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
     assert_selector "dialog#media-information h2#media-information-heading", text: "Media information", visible: :all
     assert_selector ".media-viewer__controls-start button[aria-label='Zoom into the image']", visible: :all
     assert_no_selector ".digital-assets__stage ~ .digital-assets__stage"
-    assert_no_text(/Image \d+ of \d+/) # no counter
+    # The benchmark's counter under the thumbnails, and the zoom's title and position
+    assert_selector ".media-viewer__thumbs .media-viewer__counter[data-media-viewer-target=counter]", text: "Image 1 of 2"
+    assert_selector "dialog.media-zoom h2#media-zoom-heading", text: "Kangaroo-pouch tone-tool", visible: :all
+    assert_selector "dialog.media-zoom .media-zoom__position", text: "Image 1 of 2", visible: :all
+  end
+
+  test "Download this image without an image service offers the one file, its size said when known; Cancel and Copy this information" do
+    render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
+
+    assert_selector "dialog h2#download-dialog-title", text: "Download this image", visible: :all
+    assert_no_selector "dialog input[type=radio][name=download-size]", visible: :all
+    assert_selector "dialog .digital-assets__essential-box button", text: "Copy this information", visible: :all
+    assert_selector "dialog .modal-footer button", text: "Cancel", visible: :all
+  end
+
+  test "with an IIIF image service, Download offers Small, Medium and Large under the image's width, then Full size, Medium chosen" do
+    component = NexusCcs::DigitalAssetsComponent.new(presenter: Presenter.new(doc(IMAGES.merge(
+      "licence_type_ssim" => [ "Public domain - Copyright expired" ], "iiif_info_urls_ssim" => [ "https://iiif.example/img/a/info.json", "" ]
+    ))))
+    component.define_singleton_method(:image_size) { |_path| { width: 2000, height: 1000 } }
+    render_inline(component)
+
+    labels = page.all("dialog .digital-assets__sizes label", visible: :all).map { |label| label.text(:all).strip }
+    assert_equal [ "Small — 800 × 400 px (JPEG)", "Medium — 1600 × 800 px (JPEG)", "Full size — 2000 × 1000 px (JPEG)" ], labels
+    assert_selector "dialog input#download-size-medium[checked][value='https://iiif.example/img/a/full/1600,/0/default.jpg']", visible: :all
+    assert_selector "dialog a[download][data-media-viewer-target=downloadLink][href='https://iiif.example/img/a/full/1600,/0/default.jpg']", visible: :all
+    assert_selector "dialog .digital-assets__sizes legend", text: "Size", visible: :all
+  end
+
+  test "Use with IIIF opens the manifest to copy and links to Mirador, the Universal Viewer, the JSON and What is IIIF, each saying it opens a new tab" do
+    render_media(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ]))
+
+    assert_selector ".media-viewer__controls-end button[aria-haspopup=dialog]", text: "Use with IIIF"
+    assert_selector "dialog h2#iiif-dialog-title", text: "Use this image with IIIF", visible: :all
+    assert_selector "dialog input#iiif-manifest-link[readonly][value$='/catalog/emu-1/manifest.json']", visible: :all
+    assert_selector "dialog label[for=iiif-manifest-link]", visible: :all
+    links = page.all("dialog .digital-assets__iiif-links a[target=_blank][rel=noopener]", visible: :all)
+    assert_equal [ "Open in Mirador", "Open in the Universal Viewer", "View the manifest (JSON)", "What is IIIF?" ], links.map { |a| a.text(:all).sub("(opens in a new tab)", "").strip }
+    assert_match %r{projectmirador\.org/embed/\?iiif-content=.*manifest\.json}, links.first[:href]
+  end
+
+  test "a sensitive record, a request-only one and an imageless one have no IIIF button (no manifest another viewer could open)" do
+    render_media(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ], "restrictions_tsi" => [ "Culturally sensitive images" ]))
+    assert_no_text "Use with IIIF"
+    render_media(IMAGES.merge("licence_type_ssim" => [ "ICIP Rights" ]))
+    assert_no_text "Use with IIIF"
   end
 
   test "a view-only record has no download link in its markup, and the image keeps its own shape (width and height held)" do

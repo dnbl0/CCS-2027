@@ -7,9 +7,10 @@
 /* The image, whole and centred, never upscaled; the panel keeps a steady height */
 .media-viewer__stage {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--ccs-space-4);
-  min-height: clamp(16rem, 50vh, 34rem); padding: var(--ccs-space-7) var(--ccs-space-5) var(--ccs-space-5);
+  min-height: clamp(16rem, 50vh, 34rem); padding: var(--ccs-space-5);
 }
-@media (min-width: 1024px) { .media-viewer__stage { padding: calc(var(--ccs-space-8) * 1.5) var(--ccs-space-8) var(--ccs-space-6); } }
+/* The benchmark (AIC, Wellcome, Getty, YCBA, NGA): a 640px stage with 24px padding, so the image fills about nine tenths of it */
+@media (min-width: 1024px) { .media-viewer__stage { min-height: 40rem; } .media-viewer__stage .digital-assets__image { max-height: calc(40rem - 2 * var(--ccs-space-5)); } }
 .digital-assets__main { display: flex; align-items: center; justify-content: center; width: 100%; margin: 0; }
 .digital-assets__image { display: block; width: auto; height: auto; max-width: 100%; max-height: clamp(14rem, 46vh, 30rem); object-fit: contain; }
 .media-viewer__stage > .sensitivity-gate { max-width: 32rem; margin: 0; }
@@ -19,8 +20,14 @@
 .digital-assets__media figcaption, .digital-assets__pdf { margin-top: var(--ccs-space-2); color: var(--ccs-text-secondary); }
 
 /* Thumbnails: small, centred; the one on show framed */
-.media-viewer__thumbs { padding: 0 var(--ccs-space-5) var(--ccs-space-4); }
-.media-viewer__thumb-list { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--ccs-space-3); margin: 0; padding: 0; list-style: none; }
+/* Thumbnails: one strip that scrolls sideways when there are many (room round each for its frame and focus ring), the counter under it */
+.media-viewer__thumbs { display: flex; flex-direction: column; align-items: center; gap: var(--ccs-space-2); min-width: 0; padding: 0 var(--ccs-space-5) var(--ccs-space-4); }
+.media-viewer__thumb-list {
+  display: flex; gap: var(--ccs-space-3); max-width: 100%; margin: 0; padding: 10px; list-style: none;
+  overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin;
+}
+.media-viewer__thumb-list > li { flex: none; }
+.media-viewer__counter { margin: 0; font-size: var(--ccs-font-size-sm); font-variant-numeric: tabular-nums; color: var(--ccs-text-primary); }
 .digital-assets__thumb {
   position: relative; display: block; width: 4rem; height: 4rem; padding: 0; overflow: visible; background: var(--ccs-surface-default);
   border: 0; cursor: pointer;
@@ -33,7 +40,11 @@
 
 /* The panel's foot */
 .media-viewer__controls { display: flex; align-items: center; justify-content: space-between; gap: var(--ccs-space-4); padding: 0 var(--ccs-space-5) var(--ccs-space-5); }
-.media-viewer__controls-start { display: flex; align-items: center; gap: var(--ccs-space-3); }
+.media-viewer__controls { flex-wrap: wrap; }
+.media-viewer__controls-start, .media-viewer__controls-end { display: flex; align-items: center; gap: var(--ccs-space-3); }
+.media-viewer__controls-end { flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
+.digital-assets__iiif { display: contents; }
+.media-viewer__iiif-mark { padding: 0 var(--ccs-space-1); font-size: 0.6875rem; font-weight: var(--ccs-font-weight-bold); letter-spacing: 0.04em; border: 1.5px solid currentColor; }
 .digital-assets__download { display: contents; }
 
 /* Round controls (NGA's zoom and download): white circles with a fine border */
@@ -66,17 +77,27 @@
 .media-viewer__media { display: grid; gap: var(--ccs-space-4); }
 
 /* Zoom: a full-screen modal, the image filling it on the panel grey; close top right, the tools bottom left */
-.media-zoom { width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; background: var(--ccs-surface-subtle); color: var(--ccs-text-primary); }
+/* Zoom on the dark neutral ground (Figma neutral/800: the UoM inverse grounds are navy, which tints the picture), the title and the
+   image's position top left; the round controls go outline-only, light on dark */
+.media-zoom { width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; background: var(--ccs-neutral-800); color: var(--ccs-neutral-100); }
+.media-zoom__caption { position: absolute; top: var(--ccs-space-5); left: var(--ccs-space-5); right: calc(var(--ccs-space-5) * 2 + 3rem); z-index: 2; pointer-events: none; }
+.media-zoom__title { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); line-height: 1.25; color: var(--ccs-neutral-100); text-wrap: balance; }
+.media-zoom__position { margin: var(--ccs-space-1) 0 0; font-size: var(--ccs-font-size-sm); font-variant-numeric: tabular-nums; color: var(--ccs-neutral-300); }
+.media-zoom .round-control { color: var(--ccs-neutral-100); background: transparent; border-color: var(--ccs-neutral-300); box-shadow: none; }
+.media-zoom .round-control:hover { background: rgb(255 255 255 / 10%); border-color: var(--ccs-neutral-100); }
+.media-zoom .round-control:focus-visible { outline-color: var(--ccs-cyan-400); }
+.media-zoom .round-control[aria-disabled="true"] svg { opacity: 0.45; }
+.media-zoom .round-control[aria-disabled="true"]:hover { background: transparent; border-color: var(--ccs-neutral-300); }
 .media-zoom::backdrop { background: rgb(0 0 0 / 60%); }
 .media-zoom .deep-zoom, .media-zoom .deep-zoom__stage { position: absolute; inset: 0; }
 .media-zoom .deep-zoom__stage { background: transparent; }
 .media-zoom__close { position: absolute; top: var(--ccs-space-5); right: var(--ccs-space-5); z-index: 2; }
 .media-zoom__tools { position: absolute; left: var(--ccs-space-5); bottom: var(--ccs-space-5); z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-3); max-width: calc(100% - 2 * var(--ccs-space-5)); }
-.media-zoom__divider { width: 1px; height: 1.75rem; background: var(--ccs-border-strong); }
+.media-zoom__divider { width: 1px; height: 1.75rem; background: var(--ccs-neutral-300); }
 .media-zoom__readout:empty { display: none; }
 .media-zoom__readout {
   position: absolute; right: var(--ccs-space-5); bottom: var(--ccs-space-5); z-index: 2; margin: 0; padding: var(--ccs-space-1) var(--ccs-space-3);
-  font-size: var(--ccs-font-size-sm); font-variant-numeric: tabular-nums; background: var(--ccs-surface-default); border-radius: 999px;
+  font-size: var(--ccs-font-size-sm); font-variant-numeric: tabular-nums; color: var(--ccs-text-primary); background: var(--ccs-surface-default); border-radius: 999px;
 }
 
 /* Media information: a drawer from the right */
@@ -93,13 +114,28 @@
 .media-drawer__field dt { font-weight: var(--ccs-font-weight-bold); }
 .media-drawer__field dd { margin: var(--ccs-space-1) 0 0; overflow-wrap: anywhere; }
 
-/* Download: the essential information first (CCS-67) */
-.digital-assets__essential { display: grid; gap: var(--ccs-space-3); margin: 0 0 var(--ccs-space-4); color: var(--ccs-text-primary); }
+/* Download this image (Figma Record/IIIF download): the sizes, then the essential information to copy (CCS-67) on a grey box */
+.digital-assets__sizes { margin: var(--ccs-space-5) 0; padding: 0; border: 0; }
+.digital-assets__sizes-legend { margin: 0; font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-primary); }
+.digital-assets__sizes-hint { margin: 0 0 var(--ccs-space-2); font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
+.digital-assets__sizes .form-check { display: flex; align-items: center; min-height: 2.25rem; }
+.digital-assets__size-one { font-variant-numeric: tabular-nums; }
+.digital-assets__essential-box { display: grid; justify-items: start; gap: var(--ccs-space-4); padding: var(--ccs-space-5); background: var(--ccs-surface-subtle); }
+.digital-assets__essential { display: grid; gap: var(--ccs-space-4); margin: 0; color: var(--ccs-text-primary); }
 .digital-assets__essential dt { font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
-.digital-assets__essential dd { margin: 0; overflow-wrap: anywhere; }
+.digital-assets__essential dd { margin: 0; font-weight: var(--ccs-font-weight-semibold); overflow-wrap: anywhere; }
+
+/* Use this image with IIIF (Figma Record/IIIF reuse) */
+.digital-assets__manifest { margin: var(--ccs-space-4) 0; font-size: var(--ccs-font-size-sm); background: var(--ccs-surface-subtle); }
+.digital-assets__iiif-links { display: grid; gap: var(--ccs-space-1); margin: var(--ccs-space-5) 0 0; padding: 0; list-style: none; }
+.digital-assets__iiif-links a { display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: 2.25rem; font-weight: var(--ccs-font-weight-semibold); }
+.digital-assets__iiif-links svg { width: 1.125rem; height: 1.125rem; }
 .digital-assets .access-notice--partly-withheld { margin: 0; }
 
 @media (forced-colors: active) {
   .digital-assets__thumb[aria-current="true"]::after { border-color: Highlight; }
-  .round-control { border-color: ButtonText; }
+  .round-control, .media-zoom .round-control { border-color: ButtonText; }
 }
+
+/* On the zoom's dark ground the image's focus ring is cyan (about 6:1 on neutral/800; the blue ring would be about 2:1) */
+.media-zoom .deep-zoom .openseadragon-canvas:focus-visible { outline-color: var(--ccs-cyan-400); }

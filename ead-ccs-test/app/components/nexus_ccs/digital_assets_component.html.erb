@@ -54,10 +54,12 @@
             </li>
           <% end %>
         </ol>
+        <%# Which image is on show (the benchmark's "Image 1 of 12"); the script keeps it in step %>
+        <p class="media-viewer__counter" data-media-viewer-target="counter"><%= t("#{VIEWER}.position", position: 1, count: images.size) %></p>
       </nav>
     <% end %>
 
-    <% if (assets_shown? && main) || download_href || metadata.any? %>
+    <% if (assets_shown? && main) || download_href || metadata.any? || manifest_url %>
       <%# The panel's foot: round Zoom and Download on the left, Media information on the right %>
       <div class="media-viewer__controls">
         <div class="media-viewer__controls-start">
@@ -71,23 +73,43 @@
               <button type="button" class="round-control" aria-haspopup="dialog" data-action="dialog#open"
                       aria-label="<%= t("nexus_ccs.record_page.access.download_label", title: title) %>" title="<%= t("nexus_ccs.record_page.access.download") %>"><%= icon(:download) %></button>
               <dialog class="modal uom-dialog uom-modal digital-assets__download-dialog" data-dialog-target="dialog" data-action="click->dialog#closeOnBackdrop" aria-labelledby="download-dialog-title">
-                <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                   <div class="modal-content">
                     <button type="button" class="modal-close" data-action="dialog#close"><%= t("nexus_ccs.record_page.download.close") %></button>
-                    <div class="modal-header"><h2 class="modal-title h5" id="download-dialog-title"><%= t("nexus_ccs.record_page.download.title") %></h2></div>
-                    <div class="modal-body" data-controller="clipboard">
-                      <p><%= t("nexus_ccs.record_page.download.intro") %></p>
-                      <dl class="digital-assets__essential">
-                        <% if essential_caption %><div><dt><%= t("nexus_ccs.record_page.download.caption") %></dt><dd><%= essential_caption %></dd></div><% end %>
-                        <% if licence %><div><dt><%= t("nexus_ccs.record_page.download.licence") %></dt><dd><%= licence %></dd></div><% end %>
-                      </dl>
-                      <span hidden data-clipboard-target="source" data-copy="<%= essential_text %>"></span>
-                      <button type="button" class="btn btn-outline-primary" data-action="clipboard#copy" data-clipboard-target="button"><span data-clipboard-target="label"><%= t("nexus_ccs.record_page.download.copy") %></span></button>
-                      <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
+                    <div class="modal-header"><h2 class="modal-title h5" id="download-dialog-title"><%= t("#{VIEWER}.download_heading") %></h2></div>
+                    <div class="modal-body">
+                      <% options = download_options %>
+                      <p><%= t(options.size > 1 ? "#{VIEWER}.download_intro" : "#{VIEWER}.download_one") %></p>
+                      <% if options.size > 1 %>
+                        <%# Figma's UoM Radio group: one per size the image service can draw, never larger than the image %>
+                        <fieldset class="digital-assets__sizes" aria-describedby="download-size-hint">
+                          <legend class="digital-assets__sizes-legend"><%= t("#{VIEWER}.size_legend") %></legend>
+                          <p class="digital-assets__sizes-hint" id="download-size-hint"><%= t("#{VIEWER}.size_hint") %></p>
+                          <% options.each do |key, label, href| %>
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="download-size" id="download-size-<%= key %>" value="<%= href %>"
+                                     <%= "checked" if key == default_download.first %> data-action="change->media-viewer#chooseSize">
+                              <label class="form-check-label" for="download-size-<%= key %>"><%= label %></label>
+                            </div>
+                          <% end %>
+                        </fieldset>
+                      <% elsif options.any? %>
+                        <p class="digital-assets__size-one"><%= options.first[1] %></p>
+                      <% end %>
+                      <%# CCS-67: the essential information to copy with the image %>
+                      <div class="digital-assets__essential-box" data-controller="clipboard">
+                        <dl class="digital-assets__essential">
+                          <% if essential_caption %><div><dt><%= t("nexus_ccs.record_page.download.caption") %></dt><dd><%= essential_caption %></dd></div><% end %>
+                          <% if licence %><div><dt><%= t("nexus_ccs.record_page.download.licence") %></dt><dd><%= licence %></dd></div><% end %>
+                        </dl>
+                        <span hidden data-clipboard-target="source" data-copy="<%= essential_text %>"></span>
+                        <button type="button" class="btn btn-outline-primary" data-action="clipboard#copy" data-clipboard-target="button"><span data-clipboard-target="label"><%= t("#{VIEWER}.copy_information") %></span></button>
+                        <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
+                      </div>
                     </div>
                     <div class="modal-footer">
-                      <button type="button" class="btn btn-outline-primary" data-action="dialog#close"><%= t("nexus_ccs.record_page.download.close") %></button>
-                      <a class="btn btn-primary" href="<%= download_href %>" download><%= t("nexus_ccs.record_page.download.download") %></a>
+                      <button type="button" class="btn btn-outline-primary" data-action="dialog#close"><%= t("#{VIEWER}.cancel") %></button>
+                      <a class="btn btn-primary" href="<%= default_download&.last || download_href %>" download data-media-viewer-target="downloadLink"><%= t("#{VIEWER}.download_image") %></a>
                     </div>
                   </div>
                 </div>
@@ -95,11 +117,41 @@
             </div>
           <% end %>
         </div>
+        <div class="media-viewer__controls-end">
+        <% if manifest_url %>
+          <%# Figma Record/IIIF reuse: the manifest to copy, and viewers that open it %>
+          <div class="digital-assets__iiif" data-controller="dialog">
+            <button type="button" class="media-viewer__info-button media-viewer__iiif-button" aria-haspopup="dialog" data-action="dialog#open">
+              <span class="media-viewer__iiif-mark" aria-hidden="true">IIIF</span><span><%= t("#{VIEWER}.iiif_button") %></span>
+            </button>
+            <dialog class="modal uom-dialog uom-modal digital-assets__iiif-dialog" data-dialog-target="dialog" data-action="click->dialog#closeOnBackdrop" aria-labelledby="iiif-dialog-title">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <button type="button" class="modal-close" data-action="dialog#close"><%= t("nexus_ccs.record_page.download.close") %></button>
+                  <div class="modal-header"><h2 class="modal-title h5" id="iiif-dialog-title"><%= t("#{VIEWER}.iiif_heading") %></h2></div>
+                  <div class="modal-body" data-controller="clipboard">
+                    <p><%= t("#{VIEWER}.iiif_intro") %></p>
+                    <label class="visually-hidden" for="iiif-manifest-link"><%= t("#{VIEWER}.iiif_manifest_label") %></label>
+                    <input type="text" class="form-control digital-assets__manifest" id="iiif-manifest-link" value="<%= manifest_url %>" readonly autocomplete="off" data-clipboard-target="source">
+                    <button type="button" class="btn btn-outline-primary digital-assets__copy-manifest" data-action="clipboard#copy" data-clipboard-target="button"><span data-clipboard-target="label"><%= t("#{VIEWER}.copy_manifest") %></span></button>
+                    <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
+                    <ul class="digital-assets__iiif-links">
+                      <% iiif_links.each do |key, href| %>
+                        <li><a href="<%= href %>" target="_blank" rel="noopener"><%= t("#{VIEWER}.#{key}") %><span class="visually-hidden"> <%= t("#{VIEWER}.new_tab") %></span><%= glyph(:external) %></a></li>
+                      <% end %>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </dialog>
+          </div>
+        <% end %>
         <% if metadata.any? %>
           <button type="button" class="media-viewer__info-button" aria-haspopup="dialog" aria-controls="media-information" data-media-viewer-target="infoButton" data-action="media-viewer#openInfo">
             <%= glyph(:info) %><span><%= t("#{VIEWER}.media_information") %></span>
           </button>
         <% end %>
+        </div>
       </div>
     <% end %>
   </div>
@@ -141,7 +193,11 @@
     <%# Zoom (NGA's zoom modal): the image full screen, zoom and rotate at the bottom left, close at the top right; Escape closes and
         focus returns to Zoom. The viewer loads on first use (deep_zoom_controller). %>
     <dialog class="media-zoom" aria-labelledby="media-zoom-heading" data-media-viewer-target="zoomDialog" data-action="close->media-viewer#zoomClosed">
-      <h2 class="visually-hidden" id="media-zoom-heading"><%= t("#{VIEWER}.zoom_heading", title: title) %></h2>
+      <%# Figma Record/IIIF zoom: the title and which image, top left, on the dark neutral ground %>
+      <div class="media-zoom__caption">
+        <h2 class="media-zoom__title" id="media-zoom-heading"><span class="visually-hidden"><%= t("#{VIEWER}.zoom_heading", title: "") %></span><%= title %></h2>
+        <% if images.size > 1 %><p class="media-zoom__position" data-media-viewer-target="position"><%= t("#{VIEWER}.position", position: 1, count: images.size) %></p><% end %>
+      </div>
       <%= render NexusCcs::DeepZoomComponent.new(sources: zoom_sources, label: alt(1)) %>
       <button type="button" class="round-control media-zoom__close" data-action="media-viewer#closeZoom"
               aria-label="<%= t("#{VIEWER}.close_zoom") %>" title="<%= t("#{VIEWER}.close_zoom") %>"><%= icon(:close) %></button>

@@ -8,11 +8,12 @@ import { Controller } from "@hotwired/stimulus"
 //   zoom viewer (deep_zoom_controller, listening for media-viewer:zoom on window) opens the image on show and reports back with
 //   deep-zoom:state; the tools are disabled at their limits (aria-disabled, still focusable, the reason in their tooltip) and the
 //   readout says the zoom. Previous and Next step through the images inside the modal and stop at the ends.
-// - Media information opens a drawer from the right, also a modal <dialog>.
+// - Media information opens a drawer from the right, also a modal <dialog>. The counter under the thumbnails and the zoom's
+//   "Image N of M" follow the image on show; in Download, the size chosen is the file Download image fetches.
 // Without JavaScript Zoom never appears; the image, the thumbnails and Download still work.
 export default class extends Controller {
   static targets = [ "image", "thumb", "zoomButton", "zoomDialog", "zoomIn", "zoomOut", "rotateRight", "reset", "previous", "next",
-    "readout", "infoButton", "infoDialog", "status" ]
+    "readout", "infoButton", "infoDialog", "status", "counter", "position", "downloadLink" ]
   static values = { labels: Object }
 
   connect() {
@@ -130,6 +131,9 @@ export default class extends Controller {
     this.imageTarget.alt = thumb.dataset.mediaViewerAlt
     this.thumbTargets.forEach((other) => { if (other === thumb) other.setAttribute("aria-current", "true"); else other.removeAttribute("aria-current") })
     this.syncSteps()
+    const position = this.label("position", { position: thumb.dataset.mediaViewerPosition, count: this.thumbTargets.length })
+    if (this.hasCounterTarget) this.counterTarget.textContent = position
+    if (this.hasPositionTarget) this.positionTarget.textContent = position
     if (this.hasZoomDialogTarget && this.zoomDialogTarget.open) this.openImage()
     this.announce(this.label("shown", { position: thumb.dataset.mediaViewerPosition, count: this.thumbTargets.length }))
   }
@@ -153,6 +157,11 @@ export default class extends Controller {
     else return
     event.preventDefault()
     thumbs[index].focus()
+  }
+
+  // --- Download: the size chosen is the file the Download image link fetches
+  chooseSize(event) {
+    if (this.hasDownloadLinkTarget) this.downloadLinkTarget.href = event.currentTarget.value
   }
 
   // --- Media information (CCS-422)

@@ -130,13 +130,13 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_selector ".media-viewer__controls button.round-control[aria-label='Zoom into the image']"
     # CCS-67: Download shows the essential information (caption, licence) to copy, then downloads
     find(".media-viewer__controls button.round-control[aria-label^='Download image']").click
-    assert_selector "dialog[open] h2", text: "Before you download"
+    assert_selector "dialog[open] h2", text: "Download this image"
     assert_selector "dialog[open] .digital-assets__essential dt", text: "Caption"
     assert_selector "dialog[open] a.btn[download]", text: "Download image"
-    find("dialog[open] .modal-footer button", text: "Close").click
+    find("dialog[open] .modal-footer button", text: "Cancel").click
     assert_no_selector "dialog[open]"
     # CCS-422: Media information opens a drawer from the right; Escape closes it and focus returns to the button
-    find("button.media-viewer__info-button").click
+    find("button.media-viewer__info-button:not(.media-viewer__iiif-button)").click
     assert_selector "dialog#media-information[open] h2", text: "Media information"
     page.evaluate_async_script("const done = arguments[0]; Promise.all(document.getElementById('media-information').getAnimations().map((a) => a.finished)).then(() => done())")
     drawer = page.evaluate_script("document.getElementById('media-information').getBoundingClientRect().toJSON()")
@@ -292,12 +292,23 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
   test "with the zoom modal or the media information open, the page has no axe violations, on a phone and a desktop" do
     %w[phone desktop].each do |width|
       open_record(VARIANTS.fetch("several images, view-only"), width)
-      find("button.media-viewer__info-button").click
+      find("button.media-viewer__info-button:not(.media-viewer__iiif-button)").click
       assert_selector "dialog#media-information[open]"
       assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
       find("#media-information button[aria-label='Close media information']").click
       find(".media-viewer__controls button[aria-label='Zoom into the image']").click
       assert_selector ".media-zoom .deep-zoom__stage .openseadragon-canvas", visible: :all, wait: 10
+      assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
+      # The zoom's title and position, and Next moving the position on
+      assert_selector ".media-zoom .media-zoom__title", text: BASE["title_tsim"].first
+      assert_selector ".media-zoom .media-zoom__position", text: "Image 1 of #{THUMBS.size}"
+      find(".media-zoom button[aria-label='Next image']").click
+      assert_selector ".media-zoom .media-zoom__position", text: "Image 2 of #{THUMBS.size}"
+      page.send_keys(:escape)
+      assert_selector ".media-viewer__counter", text: "Image 2 of #{THUMBS.size}"
+      # Use this image with IIIF
+      find(".media-viewer__iiif-button").click
+      assert_selector "dialog[open] h2", text: "Use this image with IIIF"
       assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
       page.send_keys(:escape)
     end

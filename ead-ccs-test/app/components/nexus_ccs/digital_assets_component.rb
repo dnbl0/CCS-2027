@@ -102,6 +102,53 @@ module NexusCcs
     # The one primary action: the main image, to download, when it is an open asset (never a view-only or withheld one: no path is in the markup)
     def download_href = (main&.first if assets_shown? && image_downloadable?(0))
 
+    # The record's IIIF manifest (ManifestsController), when this visitor's copy could be opened anywhere: the images are shown and the
+    # record is not sensitive (a sensitive record's manifest is private to the visitor's session, so another viewer would get a 404)
+    def manifest_url = (helpers.manifest_url(@document.id) if @document.id.present? && assets_shown? && images.any? && sensitivity_state.nil?)
+
+    # Use this image with IIIF (Figma Record/IIIF reuse): [label key, href] of the viewers and pages it links to, each opening a new tab
+    def iiif_links
+      encoded = ERB::Util.url_encode(manifest_url)
+      [ [ :open_mirador, "https://projectmirador.org/embed/?iiif-content=#{encoded}" ],
+        [ :open_uv, "https://uv-v4.netlify.app/#?manifest=#{encoded}" ],
+        [ :view_manifest, manifest_url ],
+        [ :what_is_iiif, "https://iiif.io/get-started/why-iiif/" ] ]
+    end
+
+    # Download this image (Figma Record/IIIF download): [key, label, href] of each size offered. With an IIIF image service the sizes
+    # are drawn by it (Small, Medium and Large, each only when narrower than the image, then Full size); without one there is just
+    # the file itself, its exact size said when it is known. Nothing larger than the image is ever offered.
+    DOWNLOAD_WIDTHS = { small: 800, medium: 1600, large: 3000 }.freeze
+
+    def download_options
+      return [] unless download_href
+
+      size = image_size(main.first)
+      width, height = size[:width], size[:height]
+      service = zoom_sources.first[:info]&.sub(%r{/info\.json\z}, "")
+      return [ [ :full, size_label(:full, width, height, file_format(download_href)), download_href ] ] unless service && width
+
+      scaled = DOWNLOAD_WIDTHS.filter_map do |key, w|
+        [ key, size_label(key, w, (height * w / width.to_f).round, "JPEG"), "#{service}/full/#{w},/0/default.jpg" ] if w < width
+      end
+      scaled + [ [ :full, size_label(:full, width, height, "JPEG"), "#{service}/full/max/0/default.jpg" ] ]
+    end
+
+    # Medium when it is offered (Figma's default: big enough to print, quick to fetch), else the largest
+    def default_download = download_options.find { |key, _, _| key == :medium } || download_options.last
+
+    def size_label(key, width, height, format)
+      name = t("#{VIEWER}.sizes.#{key}")
+      width ? t("#{VIEWER}.download_size", name: name, width: width, height: height, kind: format) : name
+    end
+    private :size_label
+
+    def file_format(path)
+      ext = File.extname(path.to_s.split("?").first).delete(".").downcase
+      { "jpg" => "JPEG", "jpeg" => "JPEG", "png" => "PNG", "tif" => "TIFF", "tiff" => "TIFF", "webp" => "WebP" }.fetch(ext, ext.upcase.presence || "image")
+    end
+    private :file_format
+
     # The image's width and height attributes (nothing when its size is not known), so the page holds its space while it loads: read
     # from the file when it is on this server, or the DAM image's size once it has been read for the IIIF manifest (only the kept
     # size: drawing the page never asks the DAM)
@@ -189,7 +236,7 @@ module NexusCcs
 
     # What the script says and shows (announcements, the zoom readout, why a control is unavailable), in the page's language
     def viewer_labels
-      %w[shown rotated zoom_level max_zoom at_fit at_max at_start at_end].index_with { |key| t("#{VIEWER}.#{key}") }
+      %w[shown position rotated zoom_level max_zoom at_fit at_max at_start at_end].index_with { |key| t("#{VIEWER}.#{key}") }
     end
 
     # The essential information before a download (CCS-67): the DA caption, or one built from the record, and the licence
