@@ -85,7 +85,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
 
         # Nothing else in the page sticks (the search strip is the header's)
         sticky = page.evaluate_script("[...document.querySelectorAll('#main-container *')].filter(e => e.getClientRects().length > 0 && ['sticky', 'fixed'].includes(getComputedStyle(e).position)).map(e => e.className)")
-        assert_equal [], sticky.reject { |name| name.include?("record__media") } # NGA: the media stays in view on desktop
+        assert_equal [], sticky.reject { |name| name.include?("record__media") } # the media stays in view on desktop
 
         small = page.evaluate_script(<<~JS)
           [...document.querySelectorAll('.record-actions button, .record-actions a, .media-viewer__controls button, .media-viewer__licence a, .digital-assets__thumb, .record__name, .record-more__tab, .result-stepper a, .record-term')]
