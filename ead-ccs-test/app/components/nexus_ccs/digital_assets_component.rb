@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # A record's media, after the National Gallery of Art's artwork pages: the image whole on a light grey panel with the other images
+  # A record's media (Figma Record/IIIF viewer): the image whole on a light grey panel with the other images
   # as thumbnails under it; round Zoom (a full-screen modal with deep zoom, CCS-57) and Download (the essential information first,
   # CCS-67) at the panel's foot, and Media information (CCS-422, a drawer from the right) at its end; under the panel one line on
   # the licence and what the visitor may do with the image. Renders nothing for a record without assets. What it shows follows AccessPolicy, asset by asset: the index holds only
@@ -90,7 +90,7 @@ module NexusCcs
       state if %i[view_only request].include?(state)
     end
 
-    # The line under the panel (NGA's "This object's media is free and in the public domain."): the licence, then what the visitor
+    # The line under the panel: the licence, then what the visitor
     # may do with the image, e.g. "Public domain. You can view the image online. Download is not available."
     def licence_sentence
       state = withheld? ? :request : tier

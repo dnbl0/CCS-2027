@@ -3,7 +3,7 @@
 <% content_for(:head) { render_link_rel_alternates } %>
 <% content_for(:head) { oembed_link_tag(solr_document_url(@document), Array(@document["title_tsim"]).first.to_s) } %> <%# for CMS and chat tools: the embed code of this record (tier-safe) %>
 
-<%# The record page after the National Gallery of Art's artwork pages: the record (RecordDocumentComponent), then You may be interested in %>
+<%# The record page: the record (RecordDocumentComponent), then You may be interested in %>
 <%= render presenter.view_config.document_component.new(id: 'document', document: presenter, component: :div, show: true, partials: presenter.view_config.partials) do |component| %>
   <% component.with_stepper do %>
     <%# Where this record is in the visitor's search ("Result 3 of 120"), and in their selection (CCS-40) %>

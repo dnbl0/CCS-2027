@@ -49,7 +49,7 @@ class SimilarRowsIntegrationTest < ActionDispatch::IntegrationTest
       assert_select "h2", count: 0
       assert_operator css_select("li.discover-cards__item").size, :<=, 3
       assert_select "h3 a[href='/catalog/emu-a']"
-      assert_select "a.record-arrow-link[href*='f%5Bcreator_ssim%5D%5B%5D=Lees%2C+Derwent']", text: "See all records for Lees, Derwent"
+      assert_select "a.arrow-link[href*='f%5Bcreator_ssim%5D%5B%5D=Lees%2C+Derwent']", text: "See all records for Lees, Derwent"
     end
   end
 
@@ -79,7 +79,7 @@ class SimilarRowsIntegrationTest < ActionDispatch::IntegrationTest
     Blacklight::Solr::Repository.send(:define_method, :find, original) if original
   end
 
-  test "You may be interested in: Similar objects, then a tab with an empty lazy frame per way the record can match" do
+  test "You may be interested in: Similar, then a tab with an empty lazy frame per way the record can match" do
     with_seeded_menu_cache do
       with_found_record(source.merge("region_ssim" => nil, "production_place_ssim" => nil)) { get "/catalog/emu-source" }
     end

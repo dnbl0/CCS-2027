@@ -82,7 +82,7 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_equal [ "Object Type", "Place", "Material", "Measurements", "Classification", "Collection", "Accession Number", "Credit line", "Copyright" ], labels
   end
 
-  test "the record's collection, with the way to the rest of it (NGA's location line)" do
+  test "the record's collection, with the way to the rest of it" do
     record = component(SHEET.merge("collection_ssim" => [ "Grainger Museum Collection" ]))
     record.define_singleton_method(:value_link) { |_row, value| "/catalog?collection=#{value}" }
     name, path = record.collection_link

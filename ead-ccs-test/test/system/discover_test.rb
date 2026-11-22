@@ -16,7 +16,7 @@ class DiscoverTest < ApplicationSystemTestCase
       visit "/catalog/emu-10247"
       page.execute_script("document.getElementById('more-from-the-collections').scrollIntoView()")
 
-      assert_selector "[role=tab][aria-selected=true]", text: "Similar objects"
+      assert_selector "[role=tab][aria-selected=true]", text: "Similar"
       assert_selector "#more-similar li.discover-cards__item", minimum: 2
       page.execute_script("window.scrollTo(0, 0)") # the sticky search bar that appears on scrolling has a known landmark finding of its own
       assert_accessible tags: AXE_TAGS + WCAG22_TAGS

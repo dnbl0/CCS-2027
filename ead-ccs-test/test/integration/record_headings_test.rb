@@ -16,9 +16,9 @@ class RecordHeadingsTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", count: 1
-    assert_select "h1.record-nga__title", count: 1
+    assert_select "h1.record__title", count: 1
     assert_select "h1.visually-hidden", count: 0
-    assert_select ".record-nga__identity h1", count: 1
+    assert_select ".record__identity h1", count: 1
     assert_select "main[aria-label]", count: 0
   end
 

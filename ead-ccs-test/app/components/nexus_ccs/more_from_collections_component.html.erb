@@ -1,22 +1,30 @@
-<%# You may be interested in (the National Gallery of Art's section of that name): a tab for each way the record can be matched (by its
-    maker, period, place, type, and Looks similar), each panel three cards and See all, loaded once its tab is shown (tabs_controller).
-    A tab whose answer is empty says so. %>
+<%# You may be interested in (the design system's tabs, components/record.css): Similar and a tab for each way the record can be matched,
+    each panel three cards and See all, loaded once its tab is shown (tabs_controller). A tab whose answer is empty says so. %>
 <section class="record-more" id="more-from-the-collections" aria-labelledby="record-more-heading">
   <div class="record-more__inner" data-controller="tabs">
-    <h2 class="record-more__heading" id="record-more-heading"><%= t("nexus_ccs.record_page.nga.interested") %></h2>
+    <h2 class="record-more__heading" id="record-more-heading"><%= t("nexus_ccs.record_page.layout.interested") %></h2>
     <div class="record-more__tabs" role="tablist" aria-labelledby="record-more-heading">
       <% rows.each_with_index do |row, index| %>
         <button type="button" role="tab" class="record-more__tab" id="more-tab-<%= row.key %>" aria-controls="more-row-<%= row.key %>"
                 aria-selected="<%= index.zero? %>" tabindex="<%= index.zero? ? 0 : -1 %>"
-                data-tabs-target="tab" data-action="tabs#choose keydown->tabs#keydown"><%= row.label %></button>
+                data-tabs-target="tab" data-action="tabs#choose keydown->tabs#keydown"><%= row.tab %></button>
       <% end %>
     </div>
     <% rows.each do |row| %>
       <section class="record-more__row" id="more-row-<%= row.key %>" role="tabpanel" aria-labelledby="more-tab-<%= row.key %>" tabindex="0" data-tabs-target="panel">
-        <h3 class="record-more__row-heading"><%= row.label %></h3>
+        <h3 class="record-more__row-heading" id="more-row-<%= row.key %>-heading"><%= row.label %></h3>
         <turbo-frame id="more-<%= row.key %>" src="<%= row.source %>" loading="lazy" data-controller="lazy-frame"
                      data-action="turbo:frame-missing->lazy-frame#missing turbo:before-fetch-response->lazy-frame#answered"></turbo-frame>
         <p class="record-more__empty" hidden data-lazy-frame-empty><%= t("nexus_ccs.record_page.split.more.empty") %></p>
+        <% if row.key == "similar" && (path = looks_similar_path) %>
+          <%# Similar colours: the Similar panel's second part; left out when its answer is empty (the frame stays empty) %>
+          <div class="record-more__part" id="more-row-colours">
+            <h4 class="record-more__part-heading"><%= t("nexus_ccs.record_page.layout.similar_colours") %></h4>
+            <turbo-frame id="more-colours" src="<%= path %>" loading="lazy" data-controller="lazy-frame"
+                         data-action="turbo:frame-missing->lazy-frame#missing turbo:before-fetch-response->lazy-frame#answered"></turbo-frame>
+            <p class="record-more__empty" hidden data-lazy-frame-empty><%= t("nexus_ccs.record_page.split.more.empty") %></p>
+          </div>
+        <% end %>
       </section>
     <% end %>
   </div>

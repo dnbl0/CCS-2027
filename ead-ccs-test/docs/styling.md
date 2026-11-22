@@ -139,18 +139,20 @@ were removed on both sites). See `docs/styling-inventory.md`.
 
 ## The record page layout
 
-**Record page after the National Gallery of Art (branch `design/record-card`, 21 Nov 2026, proposed).** The whole page follows NGA's
-artwork pages (nga.gov/artworks/132738, /59406), on white. Header in two columns (5:7 from 1024px): the title (Fraunces bold), the
-date and the maker, Associated names (each maker a link to their browse page, role and dates under it), the actions and, at the foot,
-the record's collection with "See more from this collection"; and the media (`DigitalAssetsComponent`) on a light grey panel: the
-image whole, thumbnails under it, round Zoom and Download at the panel's foot and Media information at its end, then one line on the
-licence and what the visitor may do, with Use and access or the request link. Zoom is a full-screen modal `<dialog>` (deep zoom,
-zoom in and out, rotate, reset, previous and next; Escape returns focus to Zoom); Media information is a drawer `<dialog>` from the
-right (CCS-422). On a phone: the title, then the media, then the names. Then sections, each after a full-width rule with its serif
-heading on the left: Object overview (the key facts, two columns), About this object (the description, Read more, CCS-413) and
-Record details & notes (ruled folding sections, the plus on the right: Full record, Inscriptions & marks, Use and access, How to
-cite, About this record). Last, You may be interested in: tabs (`tabs_controller.js`, WAI-ARIA, arrow keys) of Similar objects and
-the SimilarRows ways in, each panel three cards loaded when shown.
+**The record page (branch `design/record-card`, 23 Nov 2026).** In `components/record.css`, after the University's design system
+(designsystem.web.unimelb.edu.au) and the site's other pages, on white, capped at 1440px (`--layout-page`) with the site's gutters (16px,
+32px from 768px). Header in two columns (5:7 from 1024px): the h1 as every page's (Fraunces regular, navy, 48px; 36px on a phone), the date
+and the maker, Associated names (a card-level heading; each name an in-content link, `ccs-text-link`, its role and dates under it), the
+actions (`RecordActionsComponent`: Save as the site's outline button, Share, and More, a menu of Add to list, Cite this record and Copy
+link) and, at the foot, the record's collection with "See more from this collection" (the arrow link); and the media
+(`DigitalAssetsComponent`, Figma Record/IIIF viewer) on a light grey panel, sticky from 1024px. On a phone: the title, then the media, then
+the names. Then sections, each after a full-width rule with its heading on the left (the site's section heading, `--ccs-heading-section-size`):
+Object overview (the key facts, two columns, label a card-level heading above the value; names of things as the design system's tags,
+`record-tags`), About this object (the description, Read more, CCS-413) and Record details and notes (`record-accordion`: the design
+system's accordion as native `<details>`, title Source Sans 3 600 20px in link blue, the open panel on the pale grey surface). Last, You
+may be interested in (`MoreFromCollectionsComponent`): the design system's tabs, at most five with short names (Similar, Same maker, Same
+period, Same place, Same type; `tabs_controller.js`), the one on show on the primary cyan, each panel its full name as its heading and three
+cards; Similar colours (Looks similar) is the Similar panel's second part. No class is named after a page, a design or another site.
 
 **Showcase layout (branch `design/record-page-vam`, 20 Nov 2026, proposed).** After the museums' object pages (the V&A's was the
 template), in the site's light theme, in `record_showcase.css`: the image whole and centred on a full-width grey band, its tools and

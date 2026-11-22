@@ -1,0 +1,320 @@
+/* The record page (RecordDocumentComponent, then MoreFromCollectionsComponent in catalog/show), in the University of Melbourne
+   design system's patterns and the site's tokens: a 1440px page (--layout-page) with the site's gutters; a header in two columns
+   from 1024px (the title, date and maker, Associated names, the actions and the collection | the media on its grey panel,
+   digital_assets.css); then sections, each after a rule with its heading on the left: Object overview (the key facts), About this
+   object (the description) and Record details and notes (an accordion after the design system's); then You may be interested in
+   (the design system's tabs, each panel three cards). Headings follow the site's one scale (--ccs-heading-*), links the one
+   in-content link (links.css) and the arrow link (arrow_link.css), buttons the site's outline button. */
+
+.record, .record ~ .record-more {
+  --record-columns: minmax(0, 1fr);
+  --record-gutter: var(--ccs-space-4);
+  --record-section-gap: var(--ccs-space-8);
+  width: 100%; max-width: var(--layout-page); margin-inline: auto; padding-inline: var(--record-gutter);
+}
+@media (min-width: 768px) { .record, .record ~ .record-more { --record-gutter: var(--ccs-space-6); --record-section-gap: calc(var(--ccs-space-8) + var(--ccs-space-4)); } }
+@media (min-width: 1024px) { .record, .record ~ .record-more { --record-columns: minmax(0, 5fr) minmax(0, 7fr); } }
+.record { background: var(--ccs-surface-default); }
+
+/* Where the record is in the visitor's search, above the header */
+.record__stepper { margin: 0; padding-top: var(--ccs-space-3); }
+.record__stepper .selection-stepper { margin: var(--ccs-space-2) 0 0; }
+
+.record__body { margin: 0; padding: var(--ccs-space-5) 0 var(--record-section-gap); }
+.record__notices { display: grid; gap: var(--ccs-space-4); margin-bottom: var(--ccs-space-6); }
+.record__notices > * { margin: 0; }
+
+/* The header: identity left, media right (sticky while the column beside it scrolls); the collection line at the identity's foot */
+.record__header { display: grid; gap: var(--ccs-space-7) var(--ccs-space-6); grid-template-columns: var(--record-columns); }
+.record__identity, .record__media { min-width: 0; }
+/* Below 1024px one column: the title, date and maker, then the media, then the names, the actions and the collection */
+@media (max-width: 1023.98px) {
+  .record__header { row-gap: 0; }
+  .record__identity { display: contents; }
+  .record__title, .record__lines { order: 1; }
+  .record__media { order: 2; margin-top: var(--ccs-space-6); }
+  .record__names, .record__actions, .record__collection { order: 3; }
+}
+@media (min-width: 1024px) {
+  .record__header { align-items: start; }
+  .record__identity { display: flex; flex-direction: column; align-self: stretch; padding: var(--ccs-space-8) var(--ccs-space-6) 2.5rem 0; }
+  .record__media { position: sticky; top: 4.5rem; } /* clear of the site's sticky search bar */
+}
+
+/* The page title, as every page's h1 and the design system's: Fraunces regular, navy, 48px (36px on a phone) */
+.record__title {
+  margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-4xl); font-weight: var(--ccs-heading-weight);
+  line-height: var(--ccs-line-height-tight); color: var(--ccs-text-brand); text-wrap: balance;
+}
+@media (min-width: 768px) { .record__title { font-size: var(--ccs-font-size-5xl); } }
+.record__lines { margin-top: var(--ccs-space-5); }
+.record__lines p { margin: 0; font-size: var(--ccs-font-size-lg); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); }
+
+/* Associated names: a card-level heading, each name an in-content link with its role and dates under it */
+.record__names { margin-top: var(--ccs-space-7); }
+.record__names-heading { margin: 0 0 var(--ccs-space-4); font-family: var(--ccs-font-body); font-size: var(--ccs-heading-card-size); font-weight: var(--ccs-heading-weight-strong); color: var(--ccs-text-primary); }
+.record__name-list { display: grid; gap: var(--ccs-space-4); margin: 0; padding: 0; list-style: none; }
+.record__name-list li { display: flex; flex-direction: column; gap: var(--ccs-space-1); }
+.record__name { align-self: flex-start; font-size: var(--ccs-font-size-lg); }
+.record__role { font-size: var(--ccs-font-size-md); color: var(--ccs-text-secondary); }
+
+.record__actions { margin-top: var(--ccs-space-7); }
+.record__collection { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--ccs-space-4); margin: var(--ccs-space-6) 0 0; font-size: var(--ccs-font-size-md); color: var(--ccs-text-primary); }
+@media (min-width: 1024px) { .record__collection { margin-top: auto; padding-top: var(--ccs-space-7); } }
+.record__media > .no-image { margin: 0; }
+
+/* Sections: a rule, then the heading on the left (the site's section heading: Fraunces regular, 40px, 30px on a phone) */
+.record__section { display: grid; gap: var(--ccs-space-6); grid-template-columns: var(--record-columns); margin-top: var(--record-section-gap); padding-top: var(--record-section-gap); border-top: 1px solid var(--ccs-border-default); }
+.record__section-heading { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-heading-section-size); font-weight: var(--ccs-heading-weight); line-height: var(--ccs-line-height-tight); color: var(--ccs-text-brand); text-wrap: balance; }
+@media (min-width: 1024px) { .record__section-heading { padding-right: var(--ccs-space-6); } }
+
+/* Object overview: the facts in two columns, label above value; the label a card-level heading (Source Sans 3 600, 18px) */
+.record__facts { display: grid; gap: var(--ccs-space-6); grid-template-columns: minmax(0, 1fr); margin: 0; }
+@media (min-width: 600px) { .record__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.record__fact dt { margin: 0 0 var(--ccs-space-2); font-size: var(--ccs-heading-card-size); font-weight: var(--ccs-heading-weight-strong); line-height: var(--ccs-line-height-snug); color: var(--ccs-text-primary); }
+.record__fact dd { margin: 0; font-size: var(--ccs-font-size-lg); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); overflow-wrap: anywhere; }
+
+/* Names of things that open their search or browse page: the design system's tags (sage, small capitals, 4px 8px) */
+.record-tags { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2); margin: 0; padding: 0; list-style: none; }
+.record-tags__item { display: inline-flex; margin: 0; }
+.record-tags__link {
+  display: inline-flex; align-items: center; min-height: 2rem; padding: var(--ccs-space-1) var(--ccs-space-2);
+  font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-snug); letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--ccs-text-brand); background: var(--ccs-sage-150); text-decoration: none;
+}
+.record-tags__link:hover { background: var(--ccs-sage-200); text-decoration: underline; }
+.record-tags__link:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+/* About this object: the description in the body size (18px on 27px), a few lines then Read more */
+.record__description-text { display: flex; flex-direction: column; gap: var(--ccs-space-4); max-width: var(--layout-reading); }
+.record__description-text p { margin: 0; font-size: var(--ccs-font-size-lg); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); text-wrap: pretty; }
+
+/* Label beside value on rules (the full record, the record URL); a phone stacks them */
+.record .record-facts__list { margin: 0; border-bottom: 1px solid var(--ccs-border-subtle); }
+.record .record-facts__row { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ccs-space-1); padding: var(--ccs-space-3) 0; border-top: 1px solid var(--ccs-border-subtle); }
+@media (min-width: 600px) { .record .record-facts__row { grid-template-columns: 12rem minmax(0, 1fr); gap: var(--ccs-space-5); } }
+.record .record-facts__row dt { margin: 0; font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); }
+.record .record-facts__row dd { margin: 0; font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); }
+.record .record-facts__value + .record-facts__value { margin-top: var(--ccs-space-1); }
+/* names of things in the full record: the same tags */
+.record .record-term {
+  display: inline-flex; align-items: center; min-height: 2rem; padding: var(--ccs-space-1) var(--ccs-space-2); border: 0; border-radius: 0;
+  font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); letter-spacing: 0.07em; text-transform: uppercase; color: var(--ccs-text-brand); background: var(--ccs-sage-150); text-decoration: none;
+}
+.record a.record-term:hover { background: var(--ccs-sage-200); text-decoration: underline; }
+
+/* The description and long texts: a few lines, fading out, then Read more */
+.record-fade.is-collapsed .record__lead,
+.record-fade.is-collapsed .record-fade__clip {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;
+  mask-image: linear-gradient(to bottom, #000 45%, transparent);
+}
+.record-fade.is-collapsed .record-fade__clip { -webkit-line-clamp: 4; line-clamp: 4; }
+.record-fade__clip .record-facts__value { display: inline; }
+.record-fade__clip .record-facts__value + .record-facts__value::before { content: " "; }
+.record-read-more {
+  display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: 2.75rem; margin-top: var(--ccs-space-1); padding: 0;
+  border: 0; background: none; font: inherit; font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-link); cursor: pointer;
+}
+.record-read-more::after {
+  content: "+"; display: inline-grid; place-items: center; width: 1.25rem; height: 1.25rem; border-radius: var(--ccs-radius-circle);
+  background: var(--ccs-text-link); color: var(--ccs-text-inverse); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-bold); line-height: 1;
+}
+.record-read-more[aria-expanded="true"]::after { content: "–"; }
+.record-read-more:hover { text-decoration: underline; color: var(--ccs-text-link-hover); }
+.record-read-more:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+/* Record details and notes: the design system's accordion (title Source Sans 3 600 20px in link blue, 16px padding; the open
+   panel on the pale grey surface), as native <details> so it works without JavaScript */
+.record-accordion { border-top: 1px solid var(--ccs-border-default); }
+.record-accordion__item { border-bottom: 1px solid var(--ccs-border-default); scroll-margin-top: 4.5rem; } /* clear of the sticky search bar */
+.record-accordion__item > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--ccs-space-4); min-height: 3.5rem; padding: var(--ccs-space-4);
+  list-style: none; cursor: pointer;
+}
+.record-accordion__item > summary::-webkit-details-marker { display: none; }
+.record-accordion__item > summary::after {
+  --record-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  content: ""; flex: none; width: 1.5rem; height: 1.5rem; background: var(--ccs-text-link); mask: var(--record-icon) center / contain no-repeat;
+}
+.record-accordion__item[open] > summary::after { transform: rotate(180deg); }
+.record-accordion__item > summary:hover { background: var(--ccs-surface-subtle); }
+.record-accordion__item > summary:hover .record-accordion__title { text-decoration: underline; }
+.record-accordion__item > summary:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: -2px; }
+.record-accordion__title { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-snug); color: var(--ccs-text-link); }
+.record-accordion__panel { padding: var(--ccs-space-4) var(--ccs-space-4) var(--ccs-space-6); font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); background: var(--ccs-surface-subtle); }
+.record-accordion__panel > * + * { margin-top: var(--ccs-space-4); }
+.record-accordion__panel > p { margin-bottom: 0; }
+.record-accordion__list { display: grid; gap: var(--ccs-space-3); margin: 0; }
+.record-accordion__list dt { font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-semibold); }
+.record-accordion__list dd { margin: 0; overflow-wrap: anywhere; }
+.record-accordion__item .contact-collection { margin: 0; }
+.record-accordion__item .cite--inline .cite__list { display: grid; gap: var(--ccs-space-4); margin: 0; padding: 0; list-style: none; }
+.record-accordion__item .record-facts__list { border-bottom: 0; }
+.record-accordion__item .record-use { padding-top: 0; background: none; border: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .record-accordion__item { interpolate-size: allow-keywords; }
+  .record-accordion__item::details-content { height: 0; overflow: clip; transition: height 200ms ease-out, content-visibility 200ms allow-discrete; }
+  .record-accordion__item[open]::details-content { height: auto; }
+  .record-accordion__item > summary::after { transition: transform 200ms ease-out; }
+}
+
+/* About this record (inside the accordion): the text, then the record URL and the print and download line */
+.record-accordion__item .record-about { margin-top: 0; }
+.record-about__text p { margin: 0 0 var(--ccs-space-4); font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); }
+.record-about__action { margin: var(--ccs-space-4) 0 var(--ccs-space-5); }
+.record-about__button { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 var(--ccs-space-5); background: var(--ccs-surface-brand-strong); color: var(--ccs-text-inverse); font-weight: var(--ccs-font-weight-semibold); text-decoration: none; }
+.record-about__button:hover { text-decoration: underline; color: var(--ccs-text-inverse); }
+.record-about__button:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.record-about__url { overflow-wrap: anywhere; }
+.record-about .record-copy { margin-top: var(--ccs-space-2); }
+.record-about__links { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-3) 0; margin: var(--ccs-space-4) 0 0; padding: 0; list-style: none; font-size: var(--ccs-font-size-md); }
+.record-about__links > li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-4); }
+.record-about__links > li + li { margin-left: var(--ccs-space-5); padding-left: var(--ccs-space-5); border-left: 1px solid var(--ccs-border-default); }
+.record-about__print { display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: 2.75rem; padding: 0; border: 0; background: none; font: inherit; color: var(--ccs-text-link); text-decoration: underline; cursor: pointer; }
+.record-about__print:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.record-about__downloads a { display: inline-flex; align-items: center; min-height: 2.75rem; }
+.record-use__licence { margin: 0 0 var(--ccs-space-3); font-size: var(--ccs-font-size-ui); }
+.record-use__licence span { font-weight: var(--ccs-font-weight-semibold); }
+
+/* The actions (Figma Record/Actions, option A): Save the site's outline button (navy, filled navy on hover), Share a quiet button,
+   More an icon button opening a menu. One line even at 320px; every target at least 44px tall. */
+.record .record-actions { padding: 0; border: 0; }
+.record .record-actions__row { flex-wrap: nowrap; gap: var(--ccs-space-2); }
+.record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label {
+  gap: var(--ccs-space-2); min-height: 2.75rem; padding: 0 var(--ccs-space-5) 0 var(--ccs-space-4);
+  color: var(--ccs-text-brand); background: var(--ccs-surface-default); border: 1px solid var(--ccs-text-brand); border-radius: 0; white-space: nowrap;
+}
+.record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label:hover { color: var(--ccs-text-inverse); background: var(--ccs-text-brand); }
+.record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label:hover .blacklight-icons svg { color: var(--ccs-text-inverse); }
+.record .record-actions__row .save-control .toggle-bookmark-label:hover .save-control__text { text-decoration: none; }
+.record .record-actions__row .share__button { padding: 0 var(--ccs-space-3); white-space: nowrap; }
+@media (max-width: 359px) {
+  .record .record-actions__row { gap: var(--ccs-space-1); }
+  .record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label { padding: 0 var(--ccs-space-3); }
+  .record .record-actions__row .share__button { padding: 0 var(--ccs-space-2); }
+}
+
+.more-actions { position: relative; }
+.more-actions[hidden] { display: none; }
+.more-actions__button {
+  display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0;
+  color: var(--ccs-text-brand); background: none; border: 0; cursor: pointer;
+}
+.more-actions__button:hover, .more-actions__button[aria-expanded="true"] { background: var(--ccs-surface-subtle); }
+.more-actions__button:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.more-actions__menu {
+  position: absolute; top: calc(100% + var(--ccs-space-1)); left: 0; z-index: 20; min-width: 14rem; margin: 0; padding: var(--ccs-space-2) 0;
+  list-style: none; background: var(--ccs-surface-default); border: 1px solid var(--ccs-border-strong); box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
+}
+.more-actions__menu[hidden] { display: none; }
+@media (max-width: 479px) { .more-actions__menu { left: auto; right: 0; } }
+.more-actions__item {
+  display: flex; align-items: center; width: 100%; min-height: 2.75rem; padding: 0 var(--ccs-space-4); text-align: left;
+  font: inherit; font-size: var(--ccs-font-size-md); color: var(--ccs-text-primary); background: none; border: 0; cursor: pointer;
+}
+.more-actions__item:hover { background: var(--ccs-surface-subtle); text-decoration: underline; }
+.more-actions__item:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: -2px; background: var(--ccs-surface-subtle); }
+.list-dialog .list-menu--panel-only .list-menu__panel { position: static; padding: 0; border: 0; box-shadow: none; }
+
+/* You may be interested in: the section heading after a rule, the design system's tabs (Source Sans 3 600, navy; the one on show on
+   the cyan of the site's primary action), then three cards. Without JavaScript every panel shows, each under its own heading. */
+.record ~ .record-more { background: var(--ccs-surface-default); border-top: 0; }
+.record ~ .record-more .record-more__inner { max-width: none; margin: 0; padding: 0 0 var(--record-section-gap); }
+.record-more__heading {
+  margin: 0; padding-top: var(--record-section-gap); border-top: 1px solid var(--ccs-border-default);
+  font-family: var(--ccs-font-heading); font-size: var(--ccs-heading-section-size); font-weight: var(--ccs-heading-weight); line-height: var(--ccs-line-height-tight); color: var(--ccs-text-brand);
+}
+.record-more__tabs { display: none; }
+.is-tabbed .record-more__tabs { display: flex; margin: var(--ccs-space-6) 0 var(--ccs-space-7); overflow-x: auto; border-bottom: 2px solid var(--ccs-action-primary); scrollbar-width: none; }
+.record-more__tab {
+  flex: none; min-height: 2.75rem; padding: var(--ccs-space-3) var(--ccs-space-4); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold);
+  color: var(--ccs-text-brand); background: none; border: 0; cursor: pointer;
+}
+.record-more__tab:hover { background: var(--ccs-surface-subtle); text-decoration: underline; }
+.record-more__tab[aria-selected="true"] { background: var(--ccs-action-primary); }
+.record-more__tab[aria-selected="true"]:hover { text-decoration: none; }
+.record-more__tab:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: -2px; }
+.is-tabbed .record-more__row-heading { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.record-more__row-heading { margin: var(--ccs-space-6) 0 var(--ccs-space-4); font-size: var(--ccs-heading-subsection-size); font-weight: var(--ccs-heading-weight-strong); color: var(--ccs-text-primary); }
+.record-more__row:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 4px; }
+.record-more__row[hidden] { display: none; }
+.is-tabbed .record-more__row + .record-more__row { margin-top: 0; }
+.record-more__part { margin-top: var(--ccs-space-7); }
+.record-more__part-heading { margin: 0 0 var(--ccs-space-4); font-family: var(--ccs-font-body); font-size: var(--ccs-heading-card-size); font-weight: var(--ccs-heading-weight-strong); color: var(--ccs-text-primary); }
+.record-more__part:has(> .record-more__empty:not([hidden])) { display: none; }
+/* A row that came back empty is left out (no heading over "nothing to show"); in tabs, a panel that came back empty says so */
+.record-more__row:has(> .record-more__empty:not([hidden])) { display: none; }
+.is-tabbed .record-more__row:not([hidden]):has(> .record-more__empty:not([hidden])) { display: block; }
+/* The cards: the picture whole, the title a card-level heading (Source Sans 3 600, 18px), the lines under it */
+.record ~ .record-more .discover-cards { display: grid; gap: var(--ccs-space-7) var(--ccs-space-5); align-items: start; }
+.record ~ .record-more .result-card, .record ~ .record-more .result-card:hover { height: auto; padding: 0; overflow: visible; background: none; border: 0; box-shadow: none; }
+.record ~ .record-more .result-card__media { aspect-ratio: auto; background: var(--ccs-surface-subtle); }
+.record ~ .record-more .result-card__media img { position: static; width: 100%; height: auto; max-height: 22rem; object-fit: contain; }
+.record ~ .record-more .result-card__content > * { padding-inline: 0; }
+.record ~ .record-more .result-card__content > :first-child { padding-top: var(--ccs-space-4); }
+.record ~ .record-more .result-card__content > :last-child { padding-bottom: 0; }
+.record ~ .record-more .result-card__lines { display: grid; gap: var(--ccs-space-1); margin: 0; padding-top: 0; list-style: none; font-size: var(--ccs-font-size-md); color: var(--ccs-text-secondary); }
+.record ~ .record-more .result-card__lines li { margin: 0; padding: 0; }
+.record ~ .record-more .result-card .document-title-heading { margin: 0 0 var(--ccs-space-2); padding: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-heading-card-size); font-weight: var(--ccs-heading-weight-strong); line-height: var(--ccs-line-height-snug); }
+
+/* Read more as a <summary> */
+summary.record-read-more { list-style: none; }
+summary.record-read-more::-webkit-details-marker { display: none; }
+details[open] > summary.record-read-more::after { content: "–"; }
+
+@media print {
+  .record__actions, .media-viewer__controls, .record-also, .record-more, .record-read-more, .record-about__links { display: none; }
+  .record-fade.is-collapsed .record__lead, .record-fade.is-collapsed .record-fade__clip { display: block; mask-image: none; }
+  .record-accordion__panel { background: none; }
+}
+@media (forced-colors: active) {
+  .more-actions__menu { border-color: CanvasText; }
+  .record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label { border-color: ButtonText; }
+  .record-more__tab[aria-selected="true"] { outline: 2px solid Highlight; }
+  .record-tags__link, .record .record-term { border: 1px solid CanvasText; }
+}
+
+/* You may also like: pictures laid like prints on a table, each a little turned, on the grey band; Shuffle under them */
+.record-also { padding: calc(var(--ccs-space-8) + var(--ccs-space-4)) var(--ccs-space-4) var(--ccs-space-8); background: var(--ccs-surface-subtle); }
+.record-also__heading {
+  margin: 0 0 var(--ccs-space-8); font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-3xl); font-weight: var(--ccs-font-weight-semibold);
+  text-align: center; color: var(--ccs-text-primary);
+}
+.record-also__table {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ccs-space-5) var(--ccs-space-4); align-items: center;
+  max-width: 64rem; margin: 0 auto; padding: 0; list-style: none;
+}
+@media (min-width: 768px) { .record-also__table { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ccs-space-6) var(--ccs-space-5); } }
+.record-also__item[hidden] { display: none; }
+.record-also__print {
+  position: relative; display: block; text-decoration: none; padding: var(--ccs-space-2); background: var(--ccs-surface-default); box-shadow: var(--ccs-shadow-md);
+  transform: rotate(var(--tilt, 0deg)); transition: transform var(--ccs-duration-fast) ease, box-shadow var(--ccs-duration-fast) ease;
+}
+.record-also__item:nth-child(6n + 1) .record-also__print { --tilt: -2.5deg; }
+.record-also__item:nth-child(6n + 2) .record-also__print { --tilt: 1.5deg; }
+.record-also__item:nth-child(6n + 3) .record-also__print { --tilt: -1deg; }
+.record-also__item:nth-child(6n + 4) .record-also__print { --tilt: 2deg; }
+.record-also__item:nth-child(6n + 5) .record-also__print { --tilt: -1.5deg; }
+.record-also__item:nth-child(6n) .record-also__print { --tilt: 2.5deg; }
+.record-also__print img { display: block; width: 100%; height: auto; max-height: 18rem; object-fit: contain; }
+.record-also__print:hover, .record-also__print:focus-visible { transform: rotate(0deg) scale(1.03); box-shadow: var(--ccs-shadow-lg); z-index: 1; }
+.record-also__print:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
+.record-also__title {
+  display: block; margin-top: var(--ccs-space-2); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold);
+  line-height: var(--ccs-line-height-snug); color: var(--ccs-text-primary); text-decoration: none;
+}
+.record-also__print:hover .record-also__title { text-decoration: underline; }
+@media (prefers-reduced-motion: reduce) { .record-also__print { transition: none; } .record-also__print:hover, .record-also__print:focus-visible { transform: rotate(0deg); } }
+.record-also__shuffle { display: flex; justify-content: center; margin-top: var(--ccs-space-8); }
+.record-also__button {
+  display: inline-flex; flex-direction: column; align-items: center; gap: var(--ccs-space-2); padding: 0; border: 0; background: none;
+  font: inherit; font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-primary); cursor: pointer;
+}
+.record-also__button svg {
+  box-sizing: content-box; width: 1.5rem; height: 1.5rem; padding: var(--ccs-space-4); border-radius: var(--ccs-radius-circle);
+  background: var(--ccs-surface-brand-strong); color: var(--ccs-text-inverse);
+}
+.record-also__button:hover span { text-decoration: underline; }
+.record-also__button:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 4px; }
+

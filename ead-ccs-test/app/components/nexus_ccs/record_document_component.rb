@@ -180,8 +180,8 @@ module NexusCcs
 
     def lead_rows = detail_rows.select { |row| LEAD_SEQS.include?(row.seq) }
 
-    # --- The record card (after the National Gallery of Art's artwork pages) -------------------------------------------------------
-    # Associated names: each maker as a link to their browse page, with what the record says about them under it, role first as NGA
+    # --- The record page's header and sections (components/record.css) -----------------------------------------------------------
+    # Associated names: each maker as a link to their browse page, with what the record says about them under it, role first
     # has it ("Etcher, b. c. 1804 - d. 1888"). [[name, path or nil, detail]]
     def associated_names
       displays = detail_rows.find { |row| row.seq == CREATOR_SEQ }&.values || []
@@ -197,7 +197,7 @@ module NexusCcs
       [ role.to_s.strip.upcase_first, dates.to_s.strip ].compact_blank.join(", ").presence
     end
 
-    # The record's collection, with the way to the rest of it (NGA's "Not on view · See artworks now on view"): [name, path or nil]
+    # The record's collection, with the way to the rest of it: [name, path or nil]
     def collection_link
       row = detail_rows.find { |candidate| candidate.field == "collection_ssim" }
       return unless row
@@ -206,7 +206,7 @@ module NexusCcs
       [ name, value_link(row, name) ]
     end
 
-    # Object overview (NGA's Artwork overview): the key facts, in the data model sheet's order
+    # Object overview: the key facts, in the data model sheet's order
     OVERVIEW_SEQS = [ 2, 7, 10, 11, 17, 19, 20, 21, 22 ].freeze
 
     def overview_rows
@@ -218,11 +218,19 @@ module NexusCcs
 
     # A fact's values: names of things link to their search or browse page (as in the full record); several values on their own lines,
     # or joined where the sheet says so
+    # A key fact's value: names of things that open their search or browse page as the design system's tags (a list of links);
+    # anything else as text, its parts joined as the data model sheet says
     def fact_value(row)
+      links = term?(row) ? row.values.each_with_index.map { |value, index| [ flagged(row, value, index), value_link(row, value) ] } : []
+      if links.any? && links.all?(&:last)
+        items = links.map { |text, path| helpers.tag.li(helpers.link_to(text, path, class: "record-tags__link"), class: "record-tags__item") }
+        return helpers.tag.ul(helpers.safe_join(items), class: "record-tags")
+      end
+
       parts = row.values.each_with_index.map do |value, index|
         text = flagged(row, value, index)
         path = term?(row) && value_link(row, value)
-        path ? helpers.link_to(text, path) : text
+        path ? helpers.link_to(text, path, class: "ccs-text-link") : text
       end
       helpers.safe_join(parts, row.join || helpers.tag.br)
     end

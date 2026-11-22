@@ -77,19 +77,28 @@ en:
         copy: "Copy this information"
         download: "Download image"
         close: "Close"
-      # The record card after the National Gallery of Art's artwork pages. PLACEHOLDER WORDING.
+      # The record page's header and sections. PLACEHOLDER WORDING.
       card:
         cite: "How to cite this record"
-      nga:
+      # The record page's sections and headings
+      layout:
         associated_names: "Associated names"
         overview: "Object overview"
-        notes: "Record details & notes"
+        notes: "Record details and notes"
         full_record: "Full record"
-        inscriptions: "Inscriptions & marks"
+        inscriptions: "Inscriptions and marks"
         about_object: "About this object"
         see_collection: "See more from this collection"
         interested: "You may be interested in"
         similar: "Similar objects"
+        similar_colours: "Similar colours"
+        # The tabs of You may be interested in: a word or two each (the design system: short tab titles)
+        tabs:
+          similar: "Similar"
+          maker: "Same maker"
+          period: "Same period"
+          place: "Same place"
+          type: "Same type"
       # The showcase layout (20 Nov 2026)
       showcase:
         read_more: "Read more"

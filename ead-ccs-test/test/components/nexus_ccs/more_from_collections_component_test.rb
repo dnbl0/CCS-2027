@@ -15,14 +15,16 @@ class MoreFromCollectionsComponentTest < ActiveSupport::TestCase
 
   def source(**extra) = open_record("emu-source", creator_ssim: [ "Lees, Derwent" ], object_type_ssim: [ "drawing" ], **extra)
 
-  test "You may be interested in: a tab per way the record can match, each panel a lazy frame of its cards (NGA)" do
+  test "You may be interested in: a tab per way the record can match, each panel a lazy frame of its cards (the design system's tabs)" do
     render_for(source)
 
     assert_selector "section#more-from-the-collections h2#record-more-heading", text: "You may be interested in"
     tabs = page.all("[role=tablist][aria-labelledby=record-more-heading] button[role=tab]")
-    assert_equal [ "Similar objects", "More by Lees, Derwent" ], tabs.first(2).map(&:text)
+    assert_equal [ "Similar", "Same maker" ], tabs.first(2).map(&:text)
+    assert_operator tabs.size, :<=, 5 # the design system: two to five tabs
+    assert_selector "section#more-row-creator h3", text: "More by Lees, Derwent", visible: :all # the full name as the panel's heading
     assert_selector "section#more-row-similar turbo-frame#more-similar[loading=lazy][src='/catalog/emu-source/similar?view=tab']"
-    assert_includes tabs.map(&:text), "More of this type"
+    assert_includes tabs.map(&:text), "Same type"
     # the first tab is selected and the only one in the tab order (roving tabindex)
     assert_equal [ "true", "0" ], [ tabs.first["aria-selected"], tabs.first["tabindex"] ]
     assert_equal [ "false", "-1" ], [ tabs.last["aria-selected"], tabs.last["tabindex"] ]

@@ -72,7 +72,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
 
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
         assert_selector "h1", count: 1
-        assert_selector ".record-nga__header .record-nga__identity h1"
+        assert_selector ".record__header .record__identity h1"
         assert_equal false, page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
         outline = page.evaluate_script("[...document.querySelectorAll('#main-container h1, #main-container h2, #main-container h3')].filter(e => e.getClientRects().length > 0).map(e => e.tagName + ' ' + e.textContent.trim())")
@@ -81,14 +81,14 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
         levels = outline.drop(before_title.size).map { |heading| heading[1].to_i }
         assert levels.each_cons(2).all? { |a, b| b <= a + 1 }, "headings skip a level: #{outline.inspect}"
         assert_includes outline, "H2 Object overview"
-        assert_includes outline, "H2 Record details & notes"
+        assert_includes outline, "H2 Record details and notes"
 
         # Nothing else in the page sticks (the search strip is the header's)
         sticky = page.evaluate_script("[...document.querySelectorAll('#main-container *')].filter(e => e.getClientRects().length > 0 && ['sticky', 'fixed'].includes(getComputedStyle(e).position)).map(e => e.className)")
-        assert_equal [], sticky.reject { |name| name.include?("record-nga__media") } # NGA: the media stays in view on desktop
+        assert_equal [], sticky.reject { |name| name.include?("record__media") } # NGA: the media stays in view on desktop
 
         small = page.evaluate_script(<<~JS)
-          [...document.querySelectorAll('.record-actions button, .record-actions a, .media-viewer__controls button, .media-viewer__licence a, .digital-assets__thumb, .record-nga__name, .record-more__tab, .result-stepper a, .record-term')]
+          [...document.querySelectorAll('.record-actions button, .record-actions a, .media-viewer__controls button, .media-viewer__licence a, .digital-assets__thumb, .record__name, .record-more__tab, .result-stepper a, .record-term')]
             .filter(e => e.getClientRects().length > 0).map(e => e.getBoundingClientRect()).filter(r => r.height < 24 || r.width < 24).length
         JS
         assert_equal 0, small, "a control is smaller than 24px"
@@ -117,7 +117,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
 
     panel = page.evaluate_script("getComputedStyle(document.querySelector('.media-viewer__panel')).backgroundColor")
     assert_not_equal [ "rgba(0, 0, 0, 0)", "rgb(255, 255, 255)" ].include?(panel), true, "the panel is grey"
-    identity, media = %w[.record-nga__identity .record-nga__media].map { |sel| page.evaluate_script("document.querySelector('#{sel}').getBoundingClientRect().toJSON()") }
+    identity, media = %w[.record__identity .record__media].map { |sel| page.evaluate_script("document.querySelector('#{sel}').getBoundingClientRect().toJSON()") }
     assert_operator media["left"], :>=, identity["right"] - 1, "the media is right of the title"
     image = page.evaluate_script("(() => { const i = document.querySelector('.digital-assets__image'); return [i.clientHeight, window.innerHeight, getComputedStyle(i).objectFit] })()")
     assert_operator image[0], :<=, image[1] * 0.71
@@ -177,24 +177,24 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
   test "a request-only or sensitive record has no asset address in its page" do
     %w[request-only sensitive].each do |name|
       open_record(VARIANTS.fetch(name), "desktop")
-      assert_no_selector ".record--nga img[src*='/digital-assets/']"
-      layout = page.evaluate_script("document.querySelector('.record--nga').outerHTML")
+      assert_no_selector ".record img[src*='/digital-assets/']"
+      layout = page.evaluate_script("document.querySelector('.record').outerHTML")
       assert_not_includes layout, "/digital-assets/"
     end
   end
 
-  test "the record follows the National Gallery of Art's layout: the title left and the media right, then sections with their heading on the left" do
+  test "the record's layout: the title left and the media right, then sections with their heading on the left" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
     rect = ->(selector) { page.evaluate_script("document.querySelector('#{selector}').getBoundingClientRect().toJSON()") }
-    identity, media = rect.call(".record-nga__identity"), rect.call(".record-nga__media")
+    identity, media = rect.call(".record__identity"), rect.call(".record__media")
     assert_operator media["left"], :>=, identity["right"] - 1, "the media is right of the title and names"
-    heading, facts = rect.call("#record-overview-heading"), rect.call(".record-nga__facts")
+    heading, facts = rect.call("#record-overview-heading"), rect.call(".record__facts")
     assert_operator facts["left"], :>, heading["right"], "the facts are right of their heading"
-    assert_equal "rgb(255, 255, 255)", page.evaluate_script("getComputedStyle(document.querySelector('.record--nga')).backgroundColor")
+    assert_equal "rgb(255, 255, 255)", page.evaluate_script("getComputedStyle(document.querySelector('.record')).backgroundColor")
 
     # a phone: the title and date, then the media, then the names
     open_record(VARIANTS.fetch("one image, open"), "phone")
-    title, media, names = rect.call(".record-nga__title"), rect.call(".record-nga__media"), rect.call(".record-nga__names")
+    title, media, names = rect.call(".record__title"), rect.call(".record__media"), rect.call(".record__names")
     assert_operator media["top"], :>=, title["bottom"]
     assert_operator names["top"], :>=, media["bottom"]
     assert_equal false, page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
@@ -204,7 +204,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     open_record(VARIANTS.fetch("one image, open"), "desktop")
     assert_selector "#record-names-heading", text: "Associated names"
     assert_selector "#record-overview-heading", text: "Object overview"
-    assert_selector ".record-nga__fact dt", text: "Accession Number"
+    assert_selector ".record__fact dt", text: "Accession Number"
     %w[object-details record-use how-to-cite about-this-record].each { |id| assert_equal false, page.evaluate_script("document.getElementById('#{id}').open"), id }
 
     find(".media-viewer__licence a", text: "Use and access").click
@@ -218,7 +218,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
 
   test "the Tab key moves through the header in the order it reads, and each stop shows a focus ring" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
-    page.execute_script("document.querySelector('a.record-nga__name').focus()") # start on the first associated name
+    page.execute_script("document.querySelector('a.record__name').focus()") # start on the first associated name
 
     stops = 14.times.map do
       page.driver.browser.keyboard.type(:Tab)
@@ -318,27 +318,27 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     open_record({ "description_tsim" => [ "#{'A cabinet of drawers. ' * 30}\n\nMade for the specimen collection." ] }, "desktop")
 
     assert_selector "#record-about-object-heading", text: "About this object"
-    toggle = find(".record-nga__description button[aria-controls=record-description]")
+    toggle = find(".record__description button[aria-controls=record-description]")
     assert_equal [ "false", "Read more" ], [ toggle["aria-expanded"], toggle.text ]
-    assert_no_selector ".record-nga__description-text p", text: "Made for the specimen collection."
+    assert_no_selector ".record__description-text p", text: "Made for the specimen collection."
     # CCS-413: three lines while collapsed
-    lines = page.evaluate_script("(() => { const p = document.querySelector('.record-nga__lead'); return Math.round(p.clientHeight / parseFloat(getComputedStyle(p).lineHeight)) })()")
+    lines = page.evaluate_script("(() => { const p = document.querySelector('.record__lead'); return Math.round(p.clientHeight / parseFloat(getComputedStyle(p).lineHeight)) })()")
     assert_equal 3, lines
 
     toggle.click
     assert_equal [ "true", "Read less" ], [ toggle["aria-expanded"], toggle.text ]
-    assert_selector ".record-nga__description-text p", text: "Made for the specimen collection."
+    assert_selector ".record__description-text p", text: "Made for the specimen collection."
 
     toggle.click
     assert_equal "false", toggle["aria-expanded"]
-    assert_no_selector ".record-nga__description-text p", text: "Made for the specimen collection."
+    assert_no_selector ".record__description-text p", text: "Made for the specimen collection."
   end
 
   test "a short description has no Read more" do
     open_record({ "description_tsim" => [ "A cabinet." ] }, "desktop")
 
-    assert_selector ".record-nga__lead", text: "A cabinet."
-    assert_no_selector ".record-nga__description button", visible: true
+    assert_selector ".record__lead", text: "A cabinet."
+    assert_no_selector ".record__description button", visible: true
   end
 
   test "You may be interested in: tabs (the arrow keys move between them), each panel's cards loading once it is shown" do
@@ -346,7 +346,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     page.execute_script("document.getElementById('more-from-the-collections').scrollIntoView({ behavior: 'instant' })")
     assert_selector "#record-more-heading", text: "You may be interested in"
     tabs = page.all("[role=tab]")
-    assert_equal "Similar objects", tabs.first.text
+    assert_equal "Similar", tabs.first.text
     assert_operator tabs.size, :>, 1
     assert_selector "#more-row-similar", visible: true # the first tab's panel shows
     tabs.first.click

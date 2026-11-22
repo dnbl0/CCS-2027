@@ -80,7 +80,7 @@ class ColoursTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "Looks similar is offered only for a record with a viewable image: a tab of the record page's More from the collections" do
+  test "Looks similar is offered only for a record with a viewable image: the second part of the Similar tab of the record page's You may be interested in" do
     assert LooksSimilar.eligible?(SolrDocument.new(open_record("emu-source")))
     assert_not LooksSimilar.eligible?(SolrDocument.new(open_record("emu-c", has_digital_asset_bsi: false)))
     assert_not LooksSimilar.eligible?(SolrDocument.new(sensitive_record("emu-sensitive")))

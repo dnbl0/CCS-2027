@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-// The record's media (DigitalAssetsComponent, after the National Gallery of Art's artwork pages).
+// The record's media (DigitalAssetsComponent, Figma Record/IIIF viewer).
 //
 // - A thumbnail shows its image on the panel (a modified click on an open image's link still opens the file); arrow keys, Home and
 //   End move between thumbnails.

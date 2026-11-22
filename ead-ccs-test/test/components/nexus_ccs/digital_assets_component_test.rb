@@ -110,7 +110,7 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
 
     assert_no_selector ".access-notice" # the notice is in the actions column (RecordActionsComponent)
     assert_selector ".media-viewer__licence", text: "You can view the image online. Download is not available."
-    assert_selector ".media-viewer__licence a.record-arrow-link[href^='/access_requests/new']", text: "Request to use this image"
+    assert_selector ".media-viewer__licence a.arrow-link[href^='/access_requests/new']", text: "Request to use this image"
     assert_no_selector "a[download]"
     assert_selector "figure.digital-assets__main img[src='/digital-assets/large/a1.jpg']"
     assert_selector "video[controlslist=nodownload]"

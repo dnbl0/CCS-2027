@@ -58,18 +58,18 @@
 .record-split__line { margin: 0; font-size: var(--ccs-font-size-lg); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); }
 
 /* Quiet buttons: no box, the brand colour, an underline on hover (Save, Add to list, Share, Cite; Compare and Copy link as links) */
-:is(.record--split, .record--nga) .record-actions { display: flex; flex-direction: column; gap: var(--ccs-space-3); }
-:is(.record--split, .record--nga) .record-actions__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-1) var(--ccs-space-5); }
-:is(.record--split, .record--nga) .record-actions__row > * { margin: 0; }
-:is(.record--split, .record--nga) .record-actions__row :is(.save-control .toggle-bookmark-label, .list-menu__button, .share__button, .cite__button) {
+:is(.record--split, .record) .record-actions { display: flex; flex-direction: column; gap: var(--ccs-space-3); }
+:is(.record--split, .record) .record-actions__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-1) var(--ccs-space-5); }
+:is(.record--split, .record) .record-actions__row > * { margin: 0; }
+:is(.record--split, .record) .record-actions__row :is(.save-control .toggle-bookmark-label, .list-menu__button, .share__button, .cite__button) {
   display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: 2.75rem; padding: 0;
   border: 0; background: none; font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-brand);
   text-decoration: none; cursor: pointer;
 }
-:is(.record--split, .record--nga) .record-actions__row :is(.share__button, .cite__button, .list-menu__button):hover span { text-decoration: underline; }
-:is(.record--split, .record--nga) .record-actions__compare .compare-actions { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2) var(--ccs-space-4); }
-:is(.record--split, .record--nga) .record-actions__compare .compare-actions__form { display: inline; margin: 0; }
-:is(.record--split, .record--nga) .record-actions__compare :is(.compare-actions__link, .compare-actions__button),
+:is(.record--split, .record) .record-actions__row :is(.share__button, .cite__button, .list-menu__button):hover span { text-decoration: underline; }
+:is(.record--split, .record) .record-actions__compare .compare-actions { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2) var(--ccs-space-4); }
+:is(.record--split, .record) .record-actions__compare .compare-actions__form { display: inline; margin: 0; }
+:is(.record--split, .record) .record-actions__compare :is(.compare-actions__link, .compare-actions__button),
 .record-text-button {
   display: inline-flex; align-items: center; min-height: 1.5rem; padding: 0; border: 0; background: none;
   font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-regular); color: var(--ccs-text-link);

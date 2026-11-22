@@ -1,4 +1,4 @@
-/* The record's media (DigitalAssetsComponent), after the National Gallery of Art's artwork pages: the image whole on a light grey
+/* The record's media (DigitalAssetsComponent, Figma Record/IIIF viewer): the image whole on a light grey
    panel, thumbnails under it, round Zoom and Download at the panel's foot with Media information at its end, and one line on the
    licence under the panel. Zoom is a full-screen modal; Media information a drawer from the right. */
 .digital-assets { display: flex; flex-direction: column; gap: var(--ccs-space-4); min-width: 0; }
@@ -9,7 +9,7 @@
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--ccs-space-4);
   min-height: clamp(16rem, 50vh, 34rem); padding: var(--ccs-space-5);
 }
-/* The benchmark (AIC, Wellcome, Getty, YCBA, NGA): a 640px stage with 24px padding, so the image fills about nine tenths of it */
+/* The benchmark (the museum IIIF viewers compared in Figma): a 640px stage with 24px padding, so the image fills about nine tenths of it */
 @media (min-width: 1024px) { .media-viewer__stage { min-height: 40rem; } .media-viewer__stage .digital-assets__image { max-height: calc(40rem - 2 * var(--ccs-space-5)); } }
 .digital-assets__main { display: flex; align-items: center; justify-content: center; width: 100%; margin: 0; }
 .digital-assets__image { display: block; width: auto; height: auto; max-width: 100%; max-height: clamp(14rem, 46vh, 30rem); object-fit: contain; }
@@ -47,7 +47,7 @@
 .media-viewer__iiif-mark { padding: 0 var(--ccs-space-1); font-size: 0.6875rem; font-weight: var(--ccs-font-weight-bold); letter-spacing: 0.04em; border: 1.5px solid currentColor; }
 .digital-assets__download { display: contents; }
 
-/* Round controls (NGA's zoom and download): white circles with a fine border */
+/* Round controls (zoom and download): white circles with a fine border */
 .round-control {
   display: inline-flex; align-items: center; justify-content: center; flex: none; width: 3rem; height: 3rem; padding: 0;
   color: var(--ccs-text-primary); background: var(--ccs-surface-default); border: 1px solid var(--ccs-border-strong); border-radius: 50%;
@@ -70,10 +70,10 @@
 .media-viewer__info-button:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
 /* The licence line under the panel */
-.media-viewer__licence { margin: 0; font-size: var(--ccs-font-size-sm); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); }
+.media-viewer__licence { margin: 0; font-size: var(--ccs-font-size-md); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); }
 .media-viewer__licence-mark { display: inline-flex; margin-right: var(--ccs-space-2); vertical-align: -0.25em; }
 .media-viewer__licence-mark svg { width: 1.125rem; height: 1.125rem; }
-.media-viewer__licence .record-arrow-link { display: inline-flex; margin-left: var(--ccs-space-2); font-weight: var(--ccs-font-weight-semibold); }
+.media-viewer__licence .arrow-link { margin-left: var(--ccs-space-2); font-size: inherit; vertical-align: middle; }
 .media-viewer__media { display: grid; gap: var(--ccs-space-4); }
 
 /* Zoom: a full-screen modal, the image filling it on the panel grey; close top right, the tools bottom left */

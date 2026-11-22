@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Tabs (WAI-ARIA tabs pattern, automatic activation), as the National Gallery of Art's "You may be interested in": one tab in the tab
+// Tabs (WAI-ARIA tabs pattern, automatic activation), as the design system's tabs (the record page's "You may be interested in"): one tab in the tab
 // order (roving tabindex); Left and Right move between tabs and show each one's panel, Home and End go to the first and the last.
 // A panel's lazy Turbo frame loads only once its panel is shown. Without JavaScript every panel is shown, one under the other.
 export default class extends Controller {

@@ -53,7 +53,7 @@ class MediaSectionTest < ActiveSupport::TestCase
     render_for(FIELDS.except("licence_type_ssim", "rights_ssim"))
 
     assert_no_selector ".media-viewer__licence-mark" # the Creative Commons mark goes with a licence
-    assert_selector ".media-viewer__licence a.record-arrow-link" # Use and access, or the request form for a view-only image
+    assert_selector ".media-viewer__licence a.arrow-link" # Use and access, or the request form for a view-only image
     assert_includes component(FIELDS.except("licence_type_ssim", "rights_ssim")).metadata.to_h["Advisory"], "not appropriate today"
   end
 
