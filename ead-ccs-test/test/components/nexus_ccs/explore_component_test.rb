@@ -32,40 +32,39 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_selector "section.explore-periods a.home-section__link[href='/browse/periods']", text: "See all periods"
   end
 
-  test "Explore the collections: the five museums as a mosaic, the University Art Collection last as the large lead with its blurb and a call to action" do
+  test "Explore the collections: the five museums in justified rows, the University Art Collection first as the lead with its blurb and a call to action" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
-    tiles = page.all("section.explore ul.mosaic--five > li")
+    tiles = page.all("section.explore ul.justified[data-controller=justified] > li.justified__item")
     assert_equal 5, tiles.size
-    assert_equal "University Art Collection", tiles.last.find("h3").text
-    assert tiles.last[:class].include?("mosaic__item--lead")
-    assert_selector "section.explore li.mosaic__item--lead article.result-card.explore-card--lead .explore-card__cta", text: "Explore the collection"
+    assert_equal "University Art Collection", tiles.first.find("h3").text
+    assert tiles.first[:class].include?("justified__item--lead")
+    assert tiles.all? { |tile| tile[:style].to_s.match?(/--a: \d/) } # each banner's shape, from its size
+    assert_selector "section.explore li.justified__item--lead article.result-card.explore-card--lead .explore-card__cta", text: "Explore the collection"
     assert_selector "section.explore article.result-card.explore-card--tile h3.document-title-heading a[href='/browse/collections/#{Browse::Slug.build('collections', 'Grainger Museum Collection')}']", text: "Grainger Museum Collection"
     assert_selector "section.explore a.result-card__media[tabindex='-1'][aria-hidden=true] img[alt=''][loading=lazy]", count: 5 # the name is the link text
     assert_no_selector "section.explore, section.home-named", text: /\d records/ # no record counts on collections
-    # the two longest names take the two wide tiles (the first and the fourth)
-    assert_equal "Harry Brookes Allen Museum of Anatomy and Pathology", tiles.first.find("h3").text
   end
 
   test "Visit the collections: Grainger leads (first, on the left) with its hours and access, every tile opening the museum's own visitor page" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
-    lead = page.find("section.home-visit ul.mosaic--five-left > li:first-child")
-    assert lead[:class].include?("mosaic__item--lead")
+    lead = page.find("section.home-visit ul.justified > li:first-child")
+    assert lead[:class].include?("justified__item--lead")
     assert_equal "https://grainger.unimelb.edu.au/visit", lead.find("h3 a")[:href]
     assert_includes lead.text, "Open Monday, 1-4pm. Grainger Museum is step-free"
     assert_selector "section.home-visit article.explore-card--tile", count: 5
     assert_selector "section.home-visit h3 .visually-hidden", text: "(the museum's website)", count: 5
   end
 
-  test "Record types are a shelf, Places a list beside a preview, Time a strip; a type with several values is an any-of filter" do
+  test "Record types are a shelf, Places a list beside a preview, Time justified rows; a type with several values is an any-of filter" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
     assert_selector "section.explore-kinds .card-layout--shelf[data-controller=card-rail] li.card-layout__item article.result-card", count: 2
     assert_selector "article.result-card h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings']", text: "Prints and drawings"
     assert_selector "section.home-places .place-preview ul[aria-label=Places] a.place-row[aria-current=true][href*='f%5Bproduction_place_ssim%5D%5B%5D=Australia']", text: "Australia"
     assert_selector "section.home-places .place-preview__panels[aria-hidden=true]"
-    assert_selector "section.explore-periods .card-layout--strip article.result-card h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900']", text: "1900s"
+    assert_selector "section.explore-periods .card-layout--justified ul.justified[data-controller=justified] li.justified__item article.result-card h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900']", text: "1900s"
   end
 
   test "with no record types, places or times, those sections are left out without leaving a heading behind" do

@@ -1,11 +1,12 @@
-<%# More ways in: Stories, Themes and Browse by category (the homepage redesign, 2026-11): Stories as the large lead card, the other two
-    beside it. Each card is one link; its picture is decorative (placeholder pictures from the site's own banners until each page has its own). %>
+<%# More ways in: Stories, Themes and Browse by category (the homepage redesign, 2026-11), in justified rows (each picture whole),
+    Stories first as the lead. Each card is one link; its picture is decorative (placeholder pictures from the site's own banners until each page has its own). %>
 <% ways = [ [ :stories, stories_path, "site/collections-breakout.jpg" ], [ :themes, themes_path, "site/banners/grainger-museum.jpg" ],
             [ :categories, categories_path, "site/banners/medical-history-museum.jpg" ] ] %>
 <%= render NexusCcs::HomeSectionComponent.new(id: "home-ways-in", heading: t("nexus_ccs.home_more.ways_in"), intro: t("nexus_ccs.home_more.ways_in_text"), extra_class: "home-more home-ways") do %>
-  <ul class="ways" aria-label="<%= t("home.ways.label") %>">
+  <ul class="ways justified" data-controller="justified" aria-label="<%= t("home.ways.label") %>">
     <% ways.each_with_index do |(key, path, image), index| %>
-      <li class="ways__item<%= " ways__item--lead" if index.zero? %>">
+      <% size = ImageDimensions.for_path("/#{image}", root: HomeSections::IMAGES) %>
+      <li class="ways__item justified__item<%= " justified__item--lead" if index.zero? %>" <%= tag.attributes(style: aspect_style(*(size || [ nil, nil ]))) %>>
         <%# The site's card in its tile variant (as the mosaics), Stories as the lead %>
         <article class="result-card explore-card explore-card--tile<%= " explore-card--lead" if index.zero? %>">
           <%= link_to path, class: "result-card__media", tabindex: -1, "aria-hidden": true do %><%= image_tag image, alt: "", loading: "lazy", decoding: "async" %><% end %>

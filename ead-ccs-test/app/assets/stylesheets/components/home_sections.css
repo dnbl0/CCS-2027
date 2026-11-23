@@ -1,10 +1,11 @@
 /*
  * The home page's sections, after the homepage redesign wireframe (2026-11, "Collections Navigator Homepage Redesign"; docs/card-layouts.md).
  * The layouts are the wireframe's; the look is the site's own (its tokens, the tiles' radius and navy scrim from card_tiles.css).
- * Widths follow the wireframe's breakpoints: one column below 600px, two to 839px, the 20-column mosaic from 840px.
+ * No picture is cropped (Dean, 2026-11-23): the picture sections are justified rows sized by each picture's shape; the shelf and the
+ * places fit their pictures whole.
  *
  * - HomeSectionComponent: heading and intro on the left, "See all" on the right (under them on a phone).
- * - MosaicComponent: picture tiles, the name on the navy scrim, one large lead tile two rows tall.
+ * - MosaicComponent and CardLayoutComponent justified: justified rows of the site's card, the lead first.
  * - CardLayoutComponent shelf: Record types' pictures whole at one height, the name under each, scrolling sideways.
  * - PlacePreviewComponent: Places as a list of rows beside a large preview of the one pointed at or focused.
  * - More ways in: a large lead card and two beside it.
@@ -25,17 +26,9 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 .explore-periods .home-section__link { color: var(--ccs-white); }
 
 /* ---- Cover card: the picture fills it, the name sits on the navy scrim ---- */
-.mosaic { display: grid; gap: var(--ccs-space-4); grid-template-columns: minmax(0, 1fr); grid-auto-rows: 20rem; margin: 0; padding: 0; list-style: none; }
-
-.mosaic__item { display: flex; min-width: 0; }
-
 /* The tile variant of the site's card (result card / explore card): the picture fills the space above, the name (and for the lead,
    its line and call to action) below on white; the whole card is the link (the title's link covers it) */
-.explore-card--tile { position: relative; width: 100%; height: 100%; }
-
-.explore-card--tile .result-card__media { position: relative; flex: 1 1 auto; min-height: 7rem; }
-
-.explore-card--tile .result-card__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.explore-card--tile { position: relative; width: 100%; }
 
 .explore-card--tile .document-title-heading { margin: 0; font-size: var(--ccs-font-size-lg); line-height: 1.3; text-wrap: pretty; }
 
@@ -61,38 +54,42 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M17.15 12.75H4V11.25H17.15L10.95 5.05L12 4L20 12L12 20L10.95 18.95L17.15 12.75Z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
-@media (min-width: 600px) {
-  .mosaic { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 18rem; }
-  .mosaic__item--lead { grid-column: 1 / -1; }
-}
+/* ---- Justified rows: each card as wide as its picture's shape at the row's height, so no picture is cropped ----
+   Research (2026-11-23): the justified-rows pattern (Flickr, Google Photos; CSS-Tricks "Adaptive Photo Layout with Flexbox") keeps every
+   picture whole in every browser; native masonry (display: grid-lanes) is in Safari 26.4 only, and column masonry reads down the
+   columns, out of order for a keyboard or screen reader. Each item's flex-grow and flex-basis are its shape (--a, width over height),
+   so in a full row every picture has the same height and the row is exactly the width. The ::after spacer takes the last row's spare
+   room, so a short last row keeps the row height rather than stretching. --row-h is the target picture height. */
+.justified { --row-h: 13rem; display: flex; flex-wrap: wrap; gap: var(--ccs-space-4); margin: 0; padding: 0; list-style: none; }
 
-/* From 840px, the 20-column mosaics; each tile's place by its position in the list, so the reading order is the list's */
-@media (min-width: 840px) {
-  .mosaic { grid-template-columns: repeat(20, minmax(0, 1fr)); grid-auto-rows: 17rem; }
+.justified::after { content: ""; flex: 100 1 0; }
 
-  .mosaic--five > :nth-child(1) { grid-area: 1 / 1 / 2 / 9; }
-  .mosaic--five > :nth-child(2) { grid-area: 1 / 9 / 2 / 14; }
-  .mosaic--five > :nth-child(3) { grid-area: 2 / 1 / 3 / 6; }
-  .mosaic--five > :nth-child(4) { grid-area: 2 / 6 / 3 / 14; }
-  .mosaic--five > :nth-child(5) { grid-area: 1 / 14 / 3 / 21; }
+/* A last row that is mostly full stretches to the width (justified_controller.js decides, from the cards' widths) */
+.justified.justified--fill::after { display: none; }
 
-  .mosaic--five-left > :nth-child(1) { grid-area: 1 / 1 / 3 / 8; }
-  .mosaic--five-left > :nth-child(2) { grid-area: 1 / 8 / 2 / 13; }
-  .mosaic--five-left > :nth-child(3) { grid-area: 1 / 13 / 2 / 21; }
-  .mosaic--five-left > :nth-child(4) { grid-area: 2 / 8 / 3 / 16; }
-  .mosaic--five-left > :nth-child(5) { grid-area: 2 / 16 / 3 / 21; }
+/* min-width keeps a card readable: a very narrow picture (a poster) gets a slightly taller picture rather than a column of one word */
+.justified > .justified__item { --a: 1.333; display: flex; flex: var(--a) 1 calc(var(--a) * var(--row-h)); min-width: min(100%, 12rem); }
 
-  .mosaic--eight > :nth-child(1) { grid-area: 1 / 1 / 2 / 9; }
-  .mosaic--eight > :nth-child(2) { grid-area: 1 / 9 / 2 / 14; }
-  .mosaic--eight > :nth-child(3) { grid-area: 2 / 1 / 3 / 6; }
-  .mosaic--eight > :nth-child(4) { grid-area: 2 / 6 / 3 / 14; }
-  .mosaic--eight > :nth-child(5) { grid-area: 3 / 1 / 4 / 8; }
-  .mosaic--eight > :nth-child(6) { grid-area: 3 / 8 / 4 / 14; }
-  .mosaic--eight > :nth-child(7) { grid-area: 3 / 14 / 4 / 21; }
-  .mosaic--eight > :nth-child(8) { grid-area: 1 / 14 / 3 / 21; }
-}
+.justified > .justified__item > * { width: 100%; }
 
-@media (min-width: 1200px) { .mosaic { grid-auto-rows: 19rem; } }
+.justified .object-card__media { aspect-ratio: var(--a); }
+
+.justified .result-card__media { position: static; display: block; flex: none; width: 100%; height: auto; aspect-ratio: var(--a); min-height: 0; background: var(--ccs-surface-subtle); }
+
+/* Fitted, not cropped: before a picture's shape is known (no JavaScript) it sits whole inside the fallback shape */
+.justified .result-card__media img { position: static; display: block; width: 100%; height: 100%; object-fit: contain; }
+
+@media (min-width: 600px) { .justified { --row-h: 15rem; } }
+
+@media (min-width: 1200px) { .justified { --row-h: 17rem; } }
+
+/* The museums' banners are wide (about 2:1), so their rows are lower: two or three banners to a row on a desktop */
+.explore .justified, .home-visit .justified, .home-ways .justified { --row-h: 11rem; }
+
+@media (min-width: 1200px) { .explore .justified, .home-visit .justified, .home-ways .justified { --row-h: 13rem; } }
+
+/* On this day: smaller pictures, more to a row */
+@media (min-width: 1200px) { .home-on-this-day .justified { --row-h: 14rem; } }
 
 /* ---- Shelf: pictures whole at one height, as wide as their shape, the name under each ---- */
 .card-layout--shelf { position: relative; }
@@ -109,7 +106,7 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 /* The picture has a fixed height (not 100% of the box), so its width follows its shape and the card's min-content is the picture's */
 .card-layout--shelf .result-card__media { display: block; flex: none; width: auto; height: auto; aspect-ratio: auto; overflow: hidden; border-radius: var(--ccs-tile-radius); background: var(--ccs-surface-subtle); }
 
-.card-layout--shelf .result-card__media img { position: static; display: block; width: auto; min-width: 14rem; max-width: min(36rem, 85vw); height: 18rem; object-fit: cover; }
+.card-layout--shelf .result-card__media img { position: static; display: block; width: auto; min-width: 14rem; max-width: min(36rem, 85vw); height: 18rem; background: var(--ccs-surface-subtle); object-fit: contain; }
 
 .card-layout--shelf .result-card__content { padding: 0; }
 
@@ -149,7 +146,7 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 
 .place-row__thumb { flex: none; width: 4.5rem; height: 4.5rem; overflow: hidden; border-radius: var(--ccs-radius-sm); background: var(--ccs-surface-subtle); }
 
-.place-row__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.place-row__thumb img { width: 100%; height: 100%; object-fit: contain; }
 
 .place-row__body { display: flex; flex-direction: column; gap: var(--ccs-space-1); min-width: 0; }
 
@@ -167,48 +164,27 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
   .place-preview__panels { display: block; position: relative; min-height: 28rem; }
   .place-preview__panel { position: absolute; inset: 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--color-border-grey-91); background: var(--ccs-white); }
   .place-preview__panel[hidden] { display: none; }
-  .place-preview__image { flex: 1 1 auto; min-height: 0; width: 100%; object-fit: cover; }
+  .place-preview__image { flex: 1 1 auto; min-height: 0; width: 100%; background: var(--ccs-surface-subtle); object-fit: contain; }
   .place-preview__caption { flex: none; padding: var(--ccs-space-4) var(--ccs-space-5) var(--ccs-space-5); }
   .place-preview__name { margin: 0; color: var(--ccs-text-link); font-size: var(--ccs-font-size-2xl); font-weight: var(--ccs-font-weight-semibold); line-height: 1.25; }
   .place-preview__text { max-width: 60ch; margin: var(--ccs-space-2) 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-md); line-height: 1.5; }
 }
 
-/* ---- On this day: the rail's record cards ---- */
-.home-on-this-day .card-layout--rail .card-layout__item { flex-basis: min(80%, 17rem); }
-
 /* ---- Recently viewed: as many columns as fit ---- */
 .home-recent__list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 17.5rem), 1fr)); }
 
 /* ---- More ways in: a large lead card, two beside it ---- */
-.ways { display: grid; gap: var(--ccs-space-5); grid-template-columns: minmax(0, 1fr); margin: 0; padding: 0; list-style: none; }
-
-.ways__item { display: flex; min-width: 0; }
-
 .explore-card__eyebrow { margin: var(--ccs-space-4) 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
 
 .explore-card--tile .explore-card__eyebrow + .document-title-heading { padding-block-start: var(--ccs-space-1); }
 
-.ways .explore-card--tile .result-card__media { min-height: 10rem; }
-
-.ways .explore-card--lead .result-card__media { min-height: 16rem; }
-
-@media (min-width: 600px) and (max-width: 1199px) {
-  .ways { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .ways__item--lead { grid-column: 1 / -1; }
-}
-
-@media (min-width: 1200px) {
-  .ways { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: repeat(2, minmax(0, 1fr)); min-height: 34rem; }
-  .ways__item--lead { grid-row: 1 / 3; }
-}
-
-/* ---- The home page's Time cards: the site's card, no navy scrim over the picture (card_tiles.css keeps it on the Browse page) ---- */
-body.page-home .card-layout .explore-card:not(.explore-card--text) { isolation: auto; justify-content: flex-start; border: 1px solid var(--color-border-grey-91); border-radius: 0; background: var(--ccs-white); color: inherit; }
-body.page-home .card-layout:not(.card-layout--shelf) .explore-card:not(.explore-card--text) .result-card__media { position: relative; inset: auto; z-index: auto; flex: 1 1 auto; min-height: 9rem; }
-body.page-home .card-layout:not(.card-layout--shelf) .explore-card:not(.explore-card--text) .result-card__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-body.page-home .card-layout .explore-card:not(.explore-card--text) .result-card__content { padding: 0 var(--ccs-space-4); background: none; }
-body.page-home .card-layout .explore-card:not(.explore-card--text) .document-title-heading,
-body.page-home .card-layout .explore-card:not(.explore-card--text) .document-title-heading a { color: var(--ccs-text-link); }
-body.page-home .card-layout:not(.card-layout--shelf) .explore-card:not(.explore-card--text) .document-title-heading { padding-block: var(--ccs-space-3) var(--ccs-space-1); }
-body.page-home .card-layout:not(.card-layout--shelf) .explore-card:not(.explore-card--text) .explore-card__intro { margin: 0; padding-block-end: var(--ccs-space-3); }
-body.page-home .card-layout .explore-card:not(.explore-card--text) .explore-card__intro { color: var(--ccs-text-secondary); }
+/* ---- The home page's Time cards: the site's card, no navy scrim (card_tiles.css keeps it on the Browse page), picture whole ---- */
+body.page-home .card-layout--justified .explore-card:not(.explore-card--text) { position: relative; isolation: auto; justify-content: flex-start; width: 100%; border: 1px solid var(--color-border-grey-91); border-radius: 0; background: var(--ccs-white); color: inherit; aspect-ratio: auto; height: auto; }
+body.page-home .card-layout--justified .explore-card:not(.explore-card--text) .result-card__media { z-index: auto; inset: auto; }
+body.page-home .card-layout--justified .explore-card:not(.explore-card--text) .result-card__content { position: static; padding: 0 var(--ccs-space-4); background: none; }
+body.page-home .card-layout--justified .explore-card:not(.explore-card--text) .document-title-heading { padding-block: var(--ccs-space-3) var(--ccs-space-1); color: var(--ccs-text-link); }
+body.page-home .card-layout--justified .explore-card:not(.explore-card--text) .document-title-heading a { color: var(--ccs-text-link); }
+body.page-home .card-layout--justified .explore-card:not(.explore-card--text) .explore-card__intro { margin: 0 0 var(--ccs-space-3); padding: 0; color: var(--ccs-text-secondary); } /* the space outside the two-line clamp, so no third line shows */
+body.page-home .card-layout--justified .explore-card .explore-card__link::after { content: ""; position: absolute; inset: 0; }
+body.page-home .card-layout--justified .result-card:focus-within { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
+body.page-home .card-layout--justified .result-card .result-card__media img { max-height: none; }

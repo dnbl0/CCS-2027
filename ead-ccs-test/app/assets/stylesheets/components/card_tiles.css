@@ -29,7 +29,7 @@
 .card-section__more { display: flex; justify-content: center; margin-block-start: var(--ccs-space-6); }
 
 /* ---- The tile: picture fills, name on the scrim ---- */
-.card-layout:not(.card-layout--shelf) .explore-card:not(.explore-card--text) {
+.card-layout:not(.card-layout--shelf, .card-layout--justified) .explore-card:not(.explore-card--text) {
   position: relative;
   isolation: isolate;
   border: 0;
@@ -38,31 +38,31 @@
   box-shadow: none;
 }
 
-.card-layout:not(.card-layout--shelf) .explore-card:not(.explore-card--text) .result-card__media { position: absolute; inset: 0; z-index: -1; flex: none; height: auto; aspect-ratio: auto; background: var(--ccs-surface-brand); }
+.card-layout:not(.card-layout--shelf, .card-layout--justified) .explore-card:not(.explore-card--text) .result-card__media { position: absolute; inset: 0; z-index: -1; flex: none; height: auto; aspect-ratio: auto; background: var(--ccs-surface-brand); }
 
-.card-layout:not(.card-layout--shelf) .explore-card:not(.explore-card--text) .result-card__media img { object-fit: cover; object-position: center; }
+.card-layout:not(.card-layout--shelf, .card-layout--justified) .explore-card:not(.explore-card--text) .result-card__media img { object-fit: cover; object-position: center; }
 
-.card-layout:not(.card-layout--shelf) .explore-card:not(.explore-card--text) .result-card__content {
+.card-layout:not(.card-layout--shelf, .card-layout--justified) .explore-card:not(.explore-card--text) .result-card__content {
   margin-block-start: auto;
   padding: var(--ccs-tile-scrim-fade) var(--ccs-space-4) var(--ccs-space-4);
   background: linear-gradient(to top, var(--ccs-tile-scrim) calc(100% - var(--ccs-tile-scrim-fade)), rgb(0 15 70 / 0));
   color: var(--ccs-white);
 }
 
-.card-layout:not(.card-layout--shelf) .explore-card:not(.explore-card--text) .document-title-heading { padding-block: 0; color: var(--ccs-white); }
+.card-layout:not(.card-layout--shelf, .card-layout--justified) .explore-card:not(.explore-card--text) .document-title-heading { padding-block: 0; color: var(--ccs-white); }
 
-.card-layout:not(.card-layout--shelf) .explore-card:not(.explore-card--text) .document-title-heading a { color: var(--ccs-white); }
+.card-layout:not(.card-layout--shelf, .card-layout--justified) .explore-card:not(.explore-card--text) .document-title-heading a { color: var(--ccs-white); }
 
-.card-layout:not(.card-layout--shelf) .explore-card:not(.explore-card--text) .explore-card__intro { margin: var(--ccs-space-1) 0 0; color: rgb(255 255 255 / 0.9); }
+.card-layout:not(.card-layout--shelf, .card-layout--justified) .explore-card:not(.explore-card--text) .explore-card__intro { margin: var(--ccs-space-1) 0 0; color: rgb(255 255 255 / 0.9); }
 
 /* The title link covers the tile, so the whole picture is one target; the picture's own link stays out of the tab order */
-.card-layout:not(.card-layout--shelf) .explore-card .explore-card__link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.card-layout:not(.card-layout--shelf, .card-layout--justified) .explore-card .explore-card__link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
 
-.card-layout:not(.card-layout--shelf) .explore-card { position: relative; }
+.card-layout:not(.card-layout--shelf, .card-layout--justified) .explore-card { position: relative; }
 
-.card-layout:not(.card-layout--shelf) .explore-card:focus-within { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
+.card-layout:not(.card-layout--shelf, .card-layout--justified) .explore-card:focus-within { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
 
-.card-layout:not(.card-layout--shelf) .explore-card .explore-card__link:focus-visible { outline: none; }
+.card-layout:not(.card-layout--shelf, .card-layout--justified) .explore-card .explore-card__link:focus-visible { outline: none; }
 
 /* A tile in a layout with no height of its own takes a shape: the grid and wall square, the rail and strip from their rules */
 .card-layout--grid .explore-card:not(.explore-card--text),
@@ -75,7 +75,7 @@
 }
 
 /* A tile with no picture: its tint, a dark name at the foot (unchanged contrast), no border */
-.card-layout:not(.card-layout--shelf) .explore-card--text { border: 0; border-radius: var(--ccs-tile-radius); padding-block-start: var(--ccs-space-8); }
+.card-layout:not(.card-layout--shelf, .card-layout--justified) .explore-card--text { border: 0; border-radius: var(--ccs-tile-radius); padding-block-start: var(--ccs-space-8); }
 
 /* ---- The Time strip: the page's one dark band (as specific as the home page's alternating-section rule, plus its own class) ---- */
 .explore-periods,

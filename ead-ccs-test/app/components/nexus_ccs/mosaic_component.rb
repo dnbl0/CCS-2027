@@ -1,25 +1,19 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # A mosaic of picture tiles led by one large tile (the homepage redesign, 2026-11; HomeSections gives the tiles). Each tile is one
-  # link: the picture fills it and its name sits on the navy scrim (components/home_sections.css). The patterns place the tiles on a
-  # 20-column grid from 840px, two columns from 600px, one below; the list is in reading order at every width:
-  #
-  #   five       four tiles, the lead last (right, two rows tall)          Explore the collections
-  #   five_left  the lead first (left, two rows tall), four tiles          Visit the collections
-  #   eight      seven tiles, the lead last (right, two rows tall)         Collections within the collections
+  # A section's picture tiles in justified rows (the homepage redesign, 2026-11; HomeSections gives the tiles): every tile is the site's
+  # card in its tile variant, as wide as its picture's shape at the row's height, so each picture shows whole (never cropped) and each
+  # row fills the width (justified_controller.js, components/home_sections.css). The first tile is the lead, with its line and call to
+  # action. The list is in reading order at every width.
   class MosaicComponent < ViewComponent::Base
-    PATTERNS = %i[five five_left eight].freeze
+    include AspectHelper
 
-    def initialize(tiles:, pattern:, label:)
-      raise ArgumentError, "unknown pattern #{pattern.inspect}" unless PATTERNS.include?(pattern.to_sym)
-
+    def initialize(tiles:, label:)
       @tiles = tiles
-      @pattern = pattern.to_sym
       @label = label
     end
 
-    attr_reader :tiles, :pattern, :label
+    attr_reader :tiles, :label
 
     def render? = tiles.any?
   end
