@@ -2,7 +2,6 @@
 <% recent = RecentlyViewed.new(session).ids.any? ? RecentlyViewed.new(session).documents(except: nil) : [] %>
 <% if recent.any? %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "home-recently-viewed", heading: t("nexus_ccs.recently_viewed.heading"), extra_class: "home-more home-recent") do %>
-    <%= render NexusCcs::CardLayoutComponent.new(cards: recent, layout: :mosaic, label: t("nexus_ccs.recently_viewed.heading"),
-                                                 renderer: ->(document) { NexusCcs::RecordCardComponent.new(document: document, compact: true) }) %>
+    <%= render NexusCcs::MosaicComponent.new(tiles: recent.map { |document| record_tile(document) }, label: t("nexus_ccs.recently_viewed.heading"), lanes: 5) %>
   <% end %>
 <% end %>

@@ -54,10 +54,14 @@ crops pictures to fixed cells, here the cell follows the picture.
 |---|---|---|
 | Explore the collections (every collection) | fluid mosaic, the University Art Collection leading | `MosaicComponent`, `HomeSections.collections` |
 | Collections within the collections | fluid mosaic, the largest leading | `MosaicComponent`, `HomeSections.named` |
-| Record types (every kind) | a shelf of collage cards: three of each kind's records side by side, each whole | `CollageCardComponent`, `HomeSections.kind_collages` |
-| Places | a list beside a collage of four of the place's records (different records for each place where it can) | `PlacePreviewComponent`, `HomeSections.place_collages` |
-| Time | justified rows (`CardLayoutComponent` `:justified`) on the navy band | `justified_controller.js` |
-| On this day, More ways in | fluid mosaic (`CardLayoutComponent` `:mosaic`, and the ways partial) | `mosaic_controller.js` |
+| Record types (every kind) | the same tiles: one picture of each kind, its name and number | `MosaicComponent`, `ExploreComponent#kind_tiles` |
+| Places | the same tiles, each opening the place's own page | `MosaicComponent`, `ExploreComponent#place_tiles` |
+| Time | the same tiles, in time order (ordered lanes) on the navy band | `MosaicComponent`, `ExploreComponent#period_tiles` |
+| On this day, Recently viewed | the same tiles: a record's picture, its title, its maker and date | `MosaicComponent`, `record_tile` |
+| More ways in | the same tiles, Stories leading | the ways partial, `mosaic_controller.js` |
+
+No picture is used twice among the record types, places and periods (`ExploreComponent#collage_tile`: the first of a value's pictures no
+tile before it has used).
 
 - **Fluid mosaic** (`mosaic_controller.js`, `components/home_sections.css` `.mosaic-flow`): a 12-column grid (8 on a tablet, 4 on a
   phone, one tile to a row) with 8px rows. Each tile's columns come from its picture's shape (`--a`, width over height; wider pictures
@@ -68,7 +72,7 @@ crops pictures to fixed cells, here the cell follows the picture.
   row's pictures share a height and the row fills the width; a last row under 60% full keeps the row height.
 - A picture's shape comes from the server when its size is known (the Explore tiles, the site's own pictures via `ImageDimensions`)
   and is measured in the browser otherwise; it is held to 0.5–2.6. Unknown shapes are fitted (`object-fit: contain`), never cropped.
-- The cards are the site's result card in a tile variant (`explore-card--tile`, `--lead`, `--collage`): picture above, name below on
+- The cards are the site's result card in a tile variant (`explore-card--tile`, `--lead`): picture above, name below on
   white, the title's link covering the card. No navy scrim on the home page (`card_tiles.css` keeps it on the Browse page).
 - Collage pictures come from `Showcase` (licensed and not sensitive, cached six hours); the Indigenous Collections tile stays text only.
 - Tests: `test/system/home_explore_test.rb` (axe, 44px targets, no sideways scroll, **no cropped picture**, the mosaic interlocks),

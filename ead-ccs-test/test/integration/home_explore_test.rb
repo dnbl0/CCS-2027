@@ -30,10 +30,10 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
     assert_select "section[aria-labelledby=explore-title] h2#explore-title", text: "Explore the collections"
     assert_select "section.explore ul.mosaic-flow > li.mosaic-flow__item", count: COUNTS["collections"].size
     assert_select "section.explore li.mosaic-flow__item--lead:first-child h3", text: "University Art Collection"
-    assert_select "section.explore-kinds article.explore-card--collage h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints']", text: "Prints and drawings"
-    assert_select "section.home-places a.place-spot__link[href*='f%5Bproduction_place_ssim%5D%5B%5D=Japan']"
+    assert_select "section.explore-kinds article.explore-card--tile h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints']", text: "Prints and drawings"
+    assert_select "section.home-places article.explore-card--tile h3 a", text: "Japan"
     assert_select "section.home-visit", count: 0
-    assert_select "section.explore-periods article.result-card h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999']", text: "1900s"
+    assert_select "section.explore-periods article.explore-card--tile h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999']", text: "1900s"
   end
 
   test "every way in opens all the matching records, not only those with images" do
@@ -41,7 +41,7 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
 
     get "/"
 
-    assert_select "section.explore-kinds a[href*='any_assets=1'], section.home-places a.place-row[href*='any_assets=1'], section.explore-periods a[href*='any_assets=1']", minimum: 3
+    assert_select "section.explore-kinds a[href*='any_assets=1'], section.explore-periods a[href*='any_assets=1']", minimum: 2
   end
 
   test "the entry points come from the indexed records, with their real counts" do

@@ -89,12 +89,13 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     assert_operator boxes[0][2], :>, boxes[1][2], "the lead (University Art Collection) is the widest tile"
     assert_operator boxes.map(&:first).uniq.size, :>, 1, "the tiles sit side by side"
     assert_operator boxes.map { |box| box[1] }.uniq.size, :>, 2, "a mosaic, not one row: the tiles start at different heights"
-    assert_selector ".explore-kinds .card-layout--collage, .home-places .place-spot, .explore-periods .card-layout--mosaic", count: 3
-    assert_selector ".home-places button[role=tab][aria-selected=true]", text: "Australia"
-    # Places: the arrow key moves to the next place's spotlight
-    find(".home-places button[role=tab]", text: "Australia").send_keys(:right)
-    assert_selector ".home-places button[role=tab][aria-selected=true]", text: "Europe"
-    assert_selector ".home-places [role=tabpanel]:not([hidden]) h3", text: "Europe"
+    # every picture section is the same tile in the same mosaic (the collections, record types, places, time, on this day)
+    %w[.explore .home-named .explore-kinds .home-places .explore-periods .home-on-this-day].each do |section|
+      next unless page.has_css?(section, wait: 0)
+
+      assert_selector "#{section} ul.mosaic-flow.is-ready > li > article.explore-card--tile", minimum: 1
+    end
+    assert_no_selector ".explore-card--collage, .place-spot, .home-section .object-card"
     assert_no_overlaps
     assert_no_selector ".home-visit"
     colours = page.evaluate_script("[...document.querySelectorAll('main > .ccs-section:not(.ccs-section--hero)')].map(s => getComputedStyle(s).backgroundColor)")

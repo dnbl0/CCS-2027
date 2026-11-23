@@ -41,6 +41,41 @@ module NexusCcs
 
     def place_collages = @place_collages ||= HomeSections.place_collages(overview.place_tiles, helpers)
 
+    # Record types and Places as the same picture tiles as the collections (one picture of each, its name and number), so every section of
+    # the page is one kind of card in one mosaic. A place opens its own page.
+    def kind_tiles = @kind_tiles ||= kind_collages.map { |collage| collage_tile(collage, collage.path) }
+
+    def place_tiles
+      @place_tiles ||= place_collages.map { |collage| collage_tile(collage, Browse.path_for("places", collage.title) || collage.path) }
+    end
+
+    # Each tile's picture is the first of its records' pictures that no tile before it on the page has used (Australia, Melbourne and
+    # Prints and drawings would otherwise share one print)
+    def collage_tile(collage, path)
+      picture = collage.pictures.find { |candidate| fresh?(candidate[:src]) } || collage.pictures.first
+      used_pictures << picture_key(picture[:src]) if picture
+      HomeSections::Tile.new(title: collage.title, text: collage.text, path: path, image: picture && DamImage.sized(picture[:src], 600),
+                             lead: false, cta: nil, external: false, width: nil, height: nil)
+    end
+
+    # Time as the same tiles: the period's picture (one no tile above has used, else none), its name and its number of records
+    def period_tiles
+      @period_tiles ||= overview.period_tiles.map do |tile|
+        image = ExploreCardComponent.image?(tile, remote: true) ? DamImage.sized(AssetVersion.url(tile.image.path), 600) : nil
+        image = nil if image && !fresh?(image)
+        used_pictures << picture_key(image) if image
+        HomeSections::Tile.new(title: tile.label, text: (count_label(tile.count) if tile.count), path: helpers.search_action_path(tile.query),
+                               image: image, lead: false, cta: nil, external: false, width: (tile.image.width if image), height: (tile.image.height if image))
+      end
+    end
+
+    def used_pictures = @used_pictures ||= Set.new
+
+    def fresh?(src) = !used_pictures.include?(picture_key(src))
+
+    # The same picture at any size or address: its file name
+    def picture_key(src) = File.basename(URI.parse(src.to_s).path.to_s) rescue src.to_s
+
     def named_tiles
       @named_tiles ||= begin
         dimension = Categories.find("named-collections")

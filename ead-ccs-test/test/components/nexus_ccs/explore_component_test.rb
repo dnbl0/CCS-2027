@@ -46,16 +46,16 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_no_selector "section.explore, section.home-named", text: /\d records/ # no record counts on collections
   end
 
-  test "Record types are a shelf of collage cards; Places are tabs, each with a spotlight; Time a mosaic" do
+  test "Record types, Places and Time are the same picture tiles as the collections, in the same mosaic" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
-    assert_selector "section.explore-kinds .card-layout--collage[data-controller=card-rail] li.card-layout__item article.explore-card--collage", count: 2
-    assert_selector "article.explore-card--collage h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings']", text: "Prints and drawings"
-    assert_selector "article.explore-card--collage .explore-card__intro", text: "7,192 records"
-    assert_selector "section.home-places .place-spot [role=tablist][aria-label=Places] button[role=tab][aria-selected=true][aria-controls=place-panel-0]", text: "Australia", visible: :all # the tab row shows once its script runs
-    assert_selector "section.home-places section#place-panel-0[role=tabpanel][aria-labelledby=place-tab-0] h3", text: "Australia"
-    assert_selector "section.home-places #place-panel-0 a.place-spot__link[href*='f%5Bproduction_place_ssim%5D%5B%5D=Australia']", text: "Explore every record from Australia"
-    assert_selector "section.explore-periods .card-layout--mosaic ul.mosaic-flow[data-controller=mosaic][data-mosaic-lanes-value='5'] li.mosaic-flow__item article.result-card h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900']", text: "1900s"
+    tile = "ul.mosaic-flow[data-controller=mosaic] li.mosaic-flow__item article.explore-card--tile"
+    assert_selector "section.explore-kinds #{tile}", count: 2
+    assert_selector "section.explore-kinds #{tile} h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings']", text: "Prints and drawings"
+    assert_selector "section.explore-kinds #{tile} .explore-card__intro", text: "7,192 records"
+    assert_selector "section.home-places #{tile} h3 a", text: "Australia" # its own page, or its records where it has none
+    assert_selector "section.explore-periods ul.mosaic-flow[data-mosaic-ordered-value=true] li.mosaic-flow__item article.explore-card--tile h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900']", text: "1900s"
+    assert_no_selector ".explore-card--collage, .place-spot" # the shelf of collages and the place tabs are gone
   end
 
   test "with no record types, places or times, those sections are left out without leaving a heading behind" do
