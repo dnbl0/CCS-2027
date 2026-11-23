@@ -11,6 +11,13 @@ class DocumentPreviewTest < ActiveSupport::TestCase
     assert_equal "media_viewers/document", MediaTypes.viewer_for(:document)
   end
 
+  test "a glTF or GLB model and an EPUB have their viewers; a 3D format model-viewer cannot show says it cannot be previewed" do
+    assert_equal "media_viewers/model", MediaTypes.viewer_for_item({ kind: "model_3d", type: "model/gltf-binary", url: "/m/egg.glb?v=1" })
+    assert_equal "media_viewers/model", MediaTypes.viewer_for_item({ kind: "model_3d", type: "application/octet-stream", url: "/m/egg.gltf" })
+    assert_equal MediaTypes::UNSUPPORTED_VIEWER, MediaTypes.viewer_for_item({ kind: "model_3d", type: "model/stl", url: "/m/egg.stl" })
+    assert_equal "media_viewers/ebook", MediaTypes.viewer_for_item({ kind: "ebook", type: "application/epub+zip", url: "/b/notes.epub" })
+  end
+
   test "a preview's address is the file's name and a digest of its address, under the previews folder" do
     path = DocumentPreview.public_path("/digital-assets/media/Annual%20Report.docx")
     assert_match(%r{\A/digital-assets/previews/annual-report-\h{10}\.pdf\z}, path)

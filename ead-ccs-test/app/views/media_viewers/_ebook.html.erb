@@ -1,0 +1,21 @@
+<%# locals: item, title, downloadable (CCS-164). An eBook (EPUB), read a page at a time in the page by epub.js
+    (ebook_reader_controller.js), as video plays in it; the file to download only where it may be downloaded. Without JavaScript, or
+    when the book cannot be opened, the status says so and the download (if allowed) remains. %>
+<% contents_id = "ebook-contents-#{Digest::SHA256.hexdigest(item[:url].to_s)[0, 10]}" %>
+<div class="ebook-reader" data-controller="ebook-reader" data-ebook-reader-src-value="<%= item[:url] %>" data-ebook-reader-title-value="<%= title %>">
+  <div class="ebook-reader__bar" data-js-only>
+    <div class="ebook-reader__chapter" data-ebook-reader-target="chapter" hidden>
+      <label for="ebook-contents-<%= contents_id %>">Contents</label>
+      <select id="ebook-contents-<%= contents_id %>" class="form-select" data-ebook-reader-target="contents" data-action="ebook-reader#choose"></select>
+    </div>
+    <div class="ebook-reader__pages" role="group" aria-label="Turn the page">
+      <button type="button" class="text-button" data-ebook-reader-target="previous" aria-disabled="true"
+              data-action="ebook-reader#previous keydown.left->ebook-reader#previous keydown.right->ebook-reader#next"><%= NexusCcs::Glyphs.svg(:chevron_left) %><span>Previous page</span></button>
+      <button type="button" class="text-button" data-ebook-reader-target="next"
+              data-action="ebook-reader#next keydown.left->ebook-reader#previous keydown.right->ebook-reader#next"><span>Next page</span><%= NexusCcs::Glyphs.svg(:chevron_right) %></button>
+    </div>
+  </div>
+  <div class="ebook-reader__stage" data-ebook-reader-target="stage"></div>
+  <p class="ebook-reader__status" role="status" data-ebook-reader-target="status">The eBook needs JavaScript to be shown.</p>
+  <% if downloadable %><%= link_to "Download the eBook (EPUB)", item[:url], class: "text-button ebook-reader__download" %><% end %>
+</div>

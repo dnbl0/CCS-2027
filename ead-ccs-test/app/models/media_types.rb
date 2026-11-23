@@ -12,8 +12,9 @@
 #   :pdf        media_viewers/_pdf                  opens in a new tab (no in-page viewer: it would be a new dependency)
 #   :document   media_viewers/document              Office and OpenOffice files (CCS-164): a PDF preview made by LibreOffice when the
 #                                                   file is indexed (DocumentPreview), and the original to download where allowed
-#   :ebook      none yet                            EPUB (CCS-164): needs an in-page reader (epub.js), a new dependency awaiting approval
-#   :model_3d   none yet                            needs a 3D viewer (model-viewer or three.js): a new dependency awaiting approval
+#   :ebook      media_viewers/ebook                 EPUB (CCS-164): read a page at a time in the page by epub.js (vendored)
+#   :model_3d   media_viewers/model                 glTF and GLB (CCS-164): Google model-viewer (vendored). Other 3D formats (OBJ, STL,
+#                                                   USDZ, FBX, PLY) it cannot show get the "cannot be previewed" partial
 #   :other      none                                anything the DAM holds that a browser cannot show
 module MediaTypes
   Type = Data.define(:kind, :label, :viewer) do
@@ -27,8 +28,14 @@ module MediaTypes
     video: "media_viewers/video",
     audio: "media_viewers/audio",
     pdf: "media_viewers/pdf",
-    document: "media_viewers/document"
+    document: "media_viewers/document",
+    ebook: "media_viewers/ebook",
+    model_3d: "media_viewers/model"
   }.freeze
+
+  # The 3D formats model-viewer shows; a model in any other format gets UNSUPPORTED_VIEWER
+  VIEWABLE_MODEL_EXTENSIONS = %w[glb gltf].freeze
+  VIEWABLE_MODEL_TYPES = %w[model/gltf-binary model/gltf+json].freeze
 
   LABELS = { image: "Image", video: "Video", audio: "Audio", pdf: "PDF document", document: "Document", ebook: "eBook", model_3d: "3D model",
              other: "File" }.freeze
@@ -80,6 +87,7 @@ module MediaTypes
   # The viewer for one media item (Collections::DigitalMedia.parse): its kind's, unless it is audio or video a browser cannot play
   def viewer_for_item(item)
     return UNPLAYABLE_VIEWER if %w[audio video].include?(item[:kind].to_s) && !browser_playable?(item[:type], item[:url])
+    return UNSUPPORTED_VIEWER if item[:kind].to_s == "model_3d" && !viewable_model?(item[:type], item[:url])
 
     viewer_for(item[:kind])
   end
@@ -97,6 +105,11 @@ module MediaTypes
 
     extension = file_extension(url)
     extension.blank? || PLAYABLE_EXTENSIONS.include?(extension)
+  end
+
+  # Whether model-viewer can show this 3D file: glTF or GLB, by its type or else its file's extension
+  def viewable_model?(mime, url)
+    VIEWABLE_MODEL_TYPES.include?(mime.to_s.downcase.split(";").first.to_s.strip) || VIEWABLE_MODEL_EXTENSIONS.include?(file_extension(url))
   end
 
   def file_extension(url)

@@ -44,8 +44,18 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     },
     "DAM assets all withheld" => { "digital_asset_metadata_ssm" => [ { "licence" => "None", "format" => "image", "tier" => "request" } ].map(&:to_json) },
     "audio, video and PDF" => { "licence_type_ssim" => [ "Public domain - Copyright expired" ],
-                                "digital_media_ssim" => [ "audio|audio/mpeg|/digital-assets/media/GraingerLowRes.mp3|Interview", "video|video/mp4|/digital-assets/media/v.mp4|Film", "pdf|application/pdf|/d.pdf|Report" ] }
+                                "digital_media_ssim" => [ "audio|audio/mpeg|/digital-assets/media/GraingerLowRes.mp3|Interview", "video|video/mp4|/digital-assets/media/v.mp4|Film", "pdf|application/pdf|/d.pdf|Report" ] },
+    # CCS-164: test/fixtures/files, copied to public/digital-assets/test-media by the tests below
+    "eBook and 3D model" => { "licence_type_ssim" => [ "Public domain - Copyright expired" ],
+                              "digital_media_ssim" => [ "model_3d|model/gltf-binary|/digital-assets/test-media/tetrahedron.glb|Egg model",
+                                                        "ebook|application/epub+zip|/digital-assets/test-media/specimen-notes.epub|Specimen notes" ] }
   }.freeze
+
+  setup do
+    target = Rails.public_path.join("digital-assets/test-media")
+    FileUtils.mkdir_p(target)
+    %w[tetrahedron.glb specimen-notes.epub].each { |name| FileUtils.cp(file_fixture(name), target.join(name)) }
+  end
 
   WIDTHS = { "desktop" => [ 1440, 900 ], "phone" => [ 390, 844 ] }.freeze
   SIZES = WIDTHS.merge("narrow" => [ 320, 800 ]).freeze
@@ -356,6 +366,34 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     toggle.click
     assert_equal "false", toggle["aria-expanded"]
     assert_no_selector ".record__description-text p", text: "Made for the specimen collection."
+  end
+
+  test "CCS-164: a 3D model turns in the page with Zoom and Reset view; an eBook turns its pages and lists its contents" do
+    open_record(VARIANTS.fetch("eBook and 3D model"), "desktop")
+
+    assert_selector ".model-viewer.is-ready", wait: 15 # the model has loaded (model-viewer's load event)
+    within ".model-viewer" do
+      assert_selector "model-viewer[src*='tetrahedron.glb'][alt='3D model: Egg model'][camera-controls]", visible: :all
+      assert_button "Zoom in"
+      assert_button "Reset view"
+      assert_link "Download the model (GLB)"
+      orbit = -> { evaluate_script("document.querySelector('model-viewer').getCameraOrbit().radius") }
+      before = orbit.call
+      click_button "Zoom in"
+      assert_operator orbit.call, :<, before # nearer
+    end
+
+    within ".ebook-reader" do
+      assert_selector ".ebook-reader__stage iframe[title='Specimen notes']", wait: 15
+      assert_select "Contents", with_options: [ "The collecting trip", "Catalogue of eggs" ]
+      assert_text(/Page 1 of \d+ in this chapter/)
+      assert_equal "true", find_button("Previous page")["aria-disabled"]
+      click_button "Next page"
+      assert_text(/Page 2 of \d+ in this chapter/)
+      select "Catalogue of eggs", from: "Contents"
+      assert_text(/Page 1 of \d+ in this chapter/)
+      assert_link "Download the eBook (EPUB)"
+    end
   end
 
   test "a short description has no Read more" do

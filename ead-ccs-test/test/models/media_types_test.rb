@@ -44,20 +44,20 @@ class MediaTypesTest < ActiveSupport::TestCase
     assert_equal :image, MediaTypes.for(mime: "application/octet-stream", filename: "x.tiff").kind
   end
 
-  test "3D models are known but have no viewer yet, so they are not previewable" do
+  test "3D models are known, and shown by model-viewer (CCS-164)" do
     %w[3d model].each { |format_type| assert_equal :model_3d, MediaTypes.for(format_type: format_type).kind }
     %w[a.glb a.gltf a.obj a.usdz].each { |name| assert_equal :model_3d, MediaTypes.for(filename: name).kind, name }
     assert_equal :model_3d, MediaTypes.for(mime: "model/gltf-binary").kind
     type = MediaTypes.for(format_type: "3d")
-    assert_not type.previewable?
-    assert_nil type.viewer
+    assert type.previewable?
+    assert_equal "media_viewers/model", type.viewer
     assert_equal "3D model", type.label
   end
 
   test "an unknown file is :other, and a kind without a viewer is given the cannot-be-previewed partial" do
     assert_equal :other, MediaTypes.for(format_type: "spreadsheet").kind
     assert_equal :other, MediaTypes.for.kind
-    assert_equal MediaTypes::UNSUPPORTED_VIEWER, MediaTypes.viewer_for(:model_3d)
+    assert_equal MediaTypes::UNSUPPORTED_VIEWER, MediaTypes.viewer_for(:unknown_kind)
     assert_equal MediaTypes::UNSUPPORTED_VIEWER, MediaTypes.viewer_for("other")
     assert_equal "media_viewers/video", MediaTypes.viewer_for("video")
   end

@@ -72,7 +72,7 @@ Fixed in this prototype on 23 Nov 2026:
 | CCS-53 activity reporting | Reporting is Adobe Customer Journey Analytics, outside CCS | The Adobe tag loads when ADOBE_ANALYTICS_SCRIPT_URL is set, only after the visitor accepts analytics cookies (CCS-471) |
 | CCS-31 CSV upload | Removing an uploaded set | records:remove_csv (full or partial); the upload stays a back-end operation (criterion 7) |
 | CCS-295 to 299 collection pages | Lorem ipsum introductions | Draft introductions for the five museums, from their own sites, marked for approval |
-| CCS-164 formats 2027 | Office, OpenOffice, eBook, 3D not shown | Office and OpenOffice: a LibreOffice PDF preview made at indexing, its text searchable. eBook and 3D: recognised; their viewers need epub.js and model-viewer, new dependencies awaiting approval |
+| CCS-164 formats 2027 | Office, OpenOffice, eBook, 3D not shown | Office and OpenOffice: a LibreOffice PDF preview made at indexing, its text searchable. eBooks read a page at a time in the page (epub.js) and glTF/GLB 3D models turned and zoomed in the page (Google model-viewer), both approved and installed 23 Nov 2026 |
 
 Not built, by the worksheet's decisions: sign-in and signed-in features (CCS-59, 60, 61, 129, 130, 136, 13: Won't), bulk download
 (CCS-167: Won't). Still blocked on data: CCS-55 (no Indigenous data flag) and CCS-35 (no language field). Worksheet decisions that

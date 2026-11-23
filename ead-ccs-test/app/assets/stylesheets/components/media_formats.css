@@ -1,0 +1,92 @@
+/* The 3D model viewer and the eBook reader of the record page (CCS-164; media_viewers/_model, _ebook). Each fills the media band's
+   width at a fixed reading height, on the subtle surface the image viewer uses, with its tools as Gen 3 text buttons in a bar.
+   The tools show only once the file has loaded (.is-ready), so a visitor without JavaScript, or whose file fails, sees the status
+   message and the download link (where allowed), never buttons that do nothing. */
+
+.model-viewer,
+.ebook-reader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-2);
+  width: 100%;
+  text-align: start;
+}
+
+.model-viewer:not(.is-ready) [data-js-only],
+.ebook-reader:not(.is-ready) [data-js-only] { display: none; }
+
+.model-viewer__stage,
+.ebook-reader__stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: clamp(18rem, 60vh, 36rem);
+  background: var(--ccs-surface-subtle);
+  border: 1px solid var(--ccs-border-subtle);
+}
+
+.ebook-reader__stage { background: var(--ccs-surface-default); }
+
+.model-viewer__model { width: 100%; height: 100%; --poster-color: transparent; }
+.model-viewer__model:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: -3px; }
+
+.model-viewer__status,
+.ebook-reader__status {
+  margin: 0;
+  padding: var(--ccs-space-3);
+  font-size: var(--ccs-font-size-sm);
+  color: var(--ccs-text-secondary);
+}
+
+/* Once loaded, the model's status is empty; the eBook's says which page (under the book) */
+.model-viewer.is-ready .model-viewer__status { position: absolute; inset-block-end: 0; padding: var(--ccs-space-2); }
+.model-viewer.is-ready .model-viewer__status:empty,
+.ebook-reader__status:empty { display: none; }
+.ebook-reader__status { padding: 0; }
+
+.model-viewer__bar,
+.ebook-reader__bar,
+.model-viewer__tools,
+.ebook-reader__pages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ccs-space-2) var(--ccs-space-4);
+}
+
+.model-viewer__bar,
+.ebook-reader__bar { justify-content: space-between; }
+
+.model-viewer__hint {
+  margin: 0;
+  font-size: var(--ccs-font-size-sm);
+  color: var(--ccs-text-secondary);
+}
+
+.ebook-reader__chapter {
+  display: flex;
+  align-items: center;
+  gap: var(--ccs-space-2);
+  min-width: 0;
+  flex: 1 1 16rem;
+}
+.ebook-reader__chapter label { font-weight: 600; }
+.ebook-reader__chapter .form-select { min-width: 0; max-width: 28rem; }
+
+/* The first and last pages: the button stays focusable (aria-disabled), but reads as unavailable */
+.ebook-reader__pages .text-button[aria-disabled="true"] { color: var(--ccs-text-secondary); text-decoration: none; cursor: default; }
+
+.ebook-reader__download,
+.model-viewer__download { align-self: flex-start; }
+
+/* The text buttons' own padding (Gen 3) would set their words in from the stage's edge: pull the bars and the lone download link
+   out by it, so the words line up with the stage, the status and the hint */
+.model-viewer__bar,
+.ebook-reader__pages { margin-inline: calc(-1 * var(--ccs-space-3)); }
+.ebook-reader__download { margin-inline-start: calc(-1 * var(--ccs-space-3)); }
+
+@media (max-width: 479px) {
+  .model-viewer__stage,
+  .ebook-reader__stage { height: clamp(16rem, 55vh, 28rem); }
+}

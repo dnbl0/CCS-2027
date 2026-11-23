@@ -41,3 +41,4 @@
 
 # Document previews LibreOffice makes when records are indexed (DocumentPreview, CCS-164): generated, never committed
 /public/digital-assets/previews/
+/public/digital-assets/test-media/
