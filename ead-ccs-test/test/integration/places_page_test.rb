@@ -25,7 +25,7 @@ class PlacesPageTest < ActionDispatch::IntegrationTest
     assert_select "form[role=search] input[name=filter]"
     assert_select "ul.mosaic-flow[data-controller=mosaic][data-mosaic-lanes-value='6'] li article.explore-card--tile" do
       assert_select "img[alt=''][src*='w=600']" # a smaller rendition of the DAM picture
-      assert_select "h3 a[href*='production_place_ssim']", "Australia" # the name under the picture
+      assert_select "h3 a[href^='/browse/places/australia-']", "Australia" # the name under the picture, opening the place's own page
       assert_select ".explore-card__intro", "8,058 records" # every record, as the A–Z list counts them, not only the pictured ones
     end
     assert_select "turbo-frame#places-results"
