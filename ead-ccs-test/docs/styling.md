@@ -141,10 +141,11 @@ were removed on both sites). See `docs/styling-inventory.md`.
 
 **The record page (branch `design/record-card`, 23 Nov 2026).** In `components/record.css`, after the University's design system
 (designsystem.web.unimelb.edu.au) and the site's other pages, on white, capped at 1440px (`--layout-page`) with the site's gutters (16px,
-32px from 768px). Header in two columns (5:7 from 1024px): the h1 as every page's (Fraunces regular, navy, 48px; 36px on a phone), the date
-and the maker, Associated names (a card-level heading; each name an in-content link, `ccs-text-link`, its role and dates under it), the
+32px from 768px). Header in two columns (5:7 from 1024px), the identity one block at the top level with the media panel's top edge, in three groups
+32px apart (space groups them, no rules): the h1 as every page's (Fraunces regular, navy, 48px; 36px on a phone) with the date, the
+maker and the record's collection with "See more from this collection" (the arrow link) under it; Associated names (a card-level heading; each name an in-content link, `ccs-text-link`, its role and dates under it), the
 actions (`RecordActionsComponent`: Save as the site's outline button, Share, and More, a menu of Add to list, Cite this record and Copy
-link) and, at the foot, the record's collection with "See more from this collection" (the arrow link); and the media
+link, Compare under them); and the media
 (`DigitalAssetsComponent`, Figma Record/IIIF viewer) on a light grey panel, sticky from 1024px. On a phone: the title, then the media, then
 the names. Then sections, each after a full-width rule with its heading on the left (the site's section heading, `--ccs-heading-section-size`):
 Object overview (the key facts, two columns, label a card-level heading above the value; names of things as the design system's tags,
