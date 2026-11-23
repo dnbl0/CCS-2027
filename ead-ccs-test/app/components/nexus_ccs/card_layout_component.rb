@@ -24,7 +24,8 @@ module NexusCcs
 
     # cards: anything with label, query, image and intro (nil for none); panel: { title:, text:, link:, path: } for the wall;
     # renderer: a lambda giving the component for one card, for cards that are not Explore tiles (the home page's record cards)
-    def initialize(cards:, layout:, label:, panel: nil, renderer: nil)
+    # lanes: the mosaic's lanes on a wide screen
+    def initialize(cards:, layout:, label:, panel: nil, renderer: nil, lanes: 4)
       raise ArgumentError, "unknown layout #{layout.inspect}" unless LAYOUTS.include?(layout.to_sym)
 
       @cards = cards
@@ -32,7 +33,10 @@ module NexusCcs
       @label = label
       @panel = panel
       @renderer = renderer
+      @lanes = lanes
     end
+
+    attr_reader :lanes
 
     def card_component(card) = @renderer ? @renderer.call(card) : ExploreCardComponent.new(tile: card, intro: card.intro, remote: true)
 

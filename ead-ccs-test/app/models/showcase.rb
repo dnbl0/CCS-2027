@@ -15,21 +15,22 @@ module Showcase
   FACET_LIMIT = 8
   TTL = 6.hours
 
-  def self.call(fq:, first: nil)
-    key = "showcase/v1/#{Digest::SHA256.hexdigest([ fq, first ].flatten.compact.join("\n"))}"
-    cached = Rails.cache.fetch(SuppressedRecord.cache_key(key), expires_in: TTL, skip_nil: true) { fetch(Array(fq), first) }
+  # highlights: how many records to pick (the home page's place walls take more than the landing pages' four)
+  def self.call(fq:, first: nil, highlights: HIGHLIGHTS)
+    key = "showcase/v1/#{Digest::SHA256.hexdigest([ fq, first, (highlights unless highlights == HIGHLIGHTS) ].flatten.compact.join("\n"))}"
+    cached = Rails.cache.fetch(SuppressedRecord.cache_key(key), expires_in: TTL, skip_nil: true) { fetch(Array(fq), first, highlights) }
     cached && Result.new(total: cached["total"], documents: cached["docs"].map { |doc| SolrDocument.new(doc) }, facets: cached["facets"])
   end
 
   # first: a record id to lead the highlights with (a theme's hero record), when it may be shown
-  def self.fetch(fq, first)
+  def self.fetch(fq, first, highlights = HIGHLIGHTS)
     response = SolrGuard.run do
       Discovery.search(q: "*:*", rows: CANDIDATES, sort: "id asc", fq: fq + Categories::IMAGE_FILTERS, facet: true, "facet.mincount": 1,
                        "facet.field": FACET_FIELDS.map { |field| "{!ex=#{Categories::IMAGE_TAG}}#{field}" }, "facet.limit": FACET_LIMIT,
                        "facet.query": "{!ex=#{Categories::IMAGE_TAG} key=all}*:*")
     end
     lead = first.present? ? Discovery.fetch([ first ]) : []
-    shown = (lead + response.documents).uniq(&:id).select { |document| shown?(document) }.first(HIGHLIGHTS)
+    shown = (lead + response.documents).uniq(&:id).select { |document| shown?(document) }.first(highlights)
     facets = FACET_FIELDS.to_h do |field|
       pairs = response.dig("facet_counts", "facet_fields", field).to_a
       pairs = pairs.each_slice(2).to_a unless pairs.first.is_a?(Array)

@@ -20,6 +20,9 @@ en:
       intro: "From prints and paintings to scientific instruments: browse by what a record is."
     places:
       intro: "Where the records were made, from Melbourne to the other side of the world."
+      explore: "Explore every record from %{place}"
+      discover: "Discover this place"
+      records: "Records from %{place}"
     periods:
       intro: "The centuries the records come from."
     on_this_day:

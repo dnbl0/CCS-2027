@@ -1,4 +1,4 @@
-<ul class="mosaic-flow" data-controller="mosaic" data-mosaic-base-value="<%= base %>" aria-label="<%= label %>">
+<ul class="mosaic-flow" data-controller="mosaic" data-mosaic-lanes-value="<%= lanes %>" aria-label="<%= label %>">
   <% tiles.each do |tile| %>
     <li class="mosaic-flow__item<%= " mosaic-flow__item--lead" if tile.lead %>" <%= tag.attributes(style: aspect_style(tile.width, tile.height)) %>>
       <%# The site's card (result card, as ExploreCardComponent), in its tile variant: the picture whole above, the name and line below

@@ -3,7 +3,7 @@
 <% ways = [ [ :stories, stories_path, "site/collections-breakout.jpg" ], [ :themes, themes_path, "site/banners/grainger-museum.jpg" ],
             [ :categories, categories_path, "site/banners/medical-history-museum.jpg" ] ] %>
 <%= render NexusCcs::HomeSectionComponent.new(id: "home-ways-in", heading: t("nexus_ccs.home_more.ways_in"), intro: t("nexus_ccs.home_more.ways_in_text"), extra_class: "home-more home-ways") do %>
-  <ul class="ways mosaic-flow" data-controller="mosaic" data-mosaic-base-value="4" aria-label="<%= t("home.ways.label") %>">
+  <ul class="ways mosaic-flow" data-controller="mosaic" data-mosaic-lanes-value="3" aria-label="<%= t("home.ways.label") %>">
     <% ways.each_with_index do |(key, path, image), index| %>
       <% size = ImageDimensions.for_path("/#{image}", root: HomeSections::IMAGES) %>
       <li class="ways__item mosaic-flow__item<%= " mosaic-flow__item--lead" if index.zero? %>" <%= tag.attributes(style: aspect_style(*(size || [ nil, nil ]))) %>>

@@ -1,26 +1,39 @@
-<div class="place-preview" data-controller="place-preview">
-  <ul class="place-preview__list" aria-label="<%= label %>">
+<div class="place-spot" data-controller="place-tabs">
+  <div class="place-spot__tabs" role="tablist" aria-label="<%= label %>" data-place-tabs-target="list" hidden>
     <% collages.each_with_index do |place, index| %>
-      <li>
-        <%= link_to place.path, class: "place-row", aria: { current: (index.zero? ? "true" : nil) },
-                    data: { place_preview_target: "row", index: index, action: "mouseenter->place-preview#show focus->place-preview#show" } do %>
-          <span class="place-row__thumb"><% if (first = place.pictures.first) %><%= image_tag first[:src], alt: "", loading: "lazy", decoding: "async" %><% end %></span>
-          <span class="place-row__body">
-            <span class="place-row__name"><%= place.title %></span>
-            <% if place.text %><span class="place-row__count"><%= place.text %></span><% end %>
-          </span>
-        <% end %>
-      </li>
-    <% end %>
-  </ul>
-  <div class="place-preview__panels" aria-hidden="true">
-    <% collages.each_with_index do |place, index| %>
-      <div class="place-preview__panel" data-place-preview-target="panel" <%= "hidden" unless index.zero? %>>
-        <div class="place-collage">
-          <% place.pictures.each do |picture| %><%= image_tag picture[:src], alt: "", class: "place-collage__picture", loading: "lazy", decoding: "async" %><% end %>
-        </div>
-        <p class="place-preview__name"><%= place.title %></p>
-      </div>
+      <button type="button" role="tab" class="place-tab" id="<%= id(:tab, index) %>" aria-controls="<%= id(:panel, index) %>"
+              aria-selected="<%= index.zero? %>" tabindex="<%= index.zero? ? 0 : -1 %>"
+              data-place-tabs-target="tab" data-action="click->place-tabs#select keydown->place-tabs#key">
+        <span class="place-tab__thumb"><% if (first = place.pictures.first) %><%= image_tag first[:src], alt: "", loading: "lazy", decoding: "async" %><% end %></span>
+        <span class="place-tab__body">
+          <span class="place-tab__name"><%= place.title %></span>
+          <% if place.text %><span class="place-tab__count"><%= place.text %></span><% end %>
+        </span>
+      </button>
     <% end %>
   </div>
+  <% collages.each_with_index do |place, index| %>
+    <section class="place-spot__panel" role="tabpanel" id="<%= id(:panel, index) %>" aria-labelledby="<%= id(:tab, index) %>" data-place-tabs-target="panel">
+      <div class="place-spot__about">
+        <h3 class="place-spot__name"><%= place.title %></h3>
+        <% if place.text %><p class="place-spot__count"><%= place.text %></p><% end %>
+        <% if place.intro.present? %><p class="place-spot__intro"><%= place.intro %></p><% end %>
+        <%= link_to t("home.places.explore", place: place.title), place.path, class: "arrow-link arrow-link--icon place-spot__link" %>
+      </div>
+      <% if place.pictures.any? %>
+        <div class="place-spot__wall">
+          <h4 class="place-spot__wall-heading"><%= t("home.places.discover") %></h4>
+          <ul class="mosaic-flow place-spot__records" data-controller="mosaic" data-mosaic-lanes-value="3" aria-label="<%= t("home.places.records", place: place.title) %>">
+            <% place.pictures.each do |picture| %>
+              <li class="mosaic-flow__item">
+                <%= link_to helpers.solr_document_path(picture[:id]), class: "result-card__media place-spot__record" do %>
+                  <%= image_tag picture[:src], alt: picture[:title], loading: "lazy", decoding: "async" %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
 </div>

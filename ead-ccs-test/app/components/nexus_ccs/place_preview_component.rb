@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # Places on the home page (the homepage redesign, 2026-11, after Google Arts & Culture's "on this day" collage): a list of places beside
-  # a collage of the place pointed at or focused, four of its records each whole at its own shape (place_preview_controller.js). Every
-  # place is a link to its records; the collage repeats the list's words, so it is decorative. Without JavaScript the first place is
-  # shown. On a narrow screen only the list shows. collages: HomeSections::Collage, one per place.
+  # Places on the home page, after Google Arts & Culture's place pages (looked at 2026-11-23, described in our own words): a row of
+  # places, each a tab with a picture, its name and its number of records; the chosen place's spotlight shows its name, what it holds,
+  # the way to all its records, and a "Discover this place" wall of its records (each a link to its record page) in the fluid mosaic.
+  # Tabs (place_tabs_controller.js): arrow keys move between them, Home and End go to the ends. Without JavaScript every place's spotlight
+  # shows, one after another. collages: HomeSections::Collage, one per place.
   class PlacePreviewComponent < ViewComponent::Base
     def initialize(collages:, label:)
       @collages = collages
@@ -14,5 +15,7 @@ module NexusCcs
     attr_reader :collages, :label
 
     def render? = collages.any?
+
+    def id(kind, index) = "place-#{kind}-#{index}"
   end
 end

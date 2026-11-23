@@ -50,6 +50,17 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     JS
   end
 
+  # No two tiles of a mosaic overlap, and none leaves a hole: each tile's top meets the tile above it in its lane, or the top
+  def assert_no_overlaps
+    overlaps = page.evaluate_script(<<~JS)
+      [...document.querySelectorAll('main .mosaic-flow.is-ready')].flatMap(list => {
+        const boxes = [...list.children].map(li => li.getBoundingClientRect()).filter(r => r.width)
+        return boxes.flatMap((a, i) => boxes.slice(i + 1).filter(b => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1).map(() => list.getAttribute('aria-label')))
+      })
+    JS
+    assert_empty overlaps, "tiles overlap"
+  end
+
   def explore_boxes = page.evaluate_script("[...document.querySelectorAll('section.explore ul.mosaic-flow > li')].map(t => { const r = t.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)] })")
 
   def sideways_scroll? = page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
@@ -78,8 +89,13 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     assert_operator boxes[0][2], :>, boxes[1][2], "the lead (University Art Collection) is the widest tile"
     assert_operator boxes.map(&:first).uniq.size, :>, 1, "the tiles sit side by side"
     assert_operator boxes.map { |box| box[1] }.uniq.size, :>, 2, "a mosaic, not one row: the tiles start at different heights"
-    assert_selector ".explore-kinds .card-layout--collage, .home-places .place-preview, .explore-periods .card-layout--justified", count: 3
-    assert_selector ".home-places a.place-row", text: "Australia"
+    assert_selector ".explore-kinds .card-layout--collage, .home-places .place-spot, .explore-periods .card-layout--mosaic", count: 3
+    assert_selector ".home-places button[role=tab][aria-selected=true]", text: "Australia"
+    # Places: the arrow key moves to the next place's spotlight
+    find(".home-places button[role=tab]", text: "Australia").send_keys(:right)
+    assert_selector ".home-places button[role=tab][aria-selected=true]", text: "Europe"
+    assert_selector ".home-places [role=tabpanel]:not([hidden]) h3", text: "Europe"
+    assert_no_overlaps
     assert_no_selector ".home-visit"
     colours = page.evaluate_script("[...document.querySelectorAll('main > .ccs-section:not(.ccs-section--hero)')].map(s => getComputedStyle(s).backgroundColor)")
     assert_equal colours.each_cons(2).count { |a, b| a != b }, colours.size - 1, "the sections' backgrounds alternate"

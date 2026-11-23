@@ -91,13 +91,16 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 /* On this day: smaller pictures, more to a row */
 @media (min-width: 1200px) { .home-on-this-day .justified { --row-h: 14rem; } }
 
-/* ---- Fluid mosaic: tiles of different widths and heights interlock, none cropped (mosaic_controller.js) ----
+/* ---- Fluid mosaic: lane masonry, tiles of different heights (the lead two lanes wide), no holes, none cropped (mosaic_controller.js) ----
    After Google Arts & Culture's mixed-size picture layouts (looked at 2026-11-23, described in our own words): their tiles crop the
    pictures to fixed cells; here the cell follows the picture instead. The controller gives each tile its columns (from the picture's
    shape) and its rows (from its height), packed where the columns are lowest. Without JavaScript: an even grid of the same cards. */
 .mosaic-flow { --mosaic-gap: var(--ccs-space-4); display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); gap: var(--mosaic-gap); align-items: start; margin: 0; padding: 0; list-style: none; }
 
-.mosaic-flow.is-ready { grid-template-columns: repeat(var(--cols, 12), minmax(0, 1fr)); grid-auto-rows: 8px; row-gap: 0; }
+/* Laid out (mosaic_controller.js): lane masonry, each tile placed by the controller at its lane, so no tile leaves a gap under another */
+.mosaic-flow.is-ready { position: relative; display: block; }
+
+.mosaic-flow.is-ready > .mosaic-flow__item { position: absolute; }
 
 .mosaic-flow > .mosaic-flow__item { --a: 1.333; display: flex; min-width: 0; }
 
@@ -167,47 +170,57 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 
 @media (max-width: 599px) { .collage-card__pictures { height: 10rem; } .collage-card__pictures img { max-width: 14rem; } }
 
-/* ---- Places: a list beside a preview ---- */
-.place-preview { display: grid; gap: var(--ccs-space-6); grid-template-columns: minmax(0, 1fr); }
+/* ---- Places: tabs of places, the chosen one's spotlight (PlacePreviewComponent; after Google Arts & Culture's place pages) ---- */
+.place-spot__tabs { display: flex; gap: var(--ccs-space-3); margin: 0 0 var(--ccs-space-6); padding: var(--ccs-space-1) var(--ccs-space-1) var(--ccs-space-3); overflow-x: auto; scrollbar-width: thin; }
 
-.place-preview__list { display: grid; gap: var(--ccs-space-3); grid-template-columns: minmax(0, 1fr); margin: 0; padding: 0; list-style: none; }
+.place-spot__tabs[hidden] { display: none; }
 
-.place-row {
-  display: flex; align-items: center; gap: var(--ccs-space-4); min-height: 44px; padding: var(--ccs-space-3); border: 1px solid var(--ccs-border-subtle);
-  background: var(--ccs-white); color: var(--ccs-text-heading, var(--ccs-navy-1100)); text-decoration: none;
+.place-tab {
+  display: flex; flex: none; align-items: center; gap: var(--ccs-space-3); min-height: 44px; padding: var(--ccs-space-2) var(--ccs-space-4) var(--ccs-space-2) var(--ccs-space-2);
+  border: 1px solid var(--color-border-grey-91); background: var(--ccs-white); color: var(--ccs-text-heading, var(--ccs-navy-1100)); font: inherit; text-align: start; cursor: pointer;
 }
 
-.place-row:hover { border-color: var(--ccs-border-strong); }
+.place-tab:hover { border-color: var(--ccs-border-strong); }
 
-.place-row[aria-current="true"] { border-color: var(--ccs-surface-brand); box-shadow: inset 0 0 0 1px var(--ccs-surface-brand); }
+.place-tab[aria-selected="true"] { border-color: var(--ccs-surface-brand); background: var(--ccs-surface-brand); color: var(--ccs-white); }
 
-.place-row:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.place-tab:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
-.place-row__thumb { flex: none; width: 4.5rem; height: 4.5rem; overflow: hidden; border-radius: var(--ccs-radius-sm); background: var(--ccs-surface-subtle); }
+.place-tab__thumb { display: grid; flex: none; place-items: center; width: 3.5rem; height: 3.5rem; overflow: hidden; background: var(--ccs-surface-subtle); }
 
-.place-row__thumb img { width: 100%; height: 100%; object-fit: contain; }
+.place-tab__thumb img { width: 100%; height: 100%; object-fit: contain; }
 
-.place-row__body { display: flex; flex-direction: column; gap: var(--ccs-space-1); min-width: 0; }
+.place-tab__body { display: flex; flex-direction: column; gap: 2px; }
 
-.place-row__name { font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); line-height: 1.3; }
+.place-tab__name { font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); line-height: 1.2; white-space: nowrap; }
 
-.place-row__count { color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
+.place-tab__count { font-size: var(--ccs-font-size-sm); opacity: 0.85; white-space: nowrap; }
 
-.place-preview__panels { display: none; }
+.place-spot__panel { display: grid; gap: var(--ccs-space-6); grid-template-columns: minmax(0, 1fr); }
 
-@media (min-width: 600px) { .place-preview__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.place-spot__panel[hidden] { display: none; }
 
-@media (min-width: 840px) {
-  .place-preview { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: stretch; }
-  .place-preview__list { grid-template-columns: minmax(0, 1fr); align-content: start; }
-  .place-preview__panels { display: block; position: relative; min-height: 34rem; }
-  .place-preview__panel { position: absolute; inset: 0; display: flex; flex-direction: column; gap: var(--ccs-space-3); overflow: hidden; }
-  .place-preview__panel[hidden] { display: none; }
-  /* Four of the place's records, whole, in two columns: a collage, not a grid (decorative: the list is the way in) */
-  .place-collage { flex: 1 1 auto; min-height: 0; columns: 2; column-gap: var(--ccs-space-3); overflow: hidden; }
-  .place-collage__picture { display: block; width: 100%; height: auto; margin-block-end: var(--ccs-space-3); break-inside: avoid; border: 1px solid var(--color-border-grey-91); background: var(--ccs-white); }
-  .place-preview__name { flex: none; margin: 0; color: var(--ccs-text-heading, var(--ccs-navy-1100)); font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-3xl); line-height: 1.2; }
-}
+.place-spot__panel + .place-spot__panel { margin-block-start: var(--ccs-space-8); } /* without JavaScript, every spotlight in turn */
+
+.place-spot__about { display: flex; flex-direction: column; gap: var(--ccs-space-3); align-self: start; }
+
+.place-spot__name { margin: 0; color: var(--ccs-text-heading, var(--ccs-navy-1100)); font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-4xl); font-weight: 400; line-height: 1.15; }
+
+.place-spot__count { margin: 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-lg); }
+
+.place-spot__intro { max-width: 46ch; margin: 0; font-size: var(--ccs-font-size-md); line-height: 1.6; }
+
+.place-spot__link { min-height: 44px; align-items: center; font-weight: var(--ccs-font-weight-semibold); }
+
+.place-spot__wall-heading { margin: 0 0 var(--ccs-space-3); color: var(--ccs-text-secondary); font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-semibold); }
+
+.place-spot__record { display: block; border: 1px solid var(--color-border-grey-91); }
+
+.place-spot__record:hover { border-color: var(--ccs-border-strong); }
+
+.place-spot__record:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+@media (min-width: 900px) { .place-spot__panel { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); align-items: start; } .place-spot__about { position: sticky; top: var(--ccs-space-8); } }
 
 /* ---- Recently viewed: as many columns as fit ---- */
 .home-recent__list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 17.5rem), 1fr)); }
@@ -218,12 +231,12 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 .explore-card--tile .explore-card__eyebrow + .document-title-heading { padding-block-start: var(--ccs-space-1); }
 
 /* ---- The home page's Time cards: the site's card, no navy scrim (card_tiles.css keeps it on the Browse page), picture whole ---- */
-body.page-home .card-layout--justified .explore-card:not(.explore-card--text) { position: relative; isolation: auto; justify-content: flex-start; width: 100%; border: 1px solid var(--color-border-grey-91); border-radius: 0; background: var(--ccs-white); color: inherit; aspect-ratio: auto; height: auto; }
-body.page-home .card-layout--justified .explore-card:not(.explore-card--text) .result-card__media { z-index: auto; inset: auto; }
-body.page-home .card-layout--justified .explore-card:not(.explore-card--text) .result-card__content { position: static; padding: 0 var(--ccs-space-4); background: none; }
-body.page-home .card-layout--justified .explore-card:not(.explore-card--text) .document-title-heading { padding-block: var(--ccs-space-3) var(--ccs-space-1); color: var(--ccs-text-link); }
-body.page-home .card-layout--justified .explore-card:not(.explore-card--text) .document-title-heading a { color: var(--ccs-text-link); }
-body.page-home .card-layout--justified .explore-card:not(.explore-card--text) .explore-card__intro { margin: 0 0 var(--ccs-space-3); padding: 0; color: var(--ccs-text-secondary); } /* the space outside the two-line clamp, so no third line shows */
-body.page-home .card-layout--justified .explore-card .explore-card__link::after { content: ""; position: absolute; inset: 0; }
-body.page-home .card-layout--justified .result-card:focus-within { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
-body.page-home .card-layout--justified .result-card .result-card__media img { max-height: none; }
+body.page-home :is(.card-layout--justified, .card-layout--mosaic) .explore-card:not(.explore-card--text) { position: relative; isolation: auto; justify-content: flex-start; width: 100%; border: 1px solid var(--color-border-grey-91); border-radius: 0; background: var(--ccs-white); color: inherit; aspect-ratio: auto; height: auto; }
+body.page-home :is(.card-layout--justified, .card-layout--mosaic) .explore-card:not(.explore-card--text) .result-card__media { z-index: auto; inset: auto; }
+body.page-home :is(.card-layout--justified, .card-layout--mosaic) .explore-card:not(.explore-card--text) .result-card__content { position: static; padding: 0 var(--ccs-space-4); background: none; }
+body.page-home :is(.card-layout--justified, .card-layout--mosaic) .explore-card:not(.explore-card--text) .document-title-heading { padding-block: var(--ccs-space-3) var(--ccs-space-1); color: var(--ccs-text-link); }
+body.page-home :is(.card-layout--justified, .card-layout--mosaic) .explore-card:not(.explore-card--text) .document-title-heading a { color: var(--ccs-text-link); }
+body.page-home :is(.card-layout--justified, .card-layout--mosaic) .explore-card:not(.explore-card--text) .explore-card__intro { margin: 0 0 var(--ccs-space-3); padding: 0; color: var(--ccs-text-secondary); } /* the space outside the two-line clamp, so no third line shows */
+body.page-home :is(.card-layout--justified, .card-layout--mosaic) .explore-card .explore-card__link::after { content: ""; position: absolute; inset: 0; }
+body.page-home :is(.card-layout--justified, .card-layout--mosaic) .result-card:focus-within { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
+body.page-home :is(.card-layout--justified, .card-layout--mosaic) .result-card .result-card__media img { max-height: none; }

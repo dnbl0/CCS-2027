@@ -10,14 +10,14 @@ module HomeSections
 
   # A card of several pictures (after Google Arts & Culture's multi-picture cards): a few records that may be shown (Showcase:
   # licensed, not sensitive), each picture whole
-  Collage = Data.define(:title, :text, :path, :pictures)
+  Collage = Data.define(:title, :text, :path, :pictures, :intro)
 
   # The collection that leads the Explore section
   EXPLORE_LEAD = "university-art-collection"
   NAMED_SHOWN = 8
   IMAGES = Rails.root.join("app/assets/images") # the site's own pictures, for their sizes (ImageDimensions)
   KIND_PICTURES = 3
-  PLACE_PICTURES = 4
+  PLACE_PICTURES = 6
 
   module_function
 
@@ -61,26 +61,27 @@ module HomeSections
     end
   end
 
-  # Places: each place's preview, four of its records (tiles: the overview's place tiles). Places overlap (Melbourne is in Victoria
-  # and Australia), so each prefers records the places before it have not shown, and no two rows share a thumbnail.
+  # Places (after Google Arts & Culture's place pages): each place's spotlight, its description and six of its records for its
+  # "Discover this place" wall (tiles: the overview's place tiles). Places overlap (Melbourne is in Victoria and Australia), so each
+  # prefers records the places before it have not shown, and no two tabs share a picture.
   def place_collages(tiles, helpers)
     used = Set.new
     tiles.map do |tile|
       collage(tile.label, tile.count, helpers.search_action_path(tile.query), [ Browse.field_query("production_place_ssim", tile.label) ],
-              helpers, PLACE_PICTURES, used)
+              helpers, PLACE_PICTURES, used, intro: tile.intro)
     end
   end
 
-  def collage(title, count, path, fq, helpers, pictures, used = Set.new)
-    found = Array(Showcase.call(fq: fq)&.documents).filter_map do |document|
+  def collage(title, count, path, fq, helpers, pictures, used = Set.new, intro: nil)
+    found = Array(Showcase.call(fq: fq, highlights: [ pictures, Showcase::HIGHLIGHTS ].max)&.documents).filter_map do |document|
       src = document["thumbnail_path_ssi"].presence or next
-      { src: AssetVersion.url(src), title: Array(document["title_tsim"]).first.to_s }
+      { src: AssetVersion.url(src), title: Array(document["title_tsim"]).first.to_s, id: document.id }
     end
     fresh, seen = found.partition { |picture| !used.include?(picture[:src]) }
     shown = fresh + seen
     shown.first(pictures).each { |picture| used << picture[:src] }
     text = count && I18n.t("home.records", count: count, number: helpers.number_with_delimiter(count))
-    Collage.new(title: title, text: text, path: path, pictures: shown.first(pictures))
+    Collage.new(title: title, text: text, path: path, pictures: shown.first(pictures), intro: intro)
   end
 
   def museum(slug) = SitePages.collection(slug)

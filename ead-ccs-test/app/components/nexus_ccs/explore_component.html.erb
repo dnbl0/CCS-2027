@@ -4,13 +4,13 @@
     picture whole, at its own shape. %>
 <%= render NexusCcs::HomeSectionComponent.new(id: "explore-title", heading: t("home.collections.heading"), intro: t("home.collections.intro"),
                                               link: t("home.collections.see_all"), link_path: helpers.category_path("collections"), extra_class: "explore") do %>
-  <%= render NexusCcs::MosaicComponent.new(tiles: collection_tiles, label: t("home.collections.label"), base: 2.2) %>
+  <%= render NexusCcs::MosaicComponent.new(tiles: collection_tiles, label: t("home.collections.label"), lanes: 5) %>
 <% end %>
 
 <% if named_tiles.any? %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "home-named", heading: t("home.named.heading"), intro: t("home.named.intro"),
                                                 link: t("home.named.see_all"), link_path: helpers.category_path("named-collections"), extra_class: "home-named") do %>
-    <%= render NexusCcs::MosaicComponent.new(tiles: named_tiles, label: t("home.named.label"), base: 3) %>
+    <%= render NexusCcs::MosaicComponent.new(tiles: named_tiles, label: t("home.named.label"), lanes: 4) %>
   <% end %>
 <% end %>
 
@@ -38,6 +38,6 @@
 <% if overview.period_tiles.any? %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "explore-periods", heading: t("explore.place_time.periods"), intro: t("home.periods.intro"),
                                                 link: t("explore.place_time.see_all_periods"), link_path: helpers.browse_hub_path("periods"), extra_class: "explore-periods") do %>
-    <%= render NexusCcs::CardLayoutComponent.new(cards: overview.period_tiles, layout: :justified, label: t("explore.place_time.periods")) %>
+    <%= render NexusCcs::CardLayoutComponent.new(cards: overview.period_tiles, layout: :mosaic, lanes: 5, label: t("explore.place_time.periods")) %>
   <% end %>
 <% end %>
