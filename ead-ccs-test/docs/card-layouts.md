@@ -58,9 +58,11 @@ crops pictures to fixed cells, here the cell follows the picture.
 | Places | the same tiles, each opening the place's own page | `MosaicComponent`, `ExploreComponent#place_tiles` |
 | Time | the same tiles, in time order (ordered lanes) on the navy band | `MosaicComponent`, `ExploreComponent#period_tiles` |
 | On this day, Recently viewed | the same tiles: a record's picture, its title, its maker and date | `MosaicComponent`, `record_tile` |
-| More ways in | the same tiles, Stories leading | the ways partial, `mosaic_controller.js` |
 
-No picture is used twice among the record types, places and periods (`ExploreComponent#collage_tile`: the first of a value's pictures no
+Every section is the same lane masonry, led by its first tile (two lanes wide where its picture is not tall); a short section places its
+tallest tiles first after the lead (Time keeps its order) and lets its last pictures grow to end level. The line under a record type's,
+place's or period's name says what its page holds (the kinds of record and the collections that hold most of them, `CardDescription`),
+not its number of records. No picture is used twice among the record types, places and periods (`ExploreComponent#collage_tile`: the first of a value's pictures no
 tile before it has used).
 
 - **Fluid mosaic** (`mosaic_controller.js`, `components/home_sections.css` `.mosaic-flow`): a 12-column grid (8 on a tablet, 4 on a

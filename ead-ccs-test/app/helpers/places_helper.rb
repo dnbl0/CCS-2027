@@ -41,10 +41,10 @@ module PlacesHelper
 
   # A record (On this day, Recently viewed) as the home page's picture tile: its title, its maker and date (RecordCardComponent's line), and
   # its picture where a result card would show one (AccessPolicy, Sensitivity)
-  def record_tile(document)
+  def record_tile(document, lead: false)
     card = NexusCcs::RecordCardComponent.new(document: document)
     HomeSections::Tile.new(title: card.title, text: card.meta.presence, path: solr_document_path(document), image: card.image_path,
-                           lead: false, cta: nil, external: false, width: nil, height: nil)
+                           lead: lead, cta: nil, external: false, width: nil, height: nil)
   end
 
   # A category's value (Categories::Tile) as a mosaic tile: a collection or named collection opens its own page

@@ -75,8 +75,6 @@ en:
       on_this_day: "On this day"
       on_this_day_day: "Records made on %{date} in other years."
       on_this_day_years: "Records from %{year}, %{count} years ago."
-      ways_in: "More ways in"
-      ways_in_text: "Stories, themes and categories: places to start without a search."
     lists_help:
       title: "How saving and sharing work"
       save: "Select Save on a search result or a record to keep it in Saved records, in this browser."

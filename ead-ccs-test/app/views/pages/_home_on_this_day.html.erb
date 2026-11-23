@@ -4,6 +4,6 @@
 <% if found.any? %>
   <% intro = found.kind == :day ? t("nexus_ccs.home_more.on_this_day_day", date: l(found.date, format: "%-d %B")) : t("nexus_ccs.home_more.on_this_day_years", year: found.date.year - found.years_ago, count: found.years_ago) %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "home-on-this-day", heading: t("nexus_ccs.home_more.on_this_day"), intro: intro, extra_class: "home-more home-on-this-day") do %>
-    <%= render NexusCcs::MosaicComponent.new(tiles: found.documents.map { |document| record_tile(document) }, label: t("nexus_ccs.home_more.on_this_day"), lanes: 5) %>
+    <%= render NexusCcs::MosaicComponent.new(tiles: found.documents.each_with_index.map { |document, index| record_tile(document, lead: index.zero?) }, label: t("nexus_ccs.home_more.on_this_day"), lanes: 3) %>
   <% end %>
 <% end %>

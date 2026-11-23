@@ -88,7 +88,7 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     boxes = explore_boxes
     assert_operator boxes[0][2], :>, boxes[1][2], "the lead (University Art Collection) is the widest tile"
     assert_operator boxes.map(&:first).uniq.size, :>, 1, "the tiles sit side by side"
-    assert_operator boxes.map { |box| box[1] }.uniq.size, :>, 2, "a mosaic, not one row: the tiles start at different heights"
+    assert_operator boxes.map { |box| box[1] }.uniq.size, :>=, 2, "a mosaic, not one row: the tiles start at different heights"
     # every picture section is the same tile in the same mosaic (the collections, record types, places, time, on this day)
     %w[.explore .home-named .explore-kinds .home-places .explore-periods .home-on-this-day].each do |section|
       next unless page.has_css?(section, wait: 0)

@@ -8,8 +8,8 @@ import { Controller } from "@hotwired/stimulus"
 // Each picture's shape (--a, width over height) comes from the server or is measured here once it loads.
 // Without JavaScript the list is an even grid of the same cards.
 export default class extends Controller {
-  // ordered: each tile goes into the next lane in turn (left to right, row after row), not the shortest one, so a sequence (centuries)
-  // reads in its order; the lanes still end level where their last pictures can grow
+  // ordered: the tiles are placed in their own order (a sequence: centuries), never rearranged to level the lanes; each still goes into the
+  // shortest lane, so the order reads left to right, top to bottom
   static values = { lanes: { type: Number, default: 4 }, ordered: { type: Boolean, default: false } }
   static MIN_LANE = 208 // px: a lane is never narrower than this (13rem)
   static LEVEL = 48 // px: two lanes this close are level enough for a two-lane tile (the shorter one's last tile grows to meet it)
@@ -67,6 +67,19 @@ export default class extends Controller {
 
   mount(item) { return item.querySelector(".result-card__media, .object-card__media") }
 
+  // The lead first (where there is one), then the rest tallest first: a tile's height at a lane's width, its picture by its shape and its text
+  tallestFirst(items, laneWidth) {
+    const height = (item) => {
+      const mount = this.mount(item)
+      const text = item.getBoundingClientRect().height - (mount ? mount.getBoundingClientRect().height : 0)
+      return laneWidth / (parseFloat(item.style.getPropertyValue("--a")) || 1.333) + text
+    }
+    const [first, ...rest] = items
+    const lead = first?.classList.contains("mosaic-flow__item--lead")
+    const sorted = (lead ? rest : items).map((item) => [item, height(item)]).sort((a, b) => b[1] - a[1]).map(([item]) => item)
+    return lead ? [first, ...sorted] : sorted
+  }
+
   // A short mosaic (under three rows of lanes, no lead): justified rows, as a photo wall. The tiles, in order, are shared among as many rows
   // as their pictures fill at about a lane's usual height, each row taking about the same total width, so every row is full; a row's
   // pictures then share the one height that makes it exactly as wide as the list (each whole), and its cards are made one height. Few tiles
@@ -121,10 +134,16 @@ export default class extends Controller {
     const laneWidth = (width - gap * (lanes - 1)) / lanes
     this.element.classList.add("is-ready")
     if (!items.length) { this.element.style.height = "0px"; return }
-    if (items.length <= lanes) return this.row(items, width, gap)
+    // a mosaic with a lead (every section of the home page) is always lanes, however few its tiles, so the sections share one layout
     const lead = items.some((item) => item.classList.contains("mosaic-flow__item--lead"))
+    if (!lead && items.length <= lanes) return this.row(items, width, gap)
     if (!lead && lanes > 1 && items.length < lanes * 3) return this.rows(items, width, gap, laneWidth)
 
+    // A short mosaic (under three rows): after its lead, the tallest tiles go first, so the short ones fill in at the foot and the lanes end
+    // nearly level (the longest-first rule for packing lanes; an ordered one keeps its order); its last pictures may grow by up to their own
+    // height to level them
+    const short = items.length < lanes * 3
+    const placed = short && !this.orderedValue ? this.tallestFirst(items, laneWidth) : items
     const heights = new Array(lanes).fill(0)
     const spans = new Map() // each tile's lanes
     const last = new Array(lanes).fill(null) // the last tile in each lane, to grow when the lane ends short
@@ -136,14 +155,14 @@ export default class extends Controller {
       return true
     }
 
-    items.forEach((item, index) => {
+    placed.forEach((item) => {
       const mount = this.mount(item)
       if (mount) mount.style.height = "" // its own shape again before measuring
       if (item.firstElementChild) item.firstElementChild.style.minHeight = ""
       const shape = parseFloat(item.style.getPropertyValue("--a")) || 1.333
       const lead = item.classList.contains("mosaic-flow__item--lead")
       // the lead takes two lanes unless its picture is tall (a two-lane portrait would tower over the rest); a wide picture too, on 4+ lanes
-      let span = !this.orderedValue && lanes >= 3 && ((lead && shape >= 0.9) || (shape >= 1.7 && lanes >= 4)) ? 2 : 1
+      let span = lanes >= 3 && ((lead && shape >= 0.9) || (shape >= 1.7 && lanes >= 4)) ? 2 : 1
 
       // a two-lane tile goes only where two lanes are nearly level (the lowest such pair); otherwise it takes one lane
       let lane = 0
@@ -157,7 +176,7 @@ export default class extends Controller {
         if (best < 0) span = 1
         else lane = best
       }
-      if (span === 1) lane = this.orderedValue ? index % lanes : heights.indexOf(Math.min(...heights))
+      if (span === 1) lane = heights.indexOf(Math.min(...heights))
 
       const top = Math.max(...heights.slice(lane, lane + span))
       for (let c = lane; c < lane + span; c++) { // level the shorter lane under it: its last tile grows
@@ -184,7 +203,7 @@ export default class extends Controller {
     })
     grown.forEach((by, item) => {
       const mount = this.mount(item)
-      if (mount && by <= mount.getBoundingClientRect().height * 0.5) grow(item, by)
+      if (mount && by <= mount.getBoundingClientRect().height * (short ? 1 : 0.5)) grow(item, by)
     })
     this.element.style.height = `${Math.max(0, ...items.map((item) => item.offsetTop + item.offsetHeight))}px`
   }

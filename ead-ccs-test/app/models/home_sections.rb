@@ -46,18 +46,20 @@ module HomeSections
       name = value["value"]
       Tile.new(title: name, text: nil,
                path: helpers.collection_landing_path(kind: "named-collections", slug: Browse::Slug.build("named-collections", name)),
-               image: value.dig("image", "path"), lead: index.zero?, cta: (I18n.t("home.collections.cta") if index.zero?), external: false,
+               image: value.dig("image", "path"), lead: index.zero?, cta: nil, external: false,
                width: value.dig("image", "width"), height: value.dig("image", "height"))
     end
   end
 
-  # Record types: every kind (ExploreEntryPoints.kinds), each with three of its own records. links: the overview's kinds (counts, paths).
+  # Record types: every kind (ExploreEntryPoints.kinds), each with three of its own records and a line on what it holds (the collections
+  # that hold most of it, CardDescription; kept for a day). links: the overview's kinds (counts, paths).
   def kind_collages(links, helpers)
     by_label = links.index_by(&:label)
     ExploreEntryPoints.kinds.filter_map do |label, values|
       link = by_label[label] or next
-      collage(label, link.count, helpers.search_action_path(link.query),
-              [ Browse.field_query(ExploreEntryPoints::CLASSIFICATION_FIELD, values) ], helpers, KIND_PICTURES)
+      filter = Browse.field_query(ExploreEntryPoints::CLASSIFICATION_FIELD, values)
+      about = Rails.cache.fetch(SuppressedRecord.cache_key("home/kind_about/v1/#{label}"), expires_in: 1.day) { CardDescription.for(filter: filter, kinds: false) }
+      collage(label, link.count, helpers.search_action_path(link.query), [ filter ], helpers, KIND_PICTURES, intro: about.presence)
     end
   end
 

@@ -27,20 +27,3 @@ en:
       intro: "The centuries the records come from."
     on_this_day:
       see_all: "See all records with pictures"
-    ways:
-      label: "More ways in"
-      stories:
-        eyebrow: "Stories"
-        title: "Follow objects, people and ideas across the collections"
-        text: "Narratives written by the collections team, each built around records you can open and explore."
-        cta: "Read the stories"
-      themes:
-        eyebrow: "Themes"
-        title: "Records gathered around a shared idea"
-        text: "From medicine and music to the natural world."
-        cta: "Browse themes"
-      categories:
-        eyebrow: "Categories"
-        title: "Every record, sorted by what it is"
-        text: "A quick route into the whole catalogue."
-        cta: "Browse by category"

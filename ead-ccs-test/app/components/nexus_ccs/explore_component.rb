@@ -41,31 +41,39 @@ module NexusCcs
 
     def place_collages = @place_collages ||= HomeSections.place_collages(overview.place_tiles, helpers)
 
-    # Record types and Places as the same picture tiles as the collections (one picture of each, its name and number), so every section of
-    # the page is one kind of card in one mosaic. A place opens its own page.
-    def kind_tiles = @kind_tiles ||= kind_collages.map { |collage| collage_tile(collage, collage.path) }
+    # Record types and Places as the same picture tiles as the collections, in the same mosaic, the first leading (two lanes wide), as the
+    # collections within the collections: one picture of each, its name, and a line on what its page holds (the kinds of record and the
+    # collections, CardDescription, worked out from its own records) where a number of records was. A place opens its own page.
+    def kind_tiles
+      @kind_tiles ||= begin
+        about = Array(overview.kind_tiles).to_h { |tile| [ tile.label, tile.intro ] }
+        kind_collages.each_with_index.map { |collage, index| collage_tile(collage, collage.path, about[collage.title].presence || collage.intro, index.zero?) }
+      end
+    end
 
     def place_tiles
-      @place_tiles ||= place_collages.map { |collage| collage_tile(collage, Browse.path_for("places", collage.title) || collage.path) }
+      @place_tiles ||= place_collages.each_with_index.map do |collage, index|
+        collage_tile(collage, Browse.path_for("places", collage.title) || collage.path, collage.intro, index.zero?)
+      end
     end
 
     # Each tile's picture is the first of its records' pictures that no tile before it on the page has used (Australia, Melbourne and
     # Prints and drawings would otherwise share one print)
-    def collage_tile(collage, path)
+    def collage_tile(collage, path, about, lead)
       picture = collage.pictures.find { |candidate| fresh?(candidate[:src]) } || collage.pictures.first
       used_pictures << picture_key(picture[:src]) if picture
-      HomeSections::Tile.new(title: collage.title, text: collage.text, path: path, image: picture && DamImage.sized(picture[:src], 600),
-                             lead: false, cta: nil, external: false, width: nil, height: nil)
+      HomeSections::Tile.new(title: collage.title, text: about.presence, path: path, image: picture && DamImage.sized(picture[:src], 600),
+                             lead: lead, cta: nil, external: false, width: nil, height: nil)
     end
 
-    # Time as the same tiles: the period's picture (one no tile above has used, else none), its name and its number of records
+    # Time as the same tiles: the period's picture (one no tile above has used, else none), its name and what it holds, the first leading
     def period_tiles
-      @period_tiles ||= overview.period_tiles.map do |tile|
+      @period_tiles ||= overview.period_tiles.each_with_index.map do |tile, index|
         image = ExploreCardComponent.image?(tile, remote: true) ? DamImage.sized(AssetVersion.url(tile.image.path), 600) : nil
         image = nil if image && !fresh?(image)
         used_pictures << picture_key(image) if image
-        HomeSections::Tile.new(title: tile.label, text: (count_label(tile.count) if tile.count), path: helpers.search_action_path(tile.query),
-                               image: image, lead: false, cta: nil, external: false, width: (tile.image.width if image), height: (tile.image.height if image))
+        HomeSections::Tile.new(title: tile.label, text: tile.intro.presence, path: helpers.search_action_path(tile.query),
+                               image: image, lead: index.zero?, cta: nil, external: false, width: (tile.image.width if image), height: (tile.image.height if image))
       end
     end
 

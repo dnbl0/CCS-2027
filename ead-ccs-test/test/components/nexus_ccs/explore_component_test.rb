@@ -52,7 +52,9 @@ class ExploreComponentTest < ViewComponent::TestCase
     tile = "ul.mosaic-flow[data-controller=mosaic] li.mosaic-flow__item article.explore-card--tile"
     assert_selector "section.explore-kinds #{tile}", count: 2
     assert_selector "section.explore-kinds #{tile} h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings']", text: "Prints and drawings"
-    assert_selector "section.explore-kinds #{tile} .explore-card__intro", text: "7,192 records"
+    # a line on what the page holds where the number of records was (none here: the test has no index to describe them from)
+    assert_no_selector "section.explore-kinds, section.home-places, section.explore-periods", text: /\d records/
+    assert_selector "section.explore-kinds li.mosaic-flow__item--lead:first-child h3", text: "Prints and drawings" # each section led by its first tile
     assert_selector "section.home-places #{tile} h3 a", text: "Australia" # its own page, or its records where it has none
     assert_selector "section.explore-periods ul.mosaic-flow[data-mosaic-ordered-value=true] li.mosaic-flow__item article.explore-card--tile h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900']", text: "1900s"
     assert_no_selector ".explore-card--collage, .place-spot" # the shelf of collages and the place tabs are gone

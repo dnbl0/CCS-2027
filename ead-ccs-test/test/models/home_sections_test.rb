@@ -40,7 +40,7 @@ class HomeSectionsTest < ActiveSupport::TestCase
     assert_equal 8, tiles.size
     assert_equal "Bequest 1", tiles.first.title
     assert tiles.first.lead
-    assert_equal "Explore the collection", tiles.first.cta
+    assert_nil tiles.first.cta # the lead has no call to action: the whole card is the link
     assert_not tiles.map(&:title).include?("No picture")
     assert tiles.all? { |tile| tile.text.nil? } # no record counts
     assert_equal [], HomeSections.named(values.first(7), helpers) # too few for the mosaic: the section is left out

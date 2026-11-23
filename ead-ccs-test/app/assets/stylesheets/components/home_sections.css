@@ -5,10 +5,8 @@
  * places fit their pictures whole.
  *
  * - HomeSectionComponent: heading and intro on the left, "See all" on the right (under them on a phone).
- * - MosaicComponent and CardLayoutComponent justified: justified rows of the site's card, the lead first.
- * - CardLayoutComponent shelf: Record types' pictures whole at one height, the name under each, scrolling sideways.
- * - PlacePreviewComponent: Places as a list of rows beside a large preview of the one pointed at or focused.
- * - More ways in: a large lead card and two beside it.
+ * - MosaicComponent: every picture section (collections, named collections, record types, places, time, on this day, recently viewed)
+ *   as the site's tile in lane masonry, each section led by its first tile, two lanes wide.
  */
 
 /* ---- Section frame ---- */
@@ -84,9 +82,9 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 @media (min-width: 1200px) { .justified { --row-h: 17rem; } }
 
 /* The museums' banners are wide (about 2:1), so their rows are lower: two or three banners to a row on a desktop */
-.explore .justified, .home-visit .justified, .home-ways .justified { --row-h: 11rem; }
+.explore .justified, .home-visit .justified { --row-h: 11rem; }
 
-@media (min-width: 1200px) { .explore .justified, .home-visit .justified, .home-ways .justified { --row-h: 13rem; } }
+@media (min-width: 1200px) { .explore .justified, .home-visit .justified { --row-h: 13rem; } }
 
 /* On this day: smaller pictures, more to a row */
 @media (min-width: 1200px) { .home-on-this-day .justified { --row-h: 14rem; } }
@@ -151,11 +149,6 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 
 /* ---- Recently viewed: as many columns as fit ---- */
 .home-recent__list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 17.5rem), 1fr)); }
-
-/* ---- More ways in: a large lead card, two beside it ---- */
-.explore-card__eyebrow { margin: var(--ccs-space-4) 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
-
-.explore-card--tile .explore-card__eyebrow + .document-title-heading { padding-block-start: var(--ccs-space-1); }
 
 /* ---- The Places page (browse/places; after Google Arts & Culture's Places, looked at 2026-11-23) ----
    The places as the home page's mosaic (each picture whole, the name and count under it); a sticky toolbar with the live search; the
