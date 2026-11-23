@@ -3,6 +3,24 @@ en:
   # Placeholder wording: the collections team has not approved it.
   browse:
     # The Places page (after Google Arts & Culture's Places): views, the wall, the A–Z list
+    # A place's own page (browse_entities/place; after Google Arts & Culture's place pages)
+    place:
+      kind: "Place"
+      in_region: "in %{region}"
+      records:
+        one: "1 record"
+        other: "%{number} records"
+      span: "made %{span}"
+      held_in:
+        one: "held in 1 collection"
+        other: "held in %{count} collections"
+      all_places: "All places"
+      collections:
+        one: "1 collection holds records from here"
+        other: "%{count} collections hold records from here"
+      ways_in: "Ways into this place's records"
+      discover: "Discover this place"
+      page: "Page %{page} of %{pages}"
     places:
       views: "Show places"
       all: "All"

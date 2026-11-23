@@ -88,6 +88,21 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "a place has its own page, after Google Arts & Culture's place pages: its pictures, what it holds, the collections, the ways in and its records as the mosaic" do
+    browse entity_path("places", "Australia")
+
+    assert_response :success
+    assert_select "main.place-page h1", "Australia"
+    assert_select ".place-page__summary", /730 records, made 1816 to 2019, held in 1 collection\./
+    assert_select ".place-page__strip[aria-hidden=true] img[alt='']", count: 1 # the open record's picture, whole; never the withheld one
+    assert_select "a.btn[href*='production_place_ssim']", /See all 730 records/
+    assert_select "section h2", /1 collection holds records from here/
+    assert_select ".place-collections h3 a[href*='collection_ssim']", "University Art Collection"
+    assert_select ".place-chips a.places-chip", text: /Painting\s+400/
+    assert_select "section .card-layout--mosaic ul.mosaic-flow[data-controller=mosaic] li .object-card, section .card-layout--mosaic ul.mosaic-flow li article"
+    assert_select "main.browse-main", count: 0 # not the makers' and subjects' profile
+  end
+
   test "a variant spelling leads to the entity's page, which names the commonest spelling" do
     browse entity_path("places", "Europe (?)")
 

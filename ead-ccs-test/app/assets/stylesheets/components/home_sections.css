@@ -326,3 +326,68 @@ turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity
 .places-list__count { flex: none; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
 
 @media (prefers-reduced-motion: reduce) { turbo-frame#places-results[aria-busy="true"] { transition: none; } }
+
+/* ---- A place's own page (browse_entities/place; after Google Arts & Culture's place pages, looked at 2026-11-23) ----
+   A strip of the place's own pictures (each whole, one justified row) where Google Arts & Culture has a cropped banner; the name centred
+   under it; then the collections, the ways in, "Discover this place" as the fluid mosaic, and related places. */
+.place-page { padding-block-end: var(--ccs-space-10, 4rem); }
+
+/* One row that never wraps: each picture as wide as its shape, so all share one height and the row fills the width */
+.place-page__strip { flex-wrap: nowrap; gap: 4px; overflow: hidden; background: var(--ccs-surface-subtle); }
+
+.place-page__strip::after { display: none; }
+
+.place-page__strip > .justified__item { flex: var(--a) 1 0; min-width: 0; }
+
+.place-page__strip-image { display: block; width: 100%; height: auto; aspect-ratio: var(--a); object-fit: contain; }
+
+.place-page__inner { max-width: var(--layout-page, 90rem); margin-inline: auto; padding-inline: var(--ccs-space-4); }
+
+.place-page__head { display: flex; flex-direction: column; align-items: center; gap: var(--ccs-space-3); padding-block: var(--ccs-space-8) var(--ccs-space-6); text-align: center; }
+
+.place-page__kind { margin: 0; color: var(--ccs-text-secondary); font-weight: var(--ccs-font-weight-semibold); }
+
+.place-page__title { margin: 0; color: var(--ccs-text-heading, var(--ccs-navy-1100)); font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-5xl); font-weight: 400; line-height: 1.1; text-wrap: balance; }
+
+.place-page__summary { max-width: 60ch; margin: 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-lg); }
+
+.place-page__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--ccs-space-3) var(--ccs-space-6); margin-block-start: var(--ccs-space-2); }
+
+.place-page__actions .arrow-link { min-height: 44px; align-items: center; font-weight: var(--ccs-font-weight-semibold); }
+
+.place-page__advisory { max-width: 60rem; margin: 0 auto var(--ccs-space-6); }
+
+.place-section { padding-block: var(--ccs-space-6); border-block-start: 1px solid var(--color-border-grey-91); }
+
+.place-section__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--ccs-space-2) var(--ccs-space-4); }
+
+.place-section__heading { margin: 0 0 var(--ccs-space-4); color: var(--ccs-text-heading, var(--ccs-navy-1100)); font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-3xl); font-weight: 400; }
+
+.place-section__heading--small { font-size: var(--ccs-font-size-2xl); }
+
+.place-section__note { margin: 0; color: var(--ccs-text-secondary); }
+
+.place-section--facets { display: grid; gap: var(--ccs-space-6); grid-template-columns: minmax(0, 1fr); }
+
+@media (min-width: 900px) { .place-section--facets { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.place-chips { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2); margin: 0; padding: 0; list-style: none; }
+
+.place-chips .places-chip:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+/* The collections: a rail of the site's cards, each picture whole on its mount */
+.place-collections { display: flex; gap: var(--ccs-space-4); margin: 0; padding: var(--ccs-space-1) 0 var(--ccs-space-3); overflow-x: auto; scrollbar-width: thin; list-style: none; }
+
+.place-collections__item { flex: 0 0 min(80%, 16rem); display: flex; }
+
+.place-collection { position: relative; width: 100%; }
+
+.place-collection__media { display: grid; place-items: center; height: 10rem; background: var(--ccs-surface-subtle); }
+
+.place-collection__media img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+
+.place-collection .explore-card__link::after { content: ""; position: absolute; inset: 0; }
+
+.place-collection:focus-within { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
+
+.place-collection .explore-card__link:focus-visible { outline: none; }

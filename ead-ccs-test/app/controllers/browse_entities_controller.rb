@@ -16,7 +16,7 @@ class BrowseEntitiesController < CatalogController
 
   RELATED_LIMIT = 8
 
-  helper_method :related_entities, :refine
+  helper_method :related_entities, :refine, :collection_picture
 
   def entity
     @kind = Browse::Kind.find(params[:kind]) || raise(ActionController::RoutingError, "Not Found")
@@ -28,6 +28,8 @@ class BrowseEntitiesController < CatalogController
     wrap_response(@result)
     @search_query = @entry.search_query
     use_meta Browse::Meta.entity(@entry, @result), [ [ t("browse.title"), browse_path ], [ @kind.plural, browse_hub_path(@kind.key) ], [ @entry.name, nil ] ]
+    # A place has its own page, after Google Arts & Culture's place pages (browse_entities/place); makers and subjects keep the profile
+    render "browse_entities/place" if @kind.key == "places"
   end
 
   def period
@@ -83,4 +85,10 @@ class BrowseEntitiesController < CatalogController
 
   # The same records, narrowed to one more value of a field (the page's main collections, object types)
   def refine(query, field, value) = query.deep_merge(f: { field => [ value ] })
+
+  # A collection's picture for the place page's collection cards: the home page's Explore tile for it (ExploreEntryPoints), or nil
+  def collection_picture(name)
+    @collection_pictures ||= ExploreEntryPoints.overview.collections.to_h { |tile| [ tile.label, (tile.image if NexusCcs::ExploreCardComponent.image?(tile)) ] }
+    @collection_pictures[name]
+  end
 end

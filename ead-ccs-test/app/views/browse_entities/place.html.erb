@@ -1,0 +1,119 @@
+<%# One place (BrowseEntitiesController#entity for a place), after Google Arts & Culture's place pages (looked at 2026-11-23, described in
+    our own words): a strip of the place's own pictures (each whole), its name and what it holds; the collections that hold its records;
+    its kinds of record and its centuries; "Discover this place", its records as the fluid mosaic; and the places related to it. The facts
+    and records are Browse::Profile's (records whose pictures or details need permission are left out of the mosaic; the count and the
+    search include them). %>
+<% result = @result %>
+<% span = Browse::Meta.span_of(result) %>
+<% region = PlaceRegions.region_of(@entry.name) %>
+<%# the strip takes pictures from the end of the page, so it does not repeat the records "Discover this place" opens with %>
+<% pictured = result.documents.select { |document| document["thumbnail_path_ssi"].present? && AccessPolicy.view?(document) && !Sensitivity.sensitive?(document) }.last(5) %>
+<% advisory = result.cultural.positive? || @entry.name.match?(/aborigin|indigenous|torres strait|first nations|koori|palawa/i) %>
+<% content_for :title, t("browse.entity.title", name: @entry.name, kind: @kind.singular) %>
+<% content_for :body_class, "page-browse page-place" %>
+
+<main class="place-page" id="main-content">
+  <% if pictured.any? %>
+    <%# The place's own pictures, whole, in one justified row: decorative here (the same records are in "Discover this place") %>
+    <ul class="justified place-page__strip" data-controller="justified" aria-hidden="true">
+      <% pictured.each do |document| %>
+        <li class="justified__item"><%= image_tag AssetVersion.url(document["thumbnail_path_ssi"]), alt: "", class: "place-page__strip-image", decoding: "async" %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <div class="place-page__inner">
+    <header class="place-page__head">
+      <p class="place-page__kind"><%= t("browse.place.kind") %><%= " #{t('browse.place.in_region', region: region)}" if region %></p>
+      <h1 class="place-page__title"><%= @entry.name %></h1>
+      <p class="place-page__summary">
+        <%= t("browse.place.records", count: result.total, number: number_with_delimiter(result.total)) %><% if span %>, <%= t("browse.place.span", span: span) %><% end %><% if result.facets["collection_ssim"].any? %>, <%= t("browse.place.held_in", count: result.facets["collection_ssim"].size) %><% end %>.
+      </p>
+      <div class="place-page__actions">
+        <%= link_to t("browse.entity.see_all", count: number_with_delimiter(result.total)), search_catalog_path(@search_query), class: "btn btn-primary" %>
+        <%= link_to t("browse.place.all_places"), browse_hub_path("places"), class: "arrow-link arrow-link--icon" %>
+      </div>
+    </header>
+
+    <% if advisory %>
+      <aside class="browse-advisory place-page__advisory" aria-labelledby="browse-advisory-title">
+        <h2 id="browse-advisory-title" class="browse-advisory__title"><%= t("browse.entity.advisory_title") %></h2>
+        <p><%= t("browse.entity.advisory") %> <%= link_to t("browse.entity.advisory_link"), "/help#indigenous" %></p>
+      </aside>
+    <% end %>
+
+    <% if result.facets["collection_ssim"].any? %>
+      <section class="place-section" aria-labelledby="place-collections">
+        <h2 id="place-collections" class="place-section__heading"><%= t("browse.place.collections", count: result.facets["collection_ssim"].size) %></h2>
+        <ul class="place-collections">
+          <% result.facets["collection_ssim"].first(8).each do |name, count| %>
+            <% picture = collection_picture(name) %>
+            <li class="place-collections__item">
+              <article class="result-card explore-card place-collection">
+                <% if picture %><%= link_to search_catalog_path(refine(@search_query, "collection_ssim", name)), class: "place-collection__media", tabindex: -1, "aria-hidden": true do %><%= image_tag AssetVersion.url(picture.path), alt: "", loading: "lazy", decoding: "async", width: picture.width, height: picture.height %><% end %><% end %>
+                <div class="result-card__content">
+                  <h3 class="document-title-heading"><%= link_to name, search_catalog_path(refine(@search_query, "collection_ssim", name)), class: "explore-card__link" %></h3>
+                  <p class="explore-card__intro"><%= t("browse.place.records", count: count, number: number_with_delimiter(count)) %></p>
+                </div>
+              </article>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+
+    <% kinds = result.facets["object_type_ssim"].first(10) %>
+    <% periods = result.periods.select { |_, count| count.positive? } %>
+    <% if kinds.any? || periods.any? %>
+      <section class="place-section place-section--facets" aria-label="<%= t("browse.place.ways_in") %>">
+        <% if kinds.any? %>
+          <div class="place-facets">
+            <h2 class="place-section__heading place-section__heading--small"><%= t("browse.entity.object_types") %></h2>
+            <ul class="place-chips">
+              <% kinds.each do |value, count| %>
+                <li><%= link_to search_catalog_path(refine(@search_query, "object_type_ssim", value)), class: "places-chip" do %><%= value.to_s.upcase_first %> <span class="places-chip__count"><%= number_with_delimiter(count) %></span><% end %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+        <% if periods.any? %>
+          <div class="place-facets">
+            <h2 class="place-section__heading place-section__heading--small"><%= t("browse.entity.related_periods") %></h2>
+            <ul class="place-chips">
+              <% periods.each do |related_period, count| %>
+                <li><%= link_to related_period.path, class: "places-chip" do %><%= related_period.label %> <span class="places-chip__count"><%= number_with_delimiter(count) %></span><% end %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
+
+    <section class="place-section" aria-labelledby="place-discover">
+      <div class="place-section__head">
+        <h2 id="place-discover" class="place-section__heading"><%= t("browse.place.discover") %></h2>
+        <% if result.pages > 1 %><p class="place-section__note"><%= t("browse.place.page", page: result.page, pages: result.pages) %></p><% end %>
+      </div>
+      <% if result.documents.empty? %>
+        <p class="browse-empty"><%= t("browse.entity.empty_page") %></p>
+      <% else %>
+        <%= render NexusCcs::CardLayoutComponent.new(cards: result.documents, layout: :mosaic, lanes: 4, label: t("browse.place.discover"),
+                                                     renderer: ->(document) { NexusCcs::RecordCardComponent.new(document: document) }) %>
+      <% end %>
+      <% if result.held_back.positive? %><p class="browse-note"><%= t("browse.entity.held_back") %></p><% end %>
+      <%= render "browse_entities/pager", page: result.page, pages: result.pages, label: t("browse.entity.pagination") %>
+    </section>
+
+    <% related_places = related_entities(Browse::Kind.find("places"), result.facets["production_place_ssim"], except: @entry) %>
+    <% if related_places.any? %>
+      <section class="place-section" aria-labelledby="place-related">
+        <h2 id="place-related" class="place-section__heading"><%= t("browse.entity.related_places") %></h2>
+        <ul class="place-chips">
+          <% related_places.each do |related_entry, count| %>
+            <li><%= link_to related_entry.path, class: "places-chip" do %><%= related_entry.name %> <span class="places-chip__count"><%= number_with_delimiter(count) %></span><% end %></li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+  </div>
+</main>
