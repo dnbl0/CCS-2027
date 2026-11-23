@@ -28,7 +28,7 @@
 .compare__link .form-check-input { width: 1.25rem; height: 1.25rem; margin: 0; float: none; }
 .compare__link .form-check-label { font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-brand); }
 .compare__hint { grid-column: 2; margin: 0; font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
-.compare__toolbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-2) var(--ccs-space-3); }
+.compare__toolbar-actions { display: flex; flex-wrap: wrap; align-items: center; margin-inline-start: auto; gap: var(--ccs-space-2) var(--ccs-space-3); }
 
 /* The panes */
 .compare__panes { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ccs-space-5); margin: 0; padding: 0; list-style: none; }
@@ -40,6 +40,9 @@
 .compare-pane__header { display: flex; flex-wrap: wrap; align-items: flex-start; align-content: flex-start; justify-content: space-between; gap: var(--ccs-space-2) var(--ccs-space-4); padding: var(--ccs-space-3) var(--ccs-space-4); }
 .compare-pane__title { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-snug); color: var(--ccs-text-brand); overflow-wrap: anywhere; }
 .compare-pane__record { display: grid; gap: var(--ccs-space-1); min-width: 0; }
+/* A record's pane: the record and Remove on one line, the picker under them */
+.compare-pane__header--record { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+.compare-pane__header--record .compare-pane__choose { grid-column: 1 / -1; }
 .compare-pane__record .compare__details { font-size: var(--ccs-font-size-sm); }
 .compare-pane__remove-form { margin: 0; }
 .compare-pane__choose { display: flex; align-items: center; gap: var(--ccs-space-2); }
@@ -49,6 +52,21 @@
 .compare-pane__stage { position: relative; align-self: start; width: 100%; aspect-ratio: 4 / 3; background: var(--ccs-surface-subtle); border-block: 1px solid var(--ccs-border-subtle); }
 .compare-pane__image { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
 .compare-pane__tools { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--ccs-space-1); min-height: 3.5rem; padding: var(--ccs-space-1) var(--ccs-space-2); }
+
+/* The second place while one record waits for another: a dashed outline with what to do */
+.compare-slot {
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: var(--ccs-space-3); height: 100%; min-height: 16rem;
+  grid-row: 1 / -1; padding: var(--ccs-space-6); border: 2px dashed var(--ccs-border-default); background: var(--ccs-surface-subtle);
+}
+.compare-slot__heading { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-brand); }
+.compare-slot__text { margin: 0; max-width: 32rem; font-size: var(--ccs-font-size-md); color: var(--ccs-text-primary); }
+.compare__item--waiting { display: block; grid-row: span 3; }
+@media (max-width: 767.98px) { .compare__item--waiting { grid-row: auto; } }
+
+/* Nothing yet: the steps, then the way to records with images */
+.compare__empty { display: grid; justify-items: start; gap: var(--ccs-space-4); max-width: 40rem; padding: var(--ccs-space-6) 0; }
+.compare__empty-heading { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-heading-panel-size); font-weight: var(--ccs-heading-weight); color: var(--ccs-text-brand); }
+.compare__steps { display: grid; gap: var(--ccs-space-2); margin: 0; padding-inline-start: var(--ccs-space-5); font-size: var(--ccs-font-size-lg); color: var(--ccs-text-primary); }
 
 /* Without JavaScript the script-only controls hold their space but stay invisible (they would do nothing) */
 .compare:not(.is-ready) [data-js-only] { visibility: hidden; }

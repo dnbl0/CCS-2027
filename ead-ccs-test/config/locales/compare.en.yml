@@ -14,7 +14,14 @@ en:
         one: "%{count} record you added is no longer available to view, so it is not shown."
         other: "%{count} records you added are no longer available to view, so they are not shown."
       empty: "Nothing to compare yet. Open a record with an image and choose Add to comparison."
-      one_pane: "Add one more record to compare. Open another record with an image and choose Add to comparison."
+      empty_heading: "Nothing to compare yet"
+      steps:
+        - "Open a record that has an image."
+        - "Choose Add to comparison under its title."
+        - "Add another record the same way, then choose Open comparison."
+      find_records: "Find records with images"
+      slot_heading: "Add another record"
+      one_pane: "Open another record with an image and choose Add to comparison to see it here, side by side."
       record_heading: "Images of %{title}"
       # The comparison page (views/compare/show)
       record_title: "Compare images of %{title}"

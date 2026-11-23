@@ -30,20 +30,26 @@
       <p class="compare__note" role="status"><%= t("nexus_ccs.compare.unavailable", count: @unavailable) %></p>
     <% end %>
 
+    <% with_images = search_action_path(f: { has_digital_asset: [ "with" ] }, search_field: "all_fields", view: "masonry") %>
     <% if @panes.empty? %>
-      <div class="saved-empty">
-        <p class="saved-empty__text"><%= t("nexus_ccs.compare.empty") %></p>
-        <%= link_to t("nexus_ccs.saved_searches.start_searching"), root_path, class: "btn btn-primary" %>
+      <%# Nothing yet: how to compare, in three steps, and the way to records with images %>
+      <div class="compare__empty">
+        <h2 class="compare__empty-heading"><%= t("nexus_ccs.compare.empty_heading") %></h2>
+        <ol class="compare__steps">
+          <% t("nexus_ccs.compare.steps").each do |step| %><li><%= step %></li><% end %>
+        </ol>
+        <%= link_to t("nexus_ccs.compare.find_records"), with_images, class: "btn btn-primary" %>
       </div>
     <% else %>
-      <% if @panes.size == 1 && !@record_mode %><p class="compare__note"><%= t("nexus_ccs.compare.one_pane") %></p><% end %>
 
       <div class="compare__toolbar" role="group" aria-label="<%= t("nexus_ccs.compare.tools") %>">
+        <% if @panes.size > 1 %>
         <div class="compare__link form-check" data-js-only>
           <input type="checkbox" id="compare-link" class="form-check-input" checked aria-describedby="compare-link-hint" data-compare-target="link">
           <label for="compare-link" class="form-check-label"><%= t("nexus_ccs.compare.link") %></label>
           <p class="compare__hint" id="compare-link-hint"><%= t("nexus_ccs.compare.link_hint") %></p>
         </div>
+        <% end %>
         <div class="compare__toolbar-actions">
           <% if @record_mode %>
             <% if @panes.size < [ CompareList::MAX, @panes.first.images.size ].min %>
@@ -59,13 +65,14 @@
         </div>
       </div>
 
-      <ul class="compare__panes compare__panes--<%= @panes.size %>">
+      <% waiting = @panes.size == 1 && !@record_mode %>
+      <ul class="compare__panes compare__panes--<%= waiting ? 2 : @panes.size %>">
         <% @panes.each_with_index do |pane, number| %>
           <% sources = pane.images.each_with_index.map { |image, index| { url: image.url, info: image.info_url, alt: image.alt } } %>
           <% current = pane.images[pane.index] %>
           <% position = t("nexus_ccs.compare.position", position: pane.index + 1, count: pane.images.size) %>
           <li class="compare__item"><div class="compare-pane" data-compare-target="pane" data-sources="<%= sources.to_json %>" role="group" aria-labelledby="compare-pane-<%= number %>-title">
-            <header class="compare-pane__header">
+            <header class="compare-pane__header compare-pane__header--<%= @record_mode ? "image" : "record" %>">
               <% if @record_mode %>
                 <%# the pane is named by the image it shows; its picker beside the name %>
                 <h2 id="compare-pane-<%= number %>-title" class="compare-pane__title" data-pane-heading><%= position %></h2>
@@ -103,6 +110,16 @@
               <button type="button" class="text-button" data-action="compare#reset"><span><%= t("nexus_ccs.compare.reset") %></span><%= NexusCcs::Glyphs.icon(:reset_zoom) %></button>
             </div>
           </div></li>
+        <% end %>
+        <% if waiting %>
+          <%# The second place, waiting for a record: what to do, and the way to records with images %>
+          <li class="compare__item compare__item--waiting">
+            <div class="compare-slot">
+              <h2 class="compare-slot__heading"><%= t("nexus_ccs.compare.slot_heading") %></h2>
+              <p class="compare-slot__text"><%= t("nexus_ccs.compare.one_pane") %></p>
+              <%= link_to t("nexus_ccs.compare.find_records"), with_images, class: "btn btn-outline-primary" %>
+            </div>
+          </li>
         <% end %>
       </ul>
     <% end %>

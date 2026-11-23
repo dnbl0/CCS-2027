@@ -110,7 +110,8 @@ class CompareTest < ActionDispatch::IntegrationTest
     end
 
     assert_equal 0, panes.size
-    assert_select ".saved-empty__text", text: /Nothing to compare yet/
+    assert_select ".compare__empty h2", text: "Nothing to compare yet"
+    assert_select ".compare__empty ol.compare__steps li", count: 3
   end
 
   test "a record that is not in the index cannot be added" do
@@ -135,6 +136,18 @@ class CompareTest < ActionDispatch::IntegrationTest
 
       get "/compare", params: { record: "open-1", panes: 9 }
       assert_equal 3, panes.size, "no more panes than images"
+    end
+  end
+
+  test "one record added waits beside a place for another (no Move images together until there are two), with the way to records with images" do
+    with_records(stub_document("open-1")) do
+      add("open-1")
+      get "/compare"
+
+      assert_equal 1, panes.size
+      assert_select ".compare__panes--2 .compare__item--waiting .compare-slot h2", text: "Add another record"
+      assert_select ".compare-slot a[href*='has_digital_asset']", text: "Find records with images"
+      assert_select "label", text: "Move images together", count: 0
     end
   end
 
