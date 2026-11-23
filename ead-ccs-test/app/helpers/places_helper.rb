@@ -11,6 +11,18 @@ module PlacesHelper
                            lead: false, cta: nil, external: false, width: image&.width, height: image&.height)
   end
 
+  # Explore by place's pins (place_explorer_controller.js): every place on the map, with its region and line, and for a place with a card
+  # (Explore::PlaceCards) its own page and a small picture for its popup; any other place opens its records in the search
+  def place_explorer_markers(places, cards)
+    by_key = cards.index_by(&:key)
+    places.markers.each_with_index.map do |marker, key|
+      card = by_key[key]
+      picture = DamImage.sized(AssetVersion.url(card.image.path), 400) if card && NexusCcs::ExploreCardComponent.image?(card, remote: true)
+      { key: key, label: marker.label, where: Explore::PlaceCards.where(marker.path), region: Explore::PlaceCards.region(marker.path),
+        lat: marker.lat, lon: marker.lon, count: marker.count, href: card&.path || search_action_path(marker.search_query), card: card.present?, image: picture }
+    end
+  end
+
   # A category's value (Categories::Tile) as a mosaic tile: a collection or named collection opens its own page
   def category_tile(tile, dimension)
     image = NexusCcs::ExploreCardComponent.image?(tile, remote: true) ? tile.image : nil

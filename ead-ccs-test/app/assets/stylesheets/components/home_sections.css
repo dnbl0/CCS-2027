@@ -420,3 +420,6 @@ turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity
 .story__body .story__records { margin-block: var(--ccs-space-6); }
 
 .story .story__meta { margin: 0; color: var(--ccs-text-secondary); }
+
+/* A tile a narrowing list hides (Explore by place's cards) */
+.mosaic-flow > .mosaic-flow__item[hidden] { display: none; }

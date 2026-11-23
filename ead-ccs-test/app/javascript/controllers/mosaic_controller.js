@@ -21,7 +21,8 @@ export default class extends Controller {
 
   disconnect() { this.resizer?.disconnect(); cancelAnimationFrame(this.frame) }
 
-  items() { return [ ...this.element.children ].filter((child) => child.tagName === "LI") }
+  // The tiles shown: a list that narrows (Explore by place's cards) hides the others, and the mosaic is laid out again (mosaic:refresh)
+  items() { return [ ...this.element.children ].filter((child) => child.tagName === "LI" && !child.hidden) }
 
   // A shape the server did not know: from the img's size attributes, or from the picture once it has loaded (the DAM's pictures)
   measureShapes() {
@@ -73,6 +74,7 @@ export default class extends Controller {
     const laneWidth = (width - gap * (lanes - 1)) / lanes
     const items = this.items()
     this.element.classList.add("is-ready")
+    if (!items.length) { this.element.style.height = "0px"; return }
     if (items.length <= lanes) return this.row(items, width, gap)
 
     const heights = new Array(lanes).fill(0)

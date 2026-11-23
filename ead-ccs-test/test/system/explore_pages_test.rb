@@ -20,6 +20,10 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
                 Explore::Places::Node.new(path: "Europe", count: 12, children: [ Explore::Places::Node.new(path: "Europe|France", count: 12, children: [ paris ]) ]) ]
     Rails.cache.write(SuppressedRecord.cache_key("explore/v1/places"),
                       Explore::Places::Result.new(markers: [ melbourne, paris ], regions: regions, plain_regions: [], top_places: []), expires_in: 1.hour)
+    # Melbourne has a card (its own page and picture); Paris is only a pin, listed by name under the cards
+    Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/places/map/v1"),
+                      [ { "label" => "Melbourne", "count" => 1391, "image" => { "id" => "r1", "title" => "A tram", "path" => "/favicon.ico", "width" => 800, "height" => 600 } } ], expires_in: 1.hour)
+    page.execute_script("try { localStorage.clear() } catch (e) {}") rescue nil
   end
 
   teardown { Rails.cache = @cache }
@@ -79,22 +83,59 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
     assert_selector ".result-card", minimum: 1
   end
 
-  test "the map loads only when asked, and a place is reached with the keyboard" do
+  test "the map loads only when asked, is remembered, and a place is reached with the keyboard" do
     with_env("MAP_TILE_URL" => "http://127.0.0.1:1/{z}/{x}/{y}.png") do
+      visit "/explore/places"
+      page.execute_script("localStorage.removeItem('ccs:place-map')")
       visit "/explore/places"
       assert_equal false, page.evaluate_script("!!document.querySelector('.leaflet-container')")
       click_button "Show the map"
-      assert_selector "button[aria-expanded='true']", text: "Hide the map"
+      assert_selector ".leaflet-container"
+      assert_equal "shown", page.evaluate_script("localStorage.getItem('ccs:place-map')")
       assert_selector ".explore-map__pin[role='button'][aria-label='Melbourne: 1,391 records']"
       page.execute_script("document.querySelector(\".explore-map__pin[aria-label^='Melbourne']\").focus()")
       page.driver.browser.keyboard.type(:enter)
-      assert_selector ".leaflet-popup-content a", text: "See 1,391 records from Melbourne"
-      assert_equal "See 1,391 records from Melbourne", page.evaluate_script("document.activeElement.textContent")
-      assert_includes find(".leaflet-popup-content a")[:href], "place_hierarchy_ssim"
+      assert_selector ".leaflet-popup-content a", text: "Explore Melbourne"
+      assert_equal "Explore Melbourne", page.evaluate_script("document.activeElement.textContent")
+      assert_match %r{/browse/places/}, find(".leaflet-popup-content a")[:href]
       page.driver.browser.keyboard.type(:Escape)
       assert_no_selector ".leaflet-popup"
       assert_equal "Melbourne: 1,391 records", page.evaluate_script("document.activeElement.getAttribute('aria-label')")
       assert_selector ".leaflet-control-attribution a[href='https://www.openstreetmap.org/copyright']"
+
+      visit "/explore/places" # remembered: the map is back without asking
+      assert_selector ".leaflet-container"
+      click_button "Hide the map"
+      assert_no_selector ".leaflet-container"
+      assert_nil page.evaluate_script("localStorage.getItem('ccs:place-map')")
+      assert_equal "Show the map", page.evaluate_script("document.activeElement.textContent.trim()")
+    end
+  end
+
+  test "the chips and the name box narrow the cards; a card marks its pin; the places with no card are listed by name" do
+    page.driver.resize(1440, 900)
+    with_env("MAP_TILE_URL" => "http://127.0.0.1:1/{z}/{x}/{y}.png") do
+      visit "/explore/places"
+      assert_selector ".place-card", count: 1
+      assert_selector ".place-explorer__more-link", text: "Paris"
+
+      click_button "Europe"
+      assert_selector ".place-explorer__chip[aria-pressed='true']", text: "Europe"
+      assert_no_selector ".place-card"
+      assert_selector ".place-explorer__empty"
+      assert_selector ".place-explorer__status", text: "0 places in Europe"
+
+      click_button "Everywhere"
+      fill_in "Find a place", with: "victoria"
+      assert_selector ".place-card", text: "Melbourne" # "Victoria, Australia"
+      assert_no_selector ".place-explorer__more-link", text: "Paris"
+      fill_in "Find a place", with: ""
+
+      click_button "Show the map"
+      assert_selector ".explore-map__pin", minimum: 1
+      find(".place-card").hover
+      assert_selector ".explore-map__pin.is-marked[aria-label^='Melbourne']"
+      page.execute_script("localStorage.removeItem('ccs:place-map')")
     end
   end
 

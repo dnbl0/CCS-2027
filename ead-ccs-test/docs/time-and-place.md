@@ -11,9 +11,12 @@ no code, pictures or wording were taken from it.
   that century the same way. Below it, **eras** as they are catalogued ("19th century", "5th century BC") as buttons. With a
   keyboard, the left and right arrow keys move between periods (Home and End to the first and last); without JavaScript it is a
   plain list of links. On a phone the strip becomes a list.
-- **`/explore/places`**: a map of where objects were made, with a number on each place (places close together are grouped; choose
-  a group to zoom in, a place to get a link to its records), and beside it the same places as lists: regions, their countries, and
-  each country's places. **The map only loads when the visitor presses "Show the map"**, because its pictures come from
+- **`/explore/places`** (after Airbnb's search with a map, 2026-11): the places as picture cards (`Explore::PlaceCards`: the places with
+  the most pictured records, `Browse::Cards.map_cards`, joined by name to their pins) beside a map with each place's number of records
+  on its pin (places close together are grouped; choose a group to zoom in, a place for a small card linking to its page). Region chips
+  and a name box narrow the cards and the pins; once the map is shown the cards are the places in view ("Update the list as I move the
+  map"), with the places in view that have no picture listed by name under them. Hovering or focusing a card marks its pin. Under it
+  all, every region, country and place as lists. **The map only loads when the visitor presses "Show the map"**, because its pictures come from
   OpenStreetMap's server. Until the places have been located (below), the page shows lists of regions and places instead of a map.
 - **A "Place" filter** in the search results: Region > Country > State > Place, opened step by step. It sits straight after the
   workbook's Region filter (#14) and is an **addition**, not one of the workbook's filters. It appears once the index has the data.
@@ -73,7 +76,8 @@ country only once that country (or something in it) is chosen. Drawing every lev
   that names the application (`GEOCODER_USER_AGENT`), never a person or an email address. Results are cached, as the
   [Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/) asks.
 - **Map tiles** (visitors): the browser fetches tiles from `tile.openstreetmap.org` (`MAP_TILE_URL`) **only after** the visitor
-  presses "Show the map". The host is named in the Content Security Policy; the OpenStreetMap credit is shown on and under the map;
+  presses "Show the map" (the page then remembers that choice in the visitor's own browser, `localStorage` key `ccs:place-map`, until
+  they press "Hide the map"). The host is named in the Content Security Policy; the OpenStreetMap credit is shown on and under the map;
   `/privacy` says what that server receives (placeholder wording, for the University to approve). The OpenStreetMap Foundation's tile
   server is meant for light use: production should use a tile service the University has an agreement with (set `MAP_TILE_URL` and
   `MAP_TILE_ATTRIBUTION`).

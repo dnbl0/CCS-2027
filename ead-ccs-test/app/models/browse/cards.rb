@@ -122,8 +122,12 @@ module Browse
     # A Browse page's picture wall (after Google Arts & Culture's Places): the WALL values with the most pictured records (every period,
     # in order), each with one picture, kept for a day as the cards are
     WALL = 48
-    def self.wall(hub)
-      kept = cached(hub, "wall/v2") { with_totals(hub, build(hub, count: WALL, describe: false)) }
+    # Explore by place's list beside its map (Explore::PlaceCards): more places, as the map has many
+    MAP = 120
+    def self.map_cards(hub) = wall(hub, count: MAP, kind: "map/v1")
+
+    def self.wall(hub, count: WALL, kind: "wall/v2")
+      kept = cached(hub, kind) { with_totals(hub, build(hub, count: count, describe: false)) }
       return [] if kept.blank?
 
       kept.map do |entry|
@@ -166,6 +170,7 @@ module Browse
     def self.warm
       BrowseHubs.all.each { |hub| self.for(hub) }
       BrowseHubs.all.each { |hub| wall(hub) }
+      map_cards(BrowseHubs.find("places"))
     end
 
     private_class_method :build, :periods?, :field, :candidates, :group_filter, :example_image, :describe, :cached

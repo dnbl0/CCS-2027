@@ -13,6 +13,8 @@ class ExploreController < ApplicationController
 
   def places
     @places = Explore::Places.call
-    render status: :service_unavailable unless @places
+    return render status: :service_unavailable unless @places
+
+    @cards = Explore::PlaceCards.for(@places)
   end
 end

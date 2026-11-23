@@ -77,3 +77,134 @@
 .place-hierarchy__row { display: flex; justify-content: space-between; align-items: center; gap: var(--ccs-space-2); min-height: 44px; }
 .place-hierarchy summary { cursor: pointer; }
 .place-hierarchy summary:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+/* Explore by place as a list beside a map (after Airbnb's search with a map, 2026-11; place_explorer_controller.js). The head carries the
+   title, the regions as chips and the name box; under it the cards (lane masonry, each picture whole) on the left and the map on the
+   right, staying in view as the list scrolls. On a phone the map sits above the list. Targets are at least 44px. */
+.place-explorer-wrap { max-width: var(--layout-page, 90rem); margin-inline: auto; padding: var(--ccs-space-5) var(--space-32) var(--ccs-space-8); }
+.place-explorer { display: flex; flex-direction: column; gap: var(--ccs-space-5); }
+.no-js .place-explorer [data-js-only] { display: none; }
+
+.place-explorer__head { display: flex; flex-direction: column; gap: var(--ccs-space-4); }
+.place-explorer__heading { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-3xl); font-weight: 400; text-wrap: balance; }
+.place-explorer__intro { max-width: 60ch; margin: var(--ccs-space-2) 0 0; color: var(--ccs-text-secondary); text-wrap: pretty; }
+.place-explorer__tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ccs-space-3) var(--ccs-space-5); }
+
+/* The regions: one row of pill chips that scrolls sideways on a narrow screen (the next chip peeks past the edge) */
+.place-explorer__chips { display: flex; gap: var(--ccs-space-2); min-width: 0; margin: 0; padding: 2px; overflow-x: auto; scrollbar-width: none; }
+.place-explorer__chips::-webkit-scrollbar { display: none; }
+.place-explorer__chip {
+  flex: none; min-height: 44px; padding: 0 var(--ccs-space-4); border: 1px solid var(--ccs-border-default); border-radius: var(--ccs-radius-pill);
+  background: var(--ccs-surface-default); color: var(--ccs-text-primary); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); white-space: nowrap;
+}
+.place-explorer__chip:hover { border-color: var(--ccs-text-primary); }
+.place-explorer__chip[aria-pressed="true"] { border-color: var(--ccs-text-primary); background: var(--ccs-text-primary); color: var(--ccs-text-inverse); }
+.place-explorer__chip:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+.place-explorer__find { display: flex; align-items: center; gap: var(--ccs-space-2); flex: 0 1 22rem; min-width: min(100%, 16rem); }
+.place-explorer__find-label { flex: none; font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
+.place-explorer__input { min-height: 44px; border-radius: var(--ccs-radius-pill); padding-inline: var(--ccs-space-4); }
+
+/* The list and the map: one column on a phone (the map first), side by side from 992px with the map in view */
+.place-explorer__split { display: flex; flex-direction: column; gap: var(--ccs-space-5); }
+.place-explorer__list { display: flex; flex-direction: column; gap: var(--ccs-space-4); min-width: 0; }
+.place-explorer__map { display: flex; flex-direction: column; gap: var(--ccs-space-2); min-width: 0; }
+.place-explorer__status { margin: 0; font-weight: var(--ccs-font-weight-semibold); }
+.place-explorer__empty { margin: 0; padding: var(--ccs-space-6); border-radius: var(--ccs-radius-lg); background: var(--ccs-surface-subtle); }
+
+@media (min-width: 992px) {
+  .place-explorer__split { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); grid-template-areas: "list map"; align-items: start; gap: var(--ccs-space-6); }
+  .place-explorer__list { grid-area: list; }
+  /* under the sticky search strip (4.5rem, sticky_search.css), as the Help page's menu */
+  .place-explorer__map { grid-area: map; position: sticky; top: calc(4.5rem + var(--ccs-space-4)); height: calc(100dvh - 4.5rem - 2 * var(--ccs-space-4)); }
+  .place-explorer__consent, .place-explorer__stage { flex: 1 1 auto; min-height: 0; }
+}
+
+/* Before the map: a quiet panel where it will be, with what it does and the button */
+.place-explorer__consent {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--ccs-space-3);
+  padding: var(--ccs-space-6) var(--ccs-space-5); border: 1px solid var(--ccs-border-subtle); border-radius: var(--ccs-radius-lg);
+  background: var(--ccs-surface-subtle); text-align: center;
+}
+.place-explorer__consent[hidden], .place-explorer__stage[hidden] { display: none; }
+.place-explorer__consent-heading { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-xl); }
+.place-explorer__consent-note { max-width: 36ch; margin: 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); text-wrap: pretty; }
+.place-explorer__consent .btn { min-height: 44px; }
+
+.place-explorer__stage { display: flex; flex-direction: column; gap: var(--ccs-space-2); }
+.place-explorer__frame { position: relative; flex: 1 1 auto; min-height: 0; }
+.place-explorer__canvas { height: min(60dvh, 32rem); border: 0; border-radius: var(--ccs-radius-lg); }
+@media (min-width: 992px) { .place-explorer__canvas { height: 100%; } }
+.place-explorer__canvas:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+/* "Update the list as I move the map": a pill floating at the top of the map */
+.place-explorer__follow {
+  position: absolute; top: var(--ccs-space-3); left: 50%; z-index: 1000; transform: translateX(-50%);
+  display: flex; align-items: center; gap: var(--ccs-space-2); min-height: 44px; margin: 0; padding: 0 var(--ccs-space-4);
+  border-radius: var(--ccs-radius-pill); background: var(--ccs-surface-default); box-shadow: var(--ccs-shadow-md);
+  font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); white-space: nowrap; cursor: pointer;
+}
+.place-explorer__follow .form-check-input { margin: 0; }
+/* "Hide the map": the map's own control, at its top right */
+.place-explorer__close {
+  position: absolute; top: var(--ccs-space-3); right: var(--ccs-space-3); z-index: 1000; min-height: 44px; padding: 0 var(--ccs-space-4);
+  border: 0; border-radius: var(--ccs-radius-pill); background: var(--ccs-surface-default); box-shadow: var(--ccs-shadow-md);
+  color: var(--ccs-text-primary); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); white-space: nowrap;
+}
+.place-explorer__close:hover { background: var(--ccs-surface-subtle); }
+.place-explorer__close:focus-visible, .place-explorer__follow:has(:focus-visible) { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+/* A narrow map: the checkbox at the left (it may wrap), Hide at the right, and the zoom buttons under them */
+@container (max-width: 40rem) { .place-explorer__follow { left: var(--ccs-space-3); transform: none; max-width: calc(100% - 9rem); white-space: normal; } }
+.place-explorer__frame { container-type: inline-size; }
+.place-explorer__frame .leaflet-top { top: calc(44px + 2 * var(--ccs-space-3)); }
+
+.place-explorer__foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-2) var(--ccs-space-4); }
+.place-explorer__foot .explore-map__credit { margin: 0; }
+
+/* The pins: white pills with the number, dark when their card is hovered or focused, or when hovered themselves */
+.place-explorer .explore-map__marker {
+  min-width: 0; height: 32px; padding: 0 var(--ccs-space-3); border: 0; border-radius: var(--ccs-radius-pill);
+  background: var(--ccs-surface-default); color: var(--ccs-text-primary); box-shadow: var(--ccs-shadow-md), 0 0 0 1px var(--ccs-border-default);
+  transition: transform 150ms ease-out;
+}
+.place-explorer .explore-map__pin--group .explore-map__marker {
+  min-width: 0; height: 36px; background: var(--ccs-surface-default);
+  box-shadow: var(--ccs-shadow-md), 0 0 0 1px var(--ccs-border-default), 0 0 0 4px var(--ccs-surface-default), 0 0 0 5px var(--ccs-border-strong);
+}
+.place-explorer .explore-map__pin:hover .explore-map__marker,
+.place-explorer .explore-map__pin.is-marked .explore-map__marker,
+.place-explorer .explore-map__pin:focus-visible .explore-map__marker { background: var(--ccs-text-primary); color: var(--ccs-text-inverse); transform: translate(-50%, -50%) scale(1.08); }
+@media (prefers-reduced-motion: reduce) { .place-explorer .explore-map__marker { transition: none; } }
+
+/* A pin's popup: a small card, its picture whole */
+.place-explorer__popup .leaflet-popup-content-wrapper { padding: 0; overflow: hidden; border-radius: var(--ccs-radius-lg); }
+.place-explorer__popup .leaflet-popup-content { margin: 0; }
+.place-explorer__pop { display: flex; flex-direction: column; gap: var(--ccs-space-1); padding-bottom: var(--ccs-space-3); font-size: var(--ccs-font-size-sm); }
+.place-explorer__pop > :not(img) { margin: 0 var(--ccs-space-3); }
+.place-explorer__pop .explore-map__popup-title { margin-top: var(--ccs-space-3); font-size: var(--ccs-font-size-md); }
+.place-explorer__pop-image { display: block; width: 100%; height: 9rem; object-fit: contain; background: var(--ccs-surface-subtle); }
+.place-explorer__pop-where { margin: 0; color: var(--ccs-text-secondary); }
+.place-explorer__pop a { color: var(--ccs-text-link); font-weight: var(--ccs-font-weight-semibold); }
+
+/* A card: the name, where it is and its number of records under the picture */
+.place-card .document-title-heading { margin: 0; padding-bottom: 0; }
+.place-card .result-card__content { padding-bottom: var(--ccs-space-4); }
+.place-card .result-card__content { row-gap: 0; }
+.place-card .result-card__content > p { padding: 0; }
+.place-card__where { margin: var(--ccs-space-1) 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
+.place-card__count { margin: 0; font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); }
+
+/* The places in view with no picture: their names */
+.place-explorer__more { display: flex; flex-direction: column; gap: var(--ccs-space-3); }
+.place-explorer__more[hidden] { display: none; }
+.place-explorer__more-heading { margin: 0; font-size: var(--ccs-heading-subsection-size, var(--ccs-font-size-lg)); }
+.place-explorer__more-list { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2); margin: 0; padding: 0; list-style: none; }
+.place-explorer__more-link {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--ccs-space-4); border: 1px solid var(--ccs-border-default);
+  border-radius: var(--ccs-radius-pill); color: var(--ccs-text-primary); text-decoration: none;
+}
+.place-explorer__more-link:hover { border-color: var(--ccs-text-primary); }
+.place-explorer__more-count { color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
+
+.place-explorer__all { margin-top: var(--ccs-space-5); padding-top: var(--ccs-space-4); border-top: 1px solid var(--ccs-border-subtle); }
+.place-explorer__all > summary { min-height: 44px; display: flex; align-items: center; font-weight: var(--ccs-font-weight-semibold); cursor: pointer; }

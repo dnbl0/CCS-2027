@@ -36,6 +36,33 @@ en:
       regions: "Regions"
       top_places: "Places with the most records"
       all_places: "See every place, A to Z"
+      # The list and map (after Airbnb's search with a map, 2026-11; place_explorer_controller.js). Placeholder wording.
+      explorer:
+        intro: "Where the records were made. Choose a region, look for a place by name, or move the map: the places beside it follow."
+        regions: "Regions"
+        everywhere: "Everywhere"
+        find: "Find a place"
+        find_placeholder: "Melbourne, Japan, Oceania"
+        consent_heading: "See %{count} places on a map"
+        consent_note: "The map is drawn from OpenStreetMap: your browser contacts its server only once you show the map. This browser then remembers your choice until you hide the map."
+        follow: "Update the list as I move the map"
+        list: "Places"
+        shown:
+          one: "1 place"
+          other: "%{count} places"
+        shown_one: "1 place"
+        shown_other: "%{count} places"
+        in_view: "in this part of the map"
+        in_region: "in %{region}"
+        matching: "matching “%{text}”"
+        empty: "No place with a picture here. Move the map, choose another region or change the name."
+        more: "More places here (%{count})"
+        explore: "Explore %{place}"
+        see_records: "See %{records} from %{place}"
+        group: "%{count} places, %{records}: zoom in"
+        record_one: "1 record"
+        record_other: "%{count} records"
+        all: "Every place, by region and country (%{count})"
   nexus_ccs:
     # The Place filter of the results (NexusCcs::PlaceHierarchyFacetComponent). Placeholder wording.
     place_hierarchy:

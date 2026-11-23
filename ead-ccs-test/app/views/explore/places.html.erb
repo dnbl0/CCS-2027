@@ -1,57 +1,132 @@
-<%# Explore by place (Explore::Places). The map is opt-in: nothing is asked of the tile server until the visitor presses Show the map.
-    The lists of regions, countries and places beside it do the same job without the map. %>
-<% content_for :body_class, "page-browse page-explore" %>
+<%# Explore by place (Explore::Places, Explore::PlaceCards; after Airbnb's search with a map, 2026-11): the places as picture cards beside a
+    map whose pins carry each place's number of records (place_explorer_controller.js). Region chips and a name box narrow both; once the
+    map is shown the list follows it. The map is opt-in: nothing is asked of the tile server until the visitor presses Show the map (the
+    choice is then remembered in their browser). Under the cards, every region, country and place as lists, which do the same job without
+    the map or without JavaScript. %>
+<% content_for :body_class, "page-browse page-explore page-place-explorer" %>
 <% content_for :title, "#{t('explore_pages.places.title')} — Collections Navigator — University of Melbourne" %>
 <% content_for :head, stylesheet_link_tag("vendor/leaflet", media: "all") if @places&.map? %>
 <%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", browse_path ], [ t("explore_pages.places.title"), nil ] ]) %>
 <main class="browse explore" id="main-content">
-  <%# The head of the Browse pages (browse/_page_head): the title centred with its line of introduction %>
-  <div class="places-page places-page--head"><div class="places-page__inner">
-    <%= render "browse/page_head", title: t("explore_pages.places.title"), intro: t("explore_pages.places.intro") %>
-  </div></div>
-  <div class="browse__inner">
+  <% if @places.nil? || !@places.map? %>
+    <div class="places-page places-page--head"><div class="places-page__inner">
+      <%= render "browse/page_head", title: t("explore_pages.places.title"), intro: t("explore_pages.places.intro") %>
+    </div></div>
+  <% end %>
+  <div class="<%= @places&.map? ? "place-explorer-wrap" : "browse__inner" %>">
     <% if @places.nil? %>
       <p class="browse__unavailable"><%= t("explore_pages.unavailable_html", link: link_to(t("explore_pages.search_all"), search_action_path(any_assets: "1", search_field: "all_fields"))) %></p>
     <% elsif @places.map? %>
-      <div class="explore-places">
-        <section class="explore-places__map" aria-labelledby="map-heading" data-controller="place-map"
-                 data-place-map-markers-value="<%= @places.markers.map { |marker| { label: marker.label, lat: marker.lat, lon: marker.lon, count: marker.count, href: search_action_path(marker.search_query) } }.to_json %>"
-                 data-place-map-tiles-value="<%= Explore::MapTiles.url %>"
-                 data-place-map-attribution-value="<%= String.new(sanitize(Explore::MapTiles.attribution, tags: %w[a], attributes: %w[href])) %>"
-                 data-place-map-show-label-value="<%= t('explore_pages.places.show_map') %>" data-place-map-hide-label-value="<%= t('explore_pages.places.hide_map') %>">
-          <h2 class="browse__heading" id="map-heading"><%= t("explore_pages.places.map") %></h2>
-          <p id="map-note"><%= t("explore_pages.places.map_note", count: number_with_delimiter(@places.markers.size)) %></p>
-          <button type="button" class="btn btn-primary explore-map__toggle" aria-expanded="false" aria-controls="place-map"
-                  data-place-map-target="button" data-action="place-map#toggle"><%= t("explore_pages.places.show_map") %></button>
-          <div class="explore-map" id="place-map" role="region" aria-label="<%= t('explore_pages.places.map_label') %>" aria-describedby="map-note" hidden data-place-map-target="map"></div>
-          <p class="explore-map__credit"><%= t("explore_pages.places.credit") %> <%= sanitize(Explore::MapTiles.attribution, tags: %w[a], attributes: %w[href]) %></p>
-        </section>
+      <% words = t("explore_pages.places.explorer") %>
+      <% continents = Geo::Hierarchy::CONTINENTS.values.uniq %>
+      <div class="place-explorer" data-controller="place-explorer"
+           data-place-explorer-markers-value="<%= place_explorer_markers(@places, @cards).to_json %>"
+           data-place-explorer-tiles-value="<%= Explore::MapTiles.url %>"
+           data-place-explorer-attribution-value="<%= String.new(sanitize(Explore::MapTiles.attribution, tags: %w[a], attributes: %w[href])) %>"
+           data-place-explorer-words-value="<%= words.slice(:shown_one, :shown_other, :in_view, :in_region, :matching, :explore, :see_records, :group, :record_one, :record_other, :more).to_json %>">
+        <%# The head: the title and its line, then the regions as chips and the name box (Airbnb's search bar and categories) %>
+        <div class="place-explorer__head">
+          <div class="place-explorer__title">
+            <h1 class="place-explorer__heading"><%= t("explore_pages.places.title") %></h1>
+            <p class="place-explorer__intro"><%= words[:intro] %></p>
+          </div>
+          <div class="place-explorer__tools" data-js-only>
+            <div class="place-explorer__chips" role="group" aria-label="<%= words[:regions] %>">
+              <button type="button" class="place-explorer__chip" aria-pressed="true" data-place-explorer-target="chip" data-region="" data-action="place-explorer#choose"><%= words[:everywhere] %></button>
+              <% @places.regions.select { |region| continents.include?(region.label) }.each do |region| %>
+                <button type="button" class="place-explorer__chip" aria-pressed="false" data-place-explorer-target="chip" data-region="<%= region.label %>" data-action="place-explorer#choose"><%= region.label %></button>
+              <% end %>
+            </div>
+            <div class="place-explorer__find">
+              <label for="place-explorer-find" class="place-explorer__find-label"><%= words[:find] %></label>
+              <input type="search" id="place-explorer-find" class="form-control place-explorer__input" autocomplete="off" placeholder="<%= words[:find_placeholder] %>"
+                     data-place-explorer-target="query" data-action="input->place-explorer#find">
+            </div>
+          </div>
+        </div>
 
-        <section class="explore-places__lists" aria-labelledby="regions-heading">
-          <h2 class="browse__heading" id="regions-heading"><%= t("explore_pages.places.lists") %></h2>
-          <% @places.regions.each do |region| %>
-            <h3 class="explore-places__region">
-              <%= link_to search_action_path(region.search_query) do %><%= region.label %><% end %>
-              <span class="browse__count"><%= t("explore_pages.count", count: region.count, number: number_with_delimiter(region.count)) %></span>
-            </h3>
-            <ul class="explore-places__countries">
-              <% region.children.each do |country| %>
-                <li>
-                  <%= link_to search_action_path(country.search_query), class: "browse__link" do %>
-                    <span class="browse__label"><%= country.label %></span>
-                    <span class="browse__count"><%= t("explore_pages.count", count: country.count, number: number_with_delimiter(country.count)) %></span>
-                  <% end %>
-                  <% if country.children.any? %>
-                    <details class="explore-places__places">
-                      <summary><%= t("explore_pages.places.places_in", country: country.label) %> (<%= country.children.size %>)</summary>
-                      <%= render "explore/entries", entries: country.children %>
-                    </details>
-                  <% end %>
+        <div class="place-explorer__split">
+          <%# The map: first, so on a phone it sits above the list (Airbnb's map over its list); on a wide screen it stays in view on the right %>
+          <section class="place-explorer__map" aria-labelledby="map-heading" data-js-only>
+            <h2 class="visually-hidden" id="map-heading"><%= t("explore_pages.places.map") %></h2>
+            <div class="place-explorer__consent" data-place-explorer-target="consent">
+              <p class="place-explorer__consent-heading"><%= t("explore_pages.places.explorer.consent_heading", count: number_with_delimiter(@places.markers.size)) %></p>
+              <p class="place-explorer__consent-note"><%= words[:consent_note] %></p>
+              <button type="button" class="btn btn-primary" data-place-explorer-target="showButton" data-action="place-explorer#show"><%= t("explore_pages.places.show_map") %></button>
+            </div>
+            <div class="place-explorer__stage" hidden data-place-explorer-target="stage">
+              <div class="place-explorer__frame">
+                <div class="explore-map place-explorer__canvas" id="place-map" role="region" aria-label="<%= t('explore_pages.places.map_label') %>" data-place-explorer-target="map"></div>
+                <label class="place-explorer__follow">
+                  <input type="checkbox" class="form-check-input" checked data-place-explorer-target="follow" data-action="change->place-explorer#refresh">
+                  <span><%= words[:follow] %></span>
+                </label>
+                <button type="button" class="place-explorer__close" data-action="place-explorer#hide"><%= t("explore_pages.places.hide_map") %></button>
+              </div>
+              <div class="place-explorer__foot">
+                <p class="explore-map__credit"><%= t("explore_pages.places.credit") %> <%= sanitize(Explore::MapTiles.attribution, tags: %w[a], attributes: %w[href]) %></p>
+              </div>
+            </div>
+          </section>
+
+          <section class="place-explorer__list" aria-labelledby="list-heading">
+            <h2 class="visually-hidden" id="list-heading"><%= words[:list] %></h2>
+            <p class="place-explorer__status" role="status" data-place-explorer-target="status"><%= t("explore_pages.places.explorer.shown", count: @cards.size) %></p>
+            <ul class="mosaic-flow place-explorer__cards" data-controller="mosaic" data-mosaic-lanes-value="3" data-place-explorer-target="list"
+                data-action="mosaic:refresh->mosaic#schedule" aria-labelledby="list-heading">
+              <% @cards.each do |card| %>
+                <% image = NexusCcs::ExploreCardComponent.image?(card, remote: true) ? card.image : nil %>
+                <li class="mosaic-flow__item" <%= tag.attributes(style: aspect_style(image&.width, image&.height)) %> data-key="<%= card.key %>" data-place-explorer-target="card"
+                    data-action="mouseenter->place-explorer#mark mouseleave->place-explorer#unmark focusin->place-explorer#mark focusout->place-explorer#unmark">
+                  <article class="result-card explore-card explore-card--tile place-card">
+                    <% if image %>
+                      <%= link_to card.path, class: "result-card__media", tabindex: -1, "aria-hidden": true do %>
+                        <%= image_tag DamImage.sized(AssetVersion.url(image.path), 600), alt: "", loading: "lazy", decoding: "async", width: image.width, height: image.height %>
+                      <% end %>
+                    <% end %>
+                    <div class="result-card__content">
+                      <h3 class="document-title-heading"><%= link_to card.label, card.path, class: "explore-card__link" %></h3>
+                      <% if card.where %><p class="place-card__where"><%= card.where %></p><% end %>
+                      <p class="place-card__count"><%= t("home.records", count: card.count, number: number_with_delimiter(card.count)) %></p>
+                    </div>
+                  </article>
                 </li>
               <% end %>
             </ul>
-          <% end %>
-        </section>
+            <p class="place-explorer__empty" hidden data-place-explorer-target="empty"><%= words[:empty] %></p>
+            <%# The places in view that have no card (no picture to show): their names, most records first %>
+            <div class="place-explorer__more" hidden data-place-explorer-target="more">
+              <h3 class="place-explorer__more-heading" data-place-explorer-target="moreHeading"></h3>
+              <ul class="place-explorer__more-list" data-place-explorer-target="moreList"></ul>
+            </div>
+
+            <details class="place-explorer__all">
+              <summary><%= t("explore_pages.places.explorer.all", count: number_with_delimiter(@places.markers.size)) %></summary>
+              <% @places.regions.each do |region| %>
+                <h3 class="explore-places__region">
+                  <%= link_to search_action_path(region.search_query) do %><%= region.label %><% end %>
+                  <span class="browse__count"><%= t("explore_pages.count", count: region.count, number: number_with_delimiter(region.count)) %></span>
+                </h3>
+                <ul class="explore-places__countries">
+                  <% region.children.each do |country| %>
+                    <li>
+                      <%= link_to search_action_path(country.search_query), class: "browse__link" do %>
+                        <span class="browse__label"><%= country.label %></span>
+                        <span class="browse__count"><%= t("explore_pages.count", count: country.count, number: number_with_delimiter(country.count)) %></span>
+                      <% end %>
+                      <% if country.children.any? %>
+                        <details class="explore-places__places">
+                          <summary><%= t("explore_pages.places.places_in", country: country.label) %> (<%= country.children.size %>)</summary>
+                          <%= render "explore/entries", entries: country.children %>
+                        </details>
+                      <% end %>
+                    </li>
+                  <% end %>
+                </ul>
+              <% end %>
+            </details>
+          </section>
+        </div>
       </div>
     <% else %>
       <p class="explore__hint"><%= t("explore_pages.places.pending") %></p>

@@ -49,24 +49,50 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     assert_select "h2", "Centuries"
   end
 
-  test "the places page: an opt-in map with the same places in lists of regions and countries" do
-    marker = P::Marker.new(path: "Oceania|Australia|Victoria|Melbourne", lat: -37.81, lon: 144.96, count: 10)
-    country = P::Node.new(path: "Oceania|Australia", count: 12, children: [ marker ])
-    result = P::Result.new(markers: [ marker ], regions: [ P::Node.new(path: "Oceania", count: 12, children: [ country ]) ], plain_regions: [], top_places: [])
-    visit("/explore/places") { seed("places", result) }
+  test "the places page: picture cards beside an opt-in map, region chips, a name box, and every place in lists" do
+    melbourne = P::Marker.new(path: "Oceania|Australia|Victoria|Melbourne", lat: -37.81, lon: 144.96, count: 10)
+    paris = P::Marker.new(path: "Europe|France|Île-de-France|Paris", lat: 48.85, lon: 2.35, count: 4)
+    country = P::Node.new(path: "Oceania|Australia", count: 12, children: [ melbourne ])
+    english = P::Node.new(path: "English", count: 3, children: []) # not a region: a stray value of the hierarchy, offered as no chip
+    result = P::Result.new(markers: [ melbourne, paris ], regions: [ P::Node.new(path: "Oceania", count: 12, children: [ country ]), english ], plain_regions: [], top_places: [])
+    cards = [ { "label" => "Melbourne", "count" => 8, "total" => 9, "image" => { "id" => "r1", "title" => "A tram", "path" => "https://unimelbourne.widen.net/content/a/jpeg/a.jpeg?w=1000&u=x", "width" => 800, "height" => 600 } } ]
+    visit("/explore/places") do
+      seed("places", result)
+      Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/places/map/v1"), cards, expires_in: 1.day)
+    end
 
     assert_response :success
-    assert_select "button[aria-expanded='false'][aria-controls='place-map']", "Show the map"
-    assert_select "#place-map[hidden]"
-    assert_select "[data-place-map-attribution-value*='openstreetmap.org/copyright']"
-    assert_select "[data-place-map-tiles-value='https://tile.openstreetmap.org/{z}/{x}/{y}.png']"
-    assert_select ".explore-map__credit a[href='https://www.openstreetmap.org/copyright']"
-    assert_select "h3 a[href*='f%5Bplace_hierarchy_ssim%5D%5B%5D=Oceania']", "Oceania"
-    assert_select "a.browse__link[href*='Oceania%7CAustralia']", text: /Australia\s+12 records/
-    assert_select "details summary", "Places in Australia (1)"
-    assert_select "details a[href*='Oceania%7CAustralia%7CVictoria%7CMelbourne']", text: /Melbourne/
+    assert_select "h1", "Explore by place"
+    assert_select ".place-explorer__chip", 2 # Everywhere and Oceania
+    assert_select ".place-explorer__chip[aria-pressed='true']", "Everywhere"
+    assert_select ".place-explorer__chip[data-region='English']", 0
+    assert_select "input[type='search']#place-explorer-find"
+    # the card: its own page, where it is and the pin's number of records
+    assert_select "li[data-key='0'] .place-card" do
+      assert_select "h3 a[href^='/browse/places/']", "Melbourne"
+      assert_select ".place-card__where", "Victoria, Australia"
+      assert_select ".place-card__count", "10 records"
+      assert_select "img[alt=''][src*='w=600']"
+    end
+    assert_select ".place-explorer__status[role='status']", "1 place"
+    # the map: nothing asked of the tile server until the visitor presses Show the map
+    assert_select ".place-explorer__consent button", "Show the map"
+    assert_select ".place-explorer__stage[hidden] #place-map"
+    assert_select "[data-place-explorer-attribution-value*='openstreetmap.org/copyright']"
+    assert_select "[data-place-explorer-tiles-value='https://tile.openstreetmap.org/{z}/{x}/{y}.png']"
+    markers = JSON.parse(css_select("[data-place-explorer-markers-value]").first["data-place-explorer-markers-value"])
+    assert_equal [ "Melbourne", "Paris" ], markers.map { |marker| marker["label"] }
+    assert_equal [ true, false ], markers.map { |marker| marker["card"] }
+    assert_equal [ "Oceania", "Europe" ], markers.map { |marker| marker["region"] }
+    assert_match %r{\A/browse/places/}, markers.first["href"]
+    assert_includes markers.last["href"], "place_hierarchy_ssim"
     assert_no_match(/tile\.openstreetmap\.org[^"]*"\s*(src|href)=/, response.body)
     assert_select "link[href*='leaflet']"
+    # every region, country and place, as lists (the same job without the map)
+    assert_select "details.place-explorer__all summary", "Every place, by region and country (2)"
+    assert_select "h3 a[href*='f%5Bplace_hierarchy_ssim%5D%5B%5D=Oceania']", "Oceania"
+    assert_select "a.browse__link[href*='Oceania%7CAustralia']", text: /Australia\s+12 records/
+    assert_select "details details summary", "Places in Australia (1)"
   end
 
   test "before any place is located: no map, the regions and the commonest places" do

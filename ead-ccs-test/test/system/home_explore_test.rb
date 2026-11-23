@@ -35,7 +35,7 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
 
   # A card's title link covers the whole card (its ::after), so the card is its target, not the line of text
   def small_targets
-    page.evaluate_script("[...document.querySelectorAll('main .home-section a, main .home-section summary')].filter(e => !e.matches('.explore-card__link') && e.getAttribute('tabindex') !== '-1' && e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().height < 44).map(e => e.textContent.trim())")
+    page.evaluate_script("[...document.querySelectorAll('main .home-section a, main .home-section summary')].filter(e => !e.matches('.explore-card__link, .object-card__link') && e.getAttribute('tabindex') !== '-1' && e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().height < 44).map(e => e.textContent.trim())")
   end
 
   # No picture in the home sections is cropped: each is fitted (contain) or shown at its own shape
