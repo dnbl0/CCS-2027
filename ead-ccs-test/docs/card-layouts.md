@@ -73,3 +73,18 @@ crops pictures to fixed cells, here the cell follows the picture.
 - Collage pictures come from `Showcase` (licensed and not sensitive, cached six hours); the Indigenous Collections tile stays text only.
 - Tests: `test/system/home_explore_test.rb` (axe, 44px targets, no sideways scroll, **no cropped picture**, the mosaic interlocks),
   `test/components/nexus_ccs/{explore,mosaic,card_layout}_component_test.rb`, `test/models/home_sections_test.rb`.
+
+## The Browse templates (23 Nov 2026)
+
+Every Browse page uses one of two templates, after Google Arts & Culture's Places pages (looked at for ideas; nothing copied). Pictures are
+never cropped.
+
+| Template | Pages | Code |
+|---|---|---|
+| **List** | Object types, Places, Periods, Makers, Subjects (`browse/hub`: All, the mosaic; A–Z or In order; live search; Places' regions); the Browse page; Browse by category and a category's values; Themes; Stories; the head of the timeline and the map | `browse/hub.html.erb`, `browse/_page_head.html.erb`, `MosaicComponent`, `CardLayoutComponent` `:mosaic`, `places_search_controller.js` |
+| **Detail** | each place, maker, subject and period (`browse_entities/showcase`); each collection, named collection and theme (`collection_landings/_showcase`); each story (its head and record groups) | the picture strip (a justified row), the centred head, chips, the Discover or Highlights mosaic |
+
+- A card opens the value's own page where it has one (a place, maker, subject, period, collection or named collection), otherwise its
+  records in the search: `Browse::Cards::Card#path`, `ExploreCardComponent#path`, `LandingHelper#landing_path_for`.
+- Counts on a wall are every record with the value (`Browse::Cards.with_totals`), so the wall, the list and the search agree.
+- Checked with axe at desktop and phone width on every one of these pages (23 Nov 2026).
