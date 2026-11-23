@@ -51,6 +51,8 @@ en:
       all: "All %{hub}"
       period: "Period"
       theme: "Theme"
+      story: "Story"
+      story_record: "The record at the heart of this story"
       discover_places: "Discover this place"
       discover_makers: "Discover their work"
       discover_subjects: "Discover this subject"

@@ -1,13 +1,19 @@
-<%# One story (Stories): its text, sanitised, with each record and search embed drawn as the site's record cards %>
+<%# One story (Stories), with the detail pages' head (browse_entities/showcase): "Story", the title centred, its summary, author and
+    date; then its text, sanitised, in a reading column, each record embed as the site's record card and each search embed as the fluid
+    mosaic %>
 <% content_for :title, "#{@story.title} — #{t('nexus_ccs.stories.title')} — Collections Navigator — University of Melbourne" %>
 <% content_for :body_class, "page-browse page-story" %>
-<%= render NexusCcs::PageBannerComponent.new(title: @story.title, description: @story.summary) %>
-<main class="browse-main" id="main-content">
-  <article class="browse-main__inner story" aria-labelledby="story-title">
-    <h2 id="story-title" class="visually-hidden"><%= @story.title %></h2>
-    <p class="story__meta"><%= [ (t("nexus_ccs.stories.by", author: @story.author) if @story.author), t("nexus_ccs.stories.published", date: l(@story.date, format: "%-d %B %Y")) ].compact.join(" · ") %></p>
+<main class="place-page" id="main-content">
+  <article class="story" aria-labelledby="story-title">
+    <header class="place-page__head">
+      <p class="place-page__kind"><%= t("browse.place.story") %></p>
+      <h1 id="story-title" class="place-page__title"><%= @story.title %></h1>
+      <% if @story.summary.present? %><p class="place-page__summary"><%= @story.summary %></p><% end %>
+      <p class="story__meta"><%= [ (t("nexus_ccs.stories.by", author: @story.author) if @story.author), t("nexus_ccs.stories.published", date: l(@story.date, format: "%-d %B %Y")) ].compact.join(", ") %></p>
+    </header>
+    <div class="place-page__inner story__body">
     <% hero = @embedded[:records][@story.hero] %>
-    <% if hero %><div class="story__embed story__embed--hero"><%= render NexusCcs::RecordCardComponent.new(document: hero) %></div><% end %>
+    <% if hero %><h2 class="visually-hidden"><%= t("browse.place.story_record") %></h2><div class="story__embed story__embed--hero"><%= render NexusCcs::RecordCardComponent.new(document: hero) %></div><% end %>
     <% @parts.each_with_index do |part, index| %>
       <% if part.is_a?(Stories::Embed) && part.kind == :record %>
         <% document = @embedded[:records][part.value] %>
@@ -19,12 +25,17 @@
       <% elsif part.is_a?(Stories::Embed) %>
         <% found = @embedded[:searches][@parts.grep(Stories::Embed).index(part)] %>
         <% if found && found[:documents].any? %>
-          <%= render NexusCcs::RecordCardsComponent.new(id: "story-search-#{index}", heading: part.heading || t("nexus_ccs.stories.search_heading"), documents: found[:documents]) %>
+          <section class="story__records" aria-labelledby="story-search-<%= index %>">
+            <h2 id="story-search-<%= index %>" class="place-section__heading place-section__heading--small"><%= part.heading || t("nexus_ccs.stories.search_heading") %></h2>
+            <%= render NexusCcs::CardLayoutComponent.new(cards: found[:documents], layout: :mosaic, lanes: 3, label: part.heading || t("nexus_ccs.stories.search_heading"),
+                                                         renderer: ->(document) { NexusCcs::RecordCardComponent.new(document: document) }) %>
+          </section>
           <p class="story__more"><%= link_to t("nexus_ccs.stories.more_results", count: number_with_delimiter(found[:total])), search_catalog_path(part.value), class: "arrow-link" %></p>
         <% end %>
       <% else %>
         <div class="story__text"><%= part %></div>
       <% end %>
     <% end %>
+    </div>
   </article>
 </main>

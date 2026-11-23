@@ -37,7 +37,7 @@ class DiscoveryPagesSystemTest < ApplicationSystemTestCase
     page.current_window.resize_to(320, 700)
     visit "/browse/categories/regions"
 
-    assert_selector "article.explore-card h3", text: /\(\d{3}\)\z/, count: 12
+    assert_selector "article.explore-card .explore-card__intro", text: /\A\d{3} records\z/, count: 12 # the count, its own line under the name
     assert_not page.evaluate_script("document.documentElement.scrollWidth > window.innerWidth")
   end
 end

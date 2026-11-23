@@ -48,12 +48,12 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
     assert_select "section.browse-object-types .explore-card__intro", text: /records/, count: 0 # a description, not a count
   end
 
-  test "the periods section opens the results with that period's range" do
+  test "the periods section opens each period's own page" do
     seed_cards("periods", [ entry("1950–1959", "first" => 1950, "last" => 1959) ])
 
     get "/browse"
 
-    assert_select "section.browse-periods h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1950'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1959']", text: "1950–1959"
+    assert_select "section.browse-periods h3 a[href='/browse/periods/1950-1959']", text: "1950–1959"
   end
 
   test "a section whose list is unavailable keeps its heading and link but has no cards" do

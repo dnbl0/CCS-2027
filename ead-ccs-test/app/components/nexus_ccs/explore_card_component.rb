@@ -28,7 +28,8 @@ module NexusCcs
 
     def image_path = AssetVersion.url(tile.image.path)
 
-    def path = helpers.search_action_path(tile.query)
+    # The value's own page where it has one (a Browse card: a place, maker, subject or period), else its records in the search
+    def path = (tile.path if tile.respond_to?(:path)).presence || helpers.search_action_path(tile.query)
 
     def classes = [ "result-card", "explore-card", ("explore-card--text" unless image?) ].compact.join(" ")
   end
