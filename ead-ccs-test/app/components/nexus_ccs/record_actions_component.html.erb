@@ -5,12 +5,13 @@
     <% end %>
     <%= render NexusCcs::ShareDialogComponent.new(kind: :record, document: document) %>
 
-    <%# More: a menu button (WAI-ARIA APG). Hidden until the script runs, as everything in the menu needs it. %>
+    <%# More: a menu button (WAI-ARIA APG), labelled in words with the icon after it (the Gen 3 design system: never an icon on its
+        own). Hidden until the script runs, as everything in the menu needs it. %>
     <div class="more-actions" hidden data-controller="more-actions" data-action="keydown->more-actions#keydown"
          data-more-actions-copied-value="<%= t("nexus_ccs.record_page.actions.link_copied") %>">
-      <button type="button" class="more-actions__button" id="<%= menu_id %>-button" aria-haspopup="menu" aria-expanded="false"
-              aria-controls="<%= menu_id %>" aria-label="<%= t("nexus_ccs.record_page.actions.more") %>" title="<%= t("nexus_ccs.record_page.actions.more") %>"
-              data-more-actions-target="button" data-action="more-actions#toggle"><%= icon(:more_horiz) %></button>
+      <button type="button" class="more-actions__button text-button" id="<%= menu_id %>-button" aria-haspopup="menu" aria-expanded="false"
+              aria-controls="<%= menu_id %>" aria-label="<%= t("nexus_ccs.record_page.actions.more") %>"
+              data-more-actions-target="button" data-action="more-actions#toggle"><span><%= t("nexus_ccs.record_page.actions.more_label") %></span><%= icon(:more_horiz) %></button>
       <ul class="more-actions__menu" id="<%= menu_id %>" role="menu" aria-labelledby="<%= menu_id %>-button" hidden data-more-actions-target="menu">
         <% if saved_records? %>
           <li role="none"><button type="button" role="menuitem" tabindex="-1" class="more-actions__item" data-more-actions-target="item"

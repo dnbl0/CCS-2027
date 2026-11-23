@@ -128,16 +128,29 @@ optgroup,
   --bs-btn-active-border-color: var(--uom-sage-active);
 }
 
+/* The outline buttons are the Gen 3 design system's tertiary button (designsystem.web.unimelb.edu.au/style-guide/buttons): navy text
+   in a 1px navy outline on no fill, paling to the light cyan on hover (not filling navy) */
 .btn-outline-primary,
 .btn-outline-secondary {
   --bs-btn-color: var(--uom-navy);
+  --bs-btn-bg: transparent;
   --bs-btn-border-color: var(--uom-navy);
-  --bs-btn-hover-color: var(--ccs-text-inverse);
-  --bs-btn-hover-bg: var(--uom-navy);
+  --bs-btn-hover-color: var(--uom-navy);
+  --bs-btn-hover-bg: var(--ccs-cyan-150);
   --bs-btn-hover-border-color: var(--uom-navy);
-  --bs-btn-active-color: var(--ccs-text-inverse);
-  --bs-btn-active-bg: var(--uom-navy-dark);
-  --bs-btn-active-border-color: var(--uom-navy-dark);
+  --bs-btn-active-color: var(--uom-navy);
+  --bs-btn-active-bg: var(--ccs-cyan-300);
+  --bs-btn-active-border-color: var(--uom-navy);
+}
+
+/* The Gen 3 design system's button size for its primary, secondary and tertiary buttons: 18px Source Sans 3 600, 12px by 16px, square */
+.btn:is(.btn-primary, .btn-secondary, .btn-outline-primary, .btn-outline-secondary):not(.btn-sm, .btn-lg) {
+  --bs-btn-padding-y: var(--ccs-space-3);
+  --bs-btn-padding-x: var(--ccs-space-4);
+  --bs-btn-font-size: var(--ccs-font-size-lg);
+  --bs-btn-font-weight: var(--ccs-font-weight-semibold);
+  --bs-btn-line-height: var(--ccs-line-height-normal);
+  --bs-btn-border-radius: 0;
 }
 
 @media (min-width: 1200px) {

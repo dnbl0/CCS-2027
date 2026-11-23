@@ -65,13 +65,13 @@
       <div class="media-viewer__controls" role="group" aria-label="<%= t("#{VIEWER}.tools") %>">
         <div class="media-viewer__controls-start">
           <% if assets_shown? && main %>
-            <button type="button" class="media-viewer__tool" hidden aria-haspopup="dialog" data-media-viewer-target="zoomButton" data-action="media-viewer#openZoom"
+            <button type="button" class="text-button media-viewer__tool" hidden aria-haspopup="dialog" data-media-viewer-target="zoomButton" data-action="media-viewer#openZoom"
                     aria-label="<%= t("#{VIEWER}.open_zoom") %>"><%= icon(:zoom_in) %><span><%= t("#{VIEWER}.zoom") %></span></button>
           <% end %>
           <% if download_href %>
             <%# CCS-67: the essential information (caption and licence) first, to copy, then the download %>
             <div class="digital-assets__download" data-controller="dialog">
-              <button type="button" class="media-viewer__tool" aria-haspopup="dialog" data-action="dialog#open"
+              <button type="button" class="text-button media-viewer__tool" aria-haspopup="dialog" data-action="dialog#open"
                       aria-label="<%= t("nexus_ccs.record_page.access.download_label", title: title) %>"><%= icon(:download) %><span><%= t("nexus_ccs.record_page.access.download") %></span></button>
               <dialog class="modal uom-dialog uom-modal digital-assets__download-dialog" data-dialog-target="dialog" data-action="click->dialog#closeOnBackdrop" aria-labelledby="download-dialog-title">
                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -120,7 +120,7 @@
         </div>
         <div class="media-viewer__controls-end">
         <% if metadata.any? %>
-          <button type="button" class="media-viewer__tool media-viewer__info-button" aria-haspopup="dialog" aria-controls="media-information" data-media-viewer-target="infoButton" data-action="media-viewer#openInfo">
+          <button type="button" class="text-button media-viewer__tool media-viewer__info-button" aria-haspopup="dialog" aria-controls="media-information" data-media-viewer-target="infoButton" data-action="media-viewer#openInfo">
             <%= glyph(:info) %><span><%= t("#{VIEWER}.media_information") %></span>
           </button>
         <% end %>

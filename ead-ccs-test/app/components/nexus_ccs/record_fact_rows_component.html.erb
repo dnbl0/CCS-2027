@@ -20,7 +20,7 @@
             <div class="record-fade" id="<%= text_id(row) %>" data-truncate-target="text">
               <div class="record-fade__clip" data-truncate-target="lead"><% text_values(row).each do |value| %><span class="record-facts__value"><%= value %></span><% end %></div>
             </div>
-            <button type="button" class="record-read-more" aria-controls="<%= text_id(row) %>" aria-expanded="true"
+            <button type="button" class="record-read-more text-button" aria-controls="<%= text_id(row) %>" aria-expanded="true"
                     data-truncate-target="toggle" data-action="truncate#toggle" hidden><%= t("nexus_ccs.record_page.showcase.read_more") %></button>
           </div>
         <% else %>

@@ -424,6 +424,6 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     JS
     assert_equal 3, boxes.size, boxes.inspect
     assert_equal 1, boxes.map(&:first).uniq.size, boxes.inspect
-    assert boxes.all? { |_top, height, right| height >= 44 && right <= 320 }, boxes.inspect
+    assert boxes.all? { |_top, height, right| height >= 44 && right <= 304 }, boxes.inspect # inside the 16px gutter
   end
 end

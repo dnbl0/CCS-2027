@@ -2,7 +2,7 @@
 
 module NexusCcs
   # What a visitor can do with a record, in one row under its title (Figma "Record/Actions", option A): Save, the one main action,
-  # as an outlined button; Share as a quiet button; and More, an icon button opening a menu of the rest (Add to list, Cite this
+  # as an outlined button; Share as a quiet button; and More (its word, then the icon) opening a menu of the rest (Add to list, Cite this
   # record, Copy link). Compare sits under the row when the record has images to compare. Add to list and Cite open their dialogs
   # from the menu (the components render without their own buttons); Copy link copies the record's address and says so. The row
   # keeps to one line down to a 320px phone. Behaviour: controllers/more_actions_controller.js (a menu button: arrow keys, Home,

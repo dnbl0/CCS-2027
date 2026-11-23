@@ -66,8 +66,7 @@
 .record__collection .arrow-link { font-size: var(--ccs-font-size-md); min-height: 2.75rem; }
 /* Compare under the action buttons: quiet text controls, 24px apart (borderless controls need the room) */
 .record .record-actions { gap: var(--ccs-space-1); } /* the compare links' 44px targets already add room above their text */
-.record .record-actions__compare .compare-actions { gap: var(--ccs-space-2) var(--ccs-space-5); }
-.record .record-actions__compare :is(.compare-actions__link, .compare-actions__button) { min-height: 2.75rem; font-size: var(--ccs-font-size-md); }
+.record .record-actions__compare .compare-actions { gap: 0 var(--ccs-space-2); margin-inline-start: calc(-1 * var(--ccs-space-3)); } /* text buttons' padding: their words line up with the column */
 .record__media > .no-image { margin: 0; }
 
 /* Sections: a rule, then the heading on the left (the site's section heading: Fraunces regular, 40px, 30px on a phone) */
@@ -119,17 +118,9 @@
 .record-fade.is-collapsed .record-fade__clip { -webkit-line-clamp: 4; line-clamp: 4; }
 .record-fade__clip .record-facts__value { display: inline; }
 .record-fade__clip .record-facts__value + .record-facts__value::before { content: " "; }
-.record-read-more {
-  display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: 2.75rem; margin-top: var(--ccs-space-1); padding: 0;
-  border: 0; background: none; font: inherit; font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-link); cursor: pointer;
-}
-.record-read-more::after {
-  content: "+"; display: inline-grid; place-items: center; width: 1.25rem; height: 1.25rem; border-radius: var(--ccs-radius-circle);
-  background: var(--ccs-text-link); color: var(--ccs-text-inverse); font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-bold); line-height: 1;
-}
+.record-read-more { margin-top: var(--ccs-space-1); margin-inline-start: calc(-1 * var(--ccs-space-3)); }
+.record-read-more::after { content: "+"; order: 1; font-size: var(--ccs-font-size-xl); line-height: 1; }
 .record-read-more[aria-expanded="true"]::after { content: "–"; }
-.record-read-more:hover { text-decoration: underline; color: var(--ccs-text-link-hover); }
-.record-read-more:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
 /* Record details and notes: the design system's accordion (title Source Sans 3 600 20px in link blue, 16px padding; the open
    panel on the pale grey surface), as native <details> so it works without JavaScript */
@@ -187,32 +178,31 @@
 .record-use__licence { margin: 0 0 var(--ccs-space-3); font-size: var(--ccs-font-size-ui); }
 .record-use__licence span { font-weight: var(--ccs-font-weight-semibold); }
 
-/* The actions (Figma Record/Actions, option A): Save the site's outline button (navy, filled navy on hover), Share a quiet button,
-   More an icon button opening a menu. One line even at 320px; every target at least 44px tall. */
+/* The actions (Figma Record/Actions, option A) in the Gen 3 design system's buttons: Save its tertiary button (navy words and a 1px
+   navy outline, the light cyan on hover), Share and More its text button (text_button.css), each icon after its words. One line down
+   to 320px; every target at least 44px tall. */
 .record .record-actions { padding: 0; border: 0; }
 .record .record-actions__row { flex-wrap: nowrap; gap: var(--ccs-space-2); }
 .record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label {
-  gap: var(--ccs-space-2); min-height: 2.75rem; padding: 0 var(--ccs-space-5) 0 var(--ccs-space-4);
-  color: var(--ccs-text-brand); background: var(--ccs-surface-default); border: 1px solid var(--ccs-text-brand); border-radius: 0; white-space: nowrap;
+  gap: var(--ccs-space-1); min-height: 2.75rem; padding: var(--ccs-space-3) var(--ccs-space-3) var(--ccs-space-3) var(--ccs-space-4);
+  font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-brand); background: transparent; border: 1px solid var(--ccs-text-brand); border-radius: 0; white-space: nowrap;
 }
-.record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label:hover { color: var(--ccs-text-inverse); background: var(--ccs-text-brand); }
-.record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label:hover .blacklight-icons svg { color: var(--ccs-text-inverse); }
+.record .record-actions__row .save-control .blacklight-icons { order: 1; }
+.record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label .blacklight-icons svg { width: 1.25rem; height: 1.25rem; }
+.record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label:hover { color: var(--ccs-text-brand); background: var(--ccs-cyan-150); }
 .record .record-actions__row .save-control .toggle-bookmark-label:hover .save-control__text { text-decoration: none; }
-.record .record-actions__row .share__button { padding: 0 var(--ccs-space-3); white-space: nowrap; }
+/* the narrowest phones: the body size, tighter padding and the words without their icons keep the three on one line inside the 16px gutters */
 @media (max-width: 359px) {
-  .record .record-actions__row { gap: var(--ccs-space-1); }
-  .record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label { padding: 0 var(--ccs-space-3); }
-  .record .record-actions__row .share__button { padding: 0 var(--ccs-space-2); }
+  .record .record-actions__row { gap: 0; }
+  .record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label { padding: var(--ccs-space-2) var(--ccs-space-2) var(--ccs-space-2) var(--ccs-space-3); font-size: var(--ccs-font-size-md); }
+  .record .record-actions__row :is(.share__button, .more-actions__button) { padding: var(--ccs-space-2); font-size: var(--ccs-font-size-md); }
+  .record .record-actions__row :is(.share__button, .more-actions__button) svg { display: none; } /* the words alone: a text button may be words only */
 }
 
 .more-actions { position: relative; }
 .more-actions[hidden] { display: none; }
-.more-actions__button {
-  display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0;
-  color: var(--ccs-text-brand); background: none; border: 0; cursor: pointer;
-}
-.more-actions__button:hover, .more-actions__button[aria-expanded="true"] { background: var(--ccs-surface-subtle); }
-.more-actions__button:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.more-actions__button[aria-expanded="true"] { color: var(--ccs-text-link-hover); text-decoration: underline; }
 .more-actions__menu {
   position: absolute; top: calc(100% + var(--ccs-space-1)); left: 0; z-index: 20; min-width: 14rem; margin: 0; padding: var(--ccs-space-2) 0;
   list-style: none; background: var(--ccs-surface-default); border: 1px solid var(--ccs-border-strong); box-shadow: 0 4px 12px rgb(0 0 0 / 12%);

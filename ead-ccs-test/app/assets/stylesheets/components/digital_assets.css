@@ -39,7 +39,7 @@
 .digital-assets__thumb:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 6px; }
 
 /* The panel's toolbar: a white bar joined to the panel by a rule, so the tools belong to the image; Zoom and Download at the start,
-   Media information at the end, every tool one style (an icon and its word, navy, 44px tall) */
+   Media information at the end, every tool the Gen 3 text button (its word, then its icon) */
 .media-viewer__controls {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ccs-space-1) var(--ccs-space-4);
   min-height: 3.5rem; padding: var(--ccs-space-1) var(--ccs-space-3); background: var(--ccs-surface-default); border-top: 1px solid var(--ccs-border-subtle);
@@ -47,16 +47,8 @@
 .media-viewer__controls-start, .media-viewer__controls-end { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-1); }
 .media-viewer__controls-end { margin-left: auto; }
 .digital-assets__download { display: contents; }
-.media-viewer__tool {
-  display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: 2.75rem; padding: 0 var(--ccs-space-3);
-  font: inherit; font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-brand);
-  background: transparent; border: 0; border-radius: 0; cursor: pointer;
-}
+/* each tool is the Gen 3 text button (text_button.css): its words, then its icon */
 .media-viewer__tool[hidden] { display: none; }
-.media-viewer__tool svg { flex: none; width: 1.25rem; height: 1.25rem; }
-.media-viewer__tool:hover { background: var(--ccs-surface-subtle); }
-.media-viewer__tool:hover span { text-decoration: underline; }
-.media-viewer__tool:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: -2px; }
 
 /* Round controls (zoom and download): white circles with a fine border */
 .round-control {

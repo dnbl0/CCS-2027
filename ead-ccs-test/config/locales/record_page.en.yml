@@ -117,6 +117,7 @@ en:
       # The actions under the title (Figma Record/Actions, option A)
       actions:
         more: "More actions"
+        more_label: "More"
         copy_link: "Copy link"
         link_copied: "Link copied"
       split:

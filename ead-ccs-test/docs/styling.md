@@ -76,6 +76,11 @@ header omits those items (in development it defaults to `http://localhost:3000`)
   focus ring. Add the class `ccs-text-link`, or leave a link in a paragraph, list item or `dd` of `<main>` without a class. Arrow
   links, links that stretch over a whole card, the header, footer and breadcrumb links and the Help "On this page" navigation are
   separate patterns.
+- **Buttons** follow the Gen 3 design system's buttons (designsystem.web.unimelb.edu.au/style-guide/buttons): primary `btn-primary`
+  (cyan, the light cyan on hover), secondary `btn-secondary` (sage), tertiary `btn-outline-primary` (navy words in a 1px navy outline, the
+  light cyan on hover, never filling navy), all 18px Source Sans 3 600, 12px by 16px, square (`unimelb.css`); and the text button,
+  `text-button` (`components/text_button.css`: link blue, no underline until hover, its icon 20px after its words). Use buttons sparingly,
+  one main action a view. Never an icon on its own: every button has its words (an icon may follow them).
 - **Controls** use the body font (`unimelb.css`): buttons and inputs would otherwise be the browser's system font. The one
   exception is the "all / any" menu in the Advanced search heading, which is set in the heading's serif by the design.
 - **Explore tiles** (`components/explore.css`, docs/explore.md): the face of a collection tile with no picture is one of six tints, `--ccs-explore-tint-1..6`

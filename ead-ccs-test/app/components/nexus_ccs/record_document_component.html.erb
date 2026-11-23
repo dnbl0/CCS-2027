@@ -85,7 +85,7 @@
             <p class="record__lead" data-truncate-target="lead"><%= lead %></p>
             <% description_rest.each do |paragraph| %><p data-truncate-target="more"><%= paragraph %></p><% end %>
           </div>
-          <button type="button" class="record-read-more" aria-controls="record-description" aria-expanded="true"
+          <button type="button" class="record-read-more text-button" aria-controls="record-description" aria-expanded="true"
                   data-truncate-target="toggle" data-action="truncate#toggle" hidden><%= t("nexus_ccs.record_page.showcase.read_more") %></button>
         </div>
       </section>
