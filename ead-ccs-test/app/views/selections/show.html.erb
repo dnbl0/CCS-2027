@@ -19,12 +19,21 @@
         <h2 class="saved-toolbar__count" tabindex="-1" data-controller="<%= focus[:controller] %>"><%= t("nexus_ccs.selection.count", count: @documents.size) %></h2>
         <div class="saved-toolbar__actions">
           <%= link_to t("nexus_ccs.selection.cite_named"), citations_selection_path, class: "btn btn-outline-primary" %>
+          <%# CCS-40: read the selection in sequence (the order chosen) or randomly; a form, so it works without JavaScript %>
+          <% if @documents.size > 1 %>
+            <%= button_to t(@selection.shuffled? ? "nexus_ccs.selection.shuffle_again" : "nexus_ccs.selection.shuffle"), selection_path,
+                          params: { intent: "shuffle", return_to: selection_path }, class: "btn btn-outline-primary", form: { class: "d-inline" } %>
+            <% if @selection.shuffled? %>
+              <%= button_to t("nexus_ccs.selection.in_order"), selection_path, params: { intent: "in_order", return_to: selection_path },
+                            class: "btn btn-outline-primary", form: { class: "d-inline" } %>
+            <% end %>
+          <% end %>
           <%= button_to t("nexus_ccs.selection.clear"), selection_path, params: { intent: "clear", return_to: selection_path },
                         class: "btn btn-outline-primary", form: { class: "d-inline" } %>
         </div>
       </div>
       <% if @missing.positive? %><p class="saved-lists-note"><%= t("nexus_ccs.selection.missing", count: @missing) %></p><% end %>
-      <p class="saved-lists-note"><%= t("nexus_ccs.selection.order") %></p>
+      <p class="saved-lists-note"><%= t(@selection.shuffled? ? "nexus_ccs.selection.order_shuffled" : "nexus_ccs.selection.order") %></p>
       <% if Rails.configuration.x.saved_records %>
         <%= render NexusCcs::SelectionListsComponent.new(documents: @documents) %>
         <%= render NexusCcs::BulkSelectionComponent.new(documents: @documents, return_to: selection_path) %>

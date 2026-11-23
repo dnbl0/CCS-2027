@@ -6,6 +6,10 @@
 # guest's id, Sensitivity::Choices, flash), so a selection holds at most MAX records; ids only, never titles.
 class Selection
   KEY = :selected_records
+  # A number that fixes a random reading order, when the visitor asked for one (CCS-40: "browse the selected results either in
+  # sequence ... or randomly"). The ids keep the order they were chosen; reading_order is them shuffled by this seed, so the list
+  # and each record's Previous and Next agree until the visitor shuffles again or goes back to the chosen order.
+  SHUFFLE_KEY = :selected_records_shuffle
   MAX = 50
   ID_LIMIT = 200 # as RecordLookup: a longer id is not a record's
 
@@ -54,27 +58,40 @@ class Selection
 
   def clear
     @session.delete(KEY)
+    @session.delete(SHUFFLE_KEY)
   end
+
+  def shuffled? = @session[SHUFFLE_KEY].is_a?(Integer)
+
+  # A new random order (each press another)
+  def shuffle! = @session[SHUFFLE_KEY] = Random.new_seed % (2**31)
+
+  def in_chosen_order! = @session.delete(SHUFFLE_KEY)
+
+  # The ids in the order they are read: as chosen, or shuffled by the seed
+  def reading_order = shuffled? ? ids.shuffle(random: Random.new(@session[SHUFFLE_KEY])) : ids
 
   # Keeps only the ids given (those still in the index), in the selection's order
   def keep_only(existing_ids)
     @session[KEY] = ids & clean(existing_ids)
   end
 
-  # 1-based place of the record in the selection, or nil
+  # 1-based place of the record in the reading order, or nil
   def position(id)
-    index = ids.index(id.to_s)
+    index = reading_order.index(id.to_s)
     index && index + 1
   end
 
   def previous_id(id)
-    index = ids.index(id.to_s)
-    index&.positive? ? ids[index - 1] : nil
+    order = reading_order
+    index = order.index(id.to_s)
+    index&.positive? ? order[index - 1] : nil
   end
 
   def next_id(id)
-    index = ids.index(id.to_s)
-    index ? ids[index + 1] : nil
+    order = reading_order
+    index = order.index(id.to_s)
+    index ? order[index + 1] : nil
   end
 
   private

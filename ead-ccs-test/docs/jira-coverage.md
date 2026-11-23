@@ -74,6 +74,40 @@ Fixed in this prototype on 23 Nov 2026:
 | CCS-295 to 299 collection pages | Lorem ipsum introductions | Draft introductions for the five museums, from their own sites, marked for approval |
 | CCS-164 formats 2027 | Office, OpenOffice, eBook, 3D not shown | Office and OpenOffice: a LibreOffice PDF preview made at indexing, its text searchable. eBooks read a page at a time in the page (epub.js) and glTF/GLB 3D models turned and zoomed in the page (Google model-viewer), both approved and installed 23 Nov 2026 |
 
+| CCS-40 search results selection | Browsing the selection "randomly" | Shuffle the order on Selected records; the list and each record's Previous and Next follow it; Back to the order you selected |
+| CCS-137 citations, list view | Export to a Word document "without losing the format" | Download as a Word document (.docx, built with no extra library): titles in italics, the style's heading, a hanging indent; the page shows the italics too |
+
+Every other Must, Should and Could ticket of the worksheet, checked against its acceptance criteria on 23 Nov 2026:
+
+| Met in this prototype | |
+|---|---|
+| CCS-143, 206 | Search history (Blacklight's), not grouped by day (Should, not core) |
+| CCS-47, 501 | Contact us from a record, the collection's own address |
+| CCS-131, 489 | Record citations: APA, MLA, Chicago, Harvard, copy |
+| CCS-58, 498 | Compare: two or more images or records side by side, zoom and pan each, details, exit, choose others |
+| CCS-56 | Multilingual search: ICU folding and CJK bigrams in the Solr schema; values shown as the source has them |
+| CCS-112 | records:suppress / records:unsuppress for the administrator (no CM login, as the story says) |
+| CCS-163, 503 | Metadata CSV export for open records |
+| CCS-69 | Request to view: the asset withheld, the notice, the request link (AccessPolicy, AccessNoticeComponent) |
+| CCS-21, 227, 487 | Sensitivity notice; the media hidden until Continue to view (SensitivityGateComponent) |
+| CCS-44, 496 | Classification badge (ClassificationBadgeComponent), once the DAM sends DA Advisory Classification |
+| CCS-425 | A replaced DAM file shows at once: its address carries a version (AssetVersion, ?v=) |
+| CCS-481 | Audio and video formats a browser cannot play offer the file or a request (MediaTypes) |
+| CCS-39, 492 | Matched words highlighted and a "Matched in" line (SearchHighlighting) |
+| CCS-101 | Contextual help (Done in Jira) |
+| CCS-127 | AI and bot crawlers: robots.txt, X-Robots-Tag and the bot guard middleware |
+| CCS-128 | SEO basics: one h1, ordered headings, page titles, canonical links, structured data |
+| CCS-471, 506 | Cookie notice for guests, with optional analytics (CCS-53) |
+
+| Not for the prototype to build | |
+|---|---|
+| CCS-145 security, 172 WAF, 144, 146, 147, 148, 71 | Hosting and operations (the Azure and University teams); the app's own part (CSP, request limits, bot guard) is in place |
+| CCS-249, 232, 161, 119, 168, 351, 210, 208, 12 | EMu (FEIT) and other source-system integrations: the data teams |
+| CCS-4 curated content, 113 permissions | To be sized by the tech team; 113 is Done in Jira |
+| CCS-472 site entry point | An information architecture decision for the University web team |
+| CCS-51, 62, 505 accessibility, 63, 504 responsive | axe-clean at every width in CI; a screen-reader test by people is still needed |
+| CCS-57, 315 IIIF | The viewer reads IIIF when a record carries it; the DAM field (CCS-315) is the data team's |
+
 Not built, by the worksheet's decisions: sign-in and signed-in features (CCS-59, 60, 61, 129, 130, 136, 13: Won't), bulk download
 (CCS-167: Won't). Still blocked on data: CCS-55 (no Indigenous data flag) and CCS-35 (no language field). Worksheet decisions that
 differ from this prototype, for the team to settle: CCS-67 marks DA download "Won't" (the prototype downloads open images), and

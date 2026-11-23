@@ -92,4 +92,29 @@ class SelectionTest < ActiveSupport::TestCase
 
     assert_operator [ cookie.bytesize, "_ccs_session=".bytesize ].sum, :<, 4096, "the session cookie would be refused by browsers"
   end
+
+  test "CCS-40: a shuffled selection is read in one random order, the same each time, until shuffled again or put back" do
+    session = {}
+    chosen = (1..12).map { |n| "emu-#{n}" }
+    selection(session).add(chosen)
+    session[Selection::SHUFFLE_KEY] = 1234
+    order = selection(session).reading_order
+
+    assert selection(session).shuffled?
+    assert_equal chosen.sort, order.sort
+    assert_not_equal chosen, order
+    assert_equal order, selection(session).reading_order # the list and Previous/Next agree
+    assert_equal chosen, selection(session).ids # the order chosen is kept underneath
+    assert_equal 1, selection(session).position(order.first)
+    assert_equal order[1], selection(session).next_id(order.first)
+    assert_equal order[0], selection(session).previous_id(order[1])
+
+    selection(session).in_chosen_order!
+    assert_equal chosen, selection(session).reading_order
+
+    selection(session).shuffle!
+    assert selection(session).shuffled?
+    selection(session).clear
+    assert_not selection(session).shuffled?
+  end
 end
