@@ -43,3 +43,33 @@ visit after a day does, and a cache entry that is being rebuilt is still served 
 
 - The fan of overlapping cards with a larger centre card was left out: it depends on motion.
 - The home page's collection tiles keep their own design (monogram tiles).
+
+## The home page (redesign, 23 Nov 2026)
+
+After the homepage redesign wireframe ("Collections Navigator Homepage Redesign") and Google Arts & Culture's mixed layouts (looked at
+for ideas, described in our own words; nothing copied). **No picture on the home page is cropped** (Dean): where Google Arts & Culture
+crops pictures to fixed cells, here the cell follows the picture.
+
+| Section | Layout | Code |
+|---|---|---|
+| Explore the collections (every collection) | fluid mosaic, the University Art Collection leading | `MosaicComponent`, `HomeSections.collections` |
+| Collections within the collections | fluid mosaic, the largest leading | `MosaicComponent`, `HomeSections.named` |
+| Record types (every kind) | a shelf of collage cards: three of each kind's records side by side, each whole | `CollageCardComponent`, `HomeSections.kind_collages` |
+| Places | a list beside a collage of four of the place's records (different records for each place where it can) | `PlacePreviewComponent`, `HomeSections.place_collages` |
+| Time | justified rows (`CardLayoutComponent` `:justified`) on the navy band | `justified_controller.js` |
+| On this day, More ways in | fluid mosaic (`CardLayoutComponent` `:mosaic`, and the ways partial) | `mosaic_controller.js` |
+
+- **Fluid mosaic** (`mosaic_controller.js`, `components/home_sections.css` `.mosaic-flow`): a 12-column grid (8 on a tablet, 4 on a
+  phone, one tile to a row) with 8px rows. Each tile's columns come from its picture's shape (`--a`, width over height; wider pictures
+  more columns, the lead more again, a light rhythm so neighbours differ) and its rows from its height. Tiles are placed in order at the
+  lowest place they fit, narrowing (to 70%) to fit a gap or widening to take a strip too narrow for another tile, so the reading order
+  runs from the top left. Without JavaScript: an even grid of the same cards.
+- **Justified rows** (`justified_controller.js`, `.justified`): each card's flex-grow and flex-basis are its picture's shape, so a full
+  row's pictures share a height and the row fills the width; a last row under 60% full keeps the row height.
+- A picture's shape comes from the server when its size is known (the Explore tiles, the site's own pictures via `ImageDimensions`)
+  and is measured in the browser otherwise; it is held to 0.5–2.6. Unknown shapes are fitted (`object-fit: contain`), never cropped.
+- The cards are the site's result card in a tile variant (`explore-card--tile`, `--lead`, `--collage`): picture above, name below on
+  white, the title's link covering the card. No navy scrim on the home page (`card_tiles.css` keeps it on the Browse page).
+- Collage pictures come from `Showcase` (licensed and not sensitive, cached six hours); the Indigenous Collections tile stays text only.
+- Tests: `test/system/home_explore_test.rb` (axe, 44px targets, no sideways scroll, **no cropped picture**, the mosaic interlocks),
+  `test/components/nexus_ccs/{explore,mosaic,card_layout}_component_test.rb`, `test/models/home_sections_test.rb`.

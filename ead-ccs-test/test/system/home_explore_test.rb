@@ -1,7 +1,7 @@
 require "application_system_test_case"
 
-# The home page's "Explore the collections" section (NexusCcs::ExploreComponent) in a real browser, at a desktop and a phone width: axe (WCAG 2.2 AA),
-# 44px targets, no sideways scroll, the disclosures (open from tablet width, closed on a phone), the length on a phone, and no layout shift.
+# The home page's sections (NexusCcs::ExploreComponent; the homepage redesign, 2026-11) in a real browser, at a desktop and a phone width:
+# axe (WCAG 2.2 AA), 44px targets, no sideways scroll, no cropped picture, the fluid mosaic, and no layout shift.
 # The numbers are given to the section (the cache), so the page does not depend on what the shared index holds.
 class HomeExploreSystemTest < ApplicationSystemTestCase
   PATH = "/digital-assets/thumbs/0000_013_1_pf.jpg"
@@ -33,9 +33,24 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
 
   def keep(counts) = Rails.cache.write(ExploreEntryPoints::CACHE_KEY, counts, expires_in: 1.day)
 
+  # A card's title link covers the whole card (its ::after), so the card is its target, not the line of text
   def small_targets
-    page.evaluate_script("[...document.querySelectorAll('.explore a, .explore summary')].filter(e => e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().height < 44).map(e => e.textContent.trim())")
+    page.evaluate_script("[...document.querySelectorAll('main .home-section a, main .home-section summary')].filter(e => !e.matches('.explore-card__link') && e.getAttribute('tabindex') !== '-1' && e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().height < 44).map(e => e.textContent.trim())")
   end
+
+  # No picture in the home sections is cropped: each is fitted (contain) or shown at its own shape
+  def cropped_pictures
+    page.evaluate_script(<<~JS)
+      [...document.querySelectorAll('main .home-section img')].filter(img => {
+        if (!img.naturalWidth || !img.getBoundingClientRect().width) return false
+        if (getComputedStyle(img).objectFit !== 'cover') return false
+        const r = img.getBoundingClientRect()
+        return Math.abs(r.width / r.height - img.naturalWidth / img.naturalHeight) > 0.02
+      }).map(img => img.src)
+    JS
+  end
+
+  def explore_boxes = page.evaluate_script("[...document.querySelectorAll('section.explore ul.mosaic-flow > li')].map(t => { const r = t.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)] })")
 
   def sideways_scroll? = page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
@@ -49,57 +64,57 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     JS
   end
 
-  test "on a desktop: no axe violations (WCAG 2.2 AA), a mosaic of collection tiles led by a large one, targets of 44px, then a mosaic of cards in each of three sections" do
-    keep(counts)
+  test "on a desktop: no axe violations (WCAG 2.2 AA), every collection in a fluid mosaic led by a wider tile, 44px targets, no cropped picture" do
+    keep(counts(with_image: true))
     page.current_window.resize_to(1440, 900)
     visit "/"
 
-    assert_selector "section.explore ul.explore__tiles > li.explore__tile", count: 6
+    assert_selector "section.explore ul.mosaic-flow.is-ready > li.mosaic-flow__item", count: 6
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
     assert_empty small_targets
     assert_not sideways_scroll?
-    boxes = page.evaluate_script("[...document.querySelectorAll('ul.explore__tiles > .explore__tile')].map(t => { const r = t.getBoundingClientRect(); return [Math.round(r.top), Math.round(r.width)] })")
-    assert_operator boxes[0][1], :>, boxes[1][1] * 1.8, "the first collection tile is the large one (card_tiles.css)"
-    assert_equal boxes[0][0], boxes[1][0], "the next tiles start beside it"
-    assert_operator boxes.last[0], :>, boxes[0][0], "the tiles wrap onto a second row"
-    assert_selector ".explore-kinds .card-layout--bento, .explore-places .card-layout--rail, .explore-periods .card-layout--strip", count: 3
-    assert_selector ".explore-places article.result-card h3 a", text: "Australia"
-    colours = page.evaluate_script("['hero','about','explore','explore-kinds','explore-places','explore-periods'].length && [...document.querySelectorAll('main > .ccs-section:not(.ccs-section--hero)')].map(s => getComputedStyle(s).backgroundColor)")
+    assert_empty cropped_pictures
+    boxes = explore_boxes
+    assert_operator boxes[0][2], :>, boxes[1][2], "the lead (University Art Collection) is the widest tile"
+    assert_operator boxes.map(&:first).uniq.size, :>, 1, "the tiles sit side by side"
+    assert_operator boxes.map { |box| box[1] }.uniq.size, :>, 2, "a mosaic, not one row: the tiles start at different heights"
+    assert_selector ".explore-kinds .card-layout--collage, .home-places .place-preview, .explore-periods .card-layout--justified", count: 3
+    assert_selector ".home-places a.place-row", text: "Australia"
+    assert_no_selector ".home-visit"
+    colours = page.evaluate_script("[...document.querySelectorAll('main > .ccs-section:not(.ccs-section--hero)')].map(s => getComputedStyle(s).backgroundColor)")
     assert_equal colours.each_cons(2).count { |a, b| a != b }, colours.size - 1, "the sections' backgrounds alternate"
-    assert_no_selector "section.explore img"
   end
 
-  test "on a phone: no axe violations, targets of 44px or more, no sideways scroll, every row of tiles shown" do
-    keep(counts)
+  test "on a phone: no axe violations, 44px targets, no sideways scroll, one tile to a row" do
+    keep(counts(with_image: true))
     page.current_window.resize_to(390, PHONE_HEIGHT)
     visit "/"
 
-    assert_selector "section.explore ul.explore__tiles > li.explore__tile", count: 6
+    assert_selector "section.explore ul.mosaic-flow.is-ready > li.mosaic-flow__item", count: 6
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
     assert_empty small_targets
     assert_not sideways_scroll?
-    assert_selector ".explore-kinds .card-layout--bento, .explore-places .card-layout--rail, .explore-periods .card-layout--strip", count: 3
-    assert_selector ".explore-places article.result-card h3 a", text: "Australia"
+    assert_equal 1, explore_boxes.map(&:first).uniq.size, "every tile starts at the left edge"
   end
 
-  test "with example images the section has no axe violations, the picture fills its tile and the Indigenous Collections tile is still text only" do
+  test "the Indigenous Collections tile is text only, even with pictures for the others" do
     keep(counts(with_image: true))
     visit "/"
 
-    assert_selector "section.explore img.explore__image", count: 1
-    assert_selector "li.explore__tile:nth-child(1) img"
-    assert_no_selector "li.explore__tile:nth-child(5) img"
-    assert_equal "cover", page.evaluate_script("getComputedStyle(document.querySelector('.explore__image')).objectFit")
+    assert_selector "section.explore li", text: "University Art Collection"
+    assert page.find("section.explore li", text: "University Art Collection").has_css?("img")
+    assert_not page.find("section.explore li", text: "Indigenous Collections").has_css?("img")
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
   end
 
-  test "the whole tile is the link: the link fills the tile" do
-    keep(counts)
+  test "the whole card is the link: a click anywhere on a collection tile lands on its link" do
+    keep(counts(with_image: true))
+    page.current_window.resize_to(1440, 900)
     visit "/"
 
-    assert_selector ".explore__tile:nth-child(2) > a.explore__tile-link"
-    box = page.evaluate_script("(() => { const t = document.querySelector('.explore__tile:nth-child(2)').getBoundingClientRect(), l = document.querySelector('.explore__tile:nth-child(2) a').getBoundingClientRect(); return [t.width - l.width, t.height - l.height] })()")
-    assert_operator box.map(&:abs).max, :<=, 2
+    assert_selector "section.explore ul.mosaic-flow.is-ready"
+    hit = page.evaluate_script("(() => { const t = document.querySelector('section.explore li:nth-child(2) article'); t.scrollIntoView({ block: 'center' }); const r = t.getBoundingClientRect(); const e = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 3); return e && (e.closest('a') || {}).className })()")
+    assert_includes %w[explore-card__link result-card__media], hit.to_s.split.first
   end
 
   test "the section causes no layout shift on desktop or phone, with or without pictures" do

@@ -183,7 +183,7 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "#home-discover-heading", count: 0
     assert_select "turbo-frame#home-discover", count: 0
-    assert_select ".result-card", count: 0
+    assert_select ".result-card:not(.explore-card)", count: 0 # no records; the Explore cards (collections, kinds) are ways in, not records
     assert_equal 0, result.solr
     assert_operator result.sql, :<=, 1
   end
