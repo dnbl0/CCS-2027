@@ -8,23 +8,19 @@ module NexusCcs
   class MosaicComponent < ViewComponent::Base
     include AspectHelper
 
-    # even: every tile one shape (4:3, each picture whole on its mount) in a plain grid whose rows share a height, so the tiles read in their
-    # order, row by row: true for a sequence (periods); :auto when fewer than half the tiles have a picture (a few tall pictures among
-    # text tiles would leave the mosaic full of holes)
-    def initialize(tiles:, label:, lanes: 4, even: false)
+    # ordered: the tiles keep their order, row by row (a sequence: periods, eras; mosaic_controller's ordered lanes)
+    def initialize(tiles:, label:, lanes: 4, ordered: false)
       @tiles = tiles
       @label = label
       @lanes = lanes
-      @even = even == :auto ? tiles.count(&:image) * 2 < tiles.size : even
+      @ordered = ordered
     end
 
-    attr_reader :tiles, :label, :lanes, :even
+    attr_reader :tiles, :label, :lanes, :ordered
 
-    def item_style(tile) = even ? "--a: 1.333" : aspect_style(tile.width, tile.height)
+    def item_style(tile) = aspect_style(tile.width, tile.height)
 
-    def list_attributes
-      even ? { class: "mosaic-flow mosaic-flow--even" } : { class: "mosaic-flow", data: { controller: "mosaic", mosaic_lanes_value: lanes } }
-    end
+    def list_attributes = { class: "mosaic-flow", data: { controller: "mosaic", mosaic_lanes_value: lanes, mosaic_ordered_value: (true if ordered) }.compact }
 
     def render? = tiles.any?
   end

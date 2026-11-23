@@ -30,6 +30,7 @@
          pairs = showcase.facets[field].to_a.reject { |value, _| Array(search_query.dig(:f, field)).include?(value) }
          [ field, label, pairs ] if pairs.any?
        end %>
+    <% pictures&.prepare(groups.flat_map { |field, _, pairs| pairs.map { |value, _| [ field, [ value ] ] } }) %>
     <%# Each group a section of picture tiles in the page's mosaic (a picture of one of each value's records), as on the place pages %>
     <% groups.each do |field, label, pairs| %>
       <section class="place-section" aria-labelledby="showcase-<%= label %>">
@@ -39,7 +40,7 @@
              to = own || search_catalog_path(search_query.deep_merge(f: { field => Array(search_query.dig(:f, field)) + [ value ] }))
              facet_tile(value, count, to, pictures&.value(field, value))
            end %>
-        <%= render NexusCcs::MosaicComponent.new(tiles: tiles, label: t("nexus_ccs.showcase.#{label}"), lanes: 5, even: (field == "date_era_ssim" || :auto)) %>
+        <%= render "browse_entities/facet_tiles", tiles: tiles, label: t("nexus_ccs.showcase.#{label}"), ordered: field == "date_era_ssim" %>
       </section>
     <% end %>
 

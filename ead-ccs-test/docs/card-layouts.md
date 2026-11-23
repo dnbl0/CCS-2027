@@ -88,3 +88,21 @@ never cropped.
   records in the search: `Browse::Cards::Card#path`, `ExploreCardComponent#path`, `LandingHelper#landing_path_for`.
 - Counts on a wall are every record with the value (`Browse::Cards.with_totals`), so the wall, the list and the search agree.
 - Checked with axe at desktop and phone width on every one of these pages (23 Nov 2026).
+
+## The mosaic's forms, and pictures for every value (23 Nov 2026)
+
+One component (`NexusCcs::MosaicComponent`, `mosaic_controller.js`) lays out every picture section, in the form that suits how many
+tiles it has. Every picture is whole; no form crops.
+
+- **One row** (no more tiles than lanes): the pictures share one height and the cards are made one height.
+- **Justified rows** (under three rows of lanes, no lead tile): the tiles, in order, are shared among rows of about the same total width,
+  and each row is exactly as wide as the list, as a photo wall. No holes, and the order is kept (periods read 1000 to 2099). A card is
+  never narrower than 11rem.
+- **Lanes** (longer mosaics, or any with a lead): masonry, each tile in the shortest lane; `ordered:` puts each in the next lane in turn
+  so a long sequence keeps its order.
+
+The ways in on a place, maker, subject or period page, and a collection's or theme's object types, eras and named collections, are
+picture tiles (`browse_entities/_facet_tiles`). Each value's picture comes from `Browse::FacetPictures`: the page's own records first,
+then the value's records anywhere in the collections (one grouped request for all the values the page's records do not show; both kept
+for a day). A value with no picture anywhere (for example a subject whose 4,067 records have no picture that may be shown) is not a tile:
+it is listed after the mosaic under "With no picture to show", so every card in a mosaic has its picture and no value is lost.

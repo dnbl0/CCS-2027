@@ -424,9 +424,6 @@ turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity
 /* A tile a narrowing list hides (Explore by place's cards) */
 .mosaic-flow > .mosaic-flow__item[hidden] { display: none; }
 
-/* A tile with no picture (an entity page's ways in): its number of records large on the pale mount, the same shape as a picture tile */
-.mosaic-flow .mosaic-flow__figure { display: flex; align-items: center; justify-content: center; padding: var(--ccs-space-4); text-align: center; }
-.mosaic-flow__figure-text { font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-xl); line-height: 1.2; color: var(--ccs-text-secondary); text-wrap: balance; }
-/* The even form (MosaicComponent even:): a plain grid, every tile 4:3, the cards of a row one height, read in order */
-.mosaic-flow--even { grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); align-items: stretch; }
-.mosaic-flow--even > .mosaic-flow__item > * { align-self: stretch; }
+/* An entity page's values with no picture anywhere: after the mosaic, a quiet line of links (browse_entities/_facet_tiles) */
+.place-facets__plain { display: flex; flex-direction: column; gap: var(--ccs-space-2); margin-top: var(--ccs-space-5); }
+.place-facets__plain-label { margin: 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }

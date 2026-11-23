@@ -85,20 +85,27 @@
     <% kinds = result.facets["object_type_ssim"].first(10) %>
     <% periods = result.periods.select { |_, count| count.positive? } %>
     <% periods_heading = period ? t("browse.period.within") : t("browse.entity.related_periods") %>
+    <%# What is related: the places, makers and subjects of its records %>
+    <% related = [] %>
+    <% related << [ t("browse.entity.related_places"), "production_place_ssim", related_entities(Browse::Kind.find("places"), result.facets["production_place_ssim"], except: (entry if kind_key == "places")) ] %>
+    <% related << [ t("browse.entity.related_makers"), "creator_ssim", related_entities(Browse::Kind.find("makers"), result.facets["creator_ssim"], except: (entry if kind_key == "makers")) ] %>
+    <% related << [ t("browse.entity.related_subjects"), "subject_ssim", related_entities(Browse::Kind.find("subjects"), result.facets["subject_ssim"], except: (entry if kind_key == "subjects")) ] %>
+    <% related.reject! { |_, _, pairs| pairs.empty? } %>
+    <%# every value the page shows, so those none of its own records carries get a picture of their records anywhere (one request) %>
+    <% @pictures.prepare(kinds.map { |value, _| [ "object_type_ssim", [ value ] ] } + periods.map(&:first) +
+                         related.flat_map { |_, field, pairs| pairs.map { |related_entry, _| [ field, [ related_entry.name, *Array(related_entry.variants) ] ] } }) %>
     <%# Its kinds of record and its periods: picture tiles in the page's mosaic (a picture of one of each value's records), as every section;
-        the periods all one shape, so they read in time order %>
+        the periods in ordered lanes, so they read in time order %>
     <% if kinds.any? %>
       <section class="place-section" aria-labelledby="place-kinds">
         <h2 id="place-kinds" class="place-section__heading"><%= t("browse.entity.object_types") %></h2>
-        <%= render NexusCcs::MosaicComponent.new(tiles: kinds.map { |value, count| facet_tile(value, count, search_catalog_path(refine(@search_query, "object_type_ssim", value)), @pictures.value("object_type_ssim", value)) },
-                                                 label: t("browse.entity.object_types"), lanes: 5, even: :auto) %>
+        <%= render "browse_entities/facet_tiles", tiles: kinds.map { |value, count| facet_tile(value, count, search_catalog_path(refine(@search_query, "object_type_ssim", value)), @pictures.value("object_type_ssim", value)) }, label: t("browse.entity.object_types"), ordered: false %>
       </section>
     <% end %>
     <% if periods.any? %>
       <section class="place-section" aria-labelledby="related-periods">
         <h2 id="related-periods" class="place-section__heading"><%= periods_heading %></h2>
-        <%= render NexusCcs::MosaicComponent.new(tiles: periods.map { |related_period, count| facet_tile(related_period.label, count, related_period.path, @pictures.period(related_period)) },
-                                                 label: periods_heading, lanes: 5, even: true) %>
+        <%= render "browse_entities/facet_tiles", tiles: periods.map { |related_period, count| facet_tile(related_period.label, count, related_period.path, @pictures.period(related_period)) }, label: periods_heading, ordered: true %>
       </section>
     <% end %>
 
@@ -117,18 +124,11 @@
       <%= render "browse_entities/pager", page: result.page, pages: result.pages, label: t("browse.entity.pagination") %>
     </section>
 
-    <%# What is related: the places, makers and subjects of its records %>
-    <% related = [] %>
-    <% related << [ t("browse.entity.related_places"), "production_place_ssim", related_entities(Browse::Kind.find("places"), result.facets["production_place_ssim"], except: (entry if kind_key == "places")) ] %>
-    <% related << [ t("browse.entity.related_makers"), "creator_ssim", related_entities(Browse::Kind.find("makers"), result.facets["creator_ssim"], except: (entry if kind_key == "makers")) ] %>
-    <% related << [ t("browse.entity.related_subjects"), "subject_ssim", related_entities(Browse::Kind.find("subjects"), result.facets["subject_ssim"], except: (entry if kind_key == "subjects")) ] %>
-    <% related.reject! { |_, _, pairs| pairs.empty? } %>
     <% related.each_with_index do |(heading, field, pairs), index| %>
       <section class="place-section" aria-labelledby="related-<%= index %>">
         <h2 id="related-<%= index %>" class="place-section__heading"><%= heading %></h2>
         <%# a related value's picture: a record with any of its spellings (Browse::Index::Entry#variants) %>
-        <%= render NexusCcs::MosaicComponent.new(tiles: pairs.map { |related_entry, count| facet_tile(related_entry.name, count, related_entry.path, @pictures.value(field, related_entry.name, *Array(related_entry.variants))) },
-                                                 label: heading, lanes: 5, even: :auto) %>
+        <%= render "browse_entities/facet_tiles", tiles: pairs.map { |related_entry, count| facet_tile(related_entry.name, count, related_entry.path, @pictures.value(field, related_entry.name, *Array(related_entry.variants))) }, label: heading, ordered: false %>
       </section>
     <% end %>
   </div>

@@ -1,0 +1,15 @@
+<%# One of the ways in (kinds of record, periods, places, makers, subjects; a collection's eras and named collections): the values that have
+    a picture as tiles in the page's mosaic, each picture whole; the few with no picture anywhere in the collections after it as a line
+    of links, so every card in the mosaic has its picture and no value is lost. locals: tiles (HomeSections::Tile), label, ordered %>
+<% pictured, plain = tiles.partition(&:image) %>
+<%= render NexusCcs::MosaicComponent.new(tiles: pictured, label: label, lanes: 5, ordered: ordered) %>
+<% if plain.any? %>
+  <div class="place-facets__plain">
+    <p class="place-facets__plain-label"><%= t("browse.place.no_picture") %></p>
+    <ul class="place-chips">
+      <% plain.each do |tile| %>
+        <li><%= link_to tile.path, class: "places-chip" do %><%= tile.title %> <span class="places-chip__count"><%= tile.text %></span><% end %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

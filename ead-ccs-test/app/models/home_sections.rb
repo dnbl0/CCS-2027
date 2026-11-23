@@ -6,10 +6,7 @@
 # carries its picture's size when it is known, so the mosaic can give it its own shape without cropping. The words and pictures come
 # from what the site already has: config/pages.yml (the lead's blurb), the Explore tiles (ExploreEntryPoints) and the index.
 module HomeSections
-  # figure: for a tile with no picture, a number to show large where the picture would be (an entity page's ways in: its number of records)
-  Tile = Data.define(:title, :text, :path, :image, :lead, :cta, :external, :width, :height, :figure) do
-    def initialize(figure: nil, **rest) = super(figure: figure, **rest)
-  end
+  Tile = Data.define(:title, :text, :path, :image, :lead, :cta, :external, :width, :height)
 
   # A card of several pictures (after Google Arts & Culture's multi-picture cards): a few records that may be shown (Showcase:
   # licensed, not sensitive), each picture whole

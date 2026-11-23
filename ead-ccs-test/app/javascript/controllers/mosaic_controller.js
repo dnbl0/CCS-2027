@@ -8,7 +8,9 @@ import { Controller } from "@hotwired/stimulus"
 // Each picture's shape (--a, width over height) comes from the server or is measured here once it loads.
 // Without JavaScript the list is an even grid of the same cards.
 export default class extends Controller {
-  static values = { lanes: { type: Number, default: 4 } }
+  // ordered: each tile goes into the next lane in turn (left to right, row after row), not the shortest one, so a sequence (centuries)
+  // reads in its order; the lanes still end level where their last pictures can grow
+  static values = { lanes: { type: Number, default: 4 }, ordered: { type: Boolean, default: false } }
   static MIN_LANE = 208 // px: a lane is never narrower than this (13rem)
   static LEVEL = 48 // px: two lanes this close are level enough for a two-lane tile (the shorter one's last tile grows to meet it)
 
@@ -65,17 +67,63 @@ export default class extends Controller {
 
   mount(item) { return item.querySelector(".result-card__media, .object-card__media") }
 
+  // A short mosaic (under three rows of lanes, no lead): justified rows, as a photo wall. The tiles, in order, are shared among as many rows
+  // as their pictures fill at about a lane's usual height, each row taking about the same total width, so every row is full; a row's
+  // pictures then share the one height that makes it exactly as wide as the list (each whole), and its cards are made one height. Few tiles
+  // in many lanes would otherwise end raggedly, with holes under the short lanes. A card is never narrower than NARROWEST times its row's
+  // height (a tall, thin picture stands whole on its mount, with room for its name), and rows are never so many to a line that a row is
+  // shorter than a NARROWEST card 11rem wide would allow.
+  static NARROWEST = 0.75
+  static NARROWEST_CARD = 176 // px
+
+  rows(items, width, gap, laneWidth) {
+    const usual = laneWidth / 1.15
+    const shapes = items.map((item) => Math.max(this.constructor.NARROWEST, parseFloat(item.style.getPropertyValue("--a")) || 1.333))
+    const total = shapes.reduce((sum, shape) => sum + shape, 0)
+    const lowest = this.constructor.NARROWEST_CARD / this.constructor.NARROWEST // the shortest row that leaves every card room
+    const count = Math.max(1, Math.min(items.length, Math.max(Math.round((total * usual) / width), Math.ceil((total * lowest) / width))))
+    // break where the running width passes each row's share (never leaving a row empty)
+    const rows = Array.from({ length: count }, () => [])
+    let running = 0
+    items.forEach((item, i) => {
+      const r = Math.min(count - 1, Math.floor((running + shapes[i] / 2) / (total / count)))
+      rows[Math.max(r, rows.findLastIndex((row) => row.length))].push({ item, shape: shapes[i] })
+      running += shapes[i]
+    })
+    let top = 0
+    rows.filter((row) => row.length).forEach((row) => {
+      const sum = row.reduce((s, { shape }) => s + shape, 0)
+      const height = Math.min((width - gap * (row.length - 1)) / sum, usual * 1.6) // one wide row on its own does not tower
+      let left = 0
+      row.forEach(({ item, shape }) => {
+        const mount = this.mount(item)
+        if (mount) mount.style.height = `${height}px` // the row's one picture height, whatever the card's width
+        if (item.firstElementChild) item.firstElementChild.style.minHeight = ""
+        item.style.width = `${shape * height}px`
+        item.style.left = `${left}px`
+        item.style.top = `${top}px`
+        left += shape * height + gap
+      })
+      const tallest = Math.max(...row.map(({ item }) => item.getBoundingClientRect().height))
+      row.forEach(({ item }) => { (item.firstElementChild || item).style.minHeight = `${tallest}px` })
+      top += tallest + gap
+    })
+    this.element.style.height = `${Math.max(0, top - gap)}px`
+  }
+
   layout() {
     const width = this.element.clientWidth
     if (!width) return
     const gap = parseFloat(getComputedStyle(this.element).columnGap) || 16
     const fit = Math.floor((width + gap) / (this.constructor.MIN_LANE + gap))
+    const items = this.items()
     const lanes = Math.max(1, Math.min(this.lanesValue, fit))
     const laneWidth = (width - gap * (lanes - 1)) / lanes
-    const items = this.items()
     this.element.classList.add("is-ready")
     if (!items.length) { this.element.style.height = "0px"; return }
     if (items.length <= lanes) return this.row(items, width, gap)
+    const lead = items.some((item) => item.classList.contains("mosaic-flow__item--lead"))
+    if (!lead && lanes > 1 && items.length < lanes * 3) return this.rows(items, width, gap, laneWidth)
 
     const heights = new Array(lanes).fill(0)
     const spans = new Map() // each tile's lanes
@@ -88,14 +136,14 @@ export default class extends Controller {
       return true
     }
 
-    items.forEach((item) => {
+    items.forEach((item, index) => {
       const mount = this.mount(item)
       if (mount) mount.style.height = "" // its own shape again before measuring
       if (item.firstElementChild) item.firstElementChild.style.minHeight = ""
       const shape = parseFloat(item.style.getPropertyValue("--a")) || 1.333
       const lead = item.classList.contains("mosaic-flow__item--lead")
       // the lead takes two lanes unless its picture is tall (a two-lane portrait would tower over the rest); a wide picture too, on 4+ lanes
-      let span = lanes >= 3 && ((lead && shape >= 0.9) || (shape >= 1.7 && lanes >= 4)) ? 2 : 1
+      let span = !this.orderedValue && lanes >= 3 && ((lead && shape >= 0.9) || (shape >= 1.7 && lanes >= 4)) ? 2 : 1
 
       // a two-lane tile goes only where two lanes are nearly level (the lowest such pair); otherwise it takes one lane
       let lane = 0
@@ -109,7 +157,7 @@ export default class extends Controller {
         if (best < 0) span = 1
         else lane = best
       }
-      if (span === 1) lane = heights.indexOf(Math.min(...heights))
+      if (span === 1) lane = this.orderedValue ? index % lanes : heights.indexOf(Math.min(...heights))
 
       const top = Math.max(...heights.slice(lane, lane + span))
       for (let c = lane; c < lane + span; c++) { // level the shorter lane under it: its last tile grows
