@@ -6,8 +6,8 @@ class HomeSectionsTest < ActiveSupport::TestCase
 
   def named_value(name, count, image: true) = { "value" => name, "count" => count, "image" => (image ? { "path" => "https://example.test/#{count}.jpg" } : nil) }
 
-  test "the museums: four with their record counts, the two longest names in the wide places, then the lead with its blurb" do
-    tiles = HomeSections.collections({ "Medical History Museum" => 13_979, "Grainger Museum Collection" => 12_849 }, helpers)
+  test "the museums: four with no record count, the two longest names in the wide places, then the lead with its blurb" do
+    tiles = HomeSections.collections(helpers)
 
     assert_equal 5, tiles.size
     assert_equal [ false ] * 4 + [ true ], tiles.map(&:lead)
@@ -15,8 +15,7 @@ class HomeSectionsTest < ActiveSupport::TestCase
     assert_equal SitePages.collection("university-art-collection")["blurb"], tiles.last.text
     names = tiles.first(4).map(&:title)
     assert_equal names.max_by(&:length), names.first
-    assert_equal "13,979 records", tiles.find { |tile| tile.title == "Medical History Museum" }.text
-    assert_nil tiles.find { |tile| tile.title == "Henry Forman Atkinson Dental Museum" }.text # no count known: no line
+    assert tiles.first(4).all? { |tile| tile.text.nil? } # no record counts (Dean, 2026-11-23)
     assert tiles.all? { |tile| tile.image.to_s.include?("banners/") }
   end
 
@@ -29,6 +28,7 @@ class HomeSectionsTest < ActiveSupport::TestCase
     assert tiles.last.lead
     assert_equal "Explore the collection", tiles.last.cta
     assert_not tiles.map(&:title).include?("No picture")
+    assert tiles.all? { |tile| tile.text.nil? } # no record counts
     assert_equal [], HomeSections.named(values.first(7), helpers) # too few for the mosaic: the section is left out
   end
 end

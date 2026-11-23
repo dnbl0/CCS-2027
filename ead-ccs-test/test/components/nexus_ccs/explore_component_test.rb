@@ -39,9 +39,10 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_equal 5, tiles.size
     assert_equal "University Art Collection", tiles.last.find("h3").text
     assert tiles.last[:class].include?("mosaic__item--lead")
-    assert_selector "section.explore li.mosaic__item--lead .cover-card__cta", text: "Explore the collection"
-    assert_selector "section.explore a.cover-card[href='/browse/collections/#{Browse::Slug.build('collections', 'Grainger Museum Collection')}'] h3", text: "Grainger Museum Collection"
-    assert_selector "section.explore img.cover-card__image[alt=''][loading=lazy]", count: 5 # the name is the link text
+    assert_selector "section.explore li.mosaic__item--lead article.result-card.explore-card--lead .explore-card__cta", text: "Explore the collection"
+    assert_selector "section.explore article.result-card.explore-card--tile h3.document-title-heading a[href='/browse/collections/#{Browse::Slug.build('collections', 'Grainger Museum Collection')}']", text: "Grainger Museum Collection"
+    assert_selector "section.explore a.result-card__media[tabindex='-1'][aria-hidden=true] img[alt=''][loading=lazy]", count: 5 # the name is the link text
+    assert_no_selector "section.explore, section.home-named", text: /\d records/ # no record counts on collections
     # the two longest names take the two wide tiles (the first and the fourth)
     assert_equal "Harry Brookes Allen Museum of Anatomy and Pathology", tiles.first.find("h3").text
   end
@@ -51,10 +52,10 @@ class ExploreComponentTest < ViewComponent::TestCase
 
     lead = page.find("section.home-visit ul.mosaic--five-left > li:first-child")
     assert lead[:class].include?("mosaic__item--lead")
-    assert_equal "https://grainger.unimelb.edu.au/visit", lead.find("a.cover-card")[:href]
+    assert_equal "https://grainger.unimelb.edu.au/visit", lead.find("h3 a")[:href]
     assert_includes lead.text, "Open Monday, 1-4pm. Grainger Museum is step-free"
-    assert_selector "section.home-visit a.cover-card", count: 5
-    assert_selector "section.home-visit a.cover-card .visually-hidden", text: "(the museum's website)", count: 5
+    assert_selector "section.home-visit article.explore-card--tile", count: 5
+    assert_selector "section.home-visit h3 .visually-hidden", text: "(the museum's website)", count: 5
   end
 
   test "Record types are a shelf, Places a list beside a preview, Time a strip; a type with several values is an any-of filter" do

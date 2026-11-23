@@ -6,15 +6,16 @@
   <ul class="ways" aria-label="<%= t("home.ways.label") %>">
     <% ways.each_with_index do |(key, path, image), index| %>
       <li class="ways__item<%= " ways__item--lead" if index.zero? %>">
-        <%= link_to path, class: "way-card#{' way-card--lead' if index.zero?}" do %>
-          <span class="way-card__media"><%= image_tag image, alt: "", loading: "lazy", decoding: "async" %></span>
-          <span class="way-card__body">
-            <span class="way-card__eyebrow"><%= t("home.ways.#{key}.eyebrow") %></span>
-            <%= content_tag(:h3, t("home.ways.#{key}.title"), class: "way-card__title") %>
-            <span class="way-card__text"><%= t("home.ways.#{key}.text") %></span>
-            <span class="way-card__cta"><%= t("home.ways.#{key}.cta") %></span>
-          </span>
-        <% end %>
+        <%# The site's card in its tile variant (as the mosaics), Stories as the lead %>
+        <article class="result-card explore-card explore-card--tile<%= " explore-card--lead" if index.zero? %>">
+          <%= link_to path, class: "result-card__media", tabindex: -1, "aria-hidden": true do %><%= image_tag image, alt: "", loading: "lazy", decoding: "async" %><% end %>
+          <div class="result-card__content">
+            <p class="explore-card__eyebrow"><%= t("home.ways.#{key}.eyebrow") %></p>
+            <h3 class="document-title-heading"><%= link_to t("home.ways.#{key}.title"), path, class: "explore-card__link" %></h3>
+            <p class="explore-card__intro"><%= t("home.ways.#{key}.text") %></p>
+            <p class="explore-card__cta" aria-hidden="true"><%= t("home.ways.#{key}.cta") %></p>
+          </div>
+        </article>
       </li>
     <% end %>
   </ul>

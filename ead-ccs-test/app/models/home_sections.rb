@@ -3,8 +3,8 @@
 # The picture tiles of the home page's mosaic sections (NexusCcs::MosaicComponent; the 2026-11 homepage redesign wireframe,
 # "Collections Navigator Homepage Redesign"): the five museums, visiting them, and the named collections inside them. Each section
 # is a few small tiles and one large lead tile with a line of text and a call to action. The words and pictures come from what the
-# site already has: config/pages.yml (each museum's name, blurb, banner and visiting details) and the index (record counts, and a
-# picture for each named collection). Nothing here is new copy.
+# site already has: config/pages.yml (each museum's name, blurb, banner and visiting details) and the index (a picture for each named
+# collection). Nothing here is new copy.
 module HomeSections
   Tile = Data.define(:title, :text, :path, :image, :lead, :cta, :external)
 
@@ -17,13 +17,10 @@ module HomeSections
   module_function
 
   # Explore the collections: four museums, then the lead. The two longest names take the two wide tiles (the first and the fourth),
-  # so no name is squeezed into a narrow one. counts: { facet value => number of records }; helpers: for the paths and pictures.
-  def collections(counts, helpers)
+  # so no name is squeezed into a narrow one. No record counts (Dean, 2026-11-23). helpers: for the paths and pictures.
+  def collections(helpers)
     others = (MUSEUMS - [ EXPLORE_LEAD ]).sort_by { |slug| -museum(slug)["name"].length }
-    small = [ others[0], others[2], others[3], others[1] ].map do |slug|
-      count = counts[museum(slug)["facet_value"]]
-      museum_tile(slug, helpers, text: count && I18n.t("home.records", count: count, number: helpers.number_with_delimiter(count)))
-    end
+    small = [ others[0], others[2], others[3], others[1] ].map { |slug| museum_tile(slug, helpers, text: nil) }
     small + [ museum_tile(EXPLORE_LEAD, helpers, text: museum(EXPLORE_LEAD)["blurb"], lead: true, cta: I18n.t("home.collections.cta")) ]
   end
 
@@ -43,7 +40,7 @@ module HomeSections
 
     tiles = pictured.map.with_index do |value, index|
       name = value["value"]
-      Tile.new(title: name, text: I18n.t("home.records", count: value["count"], number: helpers.number_with_delimiter(value["count"])),
+      Tile.new(title: name, text: nil,
                path: helpers.collection_landing_path(kind: "named-collections", slug: Browse::Slug.build("named-collections", name)),
                image: value.dig("image", "path"), lead: index.zero?, cta: (I18n.t("home.collections.cta") if index.zero?), external: false)
     end
