@@ -56,3 +56,25 @@ violations on the results, record and advanced search pages.
 | CCS-206 History grouped by day | `CCS-2027`; not core for MVP | **Not in prototype** | Was built ahead of the board; removed so the history page is Blacklight's own. |
 | CCS-55 Indigenous data filter | New, not MVP, data not ready | **Gap: data** | Unchanged. |
 | CCS-158 Spelling suggestions | Done, but Remarks say not MVP | **Met** | Built regardless. |
+
+## Board audit, 23 Nov 2026 (labels CCS-2026, CCS-2027, MVP; 250 issues) and the 2027 backlog prioritisation
+
+Read against the code and the running site (:3085) and against "CCS 2027 Backlog - Prioritisation.xlsx" (reviewed 23/11/26).
+Jira was read only.
+
+Fixed in this prototype on 23 Nov 2026:
+
+| Ticket | What was missing | Now |
+|---|---|---|
+| CCS-482 shared mailbox | The Help page named collections-navigator@ | coll-navigator@unimelb.edu.au; the museum pages' mhm-info@ corrected to CCS-47's mhm.info@ |
+| CCS-233 contact page | Email addresses shown plainly | Every address in an HTML page written with character references (lib/middleware/email_protection.rb): shown and clickable as before, absent from the raw HTML |
+| CCS-36 PDF full text | No "Not indexed" message | A PDF with no readable text is named at indexing and its viewer says a search will not find words inside it (OCR stays out of scope) |
+| CCS-53 activity reporting | Reporting is Adobe Customer Journey Analytics, outside CCS | The Adobe tag loads when ADOBE_ANALYTICS_SCRIPT_URL is set, only after the visitor accepts analytics cookies (CCS-471) |
+| CCS-31 CSV upload | Removing an uploaded set | records:remove_csv (full or partial); the upload stays a back-end operation (criterion 7) |
+| CCS-295 to 299 collection pages | Lorem ipsum introductions | Draft introductions for the five museums, from their own sites, marked for approval |
+| CCS-164 formats 2027 | Office, OpenOffice, eBook, 3D not shown | Office and OpenOffice: a LibreOffice PDF preview made at indexing, its text searchable. eBook and 3D: recognised; their viewers need epub.js and model-viewer, new dependencies awaiting approval |
+
+Not built, by the worksheet's decisions: sign-in and signed-in features (CCS-59, 60, 61, 129, 130, 136, 13: Won't), bulk download
+(CCS-167: Won't). Still blocked on data: CCS-55 (no Indigenous data flag) and CCS-35 (no language field). Worksheet decisions that
+differ from this prototype, for the team to settle: CCS-67 marks DA download "Won't" (the prototype downloads open images), and
+CCS-448 is a Must while CCS-522 (remove the MDHS Indigenous creator fields) is Done.
