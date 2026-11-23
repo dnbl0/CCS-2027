@@ -2,7 +2,7 @@ require "application_system_test_case"
 require_relative "../support/env_override"
 
 # Explore by time (the real index) and by place (stubbed geocoded data: the CI core has no coordinates) in a real browser: axe at
-# desktop and phone width, the arrow keys on the period strip, and the opt-in map with the keyboard. No tile is fetched from the
+# desktop and phone width, the periods' tiles in time order, and the opt-in map with the keyboard. No tile is fetched from the
 # internet: MAP_TILE_URL points at a closed local port.
 class ExplorePagesSystemTest < ApplicationSystemTestCase
   include EnvOverride
@@ -33,12 +33,12 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
       page.driver.resize(*size)
       with_env("MAP_TILE_URL" => "http://127.0.0.1:1/{z}/{x}/{y}.png") do
         visit "/explore/time"
-        assert_selector ".timeline__link", minimum: 2
+        assert_selector ".time-explorer__periods a", minimum: 2
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
         assert_no_horizontal_scroll
 
-        first(".timeline__zoom").click
-        assert_selector "h2", text: /Decades of/
+        visit "/explore/time?century=1900"
+        assert_selector "h1", text: /Decades of/
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
 
         visit "/explore/places"
@@ -52,37 +52,27 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
     end
   end
 
-  test "the strip opens on the period with the most records, scrolling only the strip" do
+  test "the periods read in time order as picture tiles that do not overlap, and a century opens its own page" do
     page.driver.resize(1440, 900)
     visit "/explore/time"
-    assert_selector ".timeline__link", minimum: 2
+    assert_selector ".time-explorer__periods .mosaic-flow.is-ready li", minimum: 2
 
-    visible = page.evaluate_script(<<~JS)
-      (() => {
-        const strip = document.querySelector('.timeline'), links = [...strip.querySelectorAll('.timeline__link')]
-        const busiest = links.reduce((a, b) => Number(b.dataset.count) > Number(a.dataset.count) ? b : a).closest('li')
-        const s = strip.getBoundingClientRect(), p = busiest.getBoundingClientRect()
-        return p.left >= s.left - 1 && p.right <= s.right + 1
-      })()
+    tiles = page.evaluate_script(<<~JS)
+      [...document.querySelectorAll('.time-explorer__periods .mosaic-flow > li')].map(li => {
+        const r = li.getBoundingClientRect()
+        return { name: li.querySelector('h3').textContent.trim(), left: r.left, top: r.top, right: r.right, bottom: r.bottom }
+      })
     JS
-    assert visible, "the busiest period is in view when the page opens"
-    assert_equal 0, page.evaluate_script("window.scrollX"), "only the strip scrolled, not the page"
-  end
+    overlaps = tiles.combination(2).select { |a, b| a["left"] < b["right"] - 1 && b["left"] < a["right"] - 1 && a["top"] < b["bottom"] - 1 && b["top"] < a["bottom"] - 1 }
+    assert_empty overlaps.map { |pair| pair.map { |tile| tile["name"] } }, "tiles overlap"
+    # in time order: each tile starts no higher than the one before it in its lane, and the first row runs left to right
+    first_row = tiles.select { |tile| (tile["top"] - tiles.first["top"]).abs < 2 }
+    assert_equal first_row.sort_by { |tile| tile["left"] }.map { |tile| tile["name"] }, first_row.map { |tile| tile["name"] }
 
-  test "the arrow keys move between periods, and a period opens the search with its years" do
-    visit "/explore/time"
-    links = all(".timeline__link")
-    page.execute_script("document.querySelector('.timeline__link').focus()")
-    page.driver.browser.keyboard.type(:right)
-    assert_equal links[1].text.squish, page.evaluate_script("document.activeElement.textContent").squish
-    page.driver.browser.keyboard.type(:End)
-    assert_equal links.last.text.squish, page.evaluate_script("document.activeElement.textContent").squish
-    page.driver.browser.keyboard.type(:left)
-    assert_equal links[-2].text.squish, page.evaluate_script("document.activeElement.textContent").squish
-
-    links[1].click
-    assert_current_path(/range%5Bdate_start_isi%5D%5Bbegin%5D=/)
-    assert_selector ".result-card", minimum: 1
+    century = all(".time-explorer__periods .explore-card__link[href^='/browse/periods/']").first
+    assert century, "a century from 1000 has its own page"
+    century.click
+    assert_selector "main.place-page h1"
   end
 
   test "the map loads only when asked, is remembered, and a place is reached with the keyboard" do

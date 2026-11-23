@@ -1,60 +1,63 @@
-<%# Explore by time (Explore::Timeline): centuries, or the decades of one, as a strip of links into the search; eras below. Works as a plain list without JavaScript. %>
+<%# Explore by time (Explore::Timeline), on the Explore template (explore/places' head): the shape of the collections in time (how many
+    records each century, or each decade of one century, holds, as bars), then the periods as picture tiles in the site's mosaic, in time
+    order. A period opens its own page where it has one (Browse::Periods: from 1000; its decades are listed there), else its records in the
+    search. The eras the records are catalogued under mostly repeat the centuries, so they are a folded list after. %>
 <% period_label = @century && Explore::Timeline::Period.new(first: @century, last: @century + 99, count: 0, images: []).label %>
-<% content_for :body_class, "page-browse page-explore" %>
+<% content_for :body_class, "page-browse page-explore page-explore-time" %>
 <% content_for :title, "#{[ period_label, t('explore_pages.time.title') ].compact.join(' — ')} — Collections Navigator — University of Melbourne" %>
 <% trail = [ [ "Browse", browse_path ], [ t("explore_pages.time.title"), (explore_time_path if @century) ] ] %>
 <% trail << [ period_label, nil ] if @century %>
 <%= render NexusCcs::PageBreadcrumbsComponent.new(trail: trail) %>
 <main class="browse explore" id="main-content">
-  <%# The head of the Browse pages (browse/_page_head): the title centred with its line of introduction %>
-  <div class="places-page places-page--head"><div class="places-page__inner">
-    <%= render "browse/page_head", title: t("explore_pages.time.title"), intro: t("explore_pages.time.intro") %>
-  </div></div>
-  <div class="browse__inner">
-    <% if @timeline %>
-      <section class="explore__section" aria-labelledby="timeline-heading">
-        <h2 class="browse__heading" id="timeline-heading"><%= @century ? t("explore_pages.time.decades", period: period_label) : t("explore_pages.time.centuries") %></h2>
-        <% if @century %><p class="explore__back"><%= link_to t("explore_pages.time.all_centuries"), explore_time_path %></p><% end %>
-        <% if @timeline.periods.empty? %>
-          <p><%= t("explore_pages.time.empty") %></p>
-        <% else %>
-          <p class="explore__hint" id="timeline-keys"><%= t("explore_pages.time.keys") %></p>
-          <ol class="timeline" aria-label="<%= t('explore_pages.time.list_label') %>" data-controller="timeline">
-            <% @timeline.periods.each do |period| %>
-              <li class="timeline__period">
-                <%= link_to search_action_path(period.search_query), class: "timeline__link", "aria-describedby": "timeline-keys",
-                      data: { timeline_target: "link", action: "keydown->timeline#move", count: period.count } do %>
-                  <span class="timeline__label"><%= period.label %></span>
-                  <span class="timeline__count"><%= t("explore_pages.count", count: period.count, number: number_with_delimiter(period.count)) %></span>
-                  <% if period.images.any? %>
-                    <span class="timeline__images">
-                      <% period.images.each do |image| %><img src="<%= image.src %>" alt="" loading="lazy" width="96" height="96"><% end %>
-                    </span>
-                  <% end %>
-                <% end %>
-                <% if period.century? && !@century %>
-                  <%= link_to explore_time_path(century: period.first), class: "timeline__zoom" do %><%= t("explore_pages.time.show_decades") %><span class="visually-hidden"> <%= t("explore_pages.time.show_decades_of", period: period.label) %></span><% end %>
-                <% end %>
-              </li>
+  <div class="place-explorer-wrap">
+    <div class="time-explorer">
+      <div class="place-explorer__head">
+        <div class="place-explorer__title">
+          <h1 class="place-explorer__heading"><%= period_label ? t("explore_pages.time.decades", period: period_label) : t("explore_pages.time.title") %></h1>
+          <p class="place-explorer__intro"><%= period_label ? t("explore_pages.time.decades_intro") : t("explore_pages.time.intro") %></p>
+        </div>
+        <% if @century %><p class="time-explorer__back"><%= link_to t("explore_pages.time.all_centuries"), explore_time_path, class: "arrow-link arrow-link--icon" %></p><% end %>
+      </div>
+
+      <% if @timeline.nil? %>
+        <p class="browse__unavailable"><%= t("explore_pages.unavailable_html", link: link_to(t("explore_pages.search_all"), search_action_path(any_assets: "1", search_field: "all_fields"))) %></p>
+      <% elsif @timeline.periods.empty? %>
+        <p><%= t("explore_pages.time.empty") %></p>
+      <% else %>
+        <% periods = @timeline.periods %>
+        <% most = Math.sqrt(periods.map(&:count).max.to_f) %>
+        <%# The shape of the collections in time: one bar a period, its height the square root of its share of the busiest, so the small
+            periods stay visible beside the 20th century's thousands (the caption says so); a picture of the counts below, so it is hidden from
+            screen readers, and its words say what it shows %>
+        <figure class="time-chart">
+          <figcaption class="time-chart__caption"><%= t("explore_pages.time.chart", busiest: periods.max_by(&:count).label, count: number_with_delimiter(periods.max_by(&:count).count)) %></figcaption>
+          <ol class="time-chart__bars" aria-hidden="true">
+            <% periods.each do |period| %>
+              <li class="time-chart__bar" style="--h: <%= [ (Math.sqrt(period.count) / most * 100).round(1), 2 ].max %>%" title="<%= period.label %>: <%= number_with_delimiter(period.count) %>"></li>
             <% end %>
           </ol>
-        <% end %>
-      </section>
+          <p class="time-chart__ends" aria-hidden="true"><span><%= periods.first.label %></span><span><%= periods.last.label %></span></p>
+        </figure>
 
-      <% if @timeline.eras.any? %>
-        <section class="explore__section" aria-labelledby="eras-heading">
-          <h2 class="browse__heading" id="eras-heading"><%= t("explore_pages.time.eras") %></h2>
-          <p><%= t("explore_pages.time.eras_intro") %></p>
-          <ul class="explore-chips">
-            <%# Most records first (the source data has a few impossible eras, "30th century", with one or two records: they fall to the end) %>
-            <% @timeline.eras.sort_by { |era| -era.count }.each do |era| %>
-              <li><%= link_to search_action_path(era.search_query), class: "explore-chips__chip" do %><%= era.name %> <span class="explore-chips__count">(<%= number_with_delimiter(era.count) %>)</span><% end %></li>
-            <% end %>
-          </ul>
+        <section class="place-section time-explorer__periods" aria-labelledby="timeline-heading">
+          <h2 class="place-section__heading" id="timeline-heading"><%= @century ? t("explore_pages.time.decades_heading") : t("explore_pages.time.centuries") %></h2>
+          <% tiles = periods.map { |period| facet_tile(period.label, period.count, timeline_period_path(period) || search_action_path(period.search_query), period.images.first) } %>
+          <%= render "browse_entities/facet_tiles", tiles: tiles, label: t("explore_pages.time.list_label"), ordered: true %>
         </section>
+
+        <% if @timeline.eras.any? && !@century %>
+          <details class="place-explorer__all time-explorer__eras">
+            <summary><%= t("explore_pages.time.eras_folded", count: @timeline.eras.size) %></summary>
+            <p class="time-explorer__eras-intro"><%= t("explore_pages.time.eras_intro") %></p>
+            <ul class="place-chips">
+              <%# Most records first (the source data has a few impossible eras, "30th century", with one or two records: they fall to the end) %>
+              <% @timeline.eras.sort_by { |era| -era.count }.each do |era| %>
+                <li><%= link_to search_action_path(era.search_query), class: "places-chip" do %><%= era.name %> <span class="places-chip__count"><%= number_with_delimiter(era.count) %></span><% end %></li>
+              <% end %>
+            </ul>
+          </details>
+        <% end %>
       <% end %>
-    <% else %>
-      <p class="browse__unavailable"><%= t("explore_pages.unavailable_html", link: link_to(t("explore_pages.search_all"), search_action_path(any_assets: "1", search_field: "all_fields"))) %></p>
-    <% end %>
+    </div>
   </div>
 </main>

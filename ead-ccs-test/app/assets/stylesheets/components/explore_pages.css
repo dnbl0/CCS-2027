@@ -1,33 +1,11 @@
-/* Explore by time and by place (ExploreController): the browse pages' frame and lists (browse.css), plus the period strip, the era
-   chips and the map. The strip is positioned so the visually hidden text inside it is clipped with it. Targets are at least 44px; focus rings as the browse pages; no horizontal page scroll at 320px. */
+/* Explore by time and by place (ExploreController): the browse pages' frame and lists (browse.css), plus the era chips and the map
+   lists (Explore by time and by place themselves are on the Explore template, below). Targets are at least 44px; focus rings as the browse pages; no horizontal page scroll at 320px. */
 .explore__section { display: flex; flex-direction: column; gap: var(--ccs-space-4); min-width: 0; }
 .explore__hint, .explore__back { margin: 0; color: var(--ccs-text-secondary); }
 .explore__back a { color: var(--ccs-text-link); }
 
-/* The period strip: a row that scrolls sideways on wide screens, a plain column on a phone */
-.timeline { position: relative; display: flex; max-width: 100%; gap: var(--ccs-space-4); margin: 0; padding: 0 0 var(--ccs-space-3); list-style: none; overflow-x: auto; scroll-snap-type: x proximity; }
-.timeline__period { flex: 0 0 15rem; display: flex; flex-direction: column; gap: var(--ccs-space-2); scroll-snap-align: start; }
-
-.timeline__link {
-  flex: 1;
-  display: flex; flex-direction: column; gap: var(--ccs-space-2); min-height: 44px; padding: var(--ccs-space-4);
-  border: 1px solid var(--ccs-border-default); border-top: 4px solid var(--ccs-border-brand); border-radius: var(--ccs-radius-panel);
-  background: var(--ccs-surface-raised); color: var(--ccs-text-link); text-decoration: none;
-}
-.timeline__link:hover .timeline__label { text-decoration: underline; }
-.timeline__link:focus-visible, .timeline__zoom:focus-visible, .explore-chips__chip:focus-visible, .explore-map__toggle:focus-visible,
-.explore-places summary:focus-visible, .explore-places__region a:focus-visible {
+.explore-chips__chip:focus-visible, .explore-map__toggle:focus-visible, .explore-places summary:focus-visible, .explore-places__region a:focus-visible {
   outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px;
-}
-.timeline__label { font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); }
-.timeline__count { font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
-.timeline__images { display: flex; gap: var(--ccs-space-1); }
-.timeline__images img { width: 4rem; height: 4rem; object-fit: cover; background: var(--ccs-surface-subtle); }
-.timeline__zoom { display: inline-flex; align-items: center; min-height: 44px; color: var(--ccs-text-link); text-decoration: underline; }
-
-@media (max-width: 576px) {
-  .timeline { flex-direction: column; overflow-x: visible; }
-  .timeline__period { flex-basis: auto; }
 }
 
 /* Era chips */
@@ -250,3 +228,18 @@
 .place-explorer__all { margin-top: var(--ccs-space-5); padding-top: var(--ccs-space-4); border-top: 1px solid var(--ccs-border-subtle); }
 .place-explorer__all > summary { display: flex; align-items: center; min-height: 44px; font-weight: var(--ccs-font-weight-semibold); cursor: pointer; }
 @media (max-width: 575.98px) { .place-explorer__find { flex-basis: 100%; } }
+
+/* Explore by time on the Explore template (explore/time): the head as Explore by place's, the shape of the collections in time as bars,
+   then the periods as picture tiles in the site's mosaic (in time order), and the catalogued eras folded away */
+.time-explorer { display: flex; flex-direction: column; gap: var(--ccs-space-6); }
+.time-explorer .place-explorer__head { flex-direction: row; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; }
+.time-explorer__back { margin: 0; }
+
+.time-chart { margin: 0; padding: var(--ccs-space-5); border-radius: var(--ccs-radius-lg); background: var(--ccs-surface-subtle); }
+.time-chart__caption { margin: 0 0 var(--ccs-space-4); color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
+.time-chart__bars { display: flex; align-items: flex-end; gap: 3px; height: 8rem; margin: 0; padding: 0; list-style: none; }
+.time-chart__bar { flex: 1 1 0; min-width: 2px; height: var(--h); border-radius: 3px 3px 0 0; background: var(--ccs-text-brand); opacity: 0.85; }
+.time-chart__ends { display: flex; justify-content: space-between; margin: var(--ccs-space-2) 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-xs); font-variant-numeric: tabular-nums; }
+
+.time-explorer__periods { margin-top: 0; padding-top: 0; border-top: 0; }
+.time-explorer__eras-intro { margin: var(--ccs-space-2) 0 var(--ccs-space-3); color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }

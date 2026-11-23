@@ -30,6 +30,15 @@ module PlacesHelper
                            image: picture && DamImage.sized(AssetVersion.url(picture.src), 600), lead: false, cta: nil, external: false, width: nil, height: nil)
   end
 
+  # A period of Explore by time (Explore::Timeline::Period): its own page (Browse::Periods, from the year 1000, and "before 1000"), or
+  # nil for an earlier one (its records open in the search)
+  def timeline_period_path(period)
+    return Browse::Periods.before.path if period.before? && period.last == Browse::Periods::FIRST_CENTURY - 1
+    return if period.before? || period.first < Browse::Periods::FIRST_CENTURY
+
+    Browse::Periods.for_span(period.first, period.last)&.path
+  end
+
   # A category's value (Categories::Tile) as a mosaic tile: a collection or named collection opens its own page
   def category_tile(tile, dimension)
     image = NexusCcs::ExploreCardComponent.image?(tile, remote: true) ? tile.image : nil

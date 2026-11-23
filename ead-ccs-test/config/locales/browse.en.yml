@@ -38,6 +38,7 @@ en:
         placeholder: "Type a subject, such as portraits or anatomy"
     # A place's own page (browse_entities/place; after Google Arts & Culture's place pages)
     place:
+      no_picture: "With no picture to show"
       kind: "Place"
       in_region: "in %{region}"
       records:

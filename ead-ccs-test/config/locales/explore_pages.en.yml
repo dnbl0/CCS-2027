@@ -9,7 +9,11 @@ en:
     links_label: "Explore by time or place"
     time:
       title: "Explore by time"
-      intro: "Step through the centuries the records come from, then into decades. Each period opens its records in the search."
+      intro: "The centuries the records come from, earliest first. Each opens its own page, with its decades and its records."
+      decades_intro: "The decades of this century, earliest first. Each opens its own page, with its records."
+      decades_heading: "Decades"
+      chart: "Records by period, earliest first: most are from %{busiest} (%{count} records). Bar heights are scaled so the smaller periods stay visible."
+      eras_folded: "Eras as catalogued (%{count})"
       centuries: "Centuries"
       decades: "Decades of %{period}"
       all_centuries: "All centuries"
@@ -19,7 +23,7 @@ en:
       show_decades: "Decades"
       show_decades_of: "of %{period}"
       eras: "Eras"
-      eras_intro: "The eras the records are catalogued under."
+      eras_intro: "The eras the records are catalogued under, most records first. Most repeat the centuries above."
       empty: "No records have a date in this period."
     places:
       title: "Explore by place"

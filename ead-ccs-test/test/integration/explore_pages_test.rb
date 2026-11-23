@@ -26,24 +26,29 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the timeline is a list of periods that open the search with the year range, with decades and eras" do
+  test "the timeline: the shape of the collections as bars, the periods as tiles in time order opening their own pages, and the eras folded" do
     visit("/explore/time") { seed("timeline/all", timeline) }
 
     assert_response :success
     assert_select "h1", "Explore by time"
-    assert_select "ol.timeline li", 2
-    assert_select "a.timeline__link[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999']", text: /1900–1999\s+1,200 records/
-    assert_select "a.timeline__link[href*='range%5Bdate_start_isi%5D%5Bend%5D=-3001']", text: /Before 3000 BCE/
-    assert_select "a.timeline__link img[alt='']", 1
-    assert_select "a.timeline__zoom[href='/explore/time?century=1900']", text: /Decades of 1900–1999/
-    assert_select ".explore-chips a[href*='f%5Bdate_era_ssim%5D%5B%5D=20th+century']", text: /20th century/
+    assert_select "figure.time-chart figcaption", /most are from 1900–1999 \(1,200 records\)/
+    assert_select ".time-chart__bars[aria-hidden='true'] li", 2
+    # the periods, earliest first: a century from 1000 opens its own page (its decades are there), an earlier one its records in the search
+    assert_select ".time-explorer__periods a[href='/browse/periods/1900-1999']", text: /\A1900–1999/
+    assert_select ".time-explorer__periods a[href*='range%5Bdate_start_isi%5D%5Bend%5D=-3001']", text: /\ABefore 3000 BCE/
+    assert_select ".time-explorer__periods .mosaic-flow img[alt='']", 1 # the period with a picture is a tile; the other is a link after
+    assert_select ".time-explorer__periods", text: /1900–1999\s+1,200 records/
+    assert_select "details.time-explorer__eras summary", "Eras as catalogued (1)"
+    assert_select "details.time-explorer__eras a[href*='f%5Bdate_era_ssim%5D%5B%5D=20th+century']", text: /20th century/
   end
 
   test "a century's decades, with the way back; a century that is not one shows every century" do
     visit("/explore/time?century=1900") { seed("timeline/1900", timeline(century: 1900)) }
-    assert_select "h2", "Decades of 1900–1999"
+    assert_select "h1", "Decades of 1900–1999"
+    assert_select "h2", "Decades"
     assert_select "a[href='/explore/time']", text: "All centuries"
-    assert_select "a.timeline__zoom", 0
+    assert_select ".time-explorer__periods a[href='/browse/periods/1920-1929']", text: /\A1920–1929/
+    assert_select "details.time-explorer__eras", 0
 
     visit("/explore/time?century=1950") { seed("timeline/all", timeline) }
     assert_select "h2", "Centuries"
