@@ -68,12 +68,14 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     assert_select ".place-explorer__chip[data-region='English']", 0
     assert_select "input[type='search']#place-explorer-find"
     # the card: its own page, where it is and the pin's number of records
-    assert_select "li[data-key='0'] .place-card" do
-      assert_select "h3 a[href^='/browse/places/']", "Melbourne"
-      assert_select ".place-card__where", "Victoria, Australia"
-      assert_select ".place-card__count", "10 records"
-      assert_select "img[alt=''][src*='w=600']"
+    assert_select "li[data-key='0'] .place-tile" do
+      assert_select "h3 a.place-tile__link[href^='/browse/places/']", "Melbourne"
+      assert_select ".place-tile__where", "Victoria, Australia"
+      assert_select ".place-tile__count", "10 records"
+      assert_select ".place-tile__media img[alt=''][src*='w=600']"
     end
+    assert_select "svg.place-explorer__dots[aria-hidden='true']" # the map's preview, drawn from the page's own data
+    assert_select "button.place-explorer__switch", "Show map"
     assert_select ".place-explorer__status[role='status']", "1 place"
     # the map: nothing asked of the tile server until the visitor presses Show the map
     assert_select ".place-explorer__consent button", "Show the map"

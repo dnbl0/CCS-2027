@@ -16,7 +16,9 @@ no code, pictures or wording were taken from it.
   on its pin (places close together are grouped; choose a group to zoom in, a place for a small card linking to its page). Region chips
   and a name box narrow the cards and the pins; once the map is shown the cards are the places in view ("Update the list as I move the
   map"), with the places in view that have no picture listed by name under them. Hovering or focusing a card marks its pin. Under it
-  all, every region, country and place as lists. **The map only loads when the visitor presses "Show the map"**, because its pictures come from
+  all, every region, country and place as lists. The cards share one square shape (each picture whole on a pale mount) and come 18 at a
+  time; before the map is loaded its panel shows the places as dots drawn from the page's own data; on a phone the list comes first
+  and a floating button swaps the list and the map. **The map only loads when the visitor presses "Show the map"**, because its pictures come from
   OpenStreetMap's server. Until the places have been located (below), the page shows lists of regions and places instead of a map.
 - **A "Place" filter** in the search results: Region > Country > State > Place, opened step by step. It sits straight after the
   workbook's Region filter (#14) and is an **addition**, not one of the workbook's filters. It appears once the index has the data.

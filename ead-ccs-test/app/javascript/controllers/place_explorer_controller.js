@@ -9,12 +9,16 @@ import { Controller } from "@hotwired/stimulus"
 // choice is then remembered in this browser (localStorage) until Hide the map, so the map comes back on the next visit. Pins are buttons
 // in the Tab order; a place's pin opens a popup whose link takes the focus, and Escape gives the focus back to the pin. Places close
 // together on screen are one pin with their total, which zooms in. Animations are off for visitors who ask for reduced motion.
+//
+// Before the map, its panel shows the places as dots drawn from the page's own data (no tile is fetched for it). The cards come a page
+// at a time (Show more places). On a phone the list comes first and a floating button swaps the list and the map.
 const GROUP_PIXELS = 48
+const PAGE = 18 // cards at a time, as Airbnb's pages
 const REMEMBER = "ccs:place-map"
 const MORE = 24 // names of places without a card, at most
 
 export default class extends Controller {
-  static targets = ["card", "list", "status", "empty", "more", "moreHeading", "moreList", "consent", "showButton", "stage", "map", "follow", "chip", "query"]
+  static targets = ["card", "list", "status", "empty", "more", "moreHeading", "moreList", "moreButton", "consent", "showButton", "stage", "map", "follow", "chip", "query", "dots", "switch"]
   static values = { markers: Array, tiles: String, attribution: String, words: Object }
 
   connect() {
@@ -23,6 +27,8 @@ export default class extends Controller {
     this.region = ""
     this.text = ""
     this.pins = new Map() // a place's key => the pin that shows it (its own, or its group's)
+    this.limit = PAGE
+    this.drawDots()
     if (this.remembered()) this.show({ restoring: true })
     else this.refresh()
   }
@@ -56,7 +62,7 @@ export default class extends Controller {
       this.L = await import("leaflet")
       this.draw()
     }
-    this.refresh({ pins: true })
+    this.refresh({ pins: true, more: true })
     if (!restoring) this.followTarget.focus({ preventScroll: true }) // the button that was pressed is gone: the focus goes to the map's first control
   }
 
@@ -78,7 +84,8 @@ export default class extends Controller {
     return this.places.filter((place) => (!this.region || place.region === this.region) && (!this.text || place.search.includes(this.text)))
   }
 
-  following() { return Boolean(this.map) && this.followTarget.checked }
+  // The list follows the map only while the map can be seen (on a phone, the list view hides it)
+  following() { return Boolean(this.map) && this.followTarget.checked && this.mapTarget.offsetWidth > 0 }
 
   inView(place) {
     if (!this.following()) return true
@@ -90,16 +97,66 @@ export default class extends Controller {
   }
 
   // The cards (and, when the filters changed, the pins) for the current choices
-  refresh({ pins = false } = {}) {
+  // more: keep the cards already shown (Show more places); any other change starts again at the first page
+  refresh({ pins = false, more = false } = {}) {
+    if (!more) this.limit = PAGE
     const matching = this.matching()
     const here = matching.filter((place) => this.inView(place))
     const keys = new Set(here.filter((place) => place.card).map((place) => String(place.key)))
-    this.cardTargets.forEach((card) => { card.hidden = !keys.has(card.dataset.key) })
-    this.listTarget.dispatchEvent(new CustomEvent("mosaic:refresh"))
+    let shown = 0
+    this.cardTargets.forEach((card) => {
+      const fits = keys.has(card.dataset.key) && shown < this.limit
+      if (fits) shown += 1
+      card.hidden = !fits
+    })
+    const left = keys.size - shown
+    this.moreButtonTarget.hidden = left <= 0
+    this.moreButtonTarget.textContent = this.word("show_more", { count: left.toLocaleString("en-AU") })
     this.emptyTarget.hidden = keys.size > 0
     this.others(here.filter((place) => !place.card))
     this.say(keys.size)
     if (pins && this.map) this.group(matching)
+  }
+
+  showMore() {
+    const first = this.cardTargets.filter((card) => !card.hidden).length
+    this.limit += PAGE
+    this.refresh({ more: true })
+    // the focus goes to the first new card, so a keyboard user carries on from where the list grew
+    this.cardTargets.filter((card) => !card.hidden)[first]?.querySelector("a")?.focus()
+  }
+
+  // On a phone: the list or the map (the map's panel asks before the map is loaded, as on a wide screen)
+  switch() {
+    const toMap = !this.element.classList.contains("is-map-view")
+    this.element.classList.toggle("is-map-view", toMap)
+    this.switchTarget.textContent = this.word(toMap ? "switch_list" : "switch_map")
+    if (toMap && this.map) {
+      this.map.invalidateSize()
+      if (this.unframed) { this.frame(this.matching()); this.unframed = false }
+    }
+    this.refresh({ pins: true })
+    window.scrollTo({ top: this.element.offsetTop, behavior: "instant" })
+  }
+
+  // Each place a dot where it is (longitude across, latitude up), bigger for more records: the map's preview before it is loaded
+  drawDots() {
+    if (!this.hasDotsTarget) return
+    const svg = "http://www.w3.org/2000/svg"
+    const seen = new Map()
+    for (const place of this.places) {
+      const spot = `${Math.round(place.lon)},${Math.round(place.lat)}`
+      seen.set(spot, (seen.get(spot) || 0) + place.count)
+    }
+    const dots = [...seen].map(([spot, count]) => {
+      const [lon, lat] = spot.split(",").map(Number)
+      const dot = document.createElementNS(svg, "circle")
+      dot.setAttribute("cx", lon + 180)
+      dot.setAttribute("cy", 90 - lat)
+      dot.setAttribute("r", (0.9 + Math.log10(count + 1) * 0.55).toFixed(2))
+      return dot
+    })
+    this.dotsTarget.replaceChildren(...dots)
   }
 
   others(places) {
@@ -157,7 +214,8 @@ export default class extends Controller {
     this.map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>')
     L.tileLayer(this.tilesValue, { attribution: this.attributionValue, maxZoom: 18 }).addTo(this.map)
     this.layer = L.layerGroup().addTo(this.map)
-    this.frame(this.matching())
+    if (this.mapTarget.offsetWidth > 0) this.frame(this.matching())
+    else { this.map.setView([0, 0], 2); this.unframed = true } // drawn while hidden (a phone's list view): framed when first seen
     // Moving the map changes the cards; zooming also regroups the pins (not on every move: an open popup's own pan would close it)
     this.map.on("moveend", () => this.refresh())
     this.map.on("zoomend", () => this.group(this.matching()))

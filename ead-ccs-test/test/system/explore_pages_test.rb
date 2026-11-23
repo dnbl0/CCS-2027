@@ -42,6 +42,8 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
 
         visit "/explore/places"
+        assert_accessible(tags: AXE_TAGS + WCAG22_TAGS) # the cards, and the map's preview before it is loaded
+        click_button "Show map" if name == "390px" # a phone shows the list first
         click_button "Show the map"
         assert_selector ".explore-map__pin", minimum: 1
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
@@ -116,24 +118,24 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
     page.driver.resize(1440, 900)
     with_env("MAP_TILE_URL" => "http://127.0.0.1:1/{z}/{x}/{y}.png") do
       visit "/explore/places"
-      assert_selector ".place-card", count: 1
+      assert_selector ".place-tile", count: 1
       assert_selector ".place-explorer__more-link", text: "Paris"
 
       click_button "Europe"
       assert_selector ".place-explorer__chip[aria-pressed='true']", text: "Europe"
-      assert_no_selector ".place-card"
+      assert_no_selector ".place-tile"
       assert_selector ".place-explorer__empty"
       assert_selector ".place-explorer__status", text: "0 places in Europe"
 
       click_button "Everywhere"
       fill_in "Find a place", with: "victoria"
-      assert_selector ".place-card", text: "Melbourne" # "Victoria, Australia"
+      assert_selector ".place-tile", text: "Melbourne" # "Victoria, Australia"
       assert_no_selector ".place-explorer__more-link", text: "Paris"
       fill_in "Find a place", with: ""
 
       click_button "Show the map"
       assert_selector ".explore-map__pin", minimum: 1
-      find(".place-card").hover
+      find(".place-tile").hover
       assert_selector ".explore-map__pin.is-marked[aria-label^='Melbourne']"
       page.execute_script("localStorage.removeItem('ccs:place-map')")
     end

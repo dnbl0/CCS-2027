@@ -23,7 +23,7 @@
            data-place-explorer-markers-value="<%= place_explorer_markers(@places, @cards).to_json %>"
            data-place-explorer-tiles-value="<%= Explore::MapTiles.url %>"
            data-place-explorer-attribution-value="<%= String.new(sanitize(Explore::MapTiles.attribution, tags: %w[a], attributes: %w[href])) %>"
-           data-place-explorer-words-value="<%= words.slice(:shown_one, :shown_other, :in_view, :in_region, :matching, :explore, :see_records, :group, :record_one, :record_other, :more).to_json %>">
+           data-place-explorer-words-value="<%= words.slice(:shown_one, :shown_other, :in_view, :in_region, :matching, :explore, :see_records, :group, :record_one, :record_other, :more, :show_more, :switch_map, :switch_list).to_json %>">
         <%# The head: the title and its line, then the regions as chips and the name box (Airbnb's search bar and categories) %>
         <div class="place-explorer__head">
           <div class="place-explorer__title">
@@ -38,21 +38,26 @@
               <% end %>
             </div>
             <div class="place-explorer__find">
-              <label for="place-explorer-find" class="place-explorer__find-label"><%= words[:find] %></label>
-              <input type="search" id="place-explorer-find" class="form-control place-explorer__input" autocomplete="off" placeholder="<%= words[:find_placeholder] %>"
+              <label for="place-explorer-find" class="visually-hidden"><%= words[:find] %></label>
+              <svg class="place-explorer__find-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <input type="search" id="place-explorer-find" class="place-explorer__input" autocomplete="off" placeholder="<%= words[:find] %>"
                      data-place-explorer-target="query" data-action="input->place-explorer#find">
             </div>
           </div>
         </div>
 
         <div class="place-explorer__split">
-          <%# The map: first, so on a phone it sits above the list (Airbnb's map over its list); on a wide screen it stays in view on the right %>
+          <%# The map: on a wide screen it stays in view on the right; on a phone the list comes first and the floating button swaps the two %>
           <section class="place-explorer__map" aria-labelledby="map-heading" data-js-only>
             <h2 class="visually-hidden" id="map-heading"><%= t("explore_pages.places.map") %></h2>
             <div class="place-explorer__consent" data-place-explorer-target="consent">
+              <%# A preview drawn from the site's own data (each place a dot where it is): nothing is asked of the tile server for it %>
+              <svg class="place-explorer__dots" viewBox="0 10 360 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" data-place-explorer-target="dots"></svg>
+              <div class="place-explorer__consent-card">
               <p class="place-explorer__consent-heading"><%= t("explore_pages.places.explorer.consent_heading", count: number_with_delimiter(@places.markers.size)) %></p>
               <p class="place-explorer__consent-note"><%= words[:consent_note] %></p>
               <button type="button" class="btn btn-primary" data-place-explorer-target="showButton" data-action="place-explorer#show"><%= t("explore_pages.places.show_map") %></button>
+              </div>
             </div>
             <div class="place-explorer__stage" hidden data-place-explorer-target="stage">
               <div class="place-explorer__frame">
@@ -72,27 +77,24 @@
           <section class="place-explorer__list" aria-labelledby="list-heading">
             <h2 class="visually-hidden" id="list-heading"><%= words[:list] %></h2>
             <p class="place-explorer__status" role="status" data-place-explorer-target="status"><%= t("explore_pages.places.explorer.shown", count: @cards.size) %></p>
-            <ul class="mosaic-flow place-explorer__cards" data-controller="mosaic" data-mosaic-lanes-value="3" data-place-explorer-target="list"
-                data-action="mosaic:refresh->mosaic#schedule" aria-labelledby="list-heading">
+            <%# The cards, as Airbnb's: one shape for every picture (square), the picture whole on its pale mount, the name and its lines under it %>
+            <ul class="place-grid" data-place-explorer-target="list" aria-labelledby="list-heading">
               <% @cards.each do |card| %>
                 <% image = NexusCcs::ExploreCardComponent.image?(card, remote: true) ? card.image : nil %>
-                <li class="mosaic-flow__item" <%= tag.attributes(style: aspect_style(image&.width, image&.height)) %> data-key="<%= card.key %>" data-place-explorer-target="card"
+                <li class="place-grid__item" data-key="<%= card.key %>" data-place-explorer-target="card"
                     data-action="mouseenter->place-explorer#mark mouseleave->place-explorer#unmark focusin->place-explorer#mark focusout->place-explorer#unmark">
-                  <article class="result-card explore-card explore-card--tile place-card">
-                    <% if image %>
-                      <%= link_to card.path, class: "result-card__media", tabindex: -1, "aria-hidden": true do %>
-                        <%= image_tag DamImage.sized(AssetVersion.url(image.path), 600), alt: "", loading: "lazy", decoding: "async", width: image.width, height: image.height %>
-                      <% end %>
-                    <% end %>
-                    <div class="result-card__content">
-                      <h3 class="document-title-heading"><%= link_to card.label, card.path, class: "explore-card__link" %></h3>
-                      <% if card.where %><p class="place-card__where"><%= card.where %></p><% end %>
-                      <p class="place-card__count"><%= t("home.records", count: card.count, number: number_with_delimiter(card.count)) %></p>
+                  <article class="place-tile">
+                    <div class="place-tile__media">
+                      <% if image %><%= image_tag DamImage.sized(AssetVersion.url(image.path), 600), alt: "", loading: "lazy", decoding: "async", width: image.width, height: image.height %><% end %>
                     </div>
+                    <h3 class="place-tile__name"><%= link_to card.label, card.path, class: "place-tile__link" %></h3>
+                    <% if card.where %><p class="place-tile__where"><%= card.where %></p><% end %>
+                    <p class="place-tile__count"><%= t("explore_pages.places.explorer.records_html", count: card.count, number: number_with_delimiter(card.count)) %></p>
                   </article>
                 </li>
               <% end %>
             </ul>
+            <button type="button" class="place-explorer__show-more" hidden data-place-explorer-target="moreButton" data-action="place-explorer#showMore"></button>
             <p class="place-explorer__empty" hidden data-place-explorer-target="empty"><%= words[:empty] %></p>
             <%# The places in view that have no card (no picture to show): their names, most records first %>
             <div class="place-explorer__more" hidden data-place-explorer-target="more">
@@ -127,6 +129,8 @@
             </details>
           </section>
         </div>
+        <%# On a phone: the list or the map, swapped by a floating button (Airbnb's "Map" button) %>
+        <button type="button" class="place-explorer__switch" data-js-only data-place-explorer-target="switch" data-action="place-explorer#switch"><%= words[:switch_map] %></button>
       </div>
     <% else %>
       <p class="explore__hint"><%= t("explore_pages.places.pending") %></p>

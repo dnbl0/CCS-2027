@@ -38,7 +38,7 @@ en:
       all_places: "See every place, A to Z"
       # The list and map (after Airbnb's search with a map, 2026-11; place_explorer_controller.js). Placeholder wording.
       explorer:
-        intro: "Where the records were made. Choose a region, look for a place by name, or move the map: the places beside it follow."
+        intro: "Where the records were made. Choose a region, find a place, or move the map and the list follows."
         regions: "Regions"
         everywhere: "Everywhere"
         find: "Find a place"
@@ -63,6 +63,12 @@ en:
         record_one: "1 record"
         record_other: "%{count} records"
         all: "Every place, by region and country (%{count})"
+        records_html:
+          one: "<strong>1</strong> record"
+          other: "<strong>%{number}</strong> records"
+        show_more: "Show more places (%{count} more)"
+        switch_map: "Show map"
+        switch_list: "Show list"
   nexus_ccs:
     # The Place filter of the results (NexusCcs::PlaceHierarchyFacetComponent). Placeholder wording.
     place_hierarchy:
