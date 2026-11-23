@@ -1,0 +1,48 @@
+# The home page's sections (the homepage redesign, 2026-11: HomeSectionComponent, MosaicComponent, PlacePreviewComponent)
+en:
+  home:
+    records:
+      one: "1 record"
+      other: "%{number} records"
+    external: "(the museum's website)"
+    collections:
+      heading: "Explore the collections"
+      intro: "No search term needed. Start from a collection, a record type, a place or a time."
+      see_all: "See all collections"
+      label: "The University's museums"
+      cta: "Explore the collection"
+    visit:
+      heading: "Visit the collections"
+      intro: "See the collections in person, at the University's museums in Parkville and Carlton."
+      label: "Visiting the museums"
+      cta: "Plan your visit"
+    named:
+      heading: "Collections within the collections"
+      intro: "Named bequests, gifts and archives held inside the University's museums."
+      see_all: "See all named collections"
+      label: "Named collections"
+    kinds:
+      intro: "From prints and paintings to scientific instruments: browse by what a record is."
+    places:
+      intro: "Where the records were made, from Melbourne to the other side of the world."
+    periods:
+      intro: "The centuries the records come from."
+    on_this_day:
+      see_all: "See all records with pictures"
+    ways:
+      label: "More ways in"
+      stories:
+        eyebrow: "Stories"
+        title: "Follow objects, people and ideas across the collections"
+        text: "Narratives written by the collections team, each built around records you can open and explore."
+        cta: "Read the stories"
+      themes:
+        eyebrow: "Themes"
+        title: "Records gathered around a shared idea"
+        text: "From medicine and music to the natural world."
+        cta: "Browse themes"
+      categories:
+        eyebrow: "Categories"
+        title: "Every record, sorted by what it is"
+        text: "A quick route into the whole catalogue."
+        cta: "Browse by category"

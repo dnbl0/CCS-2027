@@ -73,3 +73,5 @@
 @import url("components/film_polish.css");
 /* Last: the card tiles restyle the cards and the home collections, over card_layout.css, explore.css and film_polish.css's masonry */
 @import url("components/card_tiles.css");
+/* Last of all: the home page sections of the homepage redesign (2026-11), over card_tiles.css */
+@import url("components/home_sections.css");

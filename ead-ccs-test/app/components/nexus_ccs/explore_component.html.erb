@@ -1,38 +1,39 @@
-<section class="ccs-section explore" aria-labelledby="explore-title">
-  <div class="ccs-section__inner explore__inner">
-    <header class="explore__header">
-      <h2 id="explore-title" class="ccs-section__heading"><%= t("explore.title") %></h2>
-      <p class="explore__intro"><%= t("explore.intro") %></p>
-    </header>
+<%# The home page's ways into the collections without a search (the homepage redesign, 2026-11; docs/card-layouts.md): the museums,
+    visiting them and the named collections inside them as mosaics of picture tiles each led by a large one; record types as a shelf
+    of pictures; places as a list beside a preview; time as a strip on the page's navy band. %>
+<%= render NexusCcs::HomeSectionComponent.new(id: "explore-title", heading: t("home.collections.heading"), intro: t("home.collections.intro"),
+                                              link: t("home.collections.see_all"), link_path: helpers.category_path("collections"), extra_class: "explore") do %>
+  <%= render NexusCcs::MosaicComponent.new(tiles: collection_tiles, pattern: :five, label: t("home.collections.label")) %>
+<% end %>
 
-    <% if overview.collections.any? %>
-      <ul id="browse-collections" class="explore__tiles<%= " explore__tiles--all" if overview.collections.size > 6 %>" aria-label="<%= t("explore.collections.label") %>">
-        <% overview.collections.each do |tile| %>
-          <li class="explore__tile explore__tile--tint-<%= tile.tint %>">
-            <%= link_to helpers.search_action_path(tile.query), class: "explore__tile-link" do %>
-              <% if image?(tile) %>
-                <%# The title is the link text, so the picture itself is decorative (empty alt) %>
-                <span class="explore__face explore__face--image"><%= image_tag image_path(tile), alt: "", width: tile.image.width, height: tile.image.height, loading: "lazy", decoding: "async", class: "explore__image" %></span>
-              <% else %>
-                <span class="explore__face" aria-hidden="true"><span class="explore__monogram"><%= monogram(tile) %></span></span>
-              <% end %>
-              <span class="explore__tile-body">
-                <h3 class="explore__tile-title"><%= tile.label %></h3>
-              </span>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-    <% end %>
-  </div>
-</section>
+<%= render NexusCcs::HomeSectionComponent.new(id: "home-visit", heading: t("home.visit.heading"), intro: t("home.visit.intro"), extra_class: "home-visit") do %>
+  <%= render NexusCcs::MosaicComponent.new(tiles: visit_tiles, pattern: :five_left, label: t("home.visit.label")) %>
+<% end %>
 
-<%# Record types, Places and Time: each its own section (the page's sections alternate white and grey), each cards in its own layout (NexusCcs::CardLayoutComponent) %>
-<% [ [ :kinds, overview.kind_tiles, t("explore.kinds.heading"), t("explore.kinds.see_all"), "object-types", :bento ],
-     [ :places, overview.place_tiles, t("explore.place_time.places"), t("explore.place_time.see_all_places"), "places", :rail ],
-     [ :periods, overview.period_tiles, t("explore.place_time.periods"), t("explore.place_time.see_all_periods"), "periods", :strip ] ].each do |key, tiles, heading, see_all, slug, layout| %>
-  <% next if tiles.empty? %>
-  <%= render NexusCcs::CardSectionComponent.new(slug: key, prefix: "explore", heading: heading, see_all: see_all, see_all_path: helpers.browse_hub_path(slug)) do %>
-    <%= render NexusCcs::CardLayoutComponent.new(cards: tiles, layout: layout, label: heading) %>
+<% if named_tiles.any? %>
+  <%= render NexusCcs::HomeSectionComponent.new(id: "home-named", heading: t("home.named.heading"), intro: t("home.named.intro"),
+                                                link: t("home.named.see_all"), link_path: helpers.category_path("named-collections"), extra_class: "home-named") do %>
+    <%= render NexusCcs::MosaicComponent.new(tiles: named_tiles, pattern: :eight, label: t("home.named.label")) %>
+  <% end %>
+<% end %>
+
+<% if overview.kind_tiles.any? %>
+  <%= render NexusCcs::HomeSectionComponent.new(id: "explore-kinds", heading: t("explore.kinds.heading"), intro: t("home.kinds.intro"),
+                                                link: t("explore.kinds.see_all"), link_path: helpers.browse_hub_path("object-types"), extra_class: "explore-kinds") do %>
+    <%= render NexusCcs::CardLayoutComponent.new(cards: overview.kind_tiles, layout: :shelf, label: t("explore.kinds.heading")) %>
+  <% end %>
+<% end %>
+
+<% if overview.place_tiles.any? %>
+  <%= render NexusCcs::HomeSectionComponent.new(id: "explore-places", heading: t("explore.place_time.places"), intro: t("home.places.intro"),
+                                                link: t("explore.place_time.see_all_places"), link_path: helpers.browse_hub_path("places"), extra_class: "home-places") do %>
+    <%= render NexusCcs::PlacePreviewComponent.new(tiles: overview.place_tiles, label: t("explore.place_time.places")) %>
+  <% end %>
+<% end %>
+
+<% if overview.period_tiles.any? %>
+  <%= render NexusCcs::HomeSectionComponent.new(id: "explore-periods", heading: t("explore.place_time.periods"), intro: t("home.periods.intro"),
+                                                link: t("explore.place_time.see_all_periods"), link_path: helpers.browse_hub_path("periods"), extra_class: "explore-periods") do %>
+    <%= render NexusCcs::CardLayoutComponent.new(cards: overview.period_tiles, layout: :strip, label: t("explore.place_time.periods")) %>
   <% end %>
 <% end %>

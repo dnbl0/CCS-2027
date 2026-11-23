@@ -1,12 +1,21 @@
-<%# Links to the Stories, Themes and Browse by category pages %>
-<section class="ccs-section home-more" aria-labelledby="home-ways-in">
-  <div class="ccs-section__inner explore__inner">
-    <h2 id="home-ways-in" class="ccs-section__heading"><%= t("nexus_ccs.home_more.ways_in") %></h2>
-    <p class="explore__intro"><%= t("nexus_ccs.home_more.ways_in_text") %></p>
-    <ul class="home-more__links">
-      <li><%= link_to t("nexus_ccs.stories.title"), stories_path, class: "arrow-link arrow-link--icon" %></li>
-      <li><%= link_to t("nexus_ccs.themes.title"), themes_path, class: "arrow-link arrow-link--icon" %></li>
-      <li><%= link_to t("nexus_ccs.categories.title"), categories_path, class: "arrow-link arrow-link--icon" %></li>
-    </ul>
-  </div>
-</section>
+<%# More ways in: Stories, Themes and Browse by category (the homepage redesign, 2026-11): Stories as the large lead card, the other two
+    beside it. Each card is one link; its picture is decorative (placeholder pictures from the site's own banners until each page has its own). %>
+<% ways = [ [ :stories, stories_path, "site/collections-breakout.jpg" ], [ :themes, themes_path, "site/banners/grainger-museum.jpg" ],
+            [ :categories, categories_path, "site/banners/medical-history-museum.jpg" ] ] %>
+<%= render NexusCcs::HomeSectionComponent.new(id: "home-ways-in", heading: t("nexus_ccs.home_more.ways_in"), intro: t("nexus_ccs.home_more.ways_in_text"), extra_class: "home-more home-ways") do %>
+  <ul class="ways" aria-label="<%= t("home.ways.label") %>">
+    <% ways.each_with_index do |(key, path, image), index| %>
+      <li class="ways__item<%= " ways__item--lead" if index.zero? %>">
+        <%= link_to path, class: "way-card#{' way-card--lead' if index.zero?}" do %>
+          <span class="way-card__media"><%= image_tag image, alt: "", loading: "lazy", decoding: "async" %></span>
+          <span class="way-card__body">
+            <span class="way-card__eyebrow"><%= t("home.ways.#{key}.eyebrow") %></span>
+            <%= content_tag(:h3, t("home.ways.#{key}.title"), class: "way-card__title") %>
+            <span class="way-card__text"><%= t("home.ways.#{key}.text") %></span>
+            <span class="way-card__cta"><%= t("home.ways.#{key}.cta") %></span>
+          </span>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

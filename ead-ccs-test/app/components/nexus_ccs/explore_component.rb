@@ -33,5 +33,24 @@ module NexusCcs
     def image?(tile) = ExploreCardComponent.image?(tile)
 
     def image_path(tile) = AssetVersion.url(tile.image.path)
+
+    # The homepage redesign's mosaics (HomeSections)
+    # Record counts from the collections category (the Explore tiles have none when every collection is listed, FILM_ALL_COLLECTIONS)
+    def collection_tiles
+      @collection_tiles ||= begin
+        dimension = Categories.find("collections")
+        counts = Array(dimension && Categories.values(dimension)).to_h { |value| [ value["value"], value["count"] ] }
+        HomeSections.collections(counts, helpers)
+      end
+    end
+
+    def visit_tiles = @visit_tiles ||= HomeSections.visit(helpers)
+
+    def named_tiles
+      @named_tiles ||= begin
+        dimension = Categories.find("named-collections")
+        dimension ? HomeSections.named(Categories.values(dimension), helpers) : []
+      end
+    end
   end
 end

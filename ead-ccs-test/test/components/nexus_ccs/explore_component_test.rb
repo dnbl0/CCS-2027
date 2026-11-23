@@ -21,85 +21,56 @@ class ExploreComponentTest < ViewComponent::TestCase
 
   def empty_overview(collections = []) = ExploreEntryPoints::Overview.new(collections, [], [], [], [], [], [])
 
-  test "an h2, then a tile for each collection: the whole tile is one link with the h3, and no record count" do
+  test "the home sections in order, each heading on the left with its See all link: the museums, visiting them, record types, places and time" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
-    assert_selector "section.explore[aria-labelledby=explore-title] h2#explore-title", text: "Explore the collections"
-    assert_selector "ul.explore__tiles[aria-label='Browse by collection'] li.explore__tile", count: 3
-    assert_selector "li.explore__tile > a.explore__tile-link h3.explore__tile-title", text: "University Art Collection"
-    assert_no_selector ".explore__tile-count"
-    assert_selector "a.explore__tile-link[href*='f%5Bcollection_ssim%5D%5B%5D=University+Art+Collection'][href*='any_assets=1']"
-    assert_selector "li.explore__tile--tint-2"
+    headings = page.all("section.home-section h2").map(&:text)
+    assert_equal [ "Explore the collections", "Visit the collections", "Record types", "Places", "Time" ], headings # no named collections without the index
+    assert_selector "section.explore .home-section__head a.home-section__link[href='/browse/categories/collections']", text: "See all collections"
+    assert_selector "section.explore-kinds a.home-section__link[href='/browse/object-types']", text: "See all object types"
+    assert_selector "section.home-places a.home-section__link[href='/browse/places']", text: "See all places"
+    assert_selector "section.explore-periods a.home-section__link[href='/browse/periods']", text: "See all periods"
   end
 
-  test "a tile with no picture is the designed face: a tint and a letter hidden from assistive technology, and no img at all" do
+  test "Explore the collections: the five museums as a mosaic, the University Art Collection last as the large lead with its blurb and a call to action" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
-    assert_no_selector "img"
-    assert_selector ".explore__face[aria-hidden=true] .explore__monogram", text: "UA"
-    assert_no_selector ".explore__face--image"
+    tiles = page.all("section.explore ul.mosaic--five > li")
+    assert_equal 5, tiles.size
+    assert_equal "University Art Collection", tiles.last.find("h3").text
+    assert tiles.last[:class].include?("mosaic__item--lead")
+    assert_selector "section.explore li.mosaic__item--lead .cover-card__cta", text: "Explore the collection"
+    assert_selector "section.explore a.cover-card[href='/browse/collections/#{Browse::Slug.build('collections', 'Grainger Museum Collection')}'] h3", text: "Grainger Museum Collection"
+    assert_selector "section.explore img.cover-card__image[alt=''][loading=lazy]", count: 5 # the name is the link text
+    # the two longest names take the two wide tiles (the first and the fourth)
+    assert_equal "Harry Brookes Allen Museum of Anatomy and Pathology", tiles.first.find("h3").text
   end
 
-  test "a tile with an example image shows it whole, lazy, sized, with an empty alt because the title is the link text" do
-    render_inline NexusCcs::ExploreComponent.new(overview: overview(image: IMAGE))
-
-    assert_selector "img.explore__image", count: 1
-    assert_selector "li.explore__tile--tint-1 img.explore__image[alt=''][loading=lazy][width='400'][height='300'][src*='0000_013_1_pf.jpg']"
-    assert_selector "li.explore__tile--tint-1 a h3", text: "University Art Collection"
-  end
-
-  test "the Indigenous Collections tile is text only even when it is given an image" do
-    render_inline NexusCcs::ExploreComponent.new(overview: overview(indigenous_image: IMAGE))
-
-    assert_no_selector "img"
-    assert_selector "li.explore__tile--tint-2 .explore__monogram", text: "IC"
-  end
-
-  test "an image path that is not a local file is not drawn" do
-    remote = IMAGE.with(path: "https://example.org/x.jpg")
-    render_inline NexusCcs::ExploreComponent.new(overview: overview(image: remote))
-
-    assert_no_selector "img"
-  end
-
-  test "Record types, Places and Time are each their own section of result cards in its own layout (bento, rail, strip), with a See all link; a type with several values is an any-of filter" do
+  test "Visit the collections: Grainger leads (first, on the left) with its hours and access, every tile opening the museum's own visitor page" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
-    assert_selector "section.explore-kinds[aria-labelledby=explore-kinds] h2#explore-kinds", text: "Record types"
-    assert_selector "section.explore-kinds .card-layout--bento li.card-layout__item article.result-card", count: 2
-    assert_selector "section.explore-places .card-layout--rail"
-    assert_selector "section.explore-periods .card-layout--strip"
-    assert_selector "article.result-card h3.document-title-heading a[href*='f%5Bclassification_ssim%5D%5B%5D=paintings']", text: "Paintings"
+    lead = page.find("section.home-visit ul.mosaic--five-left > li:first-child")
+    assert lead[:class].include?("mosaic__item--lead")
+    assert_equal "https://grainger.unimelb.edu.au/visit", lead.find("a.cover-card")[:href]
+    assert_includes lead.text, "Open Monday, 1-4pm. Grainger Museum is step-free"
+    assert_selector "section.home-visit a.cover-card", count: 5
+    assert_selector "section.home-visit a.cover-card .visually-hidden", text: "(the museum's website)", count: 5
+  end
+
+  test "Record types are a shelf, Places a list beside a preview, Time a strip; a type with several values is an any-of filter" do
+    render_inline NexusCcs::ExploreComponent.new(overview: overview)
+
+    assert_selector "section.explore-kinds .card-layout--shelf[data-controller=card-rail] li.card-layout__item article.result-card", count: 2
     assert_selector "article.result-card h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings']", text: "Prints and drawings"
-    assert_selector "section.explore-kinds a.explore__all[href='/browse/object-types']", text: "See all object types"
-    assert_selector "section.explore-places h2#explore-places", text: "Places"
-    assert_selector "section.explore-places article.result-card h3 a[href*='f%5Bproduction_place_ssim%5D%5B%5D=Australia']", text: "Australia"
-    assert_selector "section.explore-places a.explore__all[href='/browse/places']", text: "See all places"
-    assert_selector "section.explore-periods h2#explore-periods", text: "Time"
-    assert_selector "section.explore-periods article.result-card h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900']", text: "1900s"
-    assert_selector "a.explore__all[href='/browse/periods']", text: "See all periods"
+    assert_selector "section.home-places .place-preview ul[aria-label=Places] a.place-row[aria-current=true][href*='f%5Bproduction_place_ssim%5D%5B%5D=Australia']", text: "Australia"
+    assert_selector "section.home-places .place-preview__panels[aria-hidden=true]"
+    assert_selector "section.explore-periods .card-layout--strip article.result-card h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900']", text: "1900s"
   end
 
-  test "a tile with a description shows it under its name" do
-    kinds = [ ExploreEntryPoints::Link.new("Paintings", 5, Browse.search_query("classification_ssim", [ "paintings" ])) ]
-    tiles = [ ExploreEntryPoints::Tile.new(label: "Paintings", count: 5, query: kinds.first.query, image: nil, tint: 1, intro: "Held in University Art Collection.") ]
-    render_inline NexusCcs::ExploreComponent.new(overview: ExploreEntryPoints::Overview.new([], kinds, [], [], tiles, [], []))
+  test "with no record types, places or times, those sections are left out without leaving a heading behind" do
+    render_inline NexusCcs::ExploreComponent.new(overview: empty_overview([ tile("University Art Collection", 1, 1) ]))
 
-    assert_selector "section.explore-kinds .explore-card__intro", text: "Held in University Art Collection."
-  end
-
-  test "nothing renders without anything to show" do
-    render_inline NexusCcs::ExploreComponent.new(overview: empty_overview)
-
-    assert_no_selector "section"
-  end
-
-  test "with only some groups, the others are left out without leaving a heading behind" do
-    render_inline NexusCcs::ExploreComponent.new(overview: empty_overview(overview.collections))
-
-    assert_selector "li.explore__tile", count: 3
-    assert_no_selector "h2", text: "Record types"
-    assert_no_selector "h2", text: "Places"
-    assert_no_selector ".result-card"
+    assert_selector "section.explore h2", text: "Explore the collections"
+    assert_no_selector "section.explore-kinds, section.home-places, section.explore-periods"
   end
 end

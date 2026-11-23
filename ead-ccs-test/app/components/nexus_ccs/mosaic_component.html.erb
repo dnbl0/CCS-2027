@@ -1,0 +1,16 @@
+<ul class="mosaic mosaic--<%= pattern.to_s.dasherize %>" aria-label="<%= label %>">
+  <% tiles.each do |tile| %>
+    <li class="mosaic__item<%= " mosaic__item--lead" if tile.lead %>">
+      <%= link_to tile.path, class: "cover-card#{' cover-card--lead' if tile.lead}" do %>
+        <%# The name is the link text, so the picture is decorative %>
+        <% if tile.image %><%= image_tag tile.image, alt: "", class: "cover-card__image", loading: "lazy", decoding: "async" %><% end %>
+        <span class="cover-card__body">
+          <h3 class="cover-card__title"><%= tile.title %></h3>
+          <% if tile.text.present? %><span class="cover-card__text"><%= tile.text %></span><% end %>
+          <% if tile.cta %><span class="cover-card__cta"><%= tile.cta %></span><% end %>
+          <% if tile.external %><span class="visually-hidden"><%= t("home.external") %></span><% end %>
+        </span>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

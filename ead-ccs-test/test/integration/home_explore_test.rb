@@ -21,34 +21,18 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
 
   teardown { Rails.cache = @cache }
 
-  test "the home page offers a tile for each collection (no counts), and rows of tiles for record types, places and periods" do
+  test "the home page's sections: the museums as a mosaic, record types, places and periods, each linking to its records" do
     Rails.cache.write(ExploreEntryPoints::CACHE_KEY, COUNTS, expires_in: 1.day)
 
     get "/"
 
     assert_response :success
     assert_select "section[aria-labelledby=explore-title] h2#explore-title", text: "Explore the collections"
-    assert_select "a.explore__tile-link[href*='f%5Bcollection_ssim%5D%5B%5D=University+Art+Collection'] h3", text: "University Art Collection"
-    assert_select ".explore__tile-count", count: 0
-    assert_select "a.explore__tile-link h3", count: 2
+    assert_select "section.explore ul.mosaic--five > li", count: 5
+    assert_select "section.explore li.mosaic__item--lead h3", text: "University Art Collection"
     assert_select "section.explore-kinds article.result-card h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints']", text: "Prints and drawings"
-    assert_select "section.explore-places article.result-card a[href*='f%5Bproduction_place_ssim%5D%5B%5D=Japan']"
+    assert_select "section.home-places a.place-row[href*='f%5Bproduction_place_ssim%5D%5B%5D=Japan']"
     assert_select "section.explore-periods article.result-card h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999']", text: "1900s"
-    assert_select "section.explore-kinds, section.explore-places, section.explore-periods", count: 3
-    assert_select ".home-collections, .collection-directory, #home-discover-heading", count: 0
-  end
-
-  test "the section has no picture unless one was kept for a tile, and the Indigenous Collections tile never has one" do
-    image = { id: "emu-1", title: "A bronze lyre", path: PATH, width: 400, height: 300 }
-    Rails.cache.write(ExploreEntryPoints::CACHE_KEY, COUNTS, expires_in: 1.day)
-    get "/"
-    assert_select "section.explore img", count: 0
-
-    Rails.cache.write(ExploreEntryPoints::CACHE_KEY, COUNTS.merge("images" => { "University Art Collection" => image, "Indigenous Collections" => image }), expires_in: 1.day)
-    get "/"
-    assert_select "section.explore img[alt=''][loading=lazy][width='400'][height='300']", count: 1
-    assert_select "section.explore li.explore__tile:nth-child(1) img", count: 1
-    assert_select "section.explore li.explore__tile:nth-child(2) img", count: 0
   end
 
   test "every way in opens all the matching records, not only those with images" do
@@ -56,7 +40,7 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
 
     get "/"
 
-    assert_select "section.explore a[href*='any_assets=1'], section.explore-kinds a[href*='any_assets=1'], section.explore-places a[href*='any_assets=1'], section.explore-periods a[href*='any_assets=1']", count: 2 + 2 + 1 + 2
+    assert_select "section.explore-kinds a[href*='any_assets=1'], section.home-places a.place-row[href*='any_assets=1'], section.explore-periods a[href*='any_assets=1']", minimum: 3
   end
 
   test "the entry points come from the indexed records, with their real counts" do

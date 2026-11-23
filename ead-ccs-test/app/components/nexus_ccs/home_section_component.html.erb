@@ -1,0 +1,12 @@
+<section class="ccs-section home-section <%= extra_class %>" aria-labelledby="<%= id %>">
+  <div class="ccs-section__inner home-section__inner">
+    <header class="home-section__head">
+      <div class="home-section__titles">
+        <h2 id="<%= id %>" class="ccs-section__heading home-section__heading"><%= heading %></h2>
+        <% if intro.present? %><p class="home-section__intro"><%= intro %></p><% end %>
+      </div>
+      <% if link? %><%= link_to link, link_path, class: "arrow-link arrow-link--icon home-section__link" %><% end %>
+    </header>
+    <%= content %>
+  </div>
+</section>
