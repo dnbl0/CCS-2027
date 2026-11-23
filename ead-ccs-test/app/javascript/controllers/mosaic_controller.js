@@ -52,7 +52,7 @@ export default class extends Controller {
     this.element.classList.add("is-ready")
 
     // 1. each tile's columns, from its shape: the widths are then right to measure the heights
-    const least = cols === 4 ? 4 : cols === 8 ? 3 : 3 // the narrowest tile, in columns
+    const least = cols === 4 ? 4 : 2 // the narrowest tile, in columns (a phone: one tile to a row)
     const spans = items.map((item, i) => {
       const shape = parseFloat(item.style.getPropertyValue("--a")) || 1.333
       const lead = item.classList.contains("mosaic-flow__item--lead")

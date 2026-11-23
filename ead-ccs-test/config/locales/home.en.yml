@@ -11,11 +11,6 @@ en:
       see_all: "See all collections"
       label: "The University's museums"
       cta: "Explore the collection"
-    visit:
-      heading: "Visit the collections"
-      intro: "See the collections in person, at the University's museums in Parkville and Carlton."
-      label: "Visiting the museums"
-      cta: "Plan your visit"
     named:
       heading: "Collections within the collections"
       intro: "Named bequests, gifts and archives held inside the University's museums."

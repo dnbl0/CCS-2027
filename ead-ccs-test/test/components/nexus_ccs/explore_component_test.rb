@@ -21,49 +21,39 @@ class ExploreComponentTest < ViewComponent::TestCase
 
   def empty_overview(collections = []) = ExploreEntryPoints::Overview.new(collections, [], [], [], [], [], [])
 
-  test "the home sections in order, each heading on the left with its See all link: the museums, visiting them, record types, places and time" do
+  test "the home sections in order, each heading on the left with its See all link; no Visit section" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
     headings = page.all("section.home-section h2").map(&:text)
-    assert_equal [ "Explore the collections", "Visit the collections", "Record types", "Places", "Time" ], headings # no named collections without the index
+    assert_equal [ "Explore the collections", "Record types", "Places", "Time" ], headings # no named collections without the index
     assert_selector "section.explore .home-section__head a.home-section__link[href='/browse/categories/collections']", text: "See all collections"
     assert_selector "section.explore-kinds a.home-section__link[href='/browse/object-types']", text: "See all object types"
     assert_selector "section.home-places a.home-section__link[href='/browse/places']", text: "See all places"
     assert_selector "section.explore-periods a.home-section__link[href='/browse/periods']", text: "See all periods"
+    assert_no_selector "section.home-visit"
   end
 
-  test "Explore the collections: the five museums as a fluid mosaic, the University Art Collection first as the lead with its blurb and a call to action" do
-    render_inline NexusCcs::ExploreComponent.new(overview: overview)
+  test "Explore the collections: every collection as a fluid mosaic, the University Art Collection first as the lead; Indigenous Collections has no picture" do
+    render_inline NexusCcs::ExploreComponent.new(overview: overview(image: IMAGE, indigenous_image: IMAGE))
 
     tiles = page.all("section.explore ul.mosaic-flow[data-controller=mosaic] > li.mosaic-flow__item")
-    assert_equal 5, tiles.size
-    assert_equal "University Art Collection", tiles.first.find("h3").text
+    assert_equal [ "University Art Collection", "Indigenous Collections", "Medical History Museum" ], tiles.map { |tile| tile.find("h3").text }
     assert tiles.first[:class].include?("mosaic-flow__item--lead")
-    assert tiles.all? { |tile| tile[:style].to_s.match?(/--a: \d/) } # each banner's shape, from its size
-    assert_selector "section.explore li.mosaic-flow__item--lead article.result-card.explore-card--lead .explore-card__cta", text: "Explore the collection"
-    assert_selector "section.explore article.result-card.explore-card--tile h3.document-title-heading a[href='/browse/collections/#{Browse::Slug.build('collections', 'Grainger Museum Collection')}']", text: "Grainger Museum Collection"
-    assert_selector "section.explore a.result-card__media[tabindex='-1'][aria-hidden=true] img[alt=''][loading=lazy]", count: 5 # the name is the link text
+    assert_equal "--a: 1.333", tiles.first[:style] # its picture's shape, from its size
+    assert_selector "section.explore li.mosaic-flow__item--lead .explore-card__cta", text: "Explore the collection"
+    assert_selector "section.explore h3 a[href*='f%5Bcollection_ssim%5D%5B%5D=University+Art+Collection']", text: "University Art Collection"
+    assert_no_selector "section.explore li:nth-child(2) img" # Indigenous Collections is kept text only
     assert_no_selector "section.explore, section.home-named", text: /\d records/ # no record counts on collections
   end
 
-  test "Visit the collections: Grainger leads (first, on the left) with its hours and access, every tile opening the museum's own visitor page" do
+  test "Record types are a shelf of collage cards, one per kind; Places a list beside a collage; Time justified rows" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
-    lead = page.find("section.home-visit ul.mosaic-flow > li:first-child")
-    assert lead[:class].include?("mosaic-flow__item--lead")
-    assert_equal "https://grainger.unimelb.edu.au/visit", lead.find("h3 a")[:href]
-    assert_includes lead.text, "Open Monday, 1-4pm. Grainger Museum is step-free"
-    assert_selector "section.home-visit article.explore-card--tile", count: 5
-    assert_selector "section.home-visit h3 .visually-hidden", text: "(the museum's website)", count: 5
-  end
-
-  test "Record types are a shelf, Places a list beside a preview, Time justified rows; a type with several values is an any-of filter" do
-    render_inline NexusCcs::ExploreComponent.new(overview: overview)
-
-    assert_selector "section.explore-kinds .card-layout--shelf[data-controller=card-rail] li.card-layout__item article.result-card", count: 2
-    assert_selector "article.result-card h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings']", text: "Prints and drawings"
+    assert_selector "section.explore-kinds .card-layout--collage[data-controller=card-rail] li.card-layout__item article.explore-card--collage", count: 2
+    assert_selector "article.explore-card--collage h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings']", text: "Prints and drawings"
+    assert_selector "article.explore-card--collage .explore-card__intro", text: "7,192 records"
     assert_selector "section.home-places .place-preview ul[aria-label=Places] a.place-row[aria-current=true][href*='f%5Bproduction_place_ssim%5D%5B%5D=Australia']", text: "Australia"
-    assert_selector "section.home-places .place-preview__panels[aria-hidden=true]"
+    assert_selector "section.home-places .place-preview__panels[aria-hidden=true] .place-collage"
     assert_selector "section.explore-periods .card-layout--justified ul.justified[data-controller=justified] li.justified__item article.result-card h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900']", text: "1900s"
   end
 

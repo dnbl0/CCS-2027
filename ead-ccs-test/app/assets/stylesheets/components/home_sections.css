@@ -146,6 +146,27 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 
 @media (max-width: 599px) { .card-layout--shelf .result-card__media img { height: 14rem; } .card-layout--shelf .card-rail__button { top: 7rem; } }
 
+/* ---- Record types: collage cards on the shelf (CollageCardComponent) ----
+   After Google Arts & Culture's multi-picture cards: three of the kind's records side by side at one height, each whole at its own
+   shape, so each card is as wide as its pictures and no two cards are alike. */
+.card-layout--collage .card-layout__item { max-width: none; }
+
+.card-layout--collage .explore-card--collage { width: auto; min-width: 16rem; }
+
+.collage-card__pictures { display: flex; gap: 4px; height: 13rem; padding: 4px; background: var(--ccs-surface-subtle); }
+
+.collage-card__pictures img { display: block; width: auto; height: 100%; max-width: 20rem; object-fit: contain; }
+
+.card-layout--collage .result-card__content { padding: var(--ccs-space-3) var(--ccs-space-4) var(--ccs-space-4); }
+
+.card-layout--collage .document-title-heading { padding: 0; }
+
+.card-layout--collage .explore-card__intro { margin: var(--ccs-space-1) 0 0; padding: 0; display: block; }
+
+.card-layout--collage .card-rail__button { top: 6.5rem; }
+
+@media (max-width: 599px) { .collage-card__pictures { height: 10rem; } .collage-card__pictures img { max-width: 14rem; } }
+
 /* ---- Places: a list beside a preview ---- */
 .place-preview { display: grid; gap: var(--ccs-space-6); grid-template-columns: minmax(0, 1fr); }
 
@@ -179,13 +200,13 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 @media (min-width: 840px) {
   .place-preview { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: stretch; }
   .place-preview__list { grid-template-columns: minmax(0, 1fr); align-content: start; }
-  .place-preview__panels { display: block; position: relative; min-height: 28rem; }
-  .place-preview__panel { position: absolute; inset: 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--color-border-grey-91); background: var(--ccs-white); }
+  .place-preview__panels { display: block; position: relative; min-height: 34rem; }
+  .place-preview__panel { position: absolute; inset: 0; display: flex; flex-direction: column; gap: var(--ccs-space-3); overflow: hidden; }
   .place-preview__panel[hidden] { display: none; }
-  .place-preview__image { flex: 1 1 auto; min-height: 0; width: 100%; background: var(--ccs-surface-subtle); object-fit: contain; }
-  .place-preview__caption { flex: none; padding: var(--ccs-space-4) var(--ccs-space-5) var(--ccs-space-5); }
-  .place-preview__name { margin: 0; color: var(--ccs-text-link); font-size: var(--ccs-font-size-2xl); font-weight: var(--ccs-font-weight-semibold); line-height: 1.25; }
-  .place-preview__text { max-width: 60ch; margin: var(--ccs-space-2) 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-md); line-height: 1.5; }
+  /* Four of the place's records, whole, in two columns: a collage, not a grid (decorative: the list is the way in) */
+  .place-collage { flex: 1 1 auto; min-height: 0; columns: 2; column-gap: var(--ccs-space-3); overflow: hidden; }
+  .place-collage__picture { display: block; width: 100%; height: auto; margin-block-end: var(--ccs-space-3); break-inside: avoid; border: 1px solid var(--color-border-grey-91); background: var(--ccs-white); }
+  .place-preview__name { flex: none; margin: 0; color: var(--ccs-text-heading, var(--ccs-navy-1100)); font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-3xl); line-height: 1.2; }
 }
 
 /* ---- Recently viewed: as many columns as fit ---- */

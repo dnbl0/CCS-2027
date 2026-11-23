@@ -1,27 +1,25 @@
 <div class="place-preview" data-controller="place-preview">
   <ul class="place-preview__list" aria-label="<%= label %>">
-    <% tiles.each_with_index do |tile, index| %>
+    <% collages.each_with_index do |place, index| %>
       <li>
-        <%= link_to path(tile), class: "place-row", aria: { current: (index.zero? ? "true" : nil) },
+        <%= link_to place.path, class: "place-row", aria: { current: (index.zero? ? "true" : nil) },
                     data: { place_preview_target: "row", index: index, action: "mouseenter->place-preview#show focus->place-preview#show" } do %>
-          <span class="place-row__thumb"><% if image?(tile) %><%= image_tag image_path(tile), alt: "", loading: "lazy", decoding: "async" %><% end %></span>
+          <span class="place-row__thumb"><% if (first = place.pictures.first) %><%= image_tag first[:src], alt: "", loading: "lazy", decoding: "async" %><% end %></span>
           <span class="place-row__body">
-            <span class="place-row__name"><%= tile.label %></span>
-            <span class="place-row__count"><%= count_label(tile) %></span>
+            <span class="place-row__name"><%= place.title %></span>
+            <% if place.text %><span class="place-row__count"><%= place.text %></span><% end %>
           </span>
         <% end %>
       </li>
     <% end %>
   </ul>
-  <%# The preview repeats what the list's links say, so it is hidden from assistive technology; the list is the way in %>
   <div class="place-preview__panels" aria-hidden="true">
-    <% tiles.each_with_index do |tile, index| %>
+    <% collages.each_with_index do |place, index| %>
       <div class="place-preview__panel" data-place-preview-target="panel" <%= "hidden" unless index.zero? %>>
-        <% if image?(tile) %><%= image_tag image_path(tile), alt: "", class: "place-preview__image", loading: "lazy", decoding: "async" %><% end %>
-        <div class="place-preview__caption">
-          <p class="place-preview__name"><%= tile.label %></p>
-          <% if tile.intro.present? %><p class="place-preview__text"><%= tile.intro %></p><% end %>
+        <div class="place-collage">
+          <% place.pictures.each do |picture| %><%= image_tag picture[:src], alt: "", class: "place-collage__picture", loading: "lazy", decoding: "async" %><% end %>
         </div>
+        <p class="place-preview__name"><%= place.title %></p>
       </div>
     <% end %>
   </div>

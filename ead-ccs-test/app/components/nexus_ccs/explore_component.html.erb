@@ -1,13 +1,10 @@
-<%# The home page's ways into the collections without a search (the homepage redesign, 2026-11; docs/card-layouts.md): the museums,
-    visiting them and the named collections inside them as fluid mosaics, and time as justified rows (each picture whole, at its own shape);
-    record types as a shelf of pictures; places as a list beside a preview. %>
+<%# The home page's ways into the collections without a search (the homepage redesign, 2026-11, after Google Arts & Culture's mixed
+    layouts; docs/card-layouts.md): every collection and the named collections inside them as fluid mosaics; record types as a shelf of
+    collage cards (three of each kind's records); places as a list beside a collage of the place's records; time as justified rows. Every
+    picture whole, at its own shape. %>
 <%= render NexusCcs::HomeSectionComponent.new(id: "explore-title", heading: t("home.collections.heading"), intro: t("home.collections.intro"),
                                               link: t("home.collections.see_all"), link_path: helpers.category_path("collections"), extra_class: "explore") do %>
-  <%= render NexusCcs::MosaicComponent.new(tiles: collection_tiles, label: t("home.collections.label")) %>
-<% end %>
-
-<%= render NexusCcs::HomeSectionComponent.new(id: "home-visit", heading: t("home.visit.heading"), intro: t("home.visit.intro"), extra_class: "home-visit") do %>
-  <%= render NexusCcs::MosaicComponent.new(tiles: visit_tiles, label: t("home.visit.label")) %>
+  <%= render NexusCcs::MosaicComponent.new(tiles: collection_tiles, label: t("home.collections.label"), base: 2.2) %>
 <% end %>
 
 <% if named_tiles.any? %>
@@ -17,17 +14,24 @@
   <% end %>
 <% end %>
 
-<% if overview.kind_tiles.any? %>
+<% if kind_collages.any? %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "explore-kinds", heading: t("explore.kinds.heading"), intro: t("home.kinds.intro"),
                                                 link: t("explore.kinds.see_all"), link_path: helpers.browse_hub_path("object-types"), extra_class: "explore-kinds") do %>
-    <%= render NexusCcs::CardLayoutComponent.new(cards: overview.kind_tiles, layout: :shelf, label: t("explore.kinds.heading")) %>
+    <%# A shelf of collage cards (three of each kind's records), scrolling sideways with previous and next buttons %>
+    <div class="card-layout card-layout--shelf card-layout--collage" data-controller="card-rail">
+      <button type="button" class="card-rail__button card-rail__button--previous" data-card-rail-target="previous" data-action="card-rail#previous" aria-label="<%= t("card_layout.previous", label: t("explore.kinds.heading")) %>" hidden></button>
+      <ul class="card-layout__list" data-card-rail-target="scroller" tabindex="0" aria-label="<%= t("explore.kinds.heading") %>">
+        <% kind_collages.each do |collage| %><li class="card-layout__item"><%= render NexusCcs::CollageCardComponent.new(collage: collage) %></li><% end %>
+      </ul>
+      <button type="button" class="card-rail__button card-rail__button--next" data-card-rail-target="next" data-action="card-rail#next" aria-label="<%= t("card_layout.next", label: t("explore.kinds.heading")) %>" hidden></button>
+    </div>
   <% end %>
 <% end %>
 
-<% if overview.place_tiles.any? %>
+<% if place_collages.any? %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "explore-places", heading: t("explore.place_time.places"), intro: t("home.places.intro"),
                                                 link: t("explore.place_time.see_all_places"), link_path: helpers.browse_hub_path("places"), extra_class: "home-places") do %>
-    <%= render NexusCcs::PlacePreviewComponent.new(tiles: overview.place_tiles, label: t("explore.place_time.places")) %>
+    <%= render NexusCcs::PlacePreviewComponent.new(collages: place_collages, label: t("explore.place_time.places")) %>
   <% end %>
 <% end %>
 

@@ -6,16 +6,31 @@ class HomeSectionsTest < ActiveSupport::TestCase
 
   def named_value(name, count, image: true) = { "value" => name, "count" => count, "image" => (image ? { "path" => "https://example.test/#{count}.jpg" } : nil) }
 
-  test "the museums: the lead first with its blurb, then four with no record count, each with its banner's size" do
-    tiles = HomeSections.collections(helpers)
+  def tile(label, image: nil) = ExploreEntryPoints::Tile.new(label: label, count: 1, query: BrowseHubs.query("collection_ssim", label), image: image, tint: 1, intro: nil)
 
-    assert_equal 5, tiles.size
-    assert_equal [ true ] + [ false ] * 4, tiles.map(&:lead)
-    assert_equal "University Art Collection", tiles.first.title
+  test "the collections: every one, the University Art Collection first as the lead with its blurb, each picture with its size" do
+    image = ExploreEntryPoints::Image.new(id: "x", title: "x", path: "/film-thumbs/a.jpg", width: 1200, height: 800)
+    tiles = HomeSections.collections([ tile("Medical History Museum", image: image), tile("University Art Collection", image: image), tile("Indigenous Collections", image: image) ], helpers)
+
+    assert_equal [ "University Art Collection", "Medical History Museum", "Indigenous Collections" ], tiles.map(&:title)
+    assert_equal [ true, false, false ], tiles.map(&:lead)
     assert_equal SitePages.collection("university-art-collection")["blurb"], tiles.first.text
-    assert tiles.drop(1).all? { |tile| tile.text.nil? } # no record counts (Dean, 2026-11-23)
-    assert_equal [ 1100, 550 ], [ tiles.first.width, tiles.first.height ] # so the row can give it its shape
-    assert tiles.all? { |tile| tile.image.to_s.include?("banners/") }
+    assert_equal [ 1200, 800 ], [ tiles.first.width, tiles.first.height ]
+    assert_nil tiles.last.image # Indigenous Collections is kept text only
+    assert tiles.drop(1).all? { |tile| tile.text.nil? } # no record counts
+  end
+
+  test "a collage takes the records a place may show, preferring ones the places before it have not used" do
+    docs = ->(ids) { Showcase::Result.new(total: 9, documents: ids.map { |id| SolrDocument.new("id" => id, "thumbnail_path_ssi" => "/t/#{id}.jpg", "title_tsim" => [ id ]) }, facets: {}) }
+    places = [ tile("Australia"), tile("Victoria") ]
+    results = { "Australia" => docs.call(%w[a b c d]), "Victoria" => docs.call(%w[a b e f]) }
+    original = Showcase.method(:call)
+    Showcase.define_singleton_method(:call) { |fq:, **| results.fetch(fq.first[/"([^"]+)"/, 1]) }
+    collages = HomeSections.place_collages(places, helpers)
+    assert_equal %w[a b c d], collages.first.pictures.map { |picture| picture[:title] }
+    assert_equal %w[e f a b], collages.last.pictures.map { |picture| picture[:title] }
+  ensure
+    Showcase.define_singleton_method(:call, original) if original
   end
 
   test "the named collections: only those with a picture, eight or none, the largest leading first" do

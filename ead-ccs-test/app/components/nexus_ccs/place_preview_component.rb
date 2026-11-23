@@ -1,26 +1,18 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # Places on the home page (the homepage redesign, 2026-11): a list of places beside a large preview of one. Pointing at or focusing
-  # a place shows its picture and description in the preview (place_preview_controller.js); every place is a link to its records.
-  # Without JavaScript the first place is previewed and the list still links. On a narrow screen only the list shows.
+  # Places on the home page (the homepage redesign, 2026-11, after Google Arts & Culture's "on this day" collage): a list of places beside
+  # a collage of the place pointed at or focused, four of its records each whole at its own shape (place_preview_controller.js). Every
+  # place is a link to its records; the collage repeats the list's words, so it is decorative. Without JavaScript the first place is
+  # shown. On a narrow screen only the list shows. collages: HomeSections::Collage, one per place.
   class PlacePreviewComponent < ViewComponent::Base
-    def initialize(tiles:, label:)
-      @tiles = tiles
+    def initialize(collages:, label:)
+      @collages = collages
       @label = label
     end
 
-    attr_reader :tiles, :label
+    attr_reader :collages, :label
 
-    def render? = tiles.any?
-
-    def path(tile) = helpers.search_action_path(tile.query)
-
-    # The places' pictures are the DAM's own thumbnails (full addresses), as on the Browse cards
-    def image?(tile) = ExploreCardComponent.image?(tile, remote: true)
-
-    def image_path(tile) = AssetVersion.url(tile.image.path)
-
-    def count_label(tile) = t("home.records", count: tile.count, number: helpers.number_with_delimiter(tile.count))
+    def render? = collages.any?
   end
 end

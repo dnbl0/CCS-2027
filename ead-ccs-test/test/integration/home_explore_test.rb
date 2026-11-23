@@ -28,10 +28,11 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "section[aria-labelledby=explore-title] h2#explore-title", text: "Explore the collections"
-    assert_select "section.explore ul.mosaic-flow > li.mosaic-flow__item", count: 5
+    assert_select "section.explore ul.mosaic-flow > li.mosaic-flow__item", count: COUNTS["collections"].size
     assert_select "section.explore li.mosaic-flow__item--lead:first-child h3", text: "University Art Collection"
-    assert_select "section.explore-kinds article.result-card h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints']", text: "Prints and drawings"
+    assert_select "section.explore-kinds article.explore-card--collage h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints']", text: "Prints and drawings"
     assert_select "section.home-places a.place-row[href*='f%5Bproduction_place_ssim%5D%5B%5D=Japan']"
+    assert_select "section.home-visit", count: 0
     assert_select "section.explore-periods article.result-card h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999']", text: "1900s"
   end
 
