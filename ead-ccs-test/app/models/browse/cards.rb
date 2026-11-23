@@ -27,18 +27,26 @@ module Browse
     SKIPPED = { "subjects" => [ "Aboriginal and Torres Strait Islander art", "By Indigenous People", "About Indigenous People" ] }.freeze
     # How each hub's cards are laid out (NexusCcs::CardLayoutComponent): a different shape for each section, so the page is not one grid
     LAYOUT_BY_HUB = { "object-types" => :bento, "places" => :rail, "periods" => :strip, "makers" => :grid, "subjects" => :wall }.freeze
-    Card = Data.define(:label, :count, :query, :image, :intro)
+    # path: the value's own page (a place, maker or subject; a period), nil where there is none (object types: the search)
+    Card = Data.define(:label, :count, :query, :image, :intro, :path)
 
     def self.for(hub)
       kept = cached(hub) { build(hub) }
       return [] if kept.blank?
 
       kept.map do |entry|
-        Card.new(label: entry["label"].to_s.upcase_first, count: entry["count"], query: query(hub, entry), image: ExploreEntryPoints.build_image(entry["image"]), intro: entry["intro"])
+        Card.new(label: entry["label"].to_s.upcase_first, count: entry["count"], query: query(hub, entry), image: ExploreEntryPoints.build_image(entry["image"]), intro: entry["intro"],
+                 path: path(hub, entry))
       end
     end
 
     def self.periods?(hub) = hub.slug == "periods"
+
+    def self.path(hub, entry)
+      return Browse::Periods.for_span(entry["first"], entry["last"])&.path if entry["first"]
+
+      Browse.path_for(hub.slug, entry["label"]) if Browse::Kind.find(hub.slug)
+    end
 
     def self.field(hub) = CARD_FIELDS.fetch(hub.slug, hub.field)
 
@@ -111,16 +119,36 @@ module Browse
       CardDescription.for(filter: group_filter(hub, candidate), kinds: hub.slug != "object-types", earliest: candidate["first"] == ExploreEntryPoints::EARLIEST_YEAR)
     end
 
-    # The Places page's picture wall (after Google Arts & Culture's Places): the WALL places with the most pictured records, each with
-    # one picture, kept for a day as the cards are
+    # A Browse page's picture wall (after Google Arts & Culture's Places): the WALL values with the most pictured records (every period,
+    # in order), each with one picture, kept for a day as the cards are
     WALL = 48
     def self.wall(hub)
-      kept = cached(hub, "wall") { build(hub, count: WALL, describe: false) }
+      kept = cached(hub, "wall/v2") { with_totals(hub, build(hub, count: WALL, describe: false)) }
       return [] if kept.blank?
 
       kept.map do |entry|
-        Card.new(label: entry["label"].to_s.upcase_first, count: entry["count"], query: query(hub, entry), image: ExploreEntryPoints.build_image(entry["image"]), intro: nil)
+        Card.new(label: entry["label"].to_s.upcase_first, count: entry["total"] || entry["count"], query: query(hub, entry), image: ExploreEntryPoints.build_image(entry["image"]), intro: nil,
+                 path: path(hub, entry))
       end
+    end
+
+    # Each wall card's number of records: every record with the value, not only those with a picture (the cards are found among the
+    # pictured ones), from one facet request, so the wall says what the list and the search say
+    def self.with_totals(hub, cards)
+      return cards if cards.blank?
+
+      totals = if periods?(hub)
+        queries = cards.map { |card| ExploreEntryPoints.period_query(card["first"], card["last"]) }
+        found = Discovery.search(q: "*:*", rows: 0, facet: true, "facet.query": queries).dig("facet_counts", "facet_queries") || {}
+        cards.zip(queries).to_h { |card, query| [ card["label"], found[query] ] }
+      else
+        pairs = Discovery.search(q: "*:*", rows: 0, facet: true, "facet.field": field(hub), "facet.limit": -1, "facet.mincount": 1)
+                         .dig("facet_counts", "facet_fields", field(hub)).to_a.each_slice(2).to_h
+        cards.to_h { |card| [ card["label"], pairs[card["label"]] ] }
+      end
+      cards.map { |card| totals[card["label"]] ? card.merge("total" => totals[card["label"]].to_i) : card }
+    rescue *SolrGuard::FAILURES, RSolr::Error::Http, SolrGuard::Unavailable
+      cards
     end
 
     def self.cached(hub, kind = nil)
@@ -137,7 +165,7 @@ module Browse
     # Builds the cards of every hub now (rake browse:warm_cards), so no visitor waits for the first build of the day
     def self.warm
       BrowseHubs.all.each { |hub| self.for(hub) }
-      (place = BrowseHubs.find("places")) && wall(place)
+      BrowseHubs.all.each { |hub| wall(hub) }
     end
 
     private_class_method :build, :periods?, :field, :candidates, :group_filter, :example_image, :describe, :cached

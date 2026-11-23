@@ -3,6 +3,39 @@ en:
   # Placeholder wording: the collections team has not approved it.
   browse:
     # The Places page (after Google Arts & Culture's Places): views, the wall, the A–Z list
+    # Every Browse page (browse/hub; after Google Arts & Culture's Places)
+    hub:
+      search_label: "Find a %{singular}"
+      placeholder: "Type a %{singular}"
+      in_order: "In order"
+      timeline: "See the timeline"
+      all_heading: "%{noun} with the most records"
+      every: "See every %{singular}, A–Z (%{count})"
+      every_period: "See every period, in order"
+      periods_heading: "Periods, earliest first"
+      letters: "%{noun} by letter"
+      no_pictures: "None of these %{noun} has a picture to show yet. See them all in the list."
+      none: "No %{singular} matches “%{filter}”."
+      summary_all:
+        one: "1 %{singular}%{region}"
+        other: "%{count} %{noun}%{region}"
+      summary:
+        zero: "None"
+        one: "1 %{singular}"
+        other: "Showing %{first}–%{last} of %{total} %{noun}"
+    hubs:
+      places:
+        search_label: "Find a place"
+        placeholder: "Type a place, such as Japan or Carlton"
+      object-types:
+        search_label: "Find an object type"
+        placeholder: "Type an object type, such as photograph or medal"
+      makers:
+        search_label: "Find a maker"
+        placeholder: "Type a maker, such as Grainger or Kodak"
+      subjects:
+        search_label: "Find a subject"
+        placeholder: "Type a subject, such as portraits or anatomy"
     # A place's own page (browse_entities/place; after Google Arts & Culture's place pages)
     place:
       kind: "Place"
@@ -15,9 +48,15 @@ en:
         one: "held in 1 collection"
         other: "held in %{count} collections"
       all_places: "All places"
+      all: "All %{hub}"
+      period: "Period"
+      discover_places: "Discover this place"
+      discover_makers: "Discover their work"
+      discover_subjects: "Discover this subject"
+      discover_period: "Discover this period"
       collections:
-        one: "1 collection holds records from here"
-        other: "%{count} collections hold records from here"
+        one: "Held in 1 collection"
+        other: "Held in %{count} collections"
       ways_in: "Ways into this place's records"
       discover: "Discover this place"
       page: "Page %{page} of %{pages}"

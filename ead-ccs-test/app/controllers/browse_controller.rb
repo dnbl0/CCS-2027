@@ -15,12 +15,11 @@ class BrowseController < ApplicationController
     @list = BrowseList.new(@hub, letter: params[:letter], filter: params[:filter], page: params[:page], region: params[:region])
     return render(status: :service_unavailable) unless @list.available?
 
-    # Places (after Google Arts & Culture's Places): "All", a wall of the places with pictures, or "A–Z", the whole list by letter
-    return unless @hub.slug == "places"
-
-    @places_view = params[:view] == "az" || @list.letter || @list.filter ? :az : :all
-    @wall = @places_view == :all ? Browse::Cards.wall(@hub) : []
+    # Every Browse page, after Google Arts & Culture's Places: "All", a mosaic of the values with pictures, or "A–Z" (periods: in order),
+    # the whole list by letter
+    @hub_view = params[:view] == "az" || @list.letter || @list.filter ? :az : :all
+    @wall = @hub_view == :all ? Browse::Cards.wall(@hub) : []
     @wall = @wall.select { |card| PlaceRegions.region_of(card.label) == @list.region } if @list.region
-    render "browse/places"
+    render "browse/hub"
   end
 end

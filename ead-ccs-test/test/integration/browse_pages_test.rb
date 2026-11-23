@@ -67,13 +67,13 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
   test "a way in lists the most common values first, each opening all its records with its count" do
     seed("object-types", VALUES)
 
-    get "/browse/object-types"
+    get "/browse/object-types", params: { view: "az" } # every Browse page opens on "All", the mosaic; the list is "A–Z"
 
     assert_response :success
-    assert_select "h1", "Browse object types"
-    links = css_select("a.browse__link").map { |a| a.text.squish }
+    assert_select "h1", "Object types"
+    links = css_select("a.places-list__link").map { |a| a.text.squish }
     assert_equal [ "Lyre 120 records", "Harp 40 records", "Bell 3 records", "Étui 1 record", "1973 print 1 record" ], links
-    assert_select "a.browse__link[href*='f%5Bobject_type_ssim%5D%5B%5D=lyre'][href*='any_assets=1']"
+    assert_select "a.places-list__link[href*='f%5Bobject_type_ssim%5D%5B%5D=lyre'][href*='any_assets=1']"
   end
 
   test "a letter shows the values that start with it, alphabetically, and says which letter it is" do
@@ -81,29 +81,29 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
     get "/browse/object-types", params: { letter: "B" }
 
-    assert_select "a.browse__link", count: 1
-    assert_select "a.browse__link", text: /Bell/
-    assert_select "nav[aria-label='Browse by letter'] a[aria-current='page']", text: "B"
+    assert_select "a.places-list__link", count: 1
+    assert_select "a.places-list__link", text: /Bell/
+    assert_select "nav.places-letters a[aria-current='page']", text: "B"
     assert_select "nav[aria-label='Browse by letter'] a", text: "Z", count: 0 # only letters that have records
   end
 
   test "a letter that does not exist is the default list, not an error" do
     seed("object-types", VALUES)
 
-    get "/browse/object-types", params: { letter: "<script>" }
+    get "/browse/object-types", params: { letter: "<script>", view: "az" }
 
     assert_response :success
-    assert_select "a.browse__link", count: 5
+    assert_select "a.places-list__link", count: 5
   end
 
   test "the periods page lists the periods in order, from Before 1000 to now" do
     Rails.cache.write("browse_hubs/v1/periods", [ [ "Before 1000", 2, -10_000, 999 ], [ "1950–1959", 12, 1950, 1959 ] ], expires_in: 1.day)
 
-    get "/browse/periods"
+    get "/browse/periods", params: { view: "az" }
 
     assert_response :success
-    assert_equal [ "Before 1000 2 records", "1950–1959 12 records" ], css_select("a.browse__link").map { |a| a.text.squish }
-    assert_select "a.browse__link[href='/browse/periods/1950-1959']" # each period has a page of its own, which links to the search
+    assert_equal [ "Before 1000 2 records", "1950–1959 12 records" ], css_select("a.places-list__link").map { |a| a.text.squish }
+    assert_select "a.places-list__link[href='/browse/periods/1950-1959']" # each period has a page of its own, which links to the search
   end
 
   test "an unknown way in is not found" do
@@ -141,19 +141,19 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
   test "makers, places and subjects link to their entity pages, with spelling variants as one" do
     seed("subjects", [ [ "Portraits", 190 ], [ "portraits", 3 ], [ "Archaeology", 20 ] ])
 
-    get "/browse/subjects"
+    get "/browse/subjects", params: { view: "az" }
 
-    assert_equal [ "Portraits 193 records", "Archaeology 20 records" ], css_select("a.browse__link").map { |a| a.text.squish }
-    assert_select "a.browse__link[href='#{Browse.path_for('subjects', 'Portraits')}']"
+    assert_equal [ "Portraits 193 records", "Archaeology 20 records" ], css_select("a.places-list__link").map { |a| a.text.squish }
+    assert_select "a.places-list__link[href='#{Browse.path_for('subjects', 'Portraits')}']"
   end
 
   test "periods link to their pages" do
     Rails.cache.write("browse_hubs/v1/periods", [ [ "Before 1000", 2, -10_000, 999 ], [ "1950–1959", 12, 1950, 1959 ] ], expires_in: 1.day)
 
-    get "/browse/periods"
+    get "/browse/periods", params: { view: "az" }
 
-    assert_select "a.browse__link[href='/browse/periods/before-1000']"
-    assert_select "a.browse__link[href='/browse/periods/1950-1959']"
+    assert_select "a.places-list__link[href='/browse/periods/before-1000']"
+    assert_select "a.places-list__link[href='/browse/periods/1950-1959']"
   end
 
   test "the type-to-filter box is a plain GET form, narrows the list and says when nothing matches" do

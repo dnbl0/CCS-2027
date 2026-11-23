@@ -1,16 +1,24 @@
-<%# One place (BrowseEntitiesController#entity for a place), after Google Arts & Culture's place pages (looked at 2026-11-23, described in
-    our own words): a strip of the place's own pictures (each whole), its name and what it holds; the collections that hold its records;
-    its kinds of record and its centuries; "Discover this place", its records as the fluid mosaic; and the places related to it. The facts
-    and records are Browse::Profile's (records whose pictures or details need permission are left out of the mosaic; the count and the
-    search include them). %>
+<%# One place, maker, subject or period (BrowseEntitiesController#entity and #period), after Google Arts & Culture's place pages (looked at
+    2026-11-23, described in our own words): a strip of its own pictures (each whole), its name and what it holds (a maker's dates and
+    roles too); the collections that hold its records; its kinds of record and its centuries (a period: the decades within it); "Discover",
+    its records as the fluid mosaic; and what is related to it. The facts and records are Browse::Profile's (records whose pictures or details
+    need permission are left out of the mosaic; the count and the search include them). %>
 <% result = @result %>
+<% entry = @entry %>
+<% period = @period %>
+<% kind_key = entry&.kind&.key %>
+<% name = entry ? entry.name : period.label %>
+<% kind_label = entry ? entry.kind.singular : t("browse.place.period") %>
+<% facts = kind_key == "makers" ? Browse::Creator.facts(entry, result.documents) : nil %>
+<%# a maker's dates as the records give them (the commonest form) %>
+<% life = kind_key == "makers" && result.documents.filter_map { |document| Browse::Meta.life_dates(document, entry.variants) }.tally.max_by(&:last)&.first %>
 <% span = Browse::Meta.span_of(result) %>
-<% region = PlaceRegions.region_of(@entry.name) %>
+<% region = kind_key == "places" ? PlaceRegions.region_of(name) : nil %>
 <%# the strip takes pictures from the end of the page, so it does not repeat the records "Discover this place" opens with %>
 <% pictured = result.documents.select { |document| document["thumbnail_path_ssi"].present? && AccessPolicy.view?(document) && !Sensitivity.sensitive?(document) }.last(5) %>
-<% advisory = result.cultural.positive? || @entry.name.match?(/aborigin|indigenous|torres strait|first nations|koori|palawa/i) %>
-<% content_for :title, t("browse.entity.title", name: @entry.name, kind: @kind.singular) %>
-<% content_for :body_class, "page-browse page-place" %>
+<% advisory = result.cultural.positive? || name.match?(/aborigin|indigenous|torres strait|first nations|koori|palawa/i) %>
+<% content_for :title, entry ? t("browse.entity.title", name: name, kind: kind_label) : t("browse.period.title", period: name) %>
+<% content_for :body_class, "page-browse page-place page-browse-#{kind_key || 'period'}" %>
 
 <main class="place-page" id="main-content">
   <% if pictured.any? %>
@@ -24,14 +32,24 @@
 
   <div class="place-page__inner">
     <header class="place-page__head">
-      <p class="place-page__kind"><%= t("browse.place.kind") %><%= " #{t('browse.place.in_region', region: region)}" if region %></p>
-      <h1 class="place-page__title"><%= @entry.name %></h1>
+      <p class="place-page__kind"><%= kind_label %><%= " #{t('browse.place.in_region', region: region)}" if region %><% if period&.parent %>, <%= link_to period.parent.label, period.parent.path %><% end %></p>
+      <h1 class="place-page__title"><%= name %></h1>
       <p class="place-page__summary">
         <%= t("browse.place.records", count: result.total, number: number_with_delimiter(result.total)) %><% if span %>, <%= t("browse.place.span", span: span) %><% end %><% if result.facets["collection_ssim"].any? %>, <%= t("browse.place.held_in", count: result.facets["collection_ssim"].size) %><% end %>.
       </p>
+      <% if facts&.any? || life %>
+        <dl class="place-page__facts">
+          <% if life %><div><dt><%= t("browse.entity.life_dates") %></dt><dd><%= life %></dd></div><% end %>
+          <% if facts&.born %><div><dt><%= t("nexus_ccs.creator.born") %></dt><dd><%= facts.born %></dd></div><% end %>
+          <% if facts&.died %><div><dt><%= t("nexus_ccs.creator.died") %></dt><dd><%= facts.died %></dd></div><% end %>
+          <% if facts&.nationality %><div><dt><%= t("nexus_ccs.creator.nationality") %></dt><dd><%= facts.nationality %></dd></div><% end %>
+          <% if facts&.roles.present? %><div><dt><%= t("nexus_ccs.creator.roles") %></dt><dd><%= Array(facts.roles).join(", ") %></dd></div><% end %>
+        </dl>
+      <% end %>
       <div class="place-page__actions">
         <%= link_to t("browse.entity.see_all", count: number_with_delimiter(result.total)), search_catalog_path(@search_query), class: "btn btn-primary" %>
-        <%= link_to t("browse.place.all_places"), browse_hub_path("places"), class: "arrow-link arrow-link--icon" %>
+        <% hub = entry ? entry.kind.key : "periods" %>
+        <%= link_to t("browse.place.all", hub: BrowseHubs.find(hub)&.title.to_s.downcase), browse_hub_path(hub), class: "arrow-link arrow-link--icon" %>
       </div>
     </header>
 
@@ -64,6 +82,7 @@
 
     <% kinds = result.facets["object_type_ssim"].first(10) %>
     <% periods = result.periods.select { |_, count| count.positive? } %>
+    <% periods_heading = period ? t("browse.period.within") : t("browse.entity.related_periods") %>
     <% if kinds.any? || periods.any? %>
       <section class="place-section place-section--facets" aria-label="<%= t("browse.place.ways_in") %>">
         <% if kinds.any? %>
@@ -78,7 +97,7 @@
         <% end %>
         <% if periods.any? %>
           <div class="place-facets">
-            <h2 class="place-section__heading place-section__heading--small"><%= t("browse.entity.related_periods") %></h2>
+            <h2 id="related-periods" class="place-section__heading place-section__heading--small"><%= periods_heading %></h2>
             <ul class="place-chips">
               <% periods.each do |related_period, count| %>
                 <li><%= link_to related_period.path, class: "places-chip" do %><%= related_period.label %> <span class="places-chip__count"><%= number_with_delimiter(count) %></span><% end %></li>
@@ -91,7 +110,7 @@
 
     <section class="place-section" aria-labelledby="place-discover">
       <div class="place-section__head">
-        <h2 id="place-discover" class="place-section__heading"><%= t("browse.place.discover") %></h2>
+        <h2 id="place-discover" class="place-section__heading"><%= t("browse.place.discover_#{kind_key || 'period'}", default: t("browse.place.discover")) %></h2>
         <% if result.pages > 1 %><p class="place-section__note"><%= t("browse.place.page", page: result.page, pages: result.pages) %></p><% end %>
       </div>
       <% if result.documents.empty? %>
@@ -104,12 +123,17 @@
       <%= render "browse_entities/pager", page: result.page, pages: result.pages, label: t("browse.entity.pagination") %>
     </section>
 
-    <% related_places = related_entities(Browse::Kind.find("places"), result.facets["production_place_ssim"], except: @entry) %>
-    <% if related_places.any? %>
-      <section class="place-section" aria-labelledby="place-related">
-        <h2 id="place-related" class="place-section__heading"><%= t("browse.entity.related_places") %></h2>
+    <%# What is related: the places, makers and subjects of its records %>
+    <% related = [] %>
+    <% related << [ t("browse.entity.related_places"), related_entities(Browse::Kind.find("places"), result.facets["production_place_ssim"], except: (entry if kind_key == "places")) ] %>
+    <% related << [ t("browse.entity.related_makers"), related_entities(Browse::Kind.find("makers"), result.facets["creator_ssim"], except: (entry if kind_key == "makers")) ] %>
+    <% related << [ t("browse.entity.related_subjects"), related_entities(Browse::Kind.find("subjects"), result.facets["subject_ssim"], except: (entry if kind_key == "subjects")) ] %>
+    <% related.reject! { |_, pairs| pairs.empty? } %>
+    <% related.each_with_index do |(heading, pairs), index| %>
+      <section class="place-section" aria-labelledby="related-<%= index %>">
+        <h2 id="related-<%= index %>" class="place-section__heading place-section__heading--small"><%= heading %></h2>
         <ul class="place-chips">
-          <% related_places.each do |related_entry, count| %>
+          <% pairs.each do |related_entry, count| %>
             <li><%= link_to related_entry.path, class: "places-chip" do %><%= related_entry.name %> <span class="places-chip__count"><%= number_with_delimiter(count) %></span><% end %></li>
           <% end %>
         </ul>

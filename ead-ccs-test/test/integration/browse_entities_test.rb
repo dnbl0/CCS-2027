@@ -65,15 +65,15 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Bunny, Rupert"
     assert_select "title", /Bunny, Rupert — Maker/
-    assert_select ".browse-facts dt", text: "Dates on records"
-    assert_select ".browse-facts dd", text: "29 September 1864 – 25-May-47"
-    assert_select ".browse-facts dd", text: "1816 to 2019"
-    assert_select ".result-card", count: 1
+    assert_select ".place-page__facts dt", text: "Dates on records"
+    assert_select ".place-page__facts dd", text: "29 September 1864 – 25-May-47"
+    assert_select ".place-page__summary", /made 1816 to 2019/
+    assert_select ".card-layout--mosaic li.mosaic-flow__item", count: 1 # the one record that may be shown
     assert_select "a.btn[href*='f%5Bcreator_ssim%5D%5B%5D=Bunny%2C+Rupert']", text: /See all 730 records/
-    assert_select ".browse-related a", text: "Australia"
-    assert_select ".browse-related a", text: "Tiny, Tim"
-    assert_select ".browse-related a", text: "Unknown", count: 0
-    assert_select ".browse-related a[href='/browse/periods/1900-1999']"
+    assert_select ".place-chips a", text: /\AAustralia\s/ # a related place, with its count
+    assert_select ".place-chips a", text: /\ATiny, Tim\s/
+    assert_select ".place-chips a", text: /\AUnknown/, count: 0
+    assert_select ".place-chips a[href='/browse/periods/1900-1999']"
   end
 
   test "an entity with a stale slug goes to its address, and an unknown or malformed one is a 404" do
@@ -96,7 +96,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     assert_select ".place-page__summary", /730 records, made 1816 to 2019, held in 1 collection\./
     assert_select ".place-page__strip[aria-hidden=true] img[alt='']", count: 1 # the open record's picture, whole; never the withheld one
     assert_select "a.btn[href*='production_place_ssim']", /See all 730 records/
-    assert_select "section h2", /1 collection holds records from here/
+    assert_select "section h2", /Held in 1 collection/
     assert_select ".place-collections h3 a[href*='collection_ssim']", "University Art Collection"
     assert_select ".place-chips a.places-chip", text: /Painting\s+400/
     assert_select "section .card-layout--mosaic ul.mosaic-flow[data-controller=mosaic] li .object-card, section .card-layout--mosaic ul.mosaic-flow li article"

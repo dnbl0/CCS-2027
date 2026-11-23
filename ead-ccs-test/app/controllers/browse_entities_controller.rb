@@ -28,8 +28,8 @@ class BrowseEntitiesController < CatalogController
     wrap_response(@result)
     @search_query = @entry.search_query
     use_meta Browse::Meta.entity(@entry, @result), [ [ t("browse.title"), browse_path ], [ @kind.plural, browse_hub_path(@kind.key) ], [ @entry.name, nil ] ]
-    # A place has its own page, after Google Arts & Culture's place pages (browse_entities/place); makers and subjects keep the profile
-    render "browse_entities/place" if @kind.key == "places"
+    # Every entity's page, after Google Arts & Culture's place pages (browse_entities/showcase)
+    render "browse_entities/showcase"
   end
 
   def period
@@ -45,6 +45,7 @@ class BrowseEntitiesController < CatalogController
     trail = [ [ t("browse.title"), browse_path ], [ t("browse.periods"), browse_hub_path("periods") ] ]
     trail << [ @period.parent.label, browse_period_path(slug: @period.parent.slug) ] if @period.parent
     use_meta Browse::Meta.period(@period, @result.total), trail + [ [ @period.label, nil ] ]
+    render "browse_entities/showcase"
   end
 
   # Blacklight uses #search_action_url for the header's search box

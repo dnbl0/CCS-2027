@@ -391,3 +391,12 @@ turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity
 .place-collection:focus-within { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
 
 .place-collection .explore-card__link:focus-visible { outline: none; }
+
+/* A maker's dates, nationality and roles under the name (browse_entities/showcase) */
+.place-page__facts { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--ccs-space-2) var(--ccs-space-6); margin: 0; }
+
+.place-page__facts > div { display: flex; gap: var(--ccs-space-2); }
+
+.place-page__facts dt { color: var(--ccs-text-secondary); font-weight: 400; }
+
+.place-page__facts dd { margin: 0; font-weight: var(--ccs-font-weight-semibold); }
