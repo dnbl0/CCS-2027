@@ -5,12 +5,13 @@ module Browse
   # can be the same picture mosaic as the rest of the page instead of lists of chips. ONE Solr request for the entity's records that have
   # a picture that may be shown (Browse::Cards::THUMBNAIL_FILTERS: a thumbnail, not sensitive, not restricted; AccessPolicy.view? checked
   # here too), kept for a day; each value then takes the first of those records that carries it, and no picture is used twice on the page.
-  # A value none of them carries (France has 22 pictured records for its ten kinds of record) takes a picture of its own records anywhere
-  # in the collections (#prepare: one grouped request for all such values, kept for a day): a picture of London for "England, London".
+  # A value none of them carries, or whose records here the page already shows (France has 22 pictured records for its ten kinds of
+  # record), takes a picture of its own records anywhere in the collections (#prepare: one grouped request for the page's values, kept for
+  # a day): a picture of London for "England, London".
   # Only a value with no picture anywhere has none (its tile then shows its number of records in the picture's place).
   class FacetPictures
     ROWS = 400
-    ELSEWHERE = 4 # pictures kept for each value from the whole collection
+    ELSEWHERE = 12 # pictures kept for each value from the whole collection (enough to pass over the ones the page already shows)
     # the fields whose values the sections show (an entity page's, and a collection or theme page's eras and named collections)
     VALUE_FIELDS = %w[object_type_ssim creator_ssim production_place_ssim subject_ssim date_era_ssim named_collection_ssim].freeze
     FIELDS = (Profile::FIELDS + VALUE_FIELDS).uniq.freeze
@@ -47,25 +48,45 @@ module Browse
       @repository = repository
     end
 
-    # Before the tiles: every value the page will show, as [field, spellings] or a period, so the ones none of the page's records carries
-    # can be looked for in the whole collection with ONE request
+    # Before the tiles: every value the page will show, as [field, spellings] or a period, looked for in the whole collection too with ONE
+    # request, so a value whose own records here are all shown already (in Discover, or by an earlier tile) still has a picture of its own
     def prepare(wants)
-      missing = wants.reject { |want| @documents.any? { |document| carries?(document, want) } }.to_h { |want| [ query(want), want ] }
+      missing = wants.uniq.to_h { |want| [ query(want), want ] }
       return self if missing.empty?
 
-      key = SuppressedRecord.cache_key("facet_pictures/elsewhere/v1/#{Digest::SHA1.hexdigest(missing.keys.sort.join("\n"))}")
+      key = SuppressedRecord.cache_key("facet_pictures/elsewhere/v2/#{Digest::SHA1.hexdigest(missing.keys.sort.join("\n"))}")
       found = Rails.cache.fetch(key, expires_in: 1.day, skip_nil: true) { elsewhere(missing.keys) } || {}
       found.each { |solr_query, pictures| @elsewhere[missing[solr_query]] = pictures }
+      assign(missing.values)
       self
     end
 
     # The picture for a value of a field (VALUE_FIELDS), given as one or more spellings (an entity's variants), or nil
-    def value(field, *spellings) = take([ field, spellings ])
+    def value(field, *spellings) = pick([ field, spellings ])
 
     # The picture for a period (Browse::Periods::Period: a first and last year; the earliest has no first)
-    def period(period) = take(period)
+    def period(period) = pick(period)
 
     private
+
+    # After #prepare every value has its picture already (or none); without it, each takes the next free one as it is asked for
+    def pick(want) = @assigned&.key?(want) ? @assigned[want] : take(want)
+
+    # Every value's picture at once, the values with the fewest pictures choosing first (a maker with three pictures before Paris with
+    # hundreds), so a value's few pictures are not taken by one that had others; never a record the page shows elsewhere (its Discover)
+    def assign(wants)
+      options = wants.to_h do |want|
+        own = @documents.select { |document| !@avoid.include?(document["id"]) && carries?(document, want) }
+        far = Array(@elsewhere[want]).reject { |picture| @avoid.include?(picture["id"]) }
+        [ want, (own + far).uniq { |picture| picture["id"] } ]
+      end
+      @assigned = {}
+      wants.sort_by.with_index { |want, index| [ options[want].size, index ] }.each do |want|
+        found = options[want].find { |picture| !used?(picture) }
+        use(found) if found
+        @assigned[want] = found && Picture.new(id: found["id"], src: found["src"])
+      end
+    end
 
     def carries?(document, want)
       if want.is_a?(Array)
@@ -85,7 +106,7 @@ module Browse
     def elsewhere(queries)
       response = (@repository || Blacklight.default_index).search(params: { q: "*:*", defType: "lucene", qt: "select", fq: Cards::THUMBNAIL_FILTERS, rows: 0,
                                                                               fl: FIELDS.join(","), facet: false, group: true, "group.query": queries,
-                                                                              "group.limit": ELSEWHERE * 3, "group.sort": "id asc" })
+                                                                              "group.limit": ELSEWHERE * 2, "group.sort": "id asc" })
       queries.to_h do |solr_query|
         docs = Array(response.dig("grouped", solr_query, "doclist", "docs")).map { |hash| SolrDocument.new(hash) }
         pictures = docs.select { |document| AccessPolicy.view?(document) && !Sensitivity.sensitive?(document) && document["thumbnail_path_ssi"].present? }
@@ -96,15 +117,34 @@ module Browse
       nil
     end
 
-    # The page's own records first (the Discover ones last), then the value's records anywhere; no picture twice
+    # The page's own records not shown elsewhere on it first, then the value's records anywhere, and a record the page's Discover shows
+    # only when there is nothing else; no record, and no picture, twice
     def take(want)
-      free = @documents.reject { |document| @used.include?(document["id"]) }.select { |document| carries?(document, want) }
-      found = free.find { |document| !@avoid.include?(document["id"]) } || free.first
-      found ||= Array(@elsewhere[want]).find { |picture| !@used.include?(picture["id"]) }
+      free = @documents.reject { |document| used?(document) }.select { |document| carries?(document, want) }
+      found = free.find { |document| !@avoid.include?(document["id"]) }
+      found ||= Array(@elsewhere[want]).find { |picture| !used?(picture) && !@avoid.include?(picture["id"]) }
+      found ||= free.first
       return unless found
 
-      @used << found["id"]
+      use(found)
       Picture.new(id: found["id"], src: found["src"])
+    end
+
+    public
+
+    # Pictures of the page's own records that nothing else on it shows (its Discover records and its tiles' pictures excluded), for the
+    # strip at its head: at most `count`, each used up
+    def spare(count)
+      @documents.reject { |document| used?(document) || @avoid.include?(document["id"]) }.first(count).each { |document| use(document) }
+                .map { |document| Picture.new(id: document["id"], src: document["src"]) }
+    end
+
+    private
+
+    def used?(picture) = @used.include?(picture["id"]) || @used.include?(picture["src"])
+
+    def use(picture)
+      @used << picture["id"] << picture["src"]
     end
   end
 end

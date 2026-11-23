@@ -4,12 +4,27 @@
     and "Discover", its highlights as the fluid mosaic. locals: showcase, search_query, intro, name, kind_label, back ([label, path]),
     named (a collection: its named collections open their own pages), pictures (Browse::FacetPictures: a picture for each value) %>
 <% documents = showcase.documents %>
-<% pictured = documents.select { |document| document["thumbnail_path_ssi"].present? }.last(5) %>
+<% groups = { "object_type_ssim" => :object_types, "date_era_ssim" => :eras, "named_collection_ssim" => :named_collections }.filter_map do |field, label|
+     pairs = Browse::NearDuplicates.reject(showcase.facets[field].to_a, shown: [ name, *Array(search_query.dig(:f, field)) ])
+     [ field, label, pairs ] if pairs.any?
+   end %>
+<% pictures&.prepare(groups.flat_map { |field, _, pairs| pairs.map { |value, _| [ field, [ value ] ] } }) %>
+<%# each group's tiles, worked out before anything is drawn, so the strip at the head takes only pictures nothing else on the page shows %>
+<% groups = groups.map do |field, label, pairs|
+     tiles = pairs.map do |value, count|
+       own = named && field == "named_collection_ssim" ? landing_path_for("named-collections", value) : nil
+       to = own || search_catalog_path(search_query.deep_merge(f: { field => Array(search_query.dig(:f, field)) + [ value ] }))
+       facet_tile(value, count, to, pictures&.value(field, value))
+     end
+     [ field, label, tiles ]
+   end %>
+<%# the strip: its own pictures that neither the highlights nor a tile shows (left out when there are fewer than three) %>
+<% pictured = pictures ? pictures.spare(5) : [] %>
 <main class="place-page" id="main-content">
   <% if pictured.size >= 3 %>
     <ul class="justified place-page__strip" data-controller="justified" aria-hidden="true">
       <% pictured.each do |document| %>
-        <li class="justified__item"><%= image_tag AssetVersion.url(document["thumbnail_path_ssi"]), alt: "", class: "place-page__strip-image", decoding: "async" %></li>
+        <li class="justified__item"><%= image_tag AssetVersion.url(document.src), alt: "", class: "place-page__strip-image", decoding: "async" %></li>
       <% end %>
     </ul>
   <% end %>
@@ -26,20 +41,10 @@
       </div>
     </header>
 
-    <% groups = { "object_type_ssim" => :object_types, "date_era_ssim" => :eras, "named_collection_ssim" => :named_collections }.filter_map do |field, label|
-         pairs = showcase.facets[field].to_a.reject { |value, _| Array(search_query.dig(:f, field)).include?(value) }
-         [ field, label, pairs ] if pairs.any?
-       end %>
-    <% pictures&.prepare(groups.flat_map { |field, _, pairs| pairs.map { |value, _| [ field, [ value ] ] } }) %>
     <%# Each group a section of picture tiles in the page's mosaic (a picture of one of each value's records), as on the place pages %>
-    <% groups.each do |field, label, pairs| %>
+    <% groups.each do |field, label, tiles| %>
       <section class="place-section" aria-labelledby="showcase-<%= label %>">
         <h2 id="showcase-<%= label %>" class="place-section__heading"><%= t("nexus_ccs.showcase.#{label}") %></h2>
-        <% tiles = pairs.map do |value, count|
-             own = named && field == "named_collection_ssim" ? landing_path_for("named-collections", value) : nil
-             to = own || search_catalog_path(search_query.deep_merge(f: { field => Array(search_query.dig(:f, field)) + [ value ] }))
-             facet_tile(value, count, to, pictures&.value(field, value))
-           end %>
         <%= render "browse_entities/facet_tiles", tiles: tiles, label: t("nexus_ccs.showcase.#{label}"), ordered: field == "date_era_ssim" %>
       </section>
     <% end %>

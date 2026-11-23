@@ -14,18 +14,41 @@
 <% life = kind_key == "makers" && result.documents.filter_map { |document| Browse::Meta.life_dates(document, entry.variants) }.tally.max_by(&:last)&.first %>
 <% span = Browse::Meta.span_of(result) %>
 <% region = kind_key == "places" ? PlaceRegions.region_of(name) : nil %>
-<%# the strip takes pictures from the end of the page, so it does not repeat the records "Discover this place" opens with %>
-<% pictured = result.documents.select { |document| document["thumbnail_path_ssi"].present? && AccessPolicy.view?(document) && !Sensitivity.sensitive?(document) }.last(5) %>
+<% kinds = Browse::NearDuplicates.reject(result.facets["object_type_ssim"]).first(10) %>
+<% periods = result.periods.select { |_, count| count.positive? } %>
+<% periods_heading = period ? t("browse.period.within") : t("browse.entity.related_periods") %>
+<%# What is related: the places, makers and subjects of its records %>
+<% related = [] %>
+<% related << [ t("browse.entity.related_places"), "production_place_ssim", related_entities(Browse::Kind.find("places"), result.facets["production_place_ssim"], except: (entry if kind_key == "places")) ] %>
+<% related << [ t("browse.entity.related_makers"), "creator_ssim", related_entities(Browse::Kind.find("makers"), result.facets["creator_ssim"], except: (entry if kind_key == "makers")) ] %>
+<% related << [ t("browse.entity.related_subjects"), "subject_ssim", related_entities(Browse::Kind.find("subjects"), result.facets["subject_ssim"], except: (entry if kind_key == "subjects")) ] %>
+<%# each value once: no spelling twice, not the page itself or its region, no subject that only names a place already shown %>
+<% shown = [ name ] %>
+<% related.each do |section| %>
+  <% section[2] = Browse::NearDuplicates.reject(section[2], shown: shown, region: region) %>
+  <% shown += section[2].map { |related_entry, _| related_entry.name } if section[1] == "production_place_ssim" %>
+<% end %>
+<% related.reject! { |_, _, pairs| pairs.empty? } %>
+<%# every value the page shows, so those none of its own records carries get a picture of their records anywhere (one request) %>
+<% @pictures.prepare(kinds.map { |value, _| [ "object_type_ssim", [ value ] ] } + periods.map(&:first) +
+                     related.flat_map { |_, field, pairs| pairs.map { |related_entry, _| [ field, [ related_entry.name, *Array(related_entry.variants) ] ] } }) %>
+<%# the tiles, worked out before anything is drawn, so the strip at the head takes only pictures nothing else on the page shows %>
+<% kind_tiles = kinds.map { |value, count| facet_tile(value, count, search_catalog_path(refine(@search_query, "object_type_ssim", value)), @pictures.value("object_type_ssim", value)) } %>
+<% period_tiles = periods.map { |related_period, count| facet_tile(related_period.label, count, related_period.path, @pictures.period(related_period)) } %>
+<%# a related value's picture: a record with any of its spellings (Browse::Index::Entry#variants) %>
+<% related = related.map { |heading, field, pairs| [ heading, pairs.map { |related_entry, count| facet_tile(related_entry.name, count, related_entry.path, @pictures.value(field, related_entry.name, *Array(related_entry.variants))) } ] } %>
+<%# the strip: the place's own pictures that neither "Discover" nor a tile shows (left out when there are fewer than three) %>
+<% pictured = @pictures.spare(5) %>
 <% advisory = result.cultural.positive? || name.match?(/aborigin|indigenous|torres strait|first nations|koori|palawa/i) %>
 <% content_for :title, entry ? t("browse.entity.title", name: name, kind: kind_label) : t("browse.period.title", period: name) %>
 <% content_for :body_class, "page-browse page-place page-browse-#{kind_key || 'period'}" %>
 
 <main class="place-page" id="main-content">
-  <% if pictured.any? %>
-    <%# The place's own pictures, whole, in one justified row: decorative here (the same records are in "Discover this place") %>
+  <% if pictured.size >= 3 %>
+    <%# The place's own pictures, whole, in one justified row: decorative (each is one of its records, shown nowhere else on the page) %>
     <ul class="justified place-page__strip" data-controller="justified" aria-hidden="true">
       <% pictured.each do |document| %>
-        <li class="justified__item"><%= image_tag AssetVersion.url(document["thumbnail_path_ssi"]), alt: "", class: "place-page__strip-image", decoding: "async" %></li>
+        <li class="justified__item"><%= image_tag AssetVersion.url(document.src), alt: "", class: "place-page__strip-image", decoding: "async" %></li>
       <% end %>
     </ul>
   <% end %>
@@ -82,30 +105,18 @@
       </section>
     <% end %>
 
-    <% kinds = result.facets["object_type_ssim"].first(10) %>
-    <% periods = result.periods.select { |_, count| count.positive? } %>
-    <% periods_heading = period ? t("browse.period.within") : t("browse.entity.related_periods") %>
-    <%# What is related: the places, makers and subjects of its records %>
-    <% related = [] %>
-    <% related << [ t("browse.entity.related_places"), "production_place_ssim", related_entities(Browse::Kind.find("places"), result.facets["production_place_ssim"], except: (entry if kind_key == "places")) ] %>
-    <% related << [ t("browse.entity.related_makers"), "creator_ssim", related_entities(Browse::Kind.find("makers"), result.facets["creator_ssim"], except: (entry if kind_key == "makers")) ] %>
-    <% related << [ t("browse.entity.related_subjects"), "subject_ssim", related_entities(Browse::Kind.find("subjects"), result.facets["subject_ssim"], except: (entry if kind_key == "subjects")) ] %>
-    <% related.reject! { |_, _, pairs| pairs.empty? } %>
-    <%# every value the page shows, so those none of its own records carries get a picture of their records anywhere (one request) %>
-    <% @pictures.prepare(kinds.map { |value, _| [ "object_type_ssim", [ value ] ] } + periods.map(&:first) +
-                         related.flat_map { |_, field, pairs| pairs.map { |related_entry, _| [ field, [ related_entry.name, *Array(related_entry.variants) ] ] } }) %>
     <%# Its kinds of record and its periods: picture tiles in the page's mosaic (a picture of one of each value's records), as every section;
         the periods in ordered lanes, so they read in time order %>
     <% if kinds.any? %>
       <section class="place-section" aria-labelledby="place-kinds">
         <h2 id="place-kinds" class="place-section__heading"><%= t("browse.entity.object_types") %></h2>
-        <%= render "browse_entities/facet_tiles", tiles: kinds.map { |value, count| facet_tile(value, count, search_catalog_path(refine(@search_query, "object_type_ssim", value)), @pictures.value("object_type_ssim", value)) }, label: t("browse.entity.object_types"), ordered: false %>
+        <%= render "browse_entities/facet_tiles", tiles: kind_tiles, label: t("browse.entity.object_types"), ordered: false %>
       </section>
     <% end %>
     <% if periods.any? %>
       <section class="place-section" aria-labelledby="related-periods">
         <h2 id="related-periods" class="place-section__heading"><%= periods_heading %></h2>
-        <%= render "browse_entities/facet_tiles", tiles: periods.map { |related_period, count| facet_tile(related_period.label, count, related_period.path, @pictures.period(related_period)) }, label: periods_heading, ordered: true %>
+        <%= render "browse_entities/facet_tiles", tiles: period_tiles, label: periods_heading, ordered: true %>
       </section>
     <% end %>
 
@@ -124,11 +135,10 @@
       <%= render "browse_entities/pager", page: result.page, pages: result.pages, label: t("browse.entity.pagination") %>
     </section>
 
-    <% related.each_with_index do |(heading, field, pairs), index| %>
+    <% related.each_with_index do |(heading, tiles), index| %>
       <section class="place-section" aria-labelledby="related-<%= index %>">
         <h2 id="related-<%= index %>" class="place-section__heading"><%= heading %></h2>
-        <%# a related value's picture: a record with any of its spellings (Browse::Index::Entry#variants) %>
-        <%= render "browse_entities/facet_tiles", tiles: pairs.map { |related_entry, count| facet_tile(related_entry.name, count, related_entry.path, @pictures.value(field, related_entry.name, *Array(related_entry.variants))) }, label: heading, ordered: false %>
+        <%= render "browse_entities/facet_tiles", tiles: tiles, label: heading, ordered: false %>
       </section>
     <% end %>
   </div>

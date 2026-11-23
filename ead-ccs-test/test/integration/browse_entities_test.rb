@@ -97,7 +97,9 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "main.place-page h1", "Australia"
     assert_select ".place-page__summary", /730 records, made 1816 to 2019, held in 1 collection\./
-    assert_select ".place-page__strip[aria-hidden=true] img[alt='']", count: 1 # the open record's picture, whole; never the withheld one
+    # the strip shows only pictures nothing else on the page shows: its one open record is in Discover, so there is no strip (no repeat)
+    assert_select ".place-page__strip", count: 0
+    assert_select ".card-layout .object-card", count: 1
     assert_select "a.btn[href*='production_place_ssim']", /See all 730 records/
     assert_select "section h2", /Held in 1 collection/
     link = css_select(".place-collections h3 a").first
