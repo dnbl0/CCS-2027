@@ -49,7 +49,7 @@ class SimilarRowsIntegrationTest < ActionDispatch::IntegrationTest
       assert_select "h2", count: 0
       assert_operator css_select("li.discover-cards__item").size, :<=, 3
       assert_select "h3 a[href='/catalog/emu-a']"
-      assert_select "a.record-arrow-link[href*='f%5Bcreator_ssim%5D%5B%5D=Lees%2C+Derwent']", text: "See all records for Lees, Derwent"
+      assert_select "a.arrow-link[href*='f%5Bcreator_ssim%5D%5B%5D=Lees%2C+Derwent']", text: "See all records for Lees, Derwent"
     end
   end
 
@@ -79,15 +79,15 @@ class SimilarRowsIntegrationTest < ActionDispatch::IntegrationTest
     Blacklight::Solr::Repository.send(:define_method, :find, original) if original
   end
 
-  test "the record page has Related objects, then one labelled row with an empty lazy frame per way the record can match" do
+  test "You may be interested in: Similar, then a tab with an empty lazy frame per way the record can match" do
     with_seeded_menu_cache do
       with_found_record(source.merge("region_ssim" => nil, "production_place_ssim" => nil)) { get "/catalog/emu-source" }
     end
 
     assert_response :success
-    assert_select "turbo-frame#similar-records[loading=lazy]"
+    assert_select "turbo-frame#more-similar[loading=lazy]"
     rows = css_select("#more-from-the-collections .record-more__row").map { |row| row["id"] }
-    assert_equal %w[more-row-creator more-row-period more-row-type], rows.first(3)
+    assert_equal %w[more-row-similar more-row-creator more-row-period more-row-type], rows.first(4)
     assert_select "turbo-frame#more-creator[loading=lazy][src='/catalog/emu-source/similar?row=creator']"
     assert_select "turbo-frame#more-creator *", count: 0
   end

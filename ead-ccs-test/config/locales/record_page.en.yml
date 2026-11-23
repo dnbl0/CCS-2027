@@ -16,7 +16,6 @@ en:
         download_label: "Download image of %{title}"
       sections:
         key_facts: "Key facts"
-        object_details: "Object details"
         about: "About this record"
       key_facts:
         date: "Date"
@@ -30,6 +29,8 @@ en:
       about:
         persistent_link: "Persistent link"
       media:
+        # CCS-36: a PDF whose text could not be read for search. PLACEHOLDER WORDING.
+        pdf_not_indexed: "Search unavailable: this document's text could not be read (it may be a scanned image), so a search will not find words inside it. Open the PDF to read it."
         # Under the media of a record that shows some of its digital assets and withholds others (their own licence does not
         # let them be shown: AccessPolicy.withheld_assets). PLACEHOLDER WORDING, NOT YET APPROVED: the University must approve it.
         partly_withheld:
@@ -47,7 +48,6 @@ en:
       # Use and access (CCS-27, 47, 67, 68, 69, 166). PLACEHOLDER WORDING, NOT YET APPROVED: the University must approve it.
       use:
         heading: "Use and access"
-        use_this_image: "Use this image"
         view:
           none: "No image of this object is online"
           open: "You can view the image online"
@@ -79,13 +79,32 @@ en:
         copy: "Copy this information"
         download: "Download image"
         close: "Close"
+      # The record page's header and sections. PLACEHOLDER WORDING.
+      card:
+        cite: "How to cite this record"
+      # The record page's sections and headings
+      layout:
+        associated_names: "Associated names"
+        overview: "Object overview"
+        notes: "Record details and notes"
+        full_record: "All details"
+        inscriptions: "Inscriptions and marks"
+        about_object: "About this object"
+        see_collection: "See more from this collection"
+        interested: "You may be interested in"
+        similar: "Similar objects"
+        similar_colours: "Similar colours"
+        # The tabs of You may be interested in: a word or two each (the design system: short tab titles)
+        tabs:
+          similar: "Similar"
+          maker: "Same maker"
+          period: "Same period"
+          place: "Same place"
+          type: "Same type"
       # The showcase layout (20 Nov 2026)
       showcase:
         read_more: "Read more"
         read_less: "Read less"
-        aside: "Actions and use"
-        record_url: "Record URL"
-        copy_link: "Copy link"
         print: "Print this page"
         download_as: "Download as:"
         csv: "CSV"
@@ -94,13 +113,11 @@ en:
         also_like: "You may also like"
         shuffle: "Shuffle objects"
         shuffled: "Showing other objects you may like"
-        more_details:
-          one: "Show 1 more detail"
-          other: "Show %{count} more details"
-        fewer_details: "Show fewer details"
-        rights_and_contact: "Rights, credit and contact"
-        more_ways: "More ways to explore"
       # The approved split layout (Figma "Record page · Approved design", 2026-11-19)
+      # The actions under the title (Figma Record/Actions, option A)
+      actions:
+        more: "More actions"
+        more_label: "More"
       split:
         actions: "Actions for this record"
         uom_id: "UoM ID"
@@ -116,39 +133,60 @@ en:
           previous: "Previous result"
           next: "Next result"
           none: "%{label}: none"
-        history:
-          source_reference: "Source record"
         # The media viewer (Figma "Media viewer", after Europeana's item viewer). PLACEHOLDER WORDING where marked.
         viewer:
           tools: "Image tools"
+          # the words under the zoom screen's round tools (each tool's full name, above, is its accessible name)
+          short:
+            zoom_in: "Zoom in"
+            zoom_out: "Zoom out"
+            rotate_right: "Rotate"
+            reset_zoom: "Reset"
+            previous: "Previous"
+            next: "Next"
+            close: "Close"
+          zoom: "Zoom"
           media_information: "Media information"
           close_information: "Close media information"
-          rotate_left: "Rotate left"
-          rotate_right: "Rotate right"
+          rotate_right: "Rotate"
+          open_zoom: "Zoom into the image"
+          close_zoom: "Close zoom"
+          zoom_heading: "Zoom: %{title}"
+          use_link: "Use and access"
           zoom_in: "Zoom in"
           reset_zoom: "Reset zoom and rotation"
           zoom_out: "Zoom out"
-          full_screen: "Full screen"
-          exit_full_screen: "Exit full screen"
-          show_thumbnails: "Show thumbnails"
-          hide_thumbnails: "Hide thumbnails"
           thumbnails: "Images of this record"
           previous: "Previous image"
           next: "Next image"
           show_image: "Show image %{position} of %{count}"
           shown: "Image %{position} of %{count} shown"
           rotated: "Rotated %{degrees} degrees"
-          zoom_level: "%{percent}%"
+          zoom_level: "Zoom %{percent}%"
           max_zoom: "Maximum zoom"
-          drag_hint: "Drag or use the arrow keys to move around"
           at_fit: "Already showing the whole image"
           at_max: "Already at maximum zoom"
           at_start: "This is the first image"
           at_end: "This is the last image"
+          position: "Image %{position} of %{count}"
+          # Figma Record/IIIF download
+          download_heading: "Download this image"
+          download_intro: "Choose a size. Please include the caption and licence when you use the image."
+          download_one: "Please include the caption and licence when you use the image."
+          size_legend: "Size"
+          size_hint: "Sizes up to the image's own width"
+          download_size: "%{name} — %{width} × %{height} px (%{kind})"
+          copy_information: "Copy this information"
+          cancel: "Cancel"
+          download_image: "Download image"
+          sizes:
+            small: "Small"
+            medium: "Medium"
+            large: "Large"
+            full: "Full size"
         related:
           heading: "Related objects"
         more:
-          heading: "More from the collections"
           empty: "Nothing to show here yet."
           row:
             creator: "More by %{name}"

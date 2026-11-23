@@ -31,7 +31,9 @@ use to ask; the record page's own component keeps its checks.
 | Video | The browser's `<video controls>` | Keyboard and screen-reader support are the browser's. A `<track kind="captions">` is added when the record has a captions file. No download button unless the tier is `:open`. |
 | Audio | The browser's `<audio controls>` | As video; a transcript link when the record has one. |
 | PDF | A link that opens the file in a new tab | Only for `:open` records: a PDF cannot be read without being downloadable. An in-page reader would be a new dependency. |
-| 3D model | "This 3D model cannot be previewed here", with a download link where the tier allows it | See "3D" below. |
+| Office or OpenOffice document | A PDF preview LibreOffice makes when the record is indexed (`DocumentPreview`), and the original | Only where the file may be downloaded, as for a PDF (CCS-164). |
+| eBook (EPUB) | Read a page at a time in the page: epub.js (`ebook_reader_controller.js`, `_ebook`) | Previous and Next page (and the arrow keys), a Contents list, "Page 2 of 7 in this chapter". Shown as video plays, whatever the tier; the download link only where it is allowed. The book's own scripts never run. |
+| 3D model (glTF, GLB) | Turned and zoomed in the page: Google model-viewer (`model_viewer_controller.js`, `_model`) | Drag or the arrow keys turn it; Zoom in, Zoom out, Reset view. Shown as video plays; the download link only where allowed. Other 3D formats (OBJ, STL, USDZ, FBX, PLY) get "cannot be previewed here". |
 | Anything else | The same cannot-be-previewed state | |
 
 The mapping lives in `MediaTypes` (`app/models/media_types.rb`): format type (the DAM's `file_properties.format_type`), MIME
@@ -87,12 +89,15 @@ CORS headers.
 settle the name. The ingest also keeps `format_types_ssim` (each asset's `format_type`), which is not in the index; once it is,
 `MediaTypes::FORMAT_TYPE_FIELD` is where to read it so that non-image files other than audio and video can be shown.
 
-**3. A 3D viewer.** Neither `<model-viewer>` (Google's web component, glTF/GLB, AR on phones, built-in accessibility hooks) nor
-three.js is in the app, and adding either is a new dependency, so it has not been done. The extension point is ready: `:model_3d`
-is a known kind, with no viewer. To add one: pin the library, write `app/views/media_viewers/_model_3d.html.erb`, name it in
-`MediaTypes::VIEWERS`, and check access (the file URL must stay out of the page unless `AccessPolicy` and `Sensitivity` allow
-it, as the other partials do). `<model-viewer>` is the likelier fit: one element, keyboard orbit and zoom, `alt` text.
-The DAM must also hold glTF/GLB files; the index does not list any now.
+**3. 3D models and eBooks (CCS-164, done 23 Nov 2026).** Google model-viewer 4.4.0 and epub.js 0.3.93 (with JSZip 3.10) are
+installed with npm (the repository's `package.json`) and their browser builds copied to `vendor/javascript` and pinned in
+`config/importmap.rb`, unpreloaded: a page loads them only when a record has such a file. To update one: `npm i <package>@<version>`,
+copy `dist/model-viewer.min.js`, `dist/epub.min.js` or `dist/jszip.min.js` over the vendored file, and update the version in the
+importmap comment. model-viewer's draco and KTX2 decoders (from three.js, `examples/jsm/libs`) are served from
+`public/vendor/model-viewer`, not Google's CDN; a model compressed with meshopt would still fetch that decoder from Google, so ask
+for GLB without meshopt. The DAM must hold glTF/GLB or EPUB files for these to show; the index lists none yet. The content
+security policy allows what they need: `blob:` for an eBook's fonts, pictures and styles and for the decoders' workers,
+`'wasm-unsafe-eval'` for the decoders, and the media hosts in `connect-src`.
 
 **4. Captions and transcripts.** Nothing in the DAM or the index carries them. The hooks: an entry in `config/digital_media.yml`
 may have `captions` (a WebVTT file) and `transcript` (a text or HTML file), served from the same media base URL; they are stored

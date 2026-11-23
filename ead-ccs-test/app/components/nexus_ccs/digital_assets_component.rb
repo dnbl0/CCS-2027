@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # A record's media viewer (Figma "Media viewer", after Europeana's item viewer): the media information on the left at the
-  # viewer's full height (CCS-422; closed until ⋮), the stage (text/primary) with the controls bar along its bottom (⋮ | rotate |
-  # zoom in, reset, zoom out | full screen, and Download or Show thumbnails), and the numbered thumbnails on the right (a strip
-  # below 1024px), with previous, next and hide. Under it: the licence, the access level and the classification. Download first
-  # shows the essential information (CCS-67). No counter. Renders nothing for a record without assets. What it shows follows AccessPolicy, asset by asset: the index holds only
+  # A record's media (Figma Record/IIIF viewer): the image whole on a light grey panel with the other images
+  # as thumbnails under it; round Zoom (a full-screen modal with deep zoom, CCS-57) and Download (the essential information first,
+  # CCS-67) at the panel's foot, and Media information (CCS-422, a drawer from the right) at its end; under the panel one line on
+  # the licence and what the visitor may do with the image. Renders nothing for a record without assets. What it shows follows AccessPolicy, asset by asset: the index holds only
   # the assets a visitor may see (Dam::SolrWriter), and of those only an open one is offered to download (its thumbnail links to
   # the file, its player keeps its download button, a PDF is listed); a view-only one is shown without any of that. A record
   # with some assets withheld says so under them, with a request link; a :request record shows none of the assets, only the
@@ -65,7 +64,7 @@ module NexusCcs
       items = Array(@document["digital_media_ssim"]).map { |entry| Collections::DigitalMedia.parse(entry) }
                                                     .map { |item| item.merge(downloadable: AccessPolicy.download_path?(@document, item[:url])) }
                                                     .map { |item| item.merge(url: AssetVersion.url(item[:url]), captions: AssetVersion.url(item[:captions]), transcript: AssetVersion.url(item[:transcript])) }
-      items.select { |item| item[:downloadable] || %w[video audio].include?(item[:kind]) }
+      items.select { |item| item[:downloadable] || %w[video audio document ebook model_3d].include?(item[:kind]) }
     end
 
     # Pairs of [large image path, thumbnail path], in display order.
@@ -85,8 +84,57 @@ module NexusCcs
 
     def access_chip = t("nexus_ccs.record_page.access.#{tier}")
 
+    # :view_only or :request when the visitor may ask for the image (the line under the panel then links to the request form)
+    def request_state
+      state = withheld? ? :request : tier
+      state if %i[view_only request].include?(state)
+    end
+
+    # The line under the panel: the licence, then what the visitor
+    # may do with the image, e.g. "Public domain. You can view the image online. Download is not available."
+    def licence_sentence
+      state = withheld? ? :request : tier
+      parts = [ licence, t("nexus_ccs.record_page.use.view.#{state}") ]
+      parts << t("nexus_ccs.record_page.use.download.#{state}") if images.any? || withheld?
+      parts.compact_blank.map { |part| part.end_with?(".") ? part : "#{part}." }.join(" ")
+    end
+
     # The one primary action: the main image, to download, when it is an open asset (never a view-only or withheld one: no path is in the markup)
     def download_href = (main&.first if assets_shown? && image_downloadable?(0))
+
+    # Download this image (Figma Record/IIIF download): [key, label, href] of each size offered. With an IIIF image service the sizes
+    # are drawn by it (Small, Medium and Large, each only when narrower than the image, then Full size); without one there is just
+    # the file itself, its exact size said when it is known. Nothing larger than the image is ever offered.
+    DOWNLOAD_WIDTHS = { small: 800, medium: 1600, large: 3000 }.freeze
+
+    def download_options
+      return [] unless download_href
+
+      size = image_size(main.first)
+      width, height = size[:width], size[:height]
+      service = zoom_sources.first[:info]&.sub(%r{/info\.json\z}, "")
+      return [ [ :full, size_label(:full, width, height, file_format(download_href)), download_href ] ] unless service && width
+
+      scaled = DOWNLOAD_WIDTHS.filter_map do |key, w|
+        [ key, size_label(key, w, (height * w / width.to_f).round, "JPEG"), "#{service}/full/#{w},/0/default.jpg" ] if w < width
+      end
+      scaled + [ [ :full, size_label(:full, width, height, "JPEG"), "#{service}/full/max/0/default.jpg" ] ]
+    end
+
+    # Medium when it is offered (Figma's default: big enough to print, quick to fetch), else the largest
+    def default_download = download_options.find { |key, _, _| key == :medium } || download_options.last
+
+    def size_label(key, width, height, format)
+      name = t("#{VIEWER}.sizes.#{key}")
+      width ? t("#{VIEWER}.download_size", name: name, width: width, height: height, kind: format) : name
+    end
+    private :size_label
+
+    def file_format(path)
+      ext = File.extname(path.to_s.split("?").first).delete(".").downcase
+      { "jpg" => "JPEG", "jpeg" => "JPEG", "png" => "PNG", "tif" => "TIFF", "tiff" => "TIFF", "webp" => "WebP" }.fetch(ext, ext.upcase.presence || "image")
+    end
+    private :file_format
 
     # The image's width and height attributes (nothing when its size is not known), so the page holds its space while it loads: read
     # from the file when it is on this server, or the DAM image's size once it has been read for the IIIF manifest (only the kept
@@ -104,6 +152,16 @@ module NexusCcs
 
     def media_title(item) = item[:label].presence || title
 
+    # CCS-36: a PDF whose text could not be read when the record was indexed (pdf_text_unindexed_ssm), so a full-text search will not
+    # find it; its viewer says so
+    # CCS-164: an Office or OpenOffice file's PDF preview (DocumentPreview), when it has been made and the file may be downloaded (a
+    # PDF can be saved, so a view-only document gets none, as a view-only PDF is not offered either)
+    def document_preview(item) = (DocumentPreview.url_for(item[:url]) if item[:kind] == "document" && item[:downloadable])
+
+    def pdf_unindexed?(item)
+      item[:kind] == "pdf" && Array(@document["pdf_text_unindexed_ssm"]).map { |url| url.split("?").first }.include?(item[:url].to_s.split("?").first)
+    end
+
     def count = large_paths.size
 
     def title
@@ -117,9 +175,7 @@ module NexusCcs
 
     # The DAM's licence (DA License Type) when the record has DAM assets, else the EMu licence, e.g. "Copyright - Current";
     # the toolbar shows it as the licence chip
-    def licence
-      dam_value("licence") || Array(@document["licence_type_ssim"]).first.presence
-    end
+    def licence = RecordLicence.for(@document)
 
     # The DAM's DA Terms of Use, else what the record's rights note says (the licence name in brackets is the chip's, so it is
     # not repeated)
@@ -164,18 +220,26 @@ module NexusCcs
 
     VIEWER = "nexus_ccs.record_page.split.viewer"
 
-    # One of the bar's controls: an icon button named by its label (aria-label and a matching tooltip), which the script works
+    # One of the zoom modal's controls: an icon button named by its label (aria-label and a matching tooltip), which the script works
     # (media_viewer_controller, action and target). disabled: starts aria-disabled (still focusable, as at fit), with the reason.
+    # Each is its round icon with its word under it (the Gen 3 design system: never an icon on its own); the full name ("Reset zoom and
+    # rotation") is the accessible name, starting with the word shown ("Reset")
     def control(name, action, disabled: false)
       label = t("#{VIEWER}.#{name}")
-      helpers.tag.button(icon(name), type: "button", class: "viewer-control", title: label,
+      helpers.tag.button(type: "button", class: "zoom-tool", title: label,
                          aria: { label: label, disabled: (disabled ? "true" : nil) },
-                         data: { action: "media-viewer##{action}", media_viewer_target: action })
+                         data: { action: "media-viewer##{action}", media_viewer_target: action }) do
+        zoom_tool_face(name)
+      end
+    end
+
+    def zoom_tool_face(name)
+      helpers.safe_join([ helpers.tag.span(icon(name), class: "round-control"), helpers.tag.span(t("#{VIEWER}.short.#{name}"), class: "zoom-tool__label") ])
     end
 
     # What the script says and shows (announcements, the zoom readout, why a control is unavailable), in the page's language
     def viewer_labels
-      %w[shown rotated zoom_level max_zoom at_fit at_max at_start at_end full_screen exit_full_screen].index_with { |key| t("#{VIEWER}.#{key}") }
+      %w[shown position rotated zoom_level max_zoom at_fit at_max at_start at_end].index_with { |key| t("#{VIEWER}.#{key}") }
     end
 
     # The essential information before a download (CCS-67): the DA caption, or one built from the record, and the licence

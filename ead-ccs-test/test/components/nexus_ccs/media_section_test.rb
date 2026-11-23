@@ -24,18 +24,23 @@ class MediaSectionTest < ActiveSupport::TestCase
     "rights_ssim" => [ "[In copyright] WARNING This material is All Rights Reserved." ]
   }.freeze
 
-  test "the controls bar has named rotate, zoom and full screen controls, hidden until the script can work them; the licence chip is under the viewer" do
+  test "Zoom (hidden until the script can work it) opens a modal with named zoom and rotate tools; the licence line is under the panel" do
     render_for(FIELDS)
 
-    assert_selector ".media-viewer__caption .viewer-chip", text: "In copyright"
-    assert_selector ".media-viewer__bar[role=group][aria-label='Image tools']"
-    %w[Rotate\ left Rotate\ right Zoom\ in Reset\ zoom\ and\ rotation Zoom\ out].each do |name|
-      assert_selector "[hidden] button.viewer-control[aria-label='#{name}'][title]", visible: :all
+    assert_selector ".media-viewer__licence", text: "In copyright."
+    assert_selector "button.media-viewer__tool[hidden][aria-label='Zoom into the image']", visible: :all
+    assert_selector "dialog.media-zoom[aria-labelledby=media-zoom-heading] .media-zoom__tools[role=group][aria-label='Image tools']", visible: :all
+    # each tool its round icon with its word under it (never an icon on its own), the full name its accessible name
+    { "Zoom in" => "Zoom in", "Zoom out" => "Zoom out", "Rotate" => "Rotate", "Reset zoom and rotation" => "Reset" }.each do |name, word|
+      assert_selector "dialog.media-zoom button.zoom-tool[aria-label='#{name}'][title] .round-control svg", visible: :all
+      assert_selector "dialog.media-zoom button.zoom-tool[aria-label='#{name}'] .zoom-tool__label", text: word, visible: :all
     end
-    assert_selector "[hidden] button.viewer-control[aria-label='Full screen'][aria-pressed=false]", visible: :all
+    assert_selector "dialog.media-zoom button[aria-label='Close zoom']", visible: :all
     # at fit, Reset and Zoom out start unavailable (aria-disabled, still focusable)
     assert_selector "button[aria-label='Zoom out'][aria-disabled=true]", visible: :all
-    assert_no_selector ".media-viewer__readout", visible: true # the zoom readout only while zoomed
+    # Media information is a drawer from the right
+    assert_selector "button.media-viewer__info-button[aria-haspopup=dialog][aria-controls=media-information]", text: "Media information"
+    assert_selector "dialog#media-information.media-drawer h2#media-information-heading", visible: :all
   end
 
   test "the media metadata lists licence type, advisory and terms of use, without the licence name in brackets" do
@@ -49,8 +54,8 @@ class MediaSectionTest < ActiveSupport::TestCase
   test "a record with no licence still has the advisory and no licence chip" do
     render_for(FIELDS.except("licence_type_ssim", "rights_ssim"))
 
-    assert_no_selector ".viewer-chip svg" # the licence chip is the one with the Creative Commons mark
-    assert_selector "a.viewer-chip--link[href='#use-and-access']", text: "Use this image" # without a licence, a plain way to the panel
+    assert_no_selector ".media-viewer__licence-mark" # the Creative Commons mark goes with a licence
+    assert_selector ".media-viewer__licence a.arrow-link" # Use and access, or the request form for a view-only image
     assert_includes component(FIELDS.except("licence_type_ssim", "rights_ssim")).metadata.to_h["Advisory"], "not appropriate today"
   end
 

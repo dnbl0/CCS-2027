@@ -13,7 +13,7 @@ class CookieNoticeComponentTest < ActiveSupport::TestCase
   test "with no optional cookie it says so, offers one acknowledgement and no pretend choice" do
     render_inline(NexusCcs::CookieNoticeComponent.new)
 
-    assert_selector "section[aria-labelledby=cookie-notice-title] h2#cookie-notice-title", text: "Cookies on this site"
+    assert_selector "section[aria-labelledby=cookie-notice-title] p#cookie-notice-title", text: "Cookies on this site"
     assert_text "only the cookies it needs"
     assert_text "no advertising or analytics cookies"
     assert_selector "form[action='/cookie_notice'][method=post] button[name=choice][value=acknowledged]", count: 1

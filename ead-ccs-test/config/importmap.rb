@@ -31,3 +31,14 @@ pin_all_from File.join(Gem.loaded_specs.fetch("openseadragon").full_gem_path, "a
 # Leaflet 1.9.4 (vendored ES module, BSD-2-Clause): the Explore by place map only. Not preloaded: place_map_controller imports it
 # when the visitor asks for the map, so no other page loads it.
 pin "leaflet", to: "leaflet.js", preload: false
+# CCS-164, vendored from npm (versions in the repository's package.json), none preloaded: each is imported by its viewer's controller
+# only on a record with such a file. Google model-viewer 4.4.0 (Apache-2.0; three.js inside, MIT): 3D models in glTF or GLB.
+# Its draco and KTX2 decoders are served from public/vendor/model-viewer, not Google's CDN (model_viewer_controller.js).
+pin "@google/model-viewer", to: "model-viewer.js", preload: false
+# epub.js 0.3.93 (BSD-2-Clause) and the JSZip 3.10 it reads EPUB files with (MIT): eBooks. Both are UMD builds that set
+# window.ePub and window.JSZip; epub_reader.js imports them in that order.
+pin "jszip", to: "jszip.js", preload: false
+pin "epubjs", to: "epub.js", preload: false
+# The module that loads those two for ebook_reader_controller, imported only when a record has an eBook (outside controllers/, whose
+# every file is preloaded)
+pin "epub_reader", preload: false

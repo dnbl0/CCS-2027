@@ -1,4 +1,5 @@
-<%# Cite records (CCS-137): the style, the records, then the citations with Copy and Download. A plain GET form, so it works
+<%# Cite records (CCS-137): the style, the records, then the citations (titles in italics) with Copy, Download as a Word document
+    (the italics kept) and Download as text. A plain GET form, so it works
     without JavaScript; Copy is controllers/clipboard_controller.js. Rendered in the "pages" layout. %>
 <% content_for :title, "#{t('nexus_ccs.cite_page.title')}: #{@cite_heading} — Collections Navigator — University of Melbourne" %>
 <% content_for :body_class, "page-saved page-cite" %>
@@ -59,12 +60,14 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="1" /><path d="M5 15V5a1 1 0 0 1 1-1h10" /></svg>
               <span data-clipboard-target="label"><%= t("nexus_ccs.cite_page.copy") %></span>
             </button>
+            <%= link_to t("nexus_ccs.cite_page.download_word"), url_for(style: @cite_style, ids: @cite_selected.map(&:id), format: :docx, only_path: true),
+                        class: "btn btn-outline-primary cite-page__download", download: "citations-#{@cite_style}.docx" %>
             <%= link_to t("nexus_ccs.cite_page.download"), url_for(style: @cite_style, ids: @cite_selected.map(&:id), format: :txt, only_path: true),
                         class: "btn btn-outline-primary cite-page__download", download: "citations-#{@cite_style}.txt" %>
             <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
           </div>
           <ol class="cite-page__list cite__list" data-clipboard-target="source" data-copy="<%= @cite_texts.join("\n\n") %>">
-            <% @cite_texts.each do |text| %><li class="cite-page__reference"><%= text %></li><% end %>
+            <% @cite_runs.each do |runs| %><li class="cite-page__reference"><% runs.each do |text, italic| %><%= italic ? tag.i(text) : text %><% end %></li><% end %>
           </ol>
         <% end %>
       </section>

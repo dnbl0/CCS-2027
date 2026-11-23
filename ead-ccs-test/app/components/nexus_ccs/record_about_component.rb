@@ -7,10 +7,14 @@ module NexusCcs
   # details as a spreadsheet (when the record may be downloaded) and the IIIF manifest (when the visitor may see its images). The
   # record in its source catalogue is the Source URL row of Object details. Wording marked PLACEHOLDER in config/locales/record_page.en.yml.
   class RecordAboutComponent < ViewComponent::Base
-    def initialize(document:, url:)
+    # heading: false inside a folding section whose summary is the heading
+    def initialize(document:, url:, heading: true)
       @document = document
       @url = url
+      @heading = heading
     end
+
+    def heading? = @heading
 
     attr_reader :document, :url
 

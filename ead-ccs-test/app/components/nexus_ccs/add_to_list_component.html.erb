@@ -1,10 +1,12 @@
-<div class="list-menu" data-controller="list-menu" data-action="keydown->list-menu#escape">
+<div class="list-menu<%= " list-menu--panel-only" if panel_only? %>" <%= tag.attributes(data: (panel_only? ? {} : { controller: "list-menu", action: "keydown->list-menu#escape" })) %>>
+  <% unless panel_only? %>
   <%# Shown by JavaScript; without it the panel below is always open -%>
   <button type="button" class="list-menu__button" hidden aria-expanded="false" aria-controls="<%= panel_id %>"
           data-list-menu-target="button" data-action="list-menu#toggle">
     <%= helpers.list_icon(:add, css_class: "list-menu__icon") %>
     <span class="list-menu__text"><%= t("nexus_ccs.lists.menu.button") %><span class="visually-hidden">: <%= title %></span></span>
   </button>
+  <% end %>
   <div class="list-menu__panel" id="<%= panel_id %>" data-list-menu-target="panel">
     <p class="list-menu__heading"><%= t("nexus_ccs.lists.menu.heading") %></p>
     <% if lists.any? %>

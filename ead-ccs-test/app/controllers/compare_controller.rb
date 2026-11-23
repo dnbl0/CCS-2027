@@ -17,6 +17,7 @@ class CompareController < ApplicationController
     if params[:record].present?
       @record_mode = true
       @panes, @record_title = record_panes(params[:record].to_s)
+      @compare_trail = [ [ @record_title, helpers.solr_document_path(params[:record].to_s) ], [ t("nexus_ccs.compare.trail"), nil ] ]
     else
       @panes, @unavailable = list_panes
     end
@@ -79,7 +80,7 @@ class CompareController < ApplicationController
   end
 
   def pane(document, media, images, index)
-    Pane.new(record_id: document.id.to_s, title: media.title, accession_number: media.accession_number, licence: media.licence,
+    Pane.new(record_id: document.id.to_s, title: media.title, accession_number: media.accession_number, licence: RecordLicence.for(document),
              images: images, index: index)
   end
 

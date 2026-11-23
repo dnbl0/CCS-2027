@@ -23,7 +23,7 @@
 
   /* Surfaces */
   --ccs-surface-default: var(--ccs-white);
-  --ccs-surface-subtle: var(--ccs-neutral-100);
+  --ccs-surface-subtle: var(--ccs-neutral-50); /* the palest grey: panels and open accordion items on white */
   --ccs-surface-panel: var(--ccs-white);
   --ccs-surface-brand: var(--ccs-navy-1100);
   --ccs-surface-brand-strong: var(--ccs-navy-1200);
@@ -40,11 +40,11 @@
 
   /* Actions: primary (cyan) and secondary (sage) buttons */
   --ccs-action-primary: var(--ccs-cyan-400);
-  --ccs-action-primary-hover: var(--ccs-cyan-300);
+  --ccs-action-primary-hover: var(--ccs-cyan-150); /* Gen 3 design system: the primary button pales on hover */
   --ccs-action-primary-active: var(--ccs-cyan-500);
   --ccs-action-primary-text: var(--ccs-navy-1100);
   --ccs-action-secondary: var(--ccs-sage-400);
-  --ccs-action-secondary-hover: var(--ccs-sage-300);
+  --ccs-action-secondary-hover: var(--ccs-sage-250); /* Gen 3 design system: the secondary button pales on hover */
   --ccs-action-secondary-active: var(--ccs-sage-500);
   --ccs-action-secondary-text: var(--ccs-navy-1100);
   --ccs-action-disabled: var(--ccs-neutral-200);

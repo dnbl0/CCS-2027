@@ -14,10 +14,10 @@ class DiscoverTest < ApplicationSystemTestCase
     test "a record page loads its Similar objects, with no axe violations, at #{name}" do
       page.current_window.resize_to(width, 900)
       visit "/catalog/emu-10247"
-      page.execute_script("document.getElementById('similar-records').scrollIntoView()")
+      page.execute_script("document.getElementById('more-from-the-collections').scrollIntoView()")
 
-      assert_selector "#similar-records h2", text: "Similar objects"
-      assert_selector "#similar-records li.discover-cards__item", minimum: 2
+      assert_selector "[role=tab][aria-selected=true]", text: "Similar"
+      assert_selector "#more-similar li.discover-cards__item", minimum: 2
       page.execute_script("window.scrollTo(0, 0)") # the sticky search bar that appears on scrolling has a known landmark finding of its own
       assert_accessible tags: AXE_TAGS + WCAG22_TAGS
     end
@@ -34,14 +34,13 @@ class DiscoverTest < ApplicationSystemTestCase
     end
   end
 
-  test "the record page's Related objects (computed similar records) are cards linking to their records, and do not scroll sideways at 390px" do
+  test "the record page's Similar objects (computed similar records) are cards linking to their records, and do not scroll sideways at 390px" do
     page.current_window.resize_to(390, 900)
     visit "/catalog/#{first_id('id:(emu-10247 OR emu_mc-10247)')}"
-    page.execute_script("document.getElementById('similar-records').scrollIntoView()")
+    page.execute_script("document.getElementById('more-from-the-collections').scrollIntoView()")
 
-    assert_selector "#similar-records li.discover-cards__item", minimum: 2
-    assert_selector "#similar-records section#related-objects h2", text: "Related objects" # the one such section: the frame fills it
-    assert_selector "#similar-records li.discover-cards__item h3 a[href^='/catalog/']", minimum: 2
+    assert_selector "#more-similar li.discover-cards__item", minimum: 2
+    assert_selector "#more-similar li.discover-cards__item h3 a[href^='/catalog/']", minimum: 2
     assert page.evaluate_script("document.documentElement.scrollWidth <= window.innerWidth"), "the page scrolls sideways"
     page.execute_script("window.scrollTo(0, 0)")
     assert_accessible tags: AXE_TAGS + WCAG22_TAGS
@@ -51,6 +50,6 @@ class DiscoverTest < ApplicationSystemTestCase
     visit "/catalog/#{first_id('licence_type_ssim:"ICIP Rights"')}"
 
     assert_selector "h1", visible: :all
-    assert_no_selector "#similar-records"
+    assert_no_selector "#more-similar"
   end
 end

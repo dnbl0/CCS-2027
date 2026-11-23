@@ -52,38 +52,43 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   end
 
   # --- actions
-  test "an open record with images offers Compare images, Add to compare, Cite and Share, and no access notice" do
+  test "an open record with images offers Compare images, Add to compare, Share and More, and no access notice" do
     render_actions(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
-    assert_selector ".record-actions .compare-actions a[href='/compare?record=emu-1']", text: "Compare images", visible: :all
-    assert_selector ".compare-actions form[action='/compare/items'] button", text: "Add to compare", visible: :all
-    assert_selector ".record-actions__row .cite__button", visible: :all
+    assert_selector ".record-actions .compare-actions a[href='/compare?record=emu-1']", text: "Compare this record's images", visible: :all
+    assert_selector ".compare-actions form[action='/compare/items'] button", text: "Add to comparison", visible: :all
     assert_selector ".record-actions__row .share__button", text: /Share and embed/, visible: :all
+    assert_selector ".record-actions__row .more-actions__button[aria-haspopup=menu][aria-expanded=false][aria-label='More actions']", visible: :all
     assert_no_selector ".access-notice"
   end
 
-  test "Share and Cite are in one row of actions, always shown (nothing folds them away); Compare sits under the row" do
+  test "Figma option A: Share and More in one row, Add to list and Cite this record in More's menu (the link is Share's), Compare under the row" do
     render_actions(IMAGES)
 
     assert_no_selector "details", visible: :all
     assert_selector ".record-actions__row .share__button"
-    assert_selector ".record-actions__row .cite__button"
-    assert_selector ".record-actions__row + .record-actions__compare .compare-actions"
+    assert_no_selector ".record-actions__row .cite__button", visible: :all
+    items = page.all(".more-actions__menu[role=menu] [role=menuitem]", visible: :all).map { |item| item.text(:all).strip }
+    assert_equal "Cite this record", items.last
+    assert_not_includes items, "Copy link"
+    assert_selector "[role=menuitem][data-dialog-id='cite-emu-1']", visible: :all
+    assert_selector "dialog#cite-emu-1.cite__dialog", visible: :all
+    assert_selector ".record-actions__row ~ .record-actions__compare .compare-actions", visible: :all
   end
 
   test "a record with one image offers Add to compare but not Compare images" do
     render_actions("digital_asset_large_paths_ssim" => [ "/digital-assets/large/a.jpg" ], "digital_asset_paths_ssim" => [ "/digital-assets/thumbs/a.jpg" ],
                    "licence_type_ssim" => [ "Public domain - Copyright expired" ])
 
-    assert_no_selector ".compare-actions a", text: "Compare images", visible: :all
-    assert_selector ".compare-actions button", text: "Add to compare", visible: :all
+    assert_no_selector ".compare-actions a", text: "Compare this record's images", visible: :all
+    assert_selector ".compare-actions button", text: "Add to comparison", visible: :all
   end
 
   test "a view-only record's actions hold no access notice (Use and access says it) and nothing that downloads" do
     render_actions(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ]))
 
     assert_no_selector ".access-notice"
-    assert_selector ".compare-actions button", text: "Add to compare", visible: :all
+    assert_selector ".compare-actions button", text: "Add to comparison", visible: :all
     assert_no_selector "a[download]"
   end
 
@@ -96,38 +101,81 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
 
     render_actions
     assert_no_selector ".compare-actions, .access-notice", visible: :all
-    assert_selector ".cite__button", visible: :all
+    assert_selector "[role=menuitem]", text: "Cite this record", visible: :all
   end
 
   # --- media: the three tiers, in markup
-  test "an open record has Download at the end of the controls bar, the media information on ⋮, and the access chip under the viewer" do
+  test "an open record has Zoom and Download on the panel's toolbar, Media information at its end, and the licence line under it" do
     render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
-    assert_selector ".media-viewer__caption .viewer-chip--open", text: "Open: view and download"
+    assert_selector ".media-viewer__licence", text: "Public domain - Copyright expired. You can view the image online. You can download the image."
     # CCS-67: Download opens the essential information (caption and licence, to copy) before the download
-    assert_selector ".media-viewer__bar-end button.viewer-control[aria-haspopup=dialog][aria-label^='Download image of']"
+    assert_selector ".media-viewer__controls-start button.media-viewer__tool[aria-haspopup=dialog][aria-label^='Download image of']"
     assert_selector "dialog .digital-assets__essential dt", text: "Licence", visible: :all
     assert_selector "dialog a.btn[download][href='/digital-assets/large/a.jpg']", text: "Download image", visible: :all
-    # CCS-422: ⋮ opens the media information, on the left at the viewer's full height
-    assert_selector ".media-viewer__bar-start button.viewer-control[aria-controls=media-information][aria-expanded=false][aria-label='Media information']"
-    assert_selector "aside#media-information[hidden] h3#media-information-heading[tabindex='-1']", text: "Media information", visible: :all
-    assert_selector ".media-viewer__bar button[aria-label='Full screen']", visible: :all
+    # CCS-422: Media information opens a drawer from the right
+    assert_selector ".media-viewer__controls button.media-viewer__info-button[aria-controls=media-information]", text: "Media information"
+    assert_selector "dialog#media-information h2#media-information-heading", text: "Media information", visible: :all
+    assert_selector ".media-viewer__controls-start button[aria-label='Zoom into the image']", visible: :all
     assert_no_selector ".digital-assets__stage ~ .digital-assets__stage"
-    assert_no_text(/Image \d+ of \d+/) # no counter
+    # The benchmark's counter under the thumbnails, and the zoom's title and position
+    assert_selector ".media-viewer__thumbs .media-viewer__counter[data-media-viewer-target=counter]", text: "Image 1 of 2"
+    assert_selector "dialog.media-zoom h2#media-zoom-heading", text: "Kangaroo-pouch tone-tool", visible: :all
+    assert_selector "dialog.media-zoom .media-zoom__position", text: "Image 1 of 2", visible: :all
+  end
+
+  test "Download this image without an image service offers the one file, its size said when known; Cancel and Copy this information" do
+    render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
+
+    assert_selector "dialog h2#download-dialog-title", text: "Download this image", visible: :all
+    assert_no_selector "dialog input[type=radio][name=download-size]", visible: :all
+    assert_selector "dialog .digital-assets__essential-box button", text: "Copy this information", visible: :all
+    assert_selector "dialog .modal-footer button", text: "Cancel", visible: :all
+  end
+
+  test "with an IIIF image service, Download offers Small, Medium and Large under the image's width, then Full size, Medium chosen" do
+    component = NexusCcs::DigitalAssetsComponent.new(presenter: Presenter.new(doc(IMAGES.merge(
+      "licence_type_ssim" => [ "Public domain - Copyright expired" ], "iiif_info_urls_ssim" => [ "https://iiif.example/img/a/info.json", "" ]
+    ))))
+    component.define_singleton_method(:image_size) { |_path| { width: 2000, height: 1000 } }
+    render_inline(component)
+
+    labels = page.all("dialog .digital-assets__sizes label", visible: :all).map { |label| label.text(:all).strip }
+    assert_equal [ "Small — 800 × 400 px (JPEG)", "Medium — 1600 × 800 px (JPEG)", "Full size — 2000 × 1000 px (JPEG)" ], labels
+    assert_selector "dialog input#download-size-medium[checked][value='https://iiif.example/img/a/full/1600,/0/default.jpg']", visible: :all
+    assert_selector "dialog a[download][data-media-viewer-target=downloadLink][href='https://iiif.example/img/a/full/1600,/0/default.jpg']", visible: :all
+    assert_selector "dialog .digital-assets__sizes legend", text: "Size", visible: :all
+  end
+
+  test "CCS-44: a rated asset shows its viewing classification on the media toolbar, where it is viewed; an unrated one shows none" do
+    render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ], "digital_asset_advisory_classification_ssim" => [ "PG" ]))
+    assert_selector ".media-viewer__controls-end .classification-badge", text: "PG"
+
+    render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
+    assert_no_selector ".classification-badge"
+  end
+
+  test "the panel's toolbar: each tool an icon and its word (Zoom, Download image, Media information), and no IIIF button" do
+    render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
+
+    assert_selector ".media-viewer__controls[role=group][aria-label='Image tools']"
+    assert_equal [ "Zoom", "Download image", "Media information" ], page.all(".media-viewer__controls button.media-viewer__tool", visible: :all).map { |b| b.text(:all).strip }
+    assert_no_selector ".media-viewer__controls .round-control", visible: :all
+    assert_no_text "Use with IIIF"
   end
 
   test "a view-only record has no download link in its markup, and the image keeps its own shape (width and height held)" do
     render_media(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ]))
 
     assert_no_selector "a[download], a[href*='/digital-assets/']"
-    assert_selector ".viewer-chip--view-only", text: "View only"
+    assert_selector ".media-viewer__licence", text: "Download is not available."
     assert_selector "img.digital-assets__image[src='/digital-assets/large/a.jpg']"
   end
 
   test "a request-only record's markup holds no asset path, and the notice sits where the media would" do
     render_media(IMAGES.merge("licence_type_ssim" => [ "ICIP Rights" ], "digital_media_ssim" => [ "video|video/mp4|/digital-assets/media/v.mp4|Film" ]))
 
-    assert_selector ".media-viewer__canvas .access-notice--request a"
+    assert_selector ".media-viewer__stage .access-notice--request a"
     assert_no_selector "img, video, a[download]"
     assert_not_includes rendered_content, "/digital-assets/"
   end
@@ -135,7 +183,7 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   test "a sensitive record's markup holds no asset path until the visitor chooses to view it" do
     render_media(IMAGES.merge("restrictions_tsi" => [ "Culturally sensitive images" ]))
 
-    assert_selector ".media-viewer__canvas .sensitivity-gate"
+    assert_selector ".media-viewer__stage .sensitivity-gate"
     assert_no_selector ".media-viewer__thumbs", visible: :all # thumbnails would show the images
     assert_not_includes rendered_content, "/digital-assets/"
     assert_no_selector "a[download]"
@@ -168,15 +216,13 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   end
 
   # --- about
-  test "About this record: a centred heading, the text and content notice, Suggest a correction, the record URL with Copy link, Print and the downloads" do
+  test "About this record: a centred heading, the text and content notice, Suggest a correction, Print and the downloads (the link is Share's and the permalink's)" do
     render_inline(NexusCcs::RecordAboutComponent.new(document: doc("collection_ssim" => [ "University Art Collection" ]), url: "http://example.test/catalog/emu-1"))
 
     assert_selector "section#about-this-record h2.record-showcase__section-heading", text: "About this record"
     assert_selector ".record-about__text", text: "not appropriate today"
     assert_selector "a.record-about__button", text: "Suggest a correction"
-    assert_selector "[data-controller=clipboard] [data-clipboard-target=source][data-copy='http://example.test/catalog/emu-1']"
-    assert_selector ".record-facts__row dt", text: "Record URL"
-    assert_selector "button.record-copy", text: "Copy link"
+    assert_no_selector ".record-facts__row dt", text: "Record URL"
     assert_selector "button[data-action='print#print']", text: "Print this page"
   end
 

@@ -1,0 +1,13 @@
+<%# locals: item, title, downloadable, preview (CCS-164). An Office or OpenOffice file: its PDF preview (made by LibreOffice when it was
+    indexed, DocumentPreview) to read in the browser's own reader, and the original to download where the file may be downloaded. With
+    neither, say so plainly, as for any file with no viewer. %>
+<% preview = local_assigns[:preview] %>
+<% format = MediaTypes.format_name(item[:type], item[:url]) %>
+<% if preview || downloadable %>
+  <p class="digital-assets__document">
+    <% if preview %><%= link_to "Read #{title} (a PDF preview, opens in a new tab)", preview, target: "_blank", rel: "noopener", class: "digital-assets__pdf" %><% end %>
+    <% if downloadable %><%= link_to "Download the original (#{format})", item[:url], class: "digital-assets__document-original" %><% end %>
+  </p>
+<% else %>
+  <p class="digital-assets__unsupported">This document (<%= format %>) cannot be previewed here. The file is described in the media metadata.</p>
+<% end %>

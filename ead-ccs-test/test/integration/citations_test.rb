@@ -73,6 +73,22 @@ class CitationsTest < ActionDispatch::IntegrationTest
     assert_match(/\(accessed \d+ \w+ \d{4}\)/, response.body)
   end
 
+  test "the Word download keeps each title in italics, under the style's heading (CCS-137: export without losing the format)" do
+    list = list_with_records
+    get "/lists/#{list.id}/citations"
+    assert_select "a[download][href*='.docx']", text: "Download as a Word document"
+    assert_select ".cite-page__reference i", minimum: 1 # the titles, in italics on the page too
+
+    get "/lists/#{list.id}/citations.docx", params: { style: "mla", ids: record_ids }
+
+    assert_response :success
+    assert_equal WordDocument::MIME_TYPE, response.media_type
+    assert_match(/attachment; filename="citations-mla.docx"/, response.headers["Content-Disposition"])
+    assert_equal "PK\x03\x04".b, response.body.b[0, 4]
+    assert_includes response.body, "Works Cited"
+    assert_includes response.body, "<w:i/>"
+  end
+
   test "an empty list has nothing to cite, and another visitor's list is not found" do
     post "/lists", params: { list: { name: "Empty" } }
     get "/lists/#{List.order(:id).last.id}/citations"

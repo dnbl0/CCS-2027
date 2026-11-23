@@ -7,9 +7,14 @@ module NexusCcs
   # (list-menu_controller hides it behind the button). One form per card holds every list's button (the button's
   # formaction picks the list), so a page of cards stays light.
   class AddToListComponent < ViewComponent::Base
-    def initialize(document:)
+    def initialize(document:, panel_only: false)
       @document = document
+      @panel_only = panel_only
     end
+
+    # panel_only: the panel of lists alone, always shown, for a dialog that another control opens (the record page's More
+    # menu, RecordActionsComponent)
+    def panel_only? = @panel_only
 
     # Hidden while config.x.saved_records is off (config/application.rb)
     def render? = Rails.configuration.x.saved_records

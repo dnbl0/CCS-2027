@@ -71,18 +71,35 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_equal record.object_rows.map(&:seq), record.object_rows.map(&:seq).sort
   end
 
-  test "Object details shows its first six rows, and the rest continue them in the sheet's order; era and region are left out" do
-    record = component(SHEET.merge("date_era_ssim" => [ "20th century" ], "region_ssim" => [ "Oceania" ]))
-
-    assert_equal 6, record.first_detail_rows.size
-    assert_equal record.object_rows, record.first_detail_rows + record.more_detail_rows
-    assert_not_includes record.object_rows.map(&:label), "Era"
-    assert_not_includes record.object_rows.map(&:label), "Region"
+  test "CCS-400: the full record lists every field in the sheet's sequence exactly, Creator and Place in their own places" do
+    labels = component(SHEET).full_record_rows.map(&:label)
+    assert_equal %w[Object\ Type Date Creator Place Material Measurements Inscription Classification Collection Accession\ Number Source\ URL Related\ Record], labels
   end
 
-  test "under the title, one line for what it is and one for when" do
-    assert_equal [ "Tone tool", "1952" ], component(SHEET).subtitle_lines
-    assert_equal [], component({ "title_tsim" => [ "Bare" ] }).subtitle_lines
+  test "associated names: each maker by name, linked to their browse page where there is one, with the record's dates and role under it" do
+    names = component(SHEET).associated_names
+    assert_equal "Grainger, Percy Aldridge", names.first[0]
+    assert_equal "Maker, b. 1882 - d. 1961", names.first[2]
+  end
+
+  test "Object overview holds the key facts in the sheet's order; the credit line and copyright are Use and access's alone" do
+    record = component(SHEET.merge("rights_ssim" => [ "© Grainger" ]))
+    assert_equal [ "Object Type", "Place", "Material", "Measurements", "Classification", "Collection", "Accession Number" ], record.overview_rows.map(&:label)
+    assert_includes record.rights_items.map(&:first), "Copyright"
+  end
+
+  test "the maker line under the title is left out when Associated names lists exactly the same names" do
+    record = component(SHEET)
+    assert_equal record.makers.map(&:first).sort, record.associated_names.map(&:first).sort
+    assert_not record.maker_line?
+  end
+
+  test "the record's collection, with the way to the rest of it" do
+    record = component(SHEET.merge("collection_ssim" => [ "Grainger Museum Collection" ]))
+    record.define_singleton_method(:value_link) { |_row, value| "/catalog?collection=#{value}" }
+    name, path = record.collection_link
+    assert_equal "Grainger Museum Collection", name
+    assert_predicate path, :present?
   end
 
   test "Use and access: the rights items in CCS-27's order; caption and terms only with a digital asset" do

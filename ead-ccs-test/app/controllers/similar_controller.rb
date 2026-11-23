@@ -7,7 +7,8 @@
 #
 # ?row=creator|period|place|type answers one of the labelled rows under it instead (SimilarRows): the same frame mechanism, one
 # more Solr request per row, 204 when the row is empty. An unknown row is a 404. A row is drawn as a panel of the record page's
-# "More from the collections" tabs (MoreFromCollectionsComponent): three cards and See all, no heading.
+# "You may be interested in" tabs (MoreFromCollectionsComponent): three cards and See all, no heading. ?view=tab answers the similar
+# records as the first of those tabs (similar/cards).
 class SimilarController < CatalogController
   include DiscoveryFragment
 
@@ -32,6 +33,7 @@ class SimilarController < CatalogController
 
     wrap_documents(@documents)
     @entries = @documents.map { |found| FeaturedRecords::Entry.new(document: found, blurb: nil) }
+    render "similar/cards" if params[:view] == "tab" # the first tab of the record page's You may be interested in
   end
 
   # Blacklight uses #search_action_url for the header's search box

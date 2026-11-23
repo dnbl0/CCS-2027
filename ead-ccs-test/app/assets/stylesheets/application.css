@@ -21,6 +21,8 @@
 @import url("components/search_banner.css");
 @import url("components/digital_assets.css");
 @import url("components/media_viewer.css");
+@import url("components/compare.css");
+@import url("components/media_formats.css");
 @import url("components/results_layout.css");
 @import url("components/result_card.css");
 @import url("components/explore.css");
@@ -43,7 +45,8 @@
 @import url("components/advanced_rules.css");
 @import url("components/record_page.css");
 @import url("components/record_split.css");
-@import url("components/record_showcase.css");
+@import url("components/record.css");
+@import url("components/text_button.css");
 @import url("components/result_stepper.css");
 @import url("components/object_cards.css");
 @import url("components/colours.css");

@@ -138,6 +138,27 @@ class ResultsSelectionTest < ActionDispatch::IntegrationTest
     assert_select "a[href='/selection/citations']", text: "Cite selected records"
   end
 
+  test "Shuffle the order reads the selection in a random order; Back to the order you selected puts it back (CCS-40)" do
+    tick("emu-1", "emu-2", "emu-3")
+    post "/selection", params: { intent: "shuffle", return_to: "/selection" }
+    assert_redirected_to "/selection"
+    assert_equal "The selected records are now in a random order.", flash[:notice]
+    order = Selection.new(session).reading_order
+    assert_equal %w[emu-1 emu-2 emu-3], order.sort
+
+    with_seeded_menu_cache do
+      with_canned_search(->(_params) { canned_response(DOCS) }) { get "/selection" }
+    end
+    assert_equal order, css_select("article.result-card").map { |card| card["data-document-id"] }
+    assert_select "button", text: "Shuffle again"
+    assert_select "button", text: "Back to the order you selected"
+    assert_select ".saved-lists-note", text: /random order/
+
+    post "/selection", params: { intent: "in_order", return_to: "/selection" }
+    assert_equal %w[emu-1 emu-2 emu-3], Selection.new(session).reading_order
+    assert_equal %w[emu-1 emu-2 emu-3], selected_ids
+  end
+
   test "the selection page is personal: not indexed, and not in robots.txt's allowed paths" do
     get "/selection"
 

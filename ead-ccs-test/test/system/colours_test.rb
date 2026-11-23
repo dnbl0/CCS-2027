@@ -35,13 +35,13 @@ class ColoursSystemTest < ApplicationSystemTestCase
     assert_current_path(/colour_ssim/)
   end
 
-  test "Looks similar is a row of More from the collections, the record page's cards, accessible at a phone width" do
+  test "Similar colours (Looks similar) is part of the Similar tab of You may be interested in, the record page's cards, accessible at a phone width" do
     needs_solr
     ColourNeighbour.create!(record_id: RECORDS[0], neighbour_ids: RECORDS.drop(1), computed_at: Time.current)
     page.current_window.resize_to(390, 844)
     visit "/catalog/#{RECORDS[0]}"
     page.execute_script("document.getElementById('more-from-the-collections').scrollIntoView()")
-    assert_selector "#more-row-colours h3", text: "Looks similar"
+    assert_selector "#more-row-similar #more-row-colours h4", text: "Similar colours"
 
     within("#more-row-colours") do
       assert_selector "turbo-frame#more-colours .discover-cards__item", count: 2

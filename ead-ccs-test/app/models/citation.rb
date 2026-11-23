@@ -9,7 +9,9 @@
 #   source = Citation.source_for(document, url: "https://ccs.example/catalog/emu-1")
 #   Citation.format(source, :apa, accessed: Date.current)   # => "Grainger, P. A. (1922). ..."
 #
-# Citations are plain text (they are copied and downloaded as text), so titles are not italicised. Missing parts are left
+# Each style italicises the object's title. A citation is built with the title between two private-use marks (ITALIC):
+# #format and #reference_list give plain text (copied, and the .txt download), #runs gives the pieces with the title marked
+# italic, for the page and the Word download (CCS-137: "should not lose the format of the citation"). Missing parts are left
 # out, never shown as blanks: no creator moves the title to the front, no date is "n.d.", no accession number no line. The UoM ID (CollectionIdentifier) is always there.
 module Citation
   STYLES = %i[apa mla chicago harvard].freeze
@@ -18,6 +20,10 @@ module Citation
   PLACE = "Melbourne"
   MONTHS = %w[January February March April May June July August September October November December].freeze
   UNKNOWN_CREATOR = /\A(unknown|anonymous|not recorded|n\/?a)\b/i
+  # Private-use characters around the italic part (the title): never in the data (#italic removes any), never in plain text
+  ITALIC = [ "\u{E000}", "\u{E001}" ].freeze
+  # The heading each style gives its list of references, for the Word download
+  LIST_HEADINGS = { apa: "References", mla: "Works Cited", chicago: "Bibliography", harvard: "Reference list" }.freeze
 
   # A creator: a person ("Surname, Given names") or an organisation (the whole name in family)
   Name = Data.define(:family, :given) do
@@ -55,14 +61,33 @@ module Citation
   end
 
   # One citation as a line of text
-  def format(source, style, accessed:)
-    send(:"#{style_from(style)}_citation", source, accessed)
-  end
+  def format(source, style, accessed:) = plain(marked(source, style, accessed: accessed))
 
   # Many citations in a style, in the alphabetical order a reference list has (by the creator, else the title)
-  def reference_list(sources, style, accessed:)
-    sources.sort_by { |source| sort_key(source) }.map { |source| format(source, style, accessed: accessed) }
+  def reference_list(sources, style, accessed:) = marked_list(sources, style, accessed: accessed).map { |text| plain(text) }
+
+  # As reference_list, each citation as its runs: [[text, italic?], ...]
+  def reference_runs(sources, style, accessed:) = marked_list(sources, style, accessed: accessed).map { |text| runs(text) }
+
+  def list_heading(style) = LIST_HEADINGS.fetch(style_from(style))
+
+  # A citation with its title between the ITALIC marks
+  def marked(source, style, accessed:) = send(:"#{style_from(style)}_citation", source, accessed)
+
+  def marked_list(sources, style, accessed:)
+    sources.sort_by { |source| sort_key(source) }.map { |source| marked(source, style, accessed: accessed) }
   end
+
+  def plain(text) = text.delete(ITALIC.join)
+
+  # "Grainger (1922). \u{E000}Ukulele\u{E001} [object]." -> [["Grainger (1922). ", false], ["Ukulele", true], [" [object].", false]]
+  def runs(text)
+    text.split(/(#{ITALIC[0]}[^#{ITALIC[1]}]*#{ITALIC[1]})/o).reject(&:empty?).map do |piece|
+      piece.start_with?(ITALIC[0]) ? [ piece[1..-2], true ] : [ piece, false ]
+    end
+  end
+
+  def italic(text) = "#{ITALIC[0]}#{plain(text.to_s)}#{ITALIC[1]}"
 
   # ---- parsing -------------------------------------------------------------------------------------------------------
 
@@ -77,12 +102,15 @@ module Citation
     given.present? && !given.match?(/\A[a-z]/) ? Name.new(family: family, given: given) : Name.new(family: text.delete("()").squish, given: nil)
   end
 
-  # 1922 from "c. 1922", "26 July 1896", "Dec-47" (no year: the indexed start year), nil when there is none
+  # 1922 from "c. 1922", "26 July 1896"; a century or decade as the record writes it ("[c. 20th century]" is "c. 20th century", so a
+  # citation never claims a year the record does not give); otherwise ("not dated", "Dec-47") the indexed start year; nil when none
   def year_of(date_text, start_year)
-    found = date_text.to_s[/\b(1\d{3}|20\d{2})\b/, 1] || start_year&.to_s.presence
-    return nil unless found
+    text = date_text.to_s.squish
+    found = text[/\b(1\d{3}|20\d{2})\b/, 1]
+    return text.match?(/\b(c\.|ca\.?|circa)\s*\d/i) ? "c. #{found}" : found if found
+    return text.delete("[]").strip if text.match?(/\b\d{1,2}(st|nd|rd|th)\s+century\b|\b\d{3}0s\b/i)
 
-    date_text.to_s.match?(/\b(c\.|ca\.?|circa)\s*\d/i) ? "c. #{found}" : found
+    start_year&.to_s.presence
   end
 
   def first_value(document, field) = Array(document[field]).first.to_s.squish.presence
@@ -94,7 +122,7 @@ module Citation
   def apa_citation(source, accessed)
     names = source.creators.map { |name| name.person? ? "#{name.family}, #{name.initials}" : name.family }
     authors = names.size > 1 ? "#{names[0..-2].join(', ')}, & #{names.last}" : names.first
-    title = [ source.title, (" [#{source.object_type}]" if source.object_type) ].join
+    title = [ italic(source.title), (" [#{source.object_type}]" if source.object_type) ].join
     lead = authors ? "#{authors} (#{source.year || 'n.d.'}). #{title}" : "#{title} (#{source.year || 'n.d.'})"
     join_parts(lead, holder(source), accession(source, "Accession number"), uom_id(source), source.url, "Retrieved #{date_text(accessed)}.")
   end
@@ -110,7 +138,7 @@ module Citation
     else "#{names.first}, et al"
     end
     details = [ source.object_type&.capitalize, source.year || "n.d.", source.collection, PUBLISHER, accession(source, "accession number"), uom_id(source) ].compact.join(", ")
-    join_parts(authors, source.title, details, source.url, "Accessed #{date_text(accessed, abbreviate: true)}.")
+    join_parts(authors, italic(source.title), details, source.url, "Accessed #{date_text(accessed, abbreviate: true)}.")
   end
 
   # Grainger, Percy Aldridge, and John Smith. Title. Ukulele. Grainger Museum Collection, accession 00.0001. Melbourne:
@@ -121,7 +149,7 @@ module Citation
     authors = names.size > 1 ? "#{names[0..-2].join(', ')}#{names.size > 2 ? ',' : ''} and #{names.last}" : names.first
     held = [ source.collection, (accession(source, "accession") if source.accession), uom_id(source) ].compact.join(", ").presence
     publication = "#{PLACE}: #{PUBLISHER}, #{source.year || 'n.d.'}"
-    join_parts(authors, source.title, source.object_type&.capitalize, held, publication, "#{source.url} (accessed #{date_text(accessed)}).")
+    join_parts(authors, italic(source.title), source.object_type&.capitalize, held, publication, "#{source.url} (accessed #{date_text(accessed)}).")
   end
 
   # Grainger, P.A. & Smith, J. 1922, Title [ukulele], Grainger Museum Collection, University of Melbourne, Melbourne,
@@ -130,7 +158,7 @@ module Citation
     names = source.creators.map { |name| name.person? ? "#{name.family}, #{name.initials(spaced: false)}" : name.family }
     names = [ "#{names.first} et al." ] if names.size > 3
     authors = names.size > 1 ? "#{names[0..-2].join(', ')} & #{names.last}" : names.first
-    title = [ source.title, (" [#{source.object_type}]" if source.object_type) ].join
+    title = [ italic(source.title), (" [#{source.object_type}]" if source.object_type) ].join
     lead = authors ? "#{authors} #{source.year || 'n.d.'}, #{title}" : "#{title} #{source.year || 'n.d.'}"
     rest = [ holder(source), PLACE, accession(source, "accession number"), uom_id(source), "viewed #{date_text(accessed)}", "<#{source.url}>" ].compact.join(", ")
     "#{lead}, #{rest}."
@@ -157,11 +185,11 @@ module Citation
 
   # Parts as sentences: each ends in one full stop (not two after "Co." or a title ending in "?"). A link is left as it is.
   def join_parts(*parts)
-    parts.compact.map { |part| part.match?(%r{\Ahttps?://}) || part.match?(/[.?!]\z/) ? part : "#{part}." }.join(" ")
+    parts.compact.map { |part| part.match?(%r{\Ahttps?://}) || plain(part).match?(/[.?!]\z/) ? part : "#{part}." }.join(" ")
   end
 
   def sort_key(source)
     lead = source.creators.first
-    [ (lead ? lead.family : source.title).downcase.gsub(/\A(the|a|an)\s+/, ""), source.year.to_s, source.title.downcase ]
+    [ (lead ? lead.family : plain(source.title)).downcase.gsub(/\A(the|a|an)\s+/, ""), source.year.to_s, source.title.downcase ]
   end
 end

@@ -114,7 +114,6 @@ module NexusCcs
     renders_one :stepper # the search-result stepper and the selection stepper, from catalog/show (they need the controller's search context)
 
     DESCRIPTION_FIELD = "description_tsim"
-    HISTORY_FIELDS = { "source_reference_tsim" => :source_reference }.freeze # the credit line is in Use and access
 
     # "University Art Collection", linking to the whole collection
     def collection_name = responsible_collection
@@ -178,24 +177,74 @@ module NexusCcs
     # Object details: the sheet's own fields after the key rows (not the index's era and region, which repeat the date and the place)
     def object_rows = detail_rows.reject { |row| LEAD_SEQS.include?(row.seq) || !row.seq.is_a?(Integer) }
 
-    # How many rows Object details shows before "Show all details"; the rest continue the list, in the sheet's order
-    FIRST_DETAILS = 6
-
-    def first_detail_rows = object_rows.first(FIRST_DETAILS)
-    def more_detail_rows = object_rows.drop(FIRST_DETAILS)
 
     def lead_rows = detail_rows.select { |row| LEAD_SEQS.include?(row.seq) }
 
-    # Under the title, one line each: what it is and when (the object type and the date as the record gives them)
-    def subtitle_lines = [ Array(document["object_type_ssim"]).first&.to_s&.upcase_first, display_date ].compact_blank
+    # The full record: every field in the sheet's sequence exactly (CCS-400: Object Type, Date, Creator, ... Place ...), none moved ahead
+    # The maker under the title, unless Associated names just below lists exactly the same names (with their links and roles)
+    def maker_line? = makers.any? && makers.map(&:first).map(&:squish).sort != associated_names.map(&:first).map(&:squish).sort
 
-    # The record's source reference ends Object details, after the sheet's fields
-    def history_rows
-      HISTORY_FIELDS.filter_map do |field, key|
-        values = Array(document[field]).map(&:to_s).compact_blank
-        Row.new(label: I18n.t("nexus_ccs.record_page.split.history.#{key}"), values: values, field: field, seq: 100) if values.any?
+    def full_record_rows = detail_rows.select { |row| row.seq.is_a?(Integer) }.sort_by(&:seq)
+
+    # --- The record page's header and sections (components/record.css) -----------------------------------------------------------
+    # Associated names: each maker as a link to their browse page, with what the record says about them under it, role first
+    # has it ("Etcher, b. c. 1804 - d. 1888"). [[name, path or nil, detail]]
+    def associated_names
+      displays = detail_rows.find { |row| row.seq == CREATOR_SEQ }&.values || []
+      displays.first(6).map do |display|
+        name = creator_name(display) || display.sub(/\s*\(.*\z/, "")
+        [ name, Browse.path_for("makers", name), name_detail(display.delete_prefix(name).strip.delete_prefix(",").strip) ]
       end
     end
+
+    # "(b. 1882 - d. 1961) maker" -> "Maker, b. 1882 - d. 1961"
+    def name_detail(text)
+      dates, role = text.match(/\A\((.*?)\)\s*(.*)\z/)&.captures || [ nil, text ]
+      [ role.to_s.strip.upcase_first, dates.to_s.strip ].compact_blank.join(", ").presence
+    end
+
+    # The record's collection, with the way to the rest of it: [name, path or nil]
+    def collection_link
+      row = detail_rows.find { |candidate| candidate.field == "collection_ssim" }
+      return unless row
+
+      name = row.values.first
+      [ name, value_link(row, name) ]
+    end
+
+    # Object overview: the key facts, in the data model sheet's order
+    OVERVIEW_SEQS = [ 2, 7, 10, 11, 17, 19, 20, 21, 22 ].freeze
+
+    def overview_rows
+      # the summary only: the credit line and copyright are Use and access's, every field is in All details
+      detail_rows.select { |row| OVERVIEW_SEQS.include?(row.seq) }.sort_by(&:seq)
+    end
+
+    # A fact's values: names of things link to their search or browse page (as in the full record); several values on their own lines,
+    # or joined where the sheet says so
+    # A key fact's value: names of things that open their search or browse page as the design system's tags (a list of links);
+    # anything else as text, its parts joined as the data model sheet says
+    # The design system's tags are for short terms (a place, a classification); a longer value ("emu egg with carved relief") reads
+    # better as an ordinary link than in small capitals
+    TAG_MAX = 24
+    def tag_values?(row) = row.values.all? { |value| value.to_s.length <= TAG_MAX }
+
+    def fact_value(row)
+      links = term?(row) && tag_values?(row) ? row.values.each_with_index.map { |value, index| [ flagged(row, value, index), value_link(row, value) ] } : []
+      if links.any? && links.all?(&:last)
+        items = links.map { |text, path| helpers.tag.li(helpers.link_to(text, path, class: "record-tags__link"), class: "record-tags__item") }
+        return helpers.tag.ul(helpers.safe_join(items), class: "record-tags")
+      end
+
+      parts = row.values.each_with_index.map do |value, index|
+        text = flagged(row, value, index)
+        path = term?(row) && value_link(row, value)
+        path ? helpers.link_to(text, path, class: "ccs-text-link") : text
+      end
+      helpers.safe_join(parts, row.join || helpers.tag.br)
+    end
+
+    def inscriptions = Array(document["inscription_tsim"]).map(&:to_s).compact_blank
 
     # What the de-bias notices scan (RecordDebias): the details and the description
     def rows = detail_rows + [ description_row ].compact
@@ -239,7 +288,7 @@ module NexusCcs
     def can_view? = %i[open view_only].include?(access_state)
     def can_download? = access_state == :open
 
-    def use_licence = assets? ? media_component.licence : licence
+    def use_licence = RecordLicence.for(document) # the same licence on every page (RecordLicence)
 
     # The rights items, [[label, value]], in CCS-27's order (with the licence); caption and terms of use belong to a digital asset
     def rights_items

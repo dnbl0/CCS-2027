@@ -1,0 +1,24 @@
+/*
+ * The Gen 3 design system's text button (designsystem.web.unimelb.edu.au/style-guide/buttons, `button button--text`): an action that
+ * is not the page's one main action, in words. Link blue, Source Sans 3 600 18px, no fill, no underline until hover (then the hover
+ * blue and an underline); its icon 20px, after the words (the design system's custom icon place); never an icon on its own.
+ * Use the class text-button, or the selectors below where another component owns the markup.
+ */
+.text-button,
+.record .record-actions__row .share__button,
+.record .record-actions__compare :is(.compare-actions__link, .compare-actions__button) {
+  display: inline-flex; align-items: center; gap: var(--ccs-space-1); min-height: 2.75rem; margin: 0;
+  padding: var(--ccs-space-3); font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold);
+  line-height: var(--ccs-line-height-normal); color: var(--ccs-text-link); background: transparent; border: 0; border-radius: 0;
+  text-decoration: none; white-space: nowrap; cursor: pointer;
+}
+:is(.text-button, .record .record-actions__row .share__button, .record .record-actions__compare :is(.compare-actions__link, .compare-actions__button)) svg {
+  order: 1; flex: none; width: 1.25rem; height: 1.25rem;
+}
+:is(.text-button, .record .record-actions__row .share__button, .record .record-actions__compare :is(.compare-actions__link, .compare-actions__button)):hover {
+  color: var(--ccs-text-link-hover); text-decoration: underline; text-underline-offset: var(--ccs-link-underline-offset);
+}
+:is(.text-button, .record .record-actions__row .share__button, .record .record-actions__compare :is(.compare-actions__link, .compare-actions__button)):hover span { text-decoration: inherit; }
+:is(.text-button, .record .record-actions__row .share__button, .record .record-actions__compare :is(.compare-actions__link, .compare-actions__button)):focus-visible {
+  outline: 2px solid var(--ccs-focus-ring); outline-offset: 2px;
+}

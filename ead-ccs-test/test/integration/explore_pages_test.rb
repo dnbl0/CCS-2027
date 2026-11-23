@@ -94,7 +94,7 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
 
   test "the policy names the tile host, and the privacy page says when it is contacted" do
     get "/privacy"
-    assert_includes response.headers["Content-Security-Policy-Report-Only"], "img-src 'self' data: https: https://tile.openstreetmap.org"
+    assert_includes response.headers["Content-Security-Policy-Report-Only"], "img-src 'self' data: blob: https: https://tile.openstreetmap.org"
     assert_select "#map-tiles", text: /OpenStreetMap/
   end
 

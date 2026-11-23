@@ -6,8 +6,9 @@
 # page sets a cookie that is not named here or in OPTIONAL, so this list cannot drift from the app. The same list feeds the notice
 # (NexusCcs::CookieNoticeComponent) and the Cookies section of /privacy.
 #
-# OPTIONAL is empty: the site sets no analytics, advertising or other non-essential cookie, so the notice offers no choice and
-# says so (inventing one would be untrue). To add one later, add a Category with the cookies it would set and wording under
+# OPTIONAL is empty while the site sets no analytics, advertising or other non-essential cookie, so the notice offers no choice
+# and says so (inventing one would be untrue). Once Adobe analytics is configured (Analytics, CCS-53) it is the "analytics"
+# category, the notice asks (again, as the version changes) and the tag loads only after "accepted". To add one later, add a Category with the cookies it would set and wording under
 # nexus_ccs.cookie_notice.optional.<key>; the notice then shows equal "Accept" and "Decline" buttons, nothing is ticked or set
 # until the visitor accepts, and the code that would set the cookie asks CookieNotice.optional_allowed?(cookies) first. Raising
 # VERSION asks every visitor again.
@@ -32,24 +33,28 @@ module CookieNotice
   ].freeze
 
   OPTIONAL = [].freeze
+  ANALYTICS = Category.new(key: "analytics", cookies: Analytics::COOKIES.map { |name| Cookie.new(key: "analytics", name: name) })
 
   module_function
 
   def essential = ESSENTIAL
 
-  def optional = OPTIONAL
+  def optional = Analytics.enabled? ? OPTIONAL + [ ANALYTICS ] : OPTIONAL
+
+  # The notice's version: a visitor who answered before analytics existed is asked again once it does
+  def version = Analytics.enabled? ? "#{VERSION}a" : VERSION
 
   def choosable? = optional.any?
 
   # What the notice may record: one acknowledgement when there is nothing to choose, otherwise accept or decline
   def accepted_choices = choosable? ? %w[accepted declined] : %w[acknowledged]
 
-  def value(choice) = "#{VERSION}.#{choice}"
+  def value(choice) = "#{version}.#{choice}"
 
   # The saved choice, or nil when there is none, it is from an earlier version of the notice, or it is not a known choice
   def choice(cookies)
     version, choice = cookies[COOKIE].to_s.split(".", 2)
-    choice if version == VERSION && CHOICES.include?(choice)
+    choice if version == self.version && CHOICES.include?(choice)
   end
 
   def pending?(cookies) = choice(cookies).nil?

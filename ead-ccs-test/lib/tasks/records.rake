@@ -43,6 +43,31 @@ namespace :records do
 
   # --- Metadata from a CSV (CCS-31; docs/csv-upload.md). Neither task posts to Solr unless INDEX=1 and SOLR_URL is set to a writable core. ---
 
+  # CCS-31 criterion 6: take an uploaded set out of the site, in full (the CSV that was uploaded) or in part (a CSV of only the ids
+  # to remove). Each row's record (csv-<id>, as records:csv_to_documents indexes it) is removed as records:suppress removes one
+  # (CCS-112), with the same reason, so records:unsuppress puts any of them back.
+  desc 'Take the records of an uploaded CSV out of the site: bin/rails "records:remove_csv[file.csv,Why they are removed]"'
+  task :remove_csv, [ :path, :reason ] => :environment do |_task, args|
+    path = args[:path].to_s
+    abort "Give the CSV file and a reason: bin/rails 'records:remove_csv[file.csv,reason]'" unless File.file?(path)
+    reason = reason_from(args)
+    abort "Give a reason (it is kept for the record of the removal): bin/rails 'records:remove_csv[#{path},reason]'" if reason.empty?
+
+    table = CSV.parse(Collections::CsvSource.read_text(path), headers: true)
+    column = table.headers.compact.find { |header| Collections::CsvSource.normalise(header) == "id" }
+    abort "The file has no id column." unless column
+
+    source = Collections::CsvSource.new(path)
+    ids = table.filter_map { |row| row[column].to_s.strip.presence }.uniq.map { |id| source.send(:document_id, id) } # as indexed
+    bad = ids.reject { |id| SuppressedRecord.valid_id?(id) }
+    abort "Not record ids (nothing removed): #{bad.join(', ')}" if bad.any?
+
+    by = ENV.fetch("SUPPRESSED_BY") { Etc.getlogin }
+    ids.each { |id| SuppressedRecord.suppress!(id, reason: reason, by: by) }
+    puts "#{ids.size} #{ids.size == 1 ? 'record' : 'records'} removed from the site: #{ids.join(', ')}"
+    puts "Running servers stop showing them within #{ENV.fetch('SUPPRESSED_RECORDS_CACHE_SECONDS', 30)} seconds."
+  end
+
   def csv_path_from(args)
     path = args[:path].to_s
     abort "Give the CSV file: bin/rails 'records:validate_csv[path/to/file.csv]'" if path.empty?

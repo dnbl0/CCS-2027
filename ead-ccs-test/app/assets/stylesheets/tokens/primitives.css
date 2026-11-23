@@ -14,6 +14,7 @@
   /* Colour: neutral */
   --ccs-white: #fff;
   --ccs-black: #000;
+  --ccs-neutral-50: #f8f8f8;
   --ccs-neutral-100: #f4f4f4;
   --ccs-neutral-200: #e0e0e0;
   --ccs-neutral-300: #cdcdcd;
@@ -56,6 +57,7 @@
   --ccs-sage-100: #f1f5f1;
   --ccs-sage-150: #eaefe9;
   --ccs-sage-200: #d9e3d8;
+  --ccs-sage-250: #d5e0d3; /* the Gen 3 design system's secondary button on hover */
   --ccs-sage-300: #c3d2c0;
   --ccs-sage-400: #abc1a7;
   --ccs-sage-500: #81927c;

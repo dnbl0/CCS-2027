@@ -2,11 +2,44 @@
   <div class="record-actions__row">
     <% if saved_records? %>
       <%= render NexusCcs::SaveControlComponent.new(document: document) %>
-      <%= render NexusCcs::AddToListComponent.new(document: document) %>
     <% end %>
     <%= render NexusCcs::ShareDialogComponent.new(kind: :record, document: document) %>
-    <%= render NexusCcs::CiteComponent.new(document: document) %>
+
+    <%# More: a menu button (WAI-ARIA APG), labelled in words with the icon after it (the Gen 3 design system: never an icon on its
+        own). Hidden until the script runs, as everything in the menu needs it. %>
+    <div class="more-actions" hidden data-controller="more-actions" data-action="keydown->more-actions#keydown"
+>
+      <button type="button" class="more-actions__button text-button" id="<%= menu_id %>-button" aria-haspopup="menu" aria-expanded="false"
+              aria-controls="<%= menu_id %>" aria-label="<%= t("nexus_ccs.record_page.actions.more") %>"
+              data-more-actions-target="button" data-action="more-actions#toggle"><span><%= t("nexus_ccs.record_page.actions.more_label") %></span><%= icon(:more_horiz) %></button>
+      <ul class="more-actions__menu" id="<%= menu_id %>" role="menu" aria-labelledby="<%= menu_id %>-button" hidden data-more-actions-target="menu">
+        <% if saved_records? %>
+          <li role="none"><button type="button" role="menuitem" tabindex="-1" class="more-actions__item" data-more-actions-target="item"
+                                  data-action="more-actions#openDialog" data-dialog-id="<%= list_dialog_id %>"><%= t("nexus_ccs.lists.menu.button") %></button></li>
+        <% end %>
+        <li role="none"><button type="button" role="menuitem" tabindex="-1" class="more-actions__item" data-more-actions-target="item"
+                                data-action="more-actions#openDialog" data-dialog-id="<%= cite_dialog_id %>"><%= t("nexus_ccs.cite.button") %></button></li>
+      </ul>
+    </div>
   </div>
+
+  <%# The dialogs the menu opens %>
+  <%= render NexusCcs::CiteComponent.new(document: document, trigger: false) %>
+  <% if saved_records? %>
+    <div class="record-actions__list" data-controller="dialog">
+      <dialog class="modal uom-dialog uom-modal list-dialog" id="<%= list_dialog_id %>" data-dialog-target="dialog"
+              data-action="click->dialog#closeOnBackdrop" aria-labelledby="<%= list_dialog_id %>-title">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <button type="button" class="modal-close" data-action="dialog#close"><%= t("nexus_ccs.cite.close") %></button>
+            <div class="modal-header"><h2 class="modal-title h5" id="<%= list_dialog_id %>-title"><%= t("nexus_ccs.lists.menu.button") %></h2></div>
+            <div class="modal-body"><%= render NexusCcs::AddToListComponent.new(document: document, panel_only: true) %></div>
+          </div>
+        </div>
+      </dialog>
+    </div>
+  <% end %>
+
   <% if compare? %>
     <div class="record-actions__compare"><%= render NexusCcs::CompareActionsComponent.new(document: document, images: media.images.size) %></div>
   <% end %>

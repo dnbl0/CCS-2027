@@ -12,10 +12,16 @@ en:
       ok: "OK"
       accept: "Accept optional cookies"
       decline: "Decline optional cookies"
+      # The optional categories (CookieNotice.optional): analytics once Adobe analytics is configured (CCS-53)
+      optional:
+        analytics:
+          name: "Analytics"
+          purpose: "Adobe Analytics counts visits, searches and the pages people view, so the University can see how the site is used and improve it. It does not identify you by name."
       # The cookie list on /privacy
       privacy:
         intro: "These are all the cookies this site sets. Every one is needed for the site to work as you ask, so none can be switched off."
         none_optional: "The site sets no optional cookies: no advertising, analytics or tracking cookies."
+        with_optional: "It also sets analytics cookies (Adobe Analytics), but only if you accept them in the cookie notice; you can change your answer by clearing this site's cookies."
         lifetime: "How long it lasts"
         essential: "Needed"
       cookies:

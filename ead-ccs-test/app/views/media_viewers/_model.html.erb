@@ -1,0 +1,19 @@
+<%# locals: item, title, downloadable (CCS-164). A 3D model in glTF or GLB, shown by Google's model-viewer (model_viewer_controller.js),
+    turned and zoomed in the page as video plays in it; the file to download only where it may be downloaded. Without JavaScript, or
+    when the model cannot load, the status says so and the download (if allowed) remains. %>
+<% format = MediaTypes.format_name(item[:type], item[:url]) %>
+<div class="model-viewer" data-controller="model-viewer" data-model-viewer-src-value="<%= item[:url] %>"
+     data-model-viewer-alt-value="3D model: <%= title %>" data-model-viewer-decoders-value="/vendor/model-viewer">
+  <div class="model-viewer__stage" data-model-viewer-target="stage">
+    <p class="model-viewer__status" role="status" data-model-viewer-target="status">The 3D model needs JavaScript to be shown.</p>
+  </div>
+  <div class="model-viewer__bar">
+    <div class="model-viewer__tools" role="group" aria-label="3D model tools" data-js-only>
+      <button type="button" class="text-button" data-action="model-viewer#zoomIn"><span>Zoom in</span><%= NexusCcs::Glyphs.icon(:zoom_in) %></button>
+      <button type="button" class="text-button" data-action="model-viewer#zoomOut"><span>Zoom out</span><%= NexusCcs::Glyphs.icon(:zoom_out) %></button>
+      <button type="button" class="text-button" data-action="model-viewer#reset"><span>Reset view</span><%= NexusCcs::Glyphs.icon(:reset_zoom) %></button>
+    </div>
+    <% if downloadable %><%= link_to "Download the model (#{format})", item[:url], class: "text-button model-viewer__download" %><% end %>
+  </div>
+  <p class="model-viewer__hint" data-js-only>Drag to turn the model, or select it and use the arrow keys.</p>
+</div>

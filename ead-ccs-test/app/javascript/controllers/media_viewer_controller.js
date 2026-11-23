@@ -1,40 +1,33 @@
 import { Controller } from "@hotwired/stimulus"
 
-// The record's media viewer (DigitalAssetsComponent; Figma "Media viewer", after Europeana's item viewer).
+// The record's media (DigitalAssetsComponent, Figma Record/IIIF viewer).
 //
-// - ⋮ opens the media information over the left of the viewer at its full height (the image does not move): focus moves to its
-//   heading, Close or Escape returns it to ⋮. ⋮ is under the panel while it is open, so it leaves the tab order (WCAG 2.4.11); where
-//   the viewer is narrow the panel covers the media, so the rest of the viewer is made inert too.
-// - Rotate, zoom and reset are passed to the zoom viewer (deep_zoom_controller listens for media-viewer:zoom on window), which
-//   reports back with deep-zoom:state; the controls are disabled (aria-disabled, still focusable, the reason in their tooltip)
-//   at the limits, and the readout shows the zoom.
-// - A thumbnail shows its image (a modified click on an open image's link still opens the file); Previous and Next step through
-//   them and stop at the ends; arrow keys move between thumbnails. Hide thumbnails closes the column for the rest of the visit.
-// - Full screen is for the whole viewer.
-// Without JavaScript none of the script-only controls appear, and the thumbnails of open images are links to their files.
-const THUMBS_KEY = "ccs-media-viewer-thumbnails"
-
+// - A thumbnail shows its image on the panel (a modified click on an open image's link still opens the file); arrow keys, Home and
+//   End move between thumbnails.
+// - Zoom opens the image full screen in a modal <dialog> (focus is held inside it, Escape closes it and focus returns to Zoom). The
+//   zoom viewer (deep_zoom_controller, listening for media-viewer:zoom on window) opens the image on show and reports back with
+//   deep-zoom:state; the tools are disabled at their limits (aria-disabled, still focusable, the reason in their tooltip) and the
+//   readout says the zoom. Previous and Next step through the images inside the modal and stop at the ends.
+// - Media information opens a drawer from the right, also a modal <dialog>. The counter under the thumbnails and the zoom's
+//   "Image N of M" follow the image on show; in Download, the size chosen is the file Download image fetches.
+// Without JavaScript Zoom never appears; the image, the thumbnails and Download still work.
 export default class extends Controller {
-  static targets = [ "stage", "image", "panel", "panelHeading", "infoButton", "tool", "rotateLeft", "rotateRight", "zoomIn", "zoomOut", "reset",
-    "fullscreenGroup", "fullscreenButton", "readout", "readoutLevel", "readoutHint", "thumbs", "thumbList", "thumb", "thumbsFooter",
-    "previous", "next", "hideThumbs", "showThumbs", "status" ]
+  static targets = [ "image", "thumb", "zoomButton", "zoomDialog", "zoomIn", "zoomOut", "rotateRight", "reset", "previous", "next",
+    "readout", "infoButton", "infoDialog", "status", "counter", "position", "downloadLink" ]
   static values = { labels: Object }
 
   connect() {
-    this.toolTargets.forEach((group) => { group.hidden = false })
-    if (this.hasThumbsFooterTarget) this.thumbsFooterTarget.hidden = false
-    if (this.hasFullscreenGroupTarget && document.fullscreenEnabled) this.fullscreenGroupTarget.hidden = false
-    this.onFullscreen = () => this.syncFullscreen()
-    document.addEventListener("fullscreenchange", this.onFullscreen)
+    if (this.hasZoomButtonTarget) this.zoomButtonTarget.hidden = false
     this.zoom = { active: false, zoom: 100, atHome: true, atMax: false, rotation: 0 }
     this.syncTools()
     this.syncSteps()
-    if (this.hasThumbsTarget && this.storedThumbs() === "hidden") this.hideThumbnails({ focus: false })
   }
 
+  // Turbo is replacing the page: do not leave a modal open in the cached copy
   disconnect() {
-    document.removeEventListener("fullscreenchange", this.onFullscreen)
     clearTimeout(this.readoutTimer)
+    if (this.hasZoomDialogTarget && this.zoomDialogTarget.open) this.zoomDialogTarget.close()
+    if (this.hasInfoDialogTarget && this.infoDialogTarget.open) this.infoDialogTarget.close()
   }
 
   label(key, values = {}) {
@@ -55,56 +48,30 @@ export default class extends Controller {
     requestAnimationFrame(() => { this.statusTarget.textContent = text })
   }
 
-  // --- Media information (CCS-422)
-  get panelOpen() { return this.hasPanelTarget && !this.panelTarget.hidden }
-  get narrow() { return this.element.getBoundingClientRect().width < 600 }
-
-  togglePanel() { this.panelOpen ? this.closePanel() : this.openPanel() }
-
-  openPanel() {
-    if (!this.hasPanelTarget) return
-    this.panelTarget.hidden = false
-    this.element.classList.add("has-information")
-    this.infoButtonTarget.setAttribute("aria-expanded", "true")
-    this.infoButtonTarget.inert = true
-    if (this.narrow) this.inertBehindPanel(true)
-    this.panelHeadingTarget.focus({ preventScroll: true }) // the panel opens where the visitor is: no jump
+  // --- Zoom
+  openZoom() {
+    if (!this.hasZoomDialogTarget || this.zoomDialogTarget.open) return
+    this.zoomDialogTarget.showModal()
+    this.openImage()
   }
 
-  closePanel() {
-    if (!this.panelOpen) return
-    this.panelTarget.hidden = true
-    this.element.classList.remove("has-information")
-    this.infoButtonTarget.setAttribute("aria-expanded", "false")
-    this.infoButtonTarget.inert = false
-    this.inertBehindPanel(false)
-    this.infoButtonTarget.focus()
+  closeZoom() { if (this.hasZoomDialogTarget) this.zoomDialogTarget.close() }
+
+  // The dialog closed (Close, Escape): the viewer is put away, so the next Zoom starts at the whole picture
+  zoomClosed() {
+    this.dispatch("zoom", { detail: { direction: "close" } })
+    this.zoom = { active: false, zoom: 100, atHome: true, atMax: false, rotation: 0 }
+    this.syncTools()
   }
 
-  inertBehindPanel(on) {
-    this.element.querySelectorAll(".media-viewer__stage, .media-viewer__thumbs").forEach((part) => { part.inert = on })
+  openImage() {
+    if (!this.hasImageTarget) return
+    this.dispatch("zoom", { detail: { direction: "open", url: this.imageTarget.getAttribute("src"), alt: this.imageTarget.alt } })
   }
 
-  keydown(event) {
-    if (event.key === "Escape" && this.panelOpen) { event.preventDefault(); this.closePanel(); return }
-    const thumb = event.target.closest?.("[data-media-viewer-target~='thumb']")
-    if (!thumb) return
-    const offsets = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }
-    const thumbs = this.thumbTargets
-    let index = thumbs.indexOf(thumb)
-    if (event.key in offsets) index = Math.min(Math.max(index + offsets[event.key], 0), thumbs.length - 1)
-    else if (event.key === "Home") index = 0
-    else if (event.key === "End") index = thumbs.length - 1
-    else return
-    event.preventDefault()
-    thumbs[index].focus()
-  }
-
-  // --- Rotate and zoom (deep_zoom_controller does them)
-  rotateLeft(event) { this.send(event, { direction: "rotate", degrees: -90 }) }
-  rotateRight(event) { this.send(event, { direction: "rotate", degrees: 90 }) }
   zoomIn(event) { this.send(event, { direction: "in" }) }
   zoomOut(event) { this.send(event, { direction: "out" }) }
+  rotateRight(event) { this.send(event, { direction: "rotate", degrees: 90 }) }
   reset(event) { this.send(event, { direction: "reset" }) }
 
   send(event, detail) {
@@ -122,26 +89,23 @@ export default class extends Controller {
 
   syncTools() {
     const { active, atHome, atMax, rotation } = this.zoom
-    const fitted = !active || (atHome && rotation === 0)
-    if (this.hasZoomInTarget) this.setDisabled(this.zoomInTarget, atMax, this.label("at_max"))
+    if (this.hasZoomInTarget) this.setDisabled(this.zoomInTarget, active && atMax, this.label("at_max"))
     if (this.hasZoomOutTarget) this.setDisabled(this.zoomOutTarget, !active || atHome, this.label("at_fit"))
-    if (this.hasResetTarget) this.setDisabled(this.resetTarget, fitted, this.label("at_fit"))
+    if (this.hasResetTarget) this.setDisabled(this.resetTarget, !active || (atHome && rotation === 0), this.label("at_fit"))
     this.syncReadout()
   }
 
-  // The readout shows the zoom while zoomed in; its text settles before it is announced (role=status)
+  // The readout says the zoom once it settles (role=status), and nothing at the whole picture
   syncReadout() {
     if (!this.hasReadoutTarget) return
     const { active, zoom, atHome, atMax } = this.zoom
     clearTimeout(this.readoutTimer)
-    if (!active || atHome) { this.readoutTarget.hidden = true; return }
-    this.readoutTarget.hidden = false
     this.readoutTimer = setTimeout(() => {
-      this.readoutLevelTarget.textContent = atMax ? this.label("max_zoom") : this.label("zoom_level", { percent: zoom })
+      this.readoutTarget.textContent = !active || atHome ? "" : (atMax ? this.label("max_zoom") : this.label("zoom_level", { percent: zoom }))
     }, 250)
   }
 
-  // --- Thumbnails
+  // --- Thumbnails, and Previous and Next in the zoom modal
   get currentIndex() { return Math.max(this.thumbTargets.findIndex((thumb) => thumb.getAttribute("aria-current") === "true"), 0) }
 
   show(event) {
@@ -156,7 +120,7 @@ export default class extends Controller {
   step(offset) {
     const thumbs = this.thumbTargets
     const target = thumbs[Math.min(Math.max(this.currentIndex + offset, 0), thumbs.length - 1)]
-    if (target) { this.display(target); target.scrollIntoView({ block: "nearest", inline: "nearest" }) }
+    if (target) this.display(target)
   }
 
   display(thumb) {
@@ -167,7 +131,10 @@ export default class extends Controller {
     this.imageTarget.alt = thumb.dataset.mediaViewerAlt
     this.thumbTargets.forEach((other) => { if (other === thumb) other.setAttribute("aria-current", "true"); else other.removeAttribute("aria-current") })
     this.syncSteps()
-    this.dispatch("shown", { detail: { src: this.imageTarget.getAttribute("src"), alt: this.imageTarget.alt } }) // the zoom viewer resets
+    const position = this.label("position", { position: thumb.dataset.mediaViewerPosition, count: this.thumbTargets.length })
+    if (this.hasCounterTarget) this.counterTarget.textContent = position
+    if (this.hasPositionTarget) this.positionTarget.textContent = position
+    if (this.hasZoomDialogTarget && this.zoomDialogTarget.open) this.openImage()
     this.announce(this.label("shown", { position: thumb.dataset.mediaViewerPosition, count: this.thumbTargets.length }))
   }
 
@@ -178,44 +145,27 @@ export default class extends Controller {
     this.setDisabled(this.nextTarget, index === this.thumbTargets.length - 1, this.label("at_end"))
   }
 
-  hideThumbnails({ focus = true } = {}) {
-    if (!this.hasThumbsTarget) return
-    this.thumbsTarget.hidden = true
-    this.element.classList.add("has-hidden-thumbnails")
-    this.showThumbsTarget.hidden = false
-    this.showThumbsTarget.setAttribute("aria-expanded", "false")
-    this.storeThumbs("hidden")
-    if (focus) this.showThumbsTarget.focus()
+  keydown(event) {
+    const thumb = event.target.closest?.("[data-media-viewer-target~='thumb']")
+    if (!thumb) return
+    const offsets = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }
+    const thumbs = this.thumbTargets
+    let index = thumbs.indexOf(thumb)
+    if (event.key in offsets) index = Math.min(Math.max(index + offsets[event.key], 0), thumbs.length - 1)
+    else if (event.key === "Home") index = 0
+    else if (event.key === "End") index = thumbs.length - 1
+    else return
+    event.preventDefault()
+    thumbs[index].focus()
   }
 
-  showThumbnails() {
-    this.thumbsTarget.hidden = false
-    this.element.classList.remove("has-hidden-thumbnails")
-    this.showThumbsTarget.hidden = true
-    this.storeThumbs("shown")
-    const current = this.thumbTargets[this.currentIndex]
-    current?.focus()
-    current?.scrollIntoView({ block: "nearest", inline: "nearest" })
+  // --- Download: the size chosen is the file the Download image link fetches
+  chooseSize(event) {
+    if (this.hasDownloadLinkTarget) this.downloadLinkTarget.href = event.currentTarget.value
   }
 
-  storedThumbs() { try { return sessionStorage.getItem(THUMBS_KEY) } catch { return null } }
-  storeThumbs(value) { try { sessionStorage.setItem(THUMBS_KEY, value) } catch { /* private mode: the choice lasts for this page */ } }
-
-  // --- Full screen
-  async toggleFullscreen() {
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen()
-      else await this.element.requestFullscreen()
-    } catch { /* refused: nothing changes */ }
-  }
-
-  syncFullscreen() {
-    const on = document.fullscreenElement === this.element
-    this.element.classList.toggle("is-fullscreen", on)
-    if (!this.hasFullscreenButtonTarget) return
-    const name = this.label(on ? "exit_full_screen" : "full_screen")
-    this.fullscreenButtonTarget.setAttribute("aria-pressed", String(on))
-    this.fullscreenButtonTarget.setAttribute("aria-label", name)
-    this.fullscreenButtonTarget.title = name
-  }
+  // --- Media information (CCS-422)
+  openInfo() { if (this.hasInfoDialogTarget && !this.infoDialogTarget.open) this.infoDialogTarget.showModal() }
+  closeInfo() { if (this.hasInfoDialogTarget) this.infoDialogTarget.close() }
+  closeInfoOnBackdrop(event) { if (event.target === this.infoDialogTarget) this.closeInfo() }
 }

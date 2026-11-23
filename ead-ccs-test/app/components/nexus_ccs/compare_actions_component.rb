@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module NexusCcs
-  # Under a record's media: "Compare images" (the record's own images side by side) and "Add to compare" (this record to the
-  # comparison with others, CCS-58). Shown only when the record's images are on the page, so a withheld or not-yet-chosen sensitive
+  # Under a record's actions: "Compare this record's images" (its own images side by side) and "Add to comparison" (this record to
+  # the comparison with others, CCS-58), then "Open comparison (n)" once two or more records are in it. Shown only when the record's images are on the page, so a withheld or not-yet-chosen sensitive
   # record offers neither; CompareController checks again when the request arrives.
   class CompareActionsComponent < ViewComponent::Base
     def initialize(document:, images:)

@@ -305,6 +305,7 @@ en:
       none_selected: "Select at least one record to cite."
       copy: "Copy citations"
       download: "Download citations (.txt)"
+      download_word: "Download as a Word document"
     view_full_record:
       label: "View full record"
       title: "You're leaving this site"
@@ -384,6 +385,12 @@ en:
         one: "1 selected record"
         other: "%{count} selected records"
       order: "Records are listed in the order you selected them. Untick a record to take it out of the selection."
+      order_shuffled: "Records are in a random order. Previous and Next on each record follow it. Untick a record to take it out of the selection."
+      shuffle: "Shuffle the order"
+      shuffle_again: "Shuffle again"
+      in_order: "Back to the order you selected"
+      shuffled: "The selected records are now in a random order."
+      unshuffled: "The selected records are back in the order you selected them."
       missing:
         one: "1 selected record is no longer in the collection and has been left out."
         other: "%{count} selected records are no longer in the collection and have been left out."

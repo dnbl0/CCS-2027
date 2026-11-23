@@ -10,7 +10,8 @@
             <% row.values.each_with_index do |value, index| %>
               <li>
                 <% if index.positive? && joiner(row) %><span class="record-terms__join" aria-hidden="true"><%= joiner(row) %></span><% end %>
-                <% if (path = record.value_link(row, value)) %><%= link_to record.flagged(row, value, index), path, class: "record-term" %><% else %><span class="record-term record-term--static"><%= record.flagged(row, value, index) %></span><% end %>
+                <% tag = record.tag_values?(row) %>
+                <% if (path = record.value_link(row, value)) %><%= link_to record.flagged(row, value, index), path, class: (tag ? "record-term" : "ccs-text-link") %><% else %><span class="<%= "record-term record-term--static" if tag %>"><%= record.flagged(row, value, index) %></span><% end %>
               </li>
             <% end %>
           </ul>
@@ -20,7 +21,7 @@
             <div class="record-fade" id="<%= text_id(row) %>" data-truncate-target="text">
               <div class="record-fade__clip" data-truncate-target="lead"><% text_values(row).each do |value| %><span class="record-facts__value"><%= value %></span><% end %></div>
             </div>
-            <button type="button" class="record-read-more" aria-controls="<%= text_id(row) %>" aria-expanded="true"
+            <button type="button" class="record-read-more text-button" aria-controls="<%= text_id(row) %>" aria-expanded="true"
                     data-truncate-target="toggle" data-action="truncate#toggle" hidden><%= t("nexus_ccs.record_page.showcase.read_more") %></button>
           </div>
         <% else %>

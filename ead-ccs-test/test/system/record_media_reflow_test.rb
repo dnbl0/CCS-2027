@@ -24,14 +24,14 @@ class RecordMediaReflowTest < ApplicationSystemTestCase
 
     assert_no_sideways_scroll("closed")
 
-    info = find("button.viewer-control[aria-controls=media-information]")
+    info = find("button.media-viewer__info-button")
     page.execute_script("arguments[0].scrollIntoView({ block: 'center' })", info) # clear of the sticky search strip
     info.click
-    assert_selector "#media-information"
+    assert_selector "dialog#media-information[open]"
     assert_no_sideways_scroll("open")
 
     find("#media-information button[aria-label='Close media information']").click
-    assert_no_selector "#media-information"
+    assert_no_selector "dialog#media-information[open]"
     assert_no_sideways_scroll("closed again")
   end
 end

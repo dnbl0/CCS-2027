@@ -52,6 +52,7 @@
 
     <%= csrf_meta_tags %>
     <%= content_for(:head) %>
+    <%= render "layouts/analytics" %>
   </head>
   <body class="<%= render_body_class %>">
     <%= render blacklight_config.skip_link_component.new do %>

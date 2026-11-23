@@ -6,9 +6,9 @@ class RecordContactHelpTest < ApplicationSystemTestCase
     page.driver.set_cookie("country_acknowledged", "1")
     visit search_catalog_path(any_assets: "1", q: "skull")
     first(".result-card .document-title-heading a").click
-    # The card is in Use and access, under "Rights, credit and contact"
-    find("#use-and-access summary", text: "Rights, credit and contact").click
-    assert_selector "#use-and-access .contact-collection"
+    # The card is in the Use and access section of Record details and notes, closed until opened
+    find("#record-use summary").click
+    assert_selector "#record-use .contact-collection"
   end
 
   def press(key) = page.driver.browser.keyboard.type(key)

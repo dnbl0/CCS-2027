@@ -47,20 +47,17 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_no_selector ".digital-assets__thumbs"
   end
 
-  test "several assets: the first is large, and the numbered thumbnails (the first marked) swap the large image" do
+  test "several assets: the first is large, and the thumbnails under it (the first marked) swap the large image" do
     render_for(assets(3))
 
     assert_selector "h2", text: "Digital assets"
     assert_selector "figure img[alt='Cary Pocket microscope, image 1 of 3']"
-    assert_selector "nav#media-thumbnails[aria-label='Images of this record'] ol li", count: 3
+    assert_selector "nav.media-viewer__thumbs[aria-label='Images of this record'] ol li", count: 3
     assert_selector "a.digital-assets__thumb[aria-current=true][href='/digital-assets/large/a1.jpg']"
     assert_selector "a.digital-assets__thumb[href='/digital-assets/large/a2.jpg'][target=_blank][rel=noopener][aria-label='Show image 2 of 3'] img[src='/digital-assets/thumbs/a2.jpg'][alt='']"
-    assert_selector "a.digital-assets__thumb[aria-label='Show image 2 of 3'] .digital-assets__thumb-number[aria-hidden=true]", text: "2"
-    # Previous, Next and Hide thumbnails appear with the script; Previous starts unavailable on the first image
-    assert_selector "[hidden] button[aria-label='Previous image'][aria-disabled=true]", visible: :all
-    assert_selector "[hidden] button[aria-label='Next image']", visible: :all
-    assert_selector "[hidden] button[aria-label='Hide thumbnails'][aria-controls=media-thumbnails]", visible: :all
-    assert_selector "button[aria-label='Show thumbnails'][hidden]", visible: :all
+    # Previous and Next are in the zoom modal; Previous starts unavailable on the first image
+    assert_selector "dialog.media-zoom button[aria-label='Previous image'][aria-disabled=true]", visible: :all
+    assert_selector "dialog.media-zoom button[aria-label='Next image']", visible: :all
   end
 
   test "an open record has no notice, and its media can be downloaded" do
@@ -70,6 +67,33 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_selector "video:not([controlslist])"
     assert_selector "video a[href='/v.mp4']", text: "Download Film"
     assert_selector "a.digital-assets__pdf[href='/d.pdf']"
+  end
+
+  test "CCS-36: a PDF whose text could not be indexed says a search will not find words inside it; one that was indexed says nothing" do
+    render_for(assets(3).merge("digital_media_ssim" => [ "pdf|application/pdf|/d.pdf|Report", "pdf|application/pdf|/e.pdf|Letter" ],
+                               "pdf_text_unindexed_ssm" => [ "/d.pdf" ]))
+
+    assert_selector ".digital-assets__pdf-note", text: /Search unavailable/, count: 1
+    assert_selector "a.digital-assets__pdf[href='/d.pdf'] + .digital-assets__pdf-note"
+  end
+
+  test "CCS-164: an open Office document offers its PDF preview and the original; a view-only one only says it cannot be previewed" do
+    preview = DocumentPreview.file_for("/r.docx")
+    FileUtils.mkdir_p(preview.dirname)
+    File.binwrite(preview, "%PDF-1.4 test")
+    begin
+      render_for(assets(1).merge("licence_type_ssim" => [ "Public domain - Copyright expired" ],
+                                 "digital_media_ssim" => [ "document|application/vnd.openxmlformats-officedocument.wordprocessingml.document|/r.docx|Report" ]))
+      assert_selector "a.digital-assets__pdf[href='#{DocumentPreview.public_path('/r.docx')}'][target=_blank]", text: /Read Report \(a PDF preview/
+      assert_selector "a[href='/r.docx']", text: "Download the original (DOCX)"
+
+      render_for(assets(1).merge("licence_type_ssim" => [ "Copyright - Current" ],
+                                 "digital_media_ssim" => [ "document|application/vnd.openxmlformats-officedocument.wordprocessingml.document|/r.docx|Report" ]))
+      assert_no_selector "a[href$='.pdf'], a[href='/r.docx']"
+      assert_selector ".digital-assets__unsupported", text: /This document \(DOCX\) cannot be previewed here/
+    ensure
+      FileUtils.rm_f(preview)
+    end
   end
 
   # The DAM holds videos as WMV, which no web browser plays: a player would stay blank (seen 2026-11-18)
@@ -112,14 +136,15 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
                                "digital_media_ssim" => [ "video|video/mp4|/v.mp4|Film", "pdf|application/pdf|/d.pdf|Report" ]))
 
     assert_no_selector ".access-notice" # the notice is in the actions column (RecordActionsComponent)
-    assert_selector ".viewer-chip--view-only", text: "View only"
+    assert_selector ".media-viewer__licence", text: "You can view the image online. Download is not available."
+    assert_selector ".media-viewer__licence a.arrow-link[href^='/access_requests/new']", text: "Request to use this image"
     assert_no_selector "a[download]"
     assert_selector "figure.digital-assets__main img[src='/digital-assets/large/a1.jpg']"
     assert_selector "video[controlslist=nodownload]"
     assert_no_selector "video a, a[href='/v.mp4'], a[href='/d.pdf'], .digital-assets__pdf"
     assert_no_selector "a[href*='/digital-assets/']" # thumbnails are buttons, not links to the files
     assert_selector "button.digital-assets__thumb[data-media-viewer-large='/digital-assets/large/a2.jpg'] img[alt='']"
-    assert_selector ".viewer-chip", text: "Copyright - Current"
+    assert_selector ".media-viewer__licence", text: "Copyright - Current."
   end
 
   test "a request record withholds every asset, and its path, but keeps the notice, licence and metadata" do
@@ -129,8 +154,8 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_selector ".access-notice a", text: "Request access to this item"
     assert_no_selector "img, video, audio, figure, .digital-assets__thumbs, [data-media-viewer-target=image]"
     assert_no_selector "button", text: "Full screen", visible: :all
-    assert_selector ".viewer-chip", text: "ICIP Rights"
-    assert_selector ".viewer-chip--request", text: "Available on request"
+    assert_selector ".media-viewer__licence", text: "ICIP Rights. The image is available on request."
+    assert_no_selector "dialog.media-zoom, button[aria-label='Zoom into the image']", visible: :all
     %w[/digital-assets /v.mp4 a1.jpg].each { |path| assert_not_includes rendered_content, path }
   end
 
@@ -155,7 +180,7 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_selector ".access-notice--partly-withheld", text: "1 other digital asset of this record is not shown"
     assert_selector ".access-notice--partly-withheld a[href='/access_requests/new?document_id=emu-1']", text: "Request access to it"
     assert_selector ".digital-assets__download a.btn[download][href^='#{dam_url('licensed')}']", visible: :all
-    assert_selector ".viewer-chip", text: "CC BY" # the shown asset's licence, not the withheld one's "None"
+    assert_selector ".media-viewer__licence", text: "CC BY." # the shown asset's licence, not the withheld one's "None"
   end
 
   test "only open assets are offered to download: a view-only image is a button, an open one a link" do

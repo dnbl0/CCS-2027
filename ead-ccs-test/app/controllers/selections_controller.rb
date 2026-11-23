@@ -20,7 +20,7 @@ class SelectionsController < CatalogController
 
   def show
     @selection = Selection.new(session)
-    asked = @selection.ids
+    asked = @selection.reading_order
     @documents = documents_in_order(asked)
     @missing = asked.size - @documents.size
     @selection.keep_only(@documents.map { |document| document.id.to_s }) # a record dropped from the index leaves the selection
@@ -58,6 +58,12 @@ class SelectionsController < CatalogController
     when "clear"
       selection.clear
       []
+    when "shuffle"
+      selection.shuffle!
+      []
+    when "in_order"
+      selection.in_chosen_order!
+      []
     when "all" then selection.add(page_ids)
     else selection.sync(scope: page_ids, chosen: Array(params[:ids]).grep(String))
     end
@@ -67,6 +73,10 @@ class SelectionsController < CatalogController
   def return_path = url_from(params[:return_to]) || selection_path
 
   def message(selection, refused)
+    case params[:intent].to_s
+    when "shuffle" then return { notice: t("nexus_ccs.selection.shuffled") }
+    when "in_order" then return { notice: t("nexus_ccs.selection.unshuffled") }
+    end
     if refused.any?
       { alert: t("nexus_ccs.selection.full", count: Selection::MAX) }
     else

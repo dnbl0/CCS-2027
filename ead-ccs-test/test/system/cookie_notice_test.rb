@@ -16,7 +16,7 @@ class CookieNoticeSystemTest < ApplicationSystemTestCase
     visit "/help"
 
     assert_selector NOTICE
-    assert_selector "#{NOTICE} h2", text: "Cookies on this site"
+    assert_selector "#{NOTICE} .cookie-notice__title", text: "Cookies on this site"
     assert_accessible tags: AXE_TAGS + WCAG22_TAGS
   end
 

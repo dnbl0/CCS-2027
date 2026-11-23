@@ -76,6 +76,11 @@ header omits those items (in development it defaults to `http://localhost:3000`)
   focus ring. Add the class `ccs-text-link`, or leave a link in a paragraph, list item or `dd` of `<main>` without a class. Arrow
   links, links that stretch over a whole card, the header, footer and breadcrumb links and the Help "On this page" navigation are
   separate patterns.
+- **Buttons** follow the Gen 3 design system's buttons (designsystem.web.unimelb.edu.au/style-guide/buttons): primary `btn-primary`
+  (cyan, the light cyan on hover), secondary `btn-secondary` (sage), tertiary `btn-outline-primary` (navy words in a 1px navy outline, the
+  light cyan on hover, never filling navy), all 18px Source Sans 3 600, 12px by 16px, square (`unimelb.css`); and the text button,
+  `text-button` (`components/text_button.css`: link blue, no underline until hover, its icon 20px after its words). Use buttons sparingly,
+  one main action a view. Never an icon on its own: every button has its words (an icon may follow them).
 - **Controls** use the body font (`unimelb.css`): buttons and inputs would otherwise be the browser's system font. The one
   exception is the "all / any" menu in the Advanced search heading, which is set in the heading's serif by the design.
 - **Explore tiles** (`components/explore.css`, docs/explore.md): the face of a collection tile with no picture is one of six tints, `--ccs-explore-tint-1..6`
@@ -138,6 +143,23 @@ Nothing from the static pages: help, about and the home hero are ported (the col
 were removed on both sites). See `docs/styling-inventory.md`.
 
 ## The record page layout
+
+**The record page (branch `design/record-card`, 23 Nov 2026).** In `components/record.css`, after the University's design system
+(designsystem.web.unimelb.edu.au) and the site's other pages, on white, capped at 1440px (`--layout-page`) with the site's gutters (16px,
+32px from 768px). Header in two columns (5:7 from 1024px), the identity one block at the top level with the media panel's top edge, in three groups
+32px apart (space groups them, no rules): the h1 as every page's (Fraunces regular, navy, 48px; 36px on a phone) with the date, the
+maker (left out when Associated names lists the same names) and the record's collection with "See more from this collection" (the arrow link) under it; then the actions (`RecordActionsComponent`: Save the Gen 3 tertiary button, Share and embed, and More, a menu of Add to list
+and Cite this record, the link being Share's; "Compare this record's images" and "Add to comparison" under them, "Open comparison" from
+two records); then Associated names (a card-level heading; each name an in-content link, `ccs-text-link`, its role and dates under it); and
+the media (`DigitalAssetsComponent`, Figma Record/IIIF viewer) on a light grey panel, sticky from 1024px, the zoom screen's round tools each
+with its word under it. On a phone: the title block and the actions, then the media, then the names. Object overview is the summary (the
+credit line and copyright are Use and access's); All details is every field in CCS-400's sequence; a value is a tag only when short. Then sections, each after a full-width rule with its heading on the left (the site's section heading, `--ccs-heading-section-size`):
+Object overview (the key facts, two columns, label a card-level heading above the value; names of things as the design system's tags,
+`record-tags`), About this object (the description, Read more, CCS-413) and Record details and notes (`record-accordion`: the design
+system's accordion as native `<details>`, title Source Sans 3 600 20px in link blue, the open panel on the pale grey surface). Last, You
+may be interested in (`MoreFromCollectionsComponent`): the design system's tabs, at most five with short names (Similar, Same maker, Same
+period, Same place, Same type; `tabs_controller.js`), the one on show on the primary cyan, each panel its full name as its heading and three
+cards; Similar colours (Looks similar) is the Similar panel's second part. No class is named after a page, a design or another site.
 
 **Showcase layout (branch `design/record-page-vam`, 20 Nov 2026, proposed).** After the museums' object pages (the V&A's was the
 template), in the site's light theme, in `record_showcase.css`: the image whole and centred on a full-width grey band, its tools and

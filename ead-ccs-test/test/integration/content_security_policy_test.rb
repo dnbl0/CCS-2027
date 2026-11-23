@@ -9,7 +9,10 @@ class ContentSecurityPolicyTest < ActionDispatch::IntegrationTest
     policy = response.headers["Content-Security-Policy-Report-Only"]
     assert_includes policy, "default-src 'self'"
     assert_includes policy, "object-src 'none'"
-    assert_match(/script-src 'self' 'nonce-/, policy)
+    assert_match(/script-src 'self' 'wasm-unsafe-eval' 'nonce-/, policy) # WebAssembly for the 3D viewer's decoders (CCS-164), not eval
+    assert_not_includes policy, "'unsafe-eval'"
+    assert_includes policy, "worker-src 'self' blob:"
+    assert_includes policy, "connect-src 'self' https://unimelbourne.widen.net" # eBooks and 3D models are fetched from the DAM
   end
 
   test "the DAM's images and media may load: images from any https host, audio and video from this site and the DAM" do

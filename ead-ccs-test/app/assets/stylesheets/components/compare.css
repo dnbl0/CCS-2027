@@ -1,0 +1,81 @@
+/*
+ * The comparison page (views/compare/show, CCS-58; behaviour controllers/compare_controller.js), in the site's tokens and the Gen 3
+ * design system's patterns: the page's 1440px width (the images are the content), the record named once with the way back to it,
+ * a toolbar (Move images together; adding or removing an image, the design system's tertiary button; Full screen, its text button),
+ * then the panes: white panels, each headed by the image it shows (or the record, for records added from different pages) with its
+ * picker, the image whole on the pale grey, and a toolbar of text buttons joined to it (Zoom in, Zoom out, Reset). Panes stack below
+ * 768px, sit two across above it, three across for three on a wide screen, and two by two for four.
+ */
+.saved-main__inner.compare { max-width: var(--layout-page); }
+
+/* The record: the way back, then its details once */
+.compare__record { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ccs-space-2) var(--ccs-space-6); margin-bottom: var(--ccs-space-5); }
+.compare__back { font-size: var(--ccs-font-size-lg); }
+.compare__back::before { transform: scaleX(-1); } /* the arrow points back */
+.compare__details { display: flex; flex-wrap: wrap; gap: var(--ccs-space-1) var(--ccs-space-6); margin: 0; font-size: var(--ccs-font-size-md); color: var(--ccs-text-primary); }
+.compare__details > div { display: flex; flex-wrap: wrap; gap: 0 var(--ccs-space-2); }
+.compare__details dt { font-weight: var(--ccs-font-weight-semibold); }
+.compare__details dd { margin: 0; overflow-wrap: anywhere; }
+
+.compare__note { margin: 0 0 var(--ccs-space-4); font-size: var(--ccs-font-size-md); color: var(--ccs-text-primary); }
+
+/* The toolbar: ruled above and below, Move images together (with what it does) at the start, the actions at the end */
+.compare__toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ccs-space-3) var(--ccs-space-5);
+  margin-bottom: var(--ccs-space-5); padding: var(--ccs-space-3) 0; border-block: 1px solid var(--ccs-border-subtle);
+}
+.compare__link { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: var(--ccs-space-2); margin: 0; padding: 0; min-height: 2.75rem; }
+.compare__link .form-check-input { width: 1.25rem; height: 1.25rem; margin: 0; float: none; }
+.compare__link .form-check-label { font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-brand); }
+.compare__hint { grid-column: 2; margin: 0; font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
+.compare__toolbar-actions { display: flex; flex-wrap: wrap; align-items: center; margin-inline-start: auto; gap: var(--ccs-space-2) var(--ccs-space-3); }
+
+/* The panes */
+.compare__panes { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ccs-space-5); margin: 0; padding: 0; list-style: none; }
+@media (min-width: 768px) { .compare__panes:not(.compare__panes--1) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .compare__panes--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Panes side by side share their rows (subgrid), so their images line up whatever each header holds (a picker, a long title) */
+.compare__item { display: grid; grid-row: span 3; grid-template-rows: subgrid; row-gap: 0; min-width: 0; }
+.compare-pane { display: grid; grid-row: 1 / -1; grid-template-rows: subgrid; row-gap: 0; background: var(--ccs-surface-default); border: 1px solid var(--ccs-border-subtle); }
+.compare-pane__header { display: flex; flex-wrap: wrap; align-items: flex-start; align-content: flex-start; justify-content: space-between; gap: var(--ccs-space-2) var(--ccs-space-4); padding: var(--ccs-space-3) var(--ccs-space-4); }
+.compare-pane__title { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-snug); color: var(--ccs-text-brand); overflow-wrap: anywhere; }
+.compare-pane__record { display: grid; gap: var(--ccs-space-1); min-width: 0; }
+/* A record's pane: the record and Remove on one line, the picker under them */
+.compare-pane__header--record { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+.compare-pane__header--record .compare-pane__choose { grid-column: 1 / -1; }
+.compare-pane__record .compare__details { font-size: var(--ccs-font-size-sm); }
+.compare-pane__remove-form { margin: 0; }
+.compare-pane__choose { display: flex; align-items: center; gap: var(--ccs-space-2); }
+.compare-pane__choose label { font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-primary); }
+.compare-pane__choose .form-select { width: auto; min-height: 2.75rem; font-size: var(--ccs-font-size-md); }
+/* the stage holds a fixed shape before and after the viewer starts, so nothing moves when it does; the image whole on the pale grey */
+.compare-pane__stage { position: relative; align-self: start; width: 100%; aspect-ratio: 4 / 3; background: var(--ccs-surface-subtle); border-block: 1px solid var(--ccs-border-subtle); }
+.compare-pane__image { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
+.compare-pane__tools { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--ccs-space-1); min-height: 3.5rem; padding: var(--ccs-space-1) var(--ccs-space-2); }
+
+/* The second place while one record waits for another: a dashed outline with what to do */
+.compare-slot {
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: var(--ccs-space-3); height: 100%; min-height: 16rem;
+  grid-row: 1 / -1; padding: var(--ccs-space-6); border: 2px dashed var(--ccs-border-default); background: var(--ccs-surface-subtle);
+}
+.compare-slot__heading { margin: 0; font-family: var(--ccs-font-body); font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-brand); }
+.compare-slot__text { margin: 0; max-width: 32rem; font-size: var(--ccs-font-size-md); color: var(--ccs-text-primary); }
+.compare__item--waiting { display: block; grid-row: span 3; }
+@media (max-width: 767.98px) { .compare__item--waiting { grid-row: auto; } }
+
+/* Nothing yet: the steps, then the way to records with images */
+.compare__empty { display: grid; justify-items: start; gap: var(--ccs-space-4); max-width: 40rem; padding: var(--ccs-space-6) 0; }
+.compare__empty-heading { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-heading-panel-size); font-weight: var(--ccs-heading-weight); color: var(--ccs-text-brand); }
+.compare__steps { display: grid; gap: var(--ccs-space-2); margin: 0; padding-inline-start: var(--ccs-space-5); font-size: var(--ccs-font-size-lg); color: var(--ccs-text-primary); }
+
+/* Without JavaScript the script-only controls hold their space but stay invisible (they would do nothing) */
+.compare:not(.is-ready) [data-js-only] { visibility: hidden; }
+
+/* Full screen: the whole comparison, toolbar and all, the images as tall as the screen allows */
+.compare.is-fullscreen { display: flex; flex-direction: column; max-width: none; height: 100dvh; margin: 0; padding: var(--ccs-space-4) var(--ccs-space-5); overflow: auto; background: var(--ccs-surface-default); }
+.compare.is-fullscreen .compare__record, .compare.is-fullscreen .compare__note { display: none; }
+.compare.is-fullscreen .compare-pane__stage { aspect-ratio: auto; height: calc(100dvh - 16rem); }
+@media (min-width: 768px) { .compare.is-fullscreen .compare__panes--4 .compare-pane__stage { height: calc((100dvh - 24rem) / 2); } }
+@media (max-width: 767.98px) { .compare.is-fullscreen .compare-pane__stage { height: 60dvh; } }
+
+@media (forced-colors: active) { .compare-pane, .compare-pane__stage { border-color: CanvasText; } }
