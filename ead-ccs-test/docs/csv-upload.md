@@ -15,6 +15,16 @@ then a summary on the error stream, and exits 1 if anything needs fixing. `recor
 To index the result into a core you own, set `INDEX=1` and `SOLR_URL` to that core. Port 8984 (the shared, read-only Solr) is
 refused. Without `INDEX=1` the task never contacts Solr.
 
+To take an uploaded set out of the site again (CCS-31: "delete the uploaded metadata, either partial set or full"), give the CSV
+that was uploaded, or a CSV of only the ids to remove, with a reason. Each record is removed as `records:suppress` removes one
+(CCS-112), so `records:unsuppress` puts any of them back.
+
+```
+bin/rails "records:remove_csv[path/to/file.csv,Why they are removed]"
+```
+
+Updating: upload the corrected CSV again. A record keeps its id (`csv-<id>`), so indexing it again replaces it.
+
 ## Headers
 
 Matched ignoring case, spaces and underscores (`Accession Number` is `accession_number`). Only `id` and `title` are required.

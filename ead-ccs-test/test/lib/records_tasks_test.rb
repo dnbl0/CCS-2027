@@ -7,7 +7,7 @@ class RecordsTasksTest < ActiveSupport::TestCase
   setup do
     Rails.application.load_tasks unless Rake::Task.task_defined?("records:suppress")
     SuppressedRecord.delete_all
-    %w[records:suppress records:unsuppress records:suppressed].each { |name| Rake::Task[name].reenable }
+    %w[records:suppress records:unsuppress records:suppressed records:remove_csv].each { |name| Rake::Task[name].reenable }
   end
 
   def run_task(name, *args)
@@ -40,6 +40,24 @@ class RecordsTasksTest < ActiveSupport::TestCase
     assert_raises(SystemExit) { capture_io { Rake::Task["records:suppress"].invoke("emu-1") } }
 
     assert_equal 0, SuppressedRecord.count
+  end
+
+  test "CCS-31: remove_csv takes every record of an uploaded CSV out of the site (csv-<id>), with one reason; one can be put back" do
+    file = Tempfile.new([ "upload", ".csv" ])
+    file.write("ID,Title\nA1,First\nA2,Second\nB:3,Third\n,\n")
+    file.close
+    out, = run_task("records:remove_csv", file.path, "Superseded by EMu")
+
+    assert_match(/3 records removed/, out)
+    assert SuppressedRecord.suppressed?("csv-B_3") # the id as the CSV source indexes it
+    assert SuppressedRecord.suppressed?("csv-A1")
+    assert SuppressedRecord.suppressed?("csv-A2")
+    assert_equal "Superseded by EMu", SuppressedRecord.find_by!(record_id: "csv-A2").reason
+
+    run_task("records:unsuppress", "csv-A1")
+    assert_not SuppressedRecord.suppressed?("csv-A1")
+  ensure
+    file&.unlink
   end
 
   test "unsuppress puts a record back, and is safe to repeat" do
