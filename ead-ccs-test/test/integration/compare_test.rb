@@ -24,11 +24,11 @@ class CompareTest < ActionDispatch::IntegrationTest
     assert_equal 2, panes.size
     assert_select ".compare-pane__title", text: "Title of open-1"
     assert_select ".compare-pane__title", text: "Title of view-1"
-    assert_select ".compare-pane__details", text: /ACC-open-1/
-    assert_select ".compare-pane__details", text: /Copyright - Current/
+    assert_select ".compare-pane .compare__details", text: /ACC-open-1/
+    assert_select ".compare-pane .compare__details", text: /Copyright - Current/
     assert_select ".compare-pane[data-sources]"
     assert_select "input[type=checkbox][data-compare-target=link]"
-    assert_select "label", text: "Link zoom and pan"
+    assert_select "label", text: "Move images together"
   end
 
   test "a withheld record cannot be added, and its images are not on any page" do
@@ -125,16 +125,33 @@ class CompareTest < ActionDispatch::IntegrationTest
       get "/compare", params: { record: "open-1" }
       assert_equal 2, panes.size
       assert_select ".compare-pane select option", count: 6
-      assert_select "a", text: "Add a pane"
-      assert_select "a", text: "Remove a pane", count: 0
+      assert_select "a", text: "Add an image"
+      assert_select "a", text: "Remove an image", count: 0
 
       get "/compare", params: { record: "open-1", panes: 3 }
       assert_equal 3, panes.size
-      assert_select "a", text: "Add a pane", count: 0
-      assert_select "a", text: "Remove a pane"
+      assert_select "a", text: "Add an image", count: 0
+      assert_select "a", text: "Remove an image"
 
       get "/compare", params: { record: "open-1", panes: 9 }
       assert_equal 3, panes.size, "no more panes than images"
+    end
+  end
+
+  test "one record's images: the record named once with the way back and its details, each pane named by its image, the record's trail" do
+    with_records(stub_document("open-1")) do
+      get "/compare", params: { record: "open-1" }
+
+      assert_select "h1", text: "Compare images of Title of open-1"
+      assert_select "title", text: /\ACompare images of Title of open-1 — Collections Navigator — University of Melbourne/
+      assert_select ".compare__record a.compare__back[href='/catalog/open-1']", text: "Back to Title of open-1"
+      assert_select ".compare__record .compare__details", count: 1
+      assert_select ".compare-pane .compare__details", count: 0 # not repeated in every pane
+      assert_select ".compare-pane h2.compare-pane__title", text: /\AImage \d of \d\z/, count: 2
+      assert_select ".breadcrumb-bar a[href='/catalog/open-1']", text: "Title of open-1"
+      assert_select ".breadcrumb-bar", text: /Compare images/
+      assert_select ".compare__toolbar button", text: /Full screen/, count: 1
+      assert_select ".compare-pane .compare-pane__tools button.text-button", count: 6
     end
   end
 

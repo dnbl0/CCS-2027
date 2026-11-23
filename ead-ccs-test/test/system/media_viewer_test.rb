@@ -69,14 +69,14 @@ class MediaViewerTest < ApplicationSystemTestCase
     assert_selector ".compare.is-ready"
     assert_selector ".compare-pane", count: 2
     assert_selector ".compare-pane .openseadragon-canvas", count: 2, visible: :all
-    assert_checked_field "Link zoom and pan"
+    assert_checked_field "Move images together"
     assert_accessible
 
     first(".compare-pane button", text: "Zoom in").click
     wait_for_zoom_to_settle
     assert_in_delta pane_zoom(0), pane_zoom(1), 0.001, "linked panes zoom together"
 
-    uncheck "Link zoom and pan"
+    uncheck "Move images together"
     first(".compare-pane button", text: "Zoom in").click
     wait_for_zoom_to_settle
     assert_operator pane_zoom(0), :>, pane_zoom(1)
@@ -101,7 +101,7 @@ class MediaViewerTest < ApplicationSystemTestCase
 
     unnamed = page.evaluate_script("Array.from(document.querySelectorAll('.compare-pane button, .compare-pane select, .compare-pane .openseadragon-canvas')).filter(function (e) { return !(e.getAttribute('aria-label') || e.textContent.trim() || (e.labels && e.labels.length)) }).length")
     assert_equal 0, unnamed
-    assert_selector ".compare-pane button", text: "Full screen", count: 2
+    assert_selector ".compare__toolbar button", text: "Full screen", count: 1 # one Full screen for the whole comparison
   end
 
   test "records from different pages are compared once added; each pane has its title, accession number and licence" do
@@ -114,8 +114,8 @@ class MediaViewerTest < ApplicationSystemTestCase
     click_link "Open comparison (2)"
 
     assert_selector ".compare-pane", count: 2
-    assert_selector ".compare-pane .compare-pane__details dt", text: "Licence", count: 2
-    assert_selector ".compare-pane .compare-pane__details dt", text: "Accession number", count: 2
+    assert_selector ".compare-pane .compare__details dt", text: "Licence", count: 2
+    assert_selector ".compare-pane .compare__details dt", text: "Accession number", count: 2
     assert_selector ".compare.is-ready"
     assert_accessible
 

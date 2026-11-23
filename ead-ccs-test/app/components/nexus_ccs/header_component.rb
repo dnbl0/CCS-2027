@@ -27,6 +27,9 @@ module NexusCcs
       search_action_url(params || { f: { has_digital_asset: [ "with" ] }, search_field: "all_fields", view: "masonry" })
     end
 
+    # The trail of the comparison page, set by CompareController for one record's images (the record, then Compare images)
+    def compare_trail = helpers.instance_variable_get(:@compare_trail)
+
     # The trail of a browse page, set by BrowseController as [label, href] pairs
     def browse_trail = helpers.instance_variable_get(:@browse_trail) || []
 

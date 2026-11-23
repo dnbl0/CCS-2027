@@ -14,11 +14,7 @@ form.advanced .advanced-facet-limits .facet-checkbox { display: inline-flex; ali
 form.advanced .advanced-facet-limits .facet-checkbox input { width: 1.25rem; height: 1.25rem; margin: 0; accent-color: var(--ccs-navy-1100); cursor: pointer; }
 form.advanced .advanced-facet-limits .facet-label-and-count label { align-items: center; gap: var(--ccs-space-4); min-height: 2.5rem; margin: 0; font-size: var(--ccs-font-size-md); line-height: 1.35; cursor: pointer; }
 
-/* 5. Zoom and compare: the space round an image is neutral, not navy bars (the record's band is already dark) */
-.compare-pane__stage { background: var(--ccs-surface-subtle); border: 1px solid var(--ccs-border-default); }
-.compare-pane__controls { gap: var(--ccs-space-3); margin-top: var(--ccs-space-3); }
-.compare-pane__buttons { gap: var(--ccs-space-2); }
-.compare-pane__header, .compare-pane__details { margin-bottom: var(--ccs-space-3); }
+/* 5. (Compare's panes: components/compare.css) */
 
 /* 6. One card layout wherever cards open a record or a filtered search: the mosaic (blacklight-gallery's grid-lanes polyfill), each
       picture whole at its own shape, the title under it; no record count and no arrow on the home page's cards */
