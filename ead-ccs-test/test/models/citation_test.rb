@@ -75,6 +75,8 @@ class CitationTest < ActiveSupport::TestCase
     assert_match(/\(n\.d\.\)/, cite(:apa, "production_date_ssim" => nil))
     assert_match(/\(1918\)/, cite(:apa, "production_date_ssim" => [ "not dated" ], "date_start_isi" => 1918))
     assert_match(/\(c\. 1920\)/, cite(:apa, "production_date_ssim" => [ "c. 1920" ]))
+    # a century as the record writes it, never a year it does not give (the start year 1900 is not "c. 1900")
+    assert_match(/\(c\. 20th century\)/, cite(:apa, "production_date_ssim" => [ "[c. 20th century]" ], "date_start_isi" => 1900))
     assert_match(/\(1896\)/, cite(:apa, "production_date_ssim" => [ "26 July 1896" ]))
   end
 

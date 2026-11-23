@@ -181,6 +181,9 @@ module NexusCcs
     def lead_rows = detail_rows.select { |row| LEAD_SEQS.include?(row.seq) }
 
     # The full record: every field in the sheet's sequence exactly (CCS-400: Object Type, Date, Creator, ... Place ...), none moved ahead
+    # The maker under the title, unless Associated names just below lists exactly the same names (with their links and roles)
+    def maker_line? = makers.any? && makers.map(&:first).map(&:squish).sort != associated_names.map(&:first).map(&:squish).sort
+
     def full_record_rows = detail_rows.select { |row| row.seq.is_a?(Integer) }.sort_by(&:seq)
 
     # --- The record page's header and sections (components/record.css) -----------------------------------------------------------
@@ -213,18 +216,21 @@ module NexusCcs
     OVERVIEW_SEQS = [ 2, 7, 10, 11, 17, 19, 20, 21, 22 ].freeze
 
     def overview_rows
-      rows = detail_rows.select { |row| OVERVIEW_SEQS.include?(row.seq) }
-      rows += [ Row.new(label: I18n.t("nexus_ccs.record_page.use.credit_line"), values: [ credit_line ], field: "credit_line_tsim", seq: 21) ] if credit_line
-      rows += [ Row.new(label: I18n.t("nexus_ccs.record_page.use.copyright"), values: [ copyright ], field: "rights_ssim", seq: 22) ] if copyright
-      rows.sort_by(&:seq)
+      # the summary only: the credit line and copyright are Use and access's, every field is in All details
+      detail_rows.select { |row| OVERVIEW_SEQS.include?(row.seq) }.sort_by(&:seq)
     end
 
     # A fact's values: names of things link to their search or browse page (as in the full record); several values on their own lines,
     # or joined where the sheet says so
     # A key fact's value: names of things that open their search or browse page as the design system's tags (a list of links);
     # anything else as text, its parts joined as the data model sheet says
+    # The design system's tags are for short terms (a place, a classification); a longer value ("emu egg with carved relief") reads
+    # better as an ordinary link than in small capitals
+    TAG_MAX = 24
+    def tag_values?(row) = row.values.all? { |value| value.to_s.length <= TAG_MAX }
+
     def fact_value(row)
-      links = term?(row) ? row.values.each_with_index.map { |value, index| [ flagged(row, value, index), value_link(row, value) ] } : []
+      links = term?(row) && tag_values?(row) ? row.values.each_with_index.map { |value, index| [ flagged(row, value, index), value_link(row, value) ] } : []
       if links.any? && links.all?(&:last)
         items = links.map { |text, path| helpers.tag.li(helpers.link_to(text, path, class: "record-tags__link"), class: "record-tags__item") }
         return helpers.tag.ul(helpers.safe_join(items), class: "record-tags")
@@ -282,7 +288,7 @@ module NexusCcs
     def can_view? = %i[open view_only].include?(access_state)
     def can_download? = access_state == :open
 
-    def use_licence = assets? ? media_component.licence : licence
+    def use_licence = RecordLicence.for(document) # the same licence on every page (RecordLicence)
 
     # The rights items, [[label, value]], in CCS-27's order (with the licence); caption and terms of use belong to a digital asset
     def rights_items

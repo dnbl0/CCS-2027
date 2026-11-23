@@ -229,8 +229,8 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     texts = stops.map { |stop| stop["text"] }
 
     assert stops.all? { |stop| stop["ring"] }, stops.reject { |stop| stop["ring"] }.inspect
-    # the title's column (the collection, a name, Save), then the media (Zoom, Download, Media information, Use and access)
-    order = [ "See more from this collection", "Grimwade", "Save", "Zoom into the image", "Download image", "Media information", "Use and access" ].map { |label| texts.index { |text| text.include?(label) } }
+    # the title's column (the collection, Save, a name), then the media (Zoom, Download, Media information, Use and access)
+    order = [ "See more from this collection", "Save", "Grimwade", "Zoom into the image", "Download image", "Media information", "Use and access" ].map { |label| texts.index { |text| text.include?(label) } }
     assert_equal order.compact.sort, order.compact, texts.inspect
     assert_operator order.compact.size, :>=, 6, texts.inspect
   end
@@ -392,7 +392,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS, except: [ "region" ])
 
     page.driver.browser.keyboard.type(:Up)
-    assert_selector ".more-actions__item:focus", text: "Copy link" # Up from the first wraps to the last
+    assert_selector ".more-actions__item:focus", text: "Cite this record" # Up from the first wraps to the last
 
     page.driver.browser.keyboard.type(:Escape)
     assert_no_selector ".more-actions__menu"
@@ -400,7 +400,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_selector ".more-actions__button:focus" # Escape returns focus to More
   end
 
-  test "Cite this record in More's menu opens its dialog, and closing it returns focus to More; Copy link says so politely" do
+  test "Cite this record and Add to list in More's menu open their dialogs (one width), and closing each returns focus to More" do
     open_record(VARIANTS["one image, open"], "desktop")
     find(".more-actions__button").click
     find("[role=menuitem]", text: "Cite this record").click
@@ -411,8 +411,12 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     assert_selector ".more-actions__button:focus" # focus returns to More
 
     find(".more-actions__button").click
-    find("[role=menuitem]", text: "Copy link").click
-    assert_selector ".more-actions [role=status]", text: "Link copied", visible: :all
+    find("[role=menuitem]", text: "Add to list").click
+    assert_selector "dialog.list-dialog[open]"
+    widths = page.evaluate_script("[...document.querySelectorAll('dialog.list-dialog .modal-content, dialog.cite__dialog .modal-content')].map(e => getComputedStyle(e.closest('.modal-dialog')).maxWidth)")
+    assert_equal 1, widths.uniq.size, widths.inspect
+    page.driver.browser.keyboard.type(:Escape)
+    assert_no_selector "dialog.list-dialog[open]"
     assert_selector ".more-actions__button:focus"
   end
 

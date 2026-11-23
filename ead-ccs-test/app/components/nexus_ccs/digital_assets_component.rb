@@ -165,9 +165,7 @@ module NexusCcs
 
     # The DAM's licence (DA License Type) when the record has DAM assets, else the EMu licence, e.g. "Copyright - Current";
     # the toolbar shows it as the licence chip
-    def licence
-      dam_value("licence") || Array(@document["licence_type_ssim"]).first.presence
-    end
+    def licence = RecordLicence.for(@document)
 
     # The DAM's DA Terms of Use, else what the record's rights note says (the licence name in brackets is the chip's, so it is
     # not repeated)
@@ -214,11 +212,19 @@ module NexusCcs
 
     # One of the zoom modal's controls: an icon button named by its label (aria-label and a matching tooltip), which the script works
     # (media_viewer_controller, action and target). disabled: starts aria-disabled (still focusable, as at fit), with the reason.
+    # Each is its round icon with its word under it (the Gen 3 design system: never an icon on its own); the full name ("Reset zoom and
+    # rotation") is the accessible name, starting with the word shown ("Reset")
     def control(name, action, disabled: false)
       label = t("#{VIEWER}.#{name}")
-      helpers.tag.button(icon(name), type: "button", class: "round-control", title: label,
+      helpers.tag.button(type: "button", class: "zoom-tool", title: label,
                          aria: { label: label, disabled: (disabled ? "true" : nil) },
-                         data: { action: "media-viewer##{action}", media_viewer_target: action })
+                         data: { action: "media-viewer##{action}", media_viewer_target: action }) do
+        zoom_tool_face(name)
+      end
+    end
+
+    def zoom_tool_face(name)
+      helpers.safe_join([ helpers.tag.span(icon(name), class: "round-control"), helpers.tag.span(t("#{VIEWER}.short.#{name}"), class: "zoom-tool__label") ])
     end
 
     # What the script says and shows (announcements, the zoom readout, why a control is unavailable), in the page's language

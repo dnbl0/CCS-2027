@@ -1,7 +1,8 @@
 <section class="cookie-notice" aria-labelledby="cookie-notice-title" data-controller="cookie-notice" data-turbo-temporary data-placeholder-wording>
   <div class="cookie-notice__inner">
     <div class="cookie-notice__text">
-      <h2 class="cookie-notice__title" id="cookie-notice-title"><%= t("nexus_ccs.cookie_notice.title") %></h2>
+      <%# not a heading: the page's own h1 is its first heading; the region is still named by this title %>
+      <p class="cookie-notice__title" id="cookie-notice-title"><%= t("nexus_ccs.cookie_notice.title") %></p>
       <% if choosable? %>
         <p><%= t("nexus_ccs.cookie_notice.intro_with_choice") %></p>
         <ul class="cookie-notice__list">

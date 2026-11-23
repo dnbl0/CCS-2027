@@ -71,7 +71,7 @@
               </div>
               <% unless @record_mode %>
                 <%= button_to "Remove", compare_item_path(pane.record_id), method: :delete, class: "deep-zoom__button deep-zoom__button--plain",
-                              form: { class: "d-inline" }, aria: { label: "Remove from compare: #{pane.title}" } %>
+                              form: { class: "d-inline" }, aria: { label: "Remove from comparison: #{pane.title}" } %>
               <% end %>
             </div>
           </div></li>

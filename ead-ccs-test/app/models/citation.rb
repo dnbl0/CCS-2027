@@ -77,12 +77,15 @@ module Citation
     given.present? && !given.match?(/\A[a-z]/) ? Name.new(family: family, given: given) : Name.new(family: text.delete("()").squish, given: nil)
   end
 
-  # 1922 from "c. 1922", "26 July 1896", "Dec-47" (no year: the indexed start year), nil when there is none
+  # 1922 from "c. 1922", "26 July 1896"; a century or decade as the record writes it ("[c. 20th century]" is "c. 20th century", so a
+  # citation never claims a year the record does not give); otherwise ("not dated", "Dec-47") the indexed start year; nil when none
   def year_of(date_text, start_year)
-    found = date_text.to_s[/\b(1\d{3}|20\d{2})\b/, 1] || start_year&.to_s.presence
-    return nil unless found
+    text = date_text.to_s.squish
+    found = text[/\b(1\d{3}|20\d{2})\b/, 1]
+    return text.match?(/\b(c\.|ca\.?|circa)\s*\d/i) ? "c. #{found}" : found if found
+    return text.delete("[]").strip if text.match?(/\b\d{1,2}(st|nd|rd|th)\s+century\b|\b\d{3}0s\b/i)
 
-    date_text.to_s.match?(/\b(c\.|ca\.?|circa)\s*\d/i) ? "c. #{found}" : found
+    start_year&.to_s.presence
   end
 
   def first_value(document, field) = Array(document[field]).first.to_s.squish.presence

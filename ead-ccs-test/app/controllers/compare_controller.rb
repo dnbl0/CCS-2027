@@ -79,7 +79,7 @@ class CompareController < ApplicationController
   end
 
   def pane(document, media, images, index)
-    Pane.new(record_id: document.id.to_s, title: media.title, accession_number: media.accession_number, licence: media.licence,
+    Pane.new(record_id: document.id.to_s, title: media.title, accession_number: media.accession_number, licence: RecordLicence.for(document),
              images: images, index: index)
   end
 

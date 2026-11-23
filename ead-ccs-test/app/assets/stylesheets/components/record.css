@@ -27,13 +27,13 @@
 /* The header: identity left, media right (sticky while the column beside it scrolls); the collection line at the identity's foot */
 .record__header { display: grid; gap: var(--ccs-space-7) var(--ccs-space-6); grid-template-columns: var(--record-columns); }
 .record__identity, .record__media { min-width: 0; }
-/* Below 1024px one column: the title, date and maker, then the media, then the names, the actions and the collection */
+/* Below 1024px one column: the title with its date, maker and collection and the actions, then the media, then the names */
 @media (max-width: 1023.98px) {
   .record__header { row-gap: 0; }
   .record__identity { display: contents; }
-  .record__title, .record__lines { order: 1; }
+  .record__title, .record__lines, .record__actions { order: 1; }
   .record__media { order: 2; margin-top: var(--ccs-space-6); }
-  .record__names, .record__actions { order: 3; }
+  .record__names { order: 3; }
 }
 @media (min-width: 1024px) {
   .record__header { align-items: start; }
@@ -48,8 +48,8 @@
   line-height: var(--ccs-line-height-tight); color: var(--ccs-text-brand); text-wrap: balance;
 }
 @media (min-width: 768px) { .record__title { font-size: var(--ccs-font-size-5xl); } }
-/* Three groups, each 32px from the next, their own parts 8 to 12px apart: the title with what identifies the object, Associated names,
-   and the actions with Compare under them */
+/* Three groups, each 32px from the next, their own parts 4 to 12px apart: the title with what identifies the object, the actions with
+   Compare under them, and Associated names */
 .record__lines { display: grid; gap: var(--ccs-space-1); margin-top: var(--ccs-space-4); }
 .record__lines p { margin: 0; font-size: var(--ccs-font-size-lg); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); }
 
@@ -220,7 +220,10 @@
 }
 .more-actions__item:hover { background: var(--ccs-surface-subtle); text-decoration: underline; }
 .more-actions__item:focus-visible { outline: 2px solid var(--ccs-focus-ring); outline-offset: -2px; background: var(--ccs-surface-subtle); }
-.list-dialog .list-menu--panel-only .list-menu__panel { position: static; padding: 0; border: 0; box-shadow: none; }
+/* Add to list: the same dialog width as Share and Cite (720px), its panel and field filling it */
+.list-dialog { --bs-modal-width: 720px; }
+.list-dialog .list-menu--panel-only .list-menu__panel { position: static; width: auto; max-width: none; padding: 0; border: 0; box-shadow: none; }
+.list-dialog .list-menu__input { width: 100%; }
 
 /* You may be interested in: the section heading after a rule, the design system's tabs (Source Sans 3 600, navy; the one on show on
    the cyan of the site's primary action), then three cards. Without JavaScript every panel shows, each under its own heading. */
@@ -248,6 +251,7 @@
 .record-more__part { margin-top: var(--ccs-space-7); }
 .record-more__part-heading { margin: 0 0 var(--ccs-space-4); font-family: var(--ccs-font-body); font-size: var(--ccs-heading-card-size); font-weight: var(--ccs-heading-weight-strong); color: var(--ccs-text-primary); }
 .record-more__part:has(> .record-more__empty:not([hidden])) { display: none; }
+.record-more__part:not(:has(turbo-frame[complete])) { display: none; } /* its heading waits for its cards: no heading over nothing */
 /* A row that came back empty is left out (no heading over "nothing to show"); in tabs, a panel that came back empty says so */
 .record-more__row:has(> .record-more__empty:not([hidden])) { display: none; }
 .is-tabbed .record-more__row:not([hidden]):has(> .record-more__empty:not([hidden])) { display: block; }

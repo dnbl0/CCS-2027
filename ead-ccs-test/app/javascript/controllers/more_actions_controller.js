@@ -2,11 +2,10 @@ import { Controller } from "@hotwired/stimulus"
 
 // More on the record page (NexusCcs::RecordActionsComponent): a menu button after the WAI-ARIA APG pattern. More opens the menu
 // and focuses its first item; the arrow keys, Home and End move between items; Escape, Tab or a click elsewhere closes it, and
-// Escape puts focus back on More. An item either opens a dialog by its id (Add to list, Cite this record: focus comes back to More
-// when the dialog closes) or copies the record's link and says "Link copied" in a polite status line.
+// Escape puts focus back on More. An item opens a dialog by its id (Add to list, Cite this record: focus comes back to More
+// when the dialog closes).
 export default class extends Controller {
-  static targets = [ "button", "menu", "item", "status" ]
-  static values = { copied: String }
+  static targets = [ "button", "menu", "item" ]
 
   connect() {
     this.element.hidden = false
@@ -16,7 +15,6 @@ export default class extends Controller {
 
   disconnect() {
     document.removeEventListener("click", this.onDocumentClick)
-    clearTimeout(this.statusTimer)
   }
 
   get isOpen() { return !this.menuTarget.hidden }
@@ -68,12 +66,4 @@ export default class extends Controller {
     dialog.showModal()
   }
 
-  async copyLink(event) {
-    const url = event.currentTarget.dataset.url
-    try { await navigator.clipboard.writeText(url) } catch (_) { /* no clipboard: the address is in the browser's bar */ }
-    this.close({ focusButton: true })
-    this.statusTarget.textContent = this.copiedValue
-    clearTimeout(this.statusTimer)
-    this.statusTimer = setTimeout(() => { this.statusTarget.textContent = "" }, 3000)
-  }
 }

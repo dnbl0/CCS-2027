@@ -85,7 +85,7 @@ en:
         associated_names: "Associated names"
         overview: "Object overview"
         notes: "Record details and notes"
-        full_record: "Full record"
+        full_record: "All details"
         inscriptions: "Inscriptions and marks"
         about_object: "About this object"
         see_collection: "See more from this collection"
@@ -103,8 +103,6 @@ en:
       showcase:
         read_more: "Read more"
         read_less: "Read less"
-        record_url: "Record URL"
-        copy_link: "Copy link"
         print: "Print this page"
         download_as: "Download as:"
         csv: "CSV"
@@ -118,8 +116,6 @@ en:
       actions:
         more: "More actions"
         more_label: "More"
-        copy_link: "Copy link"
-        link_copied: "Link copied"
       split:
         actions: "Actions for this record"
         uom_id: "UoM ID"
@@ -138,6 +134,15 @@ en:
         # The media viewer (Figma "Media viewer", after Europeana's item viewer). PLACEHOLDER WORDING where marked.
         viewer:
           tools: "Image tools"
+          # the words under the zoom screen's round tools (each tool's full name, above, is its accessible name)
+          short:
+            zoom_in: "Zoom in"
+            zoom_out: "Zoom out"
+            rotate_right: "Rotate"
+            reset_zoom: "Reset"
+            previous: "Previous"
+            next: "Next"
+            close: "Close"
           zoom: "Zoom"
           media_information: "Media information"
           close_information: "Close media information"

@@ -1,5 +1,5 @@
-<%# The record page (components/record.css): a header in two columns (the title with its date, maker and collection, Associated
-    names and the actions; the media on its grey panel), then sections each opened by a rule with the heading on the left: Object
+<%# The record page (components/record.css): a header in two columns (the title with its date, maker and collection, the actions
+    and Associated names; the media on its grey panel), then sections each opened by a rule with the heading on the left: Object
     overview (the key facts), About this object (the description) and Record details and notes (an accordion). You may be interested
     in follows (catalog/show). %>
 <%= content_tag @component,
@@ -25,10 +25,10 @@
         <h1 class="record__title"><%= title_markup %></h1>
         <%# What identifies the object, kept together under the title: its date, its maker and the collection it belongs to %>
         <% collection = collection_link %>
-        <% if display_date || makers.any? || collection %>
+        <% if display_date || maker_line? || collection %>
           <div class="record__lines">
             <% if display_date %><p><%= display_date %></p><% end %>
-            <% if makers.any? %><p><%= makers.map(&:first).join("; ") %></p><% end %>
+            <% if maker_line? %><p><%= makers.map(&:first).join("; ") %></p><% end %>
             <% if collection %>
               <p class="record__collection">
                 <span><%= collection.first %></span>
@@ -37,6 +37,8 @@
             <% end %>
           </div>
         <% end %>
+        <%# The actions straight under what identifies the object: in reach before the image on a phone %>
+        <div class="record__actions"><%= render NexusCcs::RecordActionsComponent.new(document: document) %></div>
         <% if associated_names.any? %>
           <section class="record__names" aria-labelledby="record-names-heading">
             <h2 class="record__names-heading" id="record-names-heading"><%= t("nexus_ccs.record_page.layout.associated_names") %></h2>
@@ -50,7 +52,6 @@
             </ul>
           </section>
         <% end %>
-        <div class="record__actions"><%= render NexusCcs::RecordActionsComponent.new(document: document) %></div>
       </div>
 
       <div class="record__media">

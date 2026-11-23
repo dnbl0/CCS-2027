@@ -55,22 +55,22 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   test "an open record with images offers Compare images, Add to compare, Share and More, and no access notice" do
     render_actions(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 
-    assert_selector ".record-actions .compare-actions a[href='/compare?record=emu-1']", text: "Compare images", visible: :all
-    assert_selector ".compare-actions form[action='/compare/items'] button", text: "Add to compare", visible: :all
+    assert_selector ".record-actions .compare-actions a[href='/compare?record=emu-1']", text: "Compare this record's images", visible: :all
+    assert_selector ".compare-actions form[action='/compare/items'] button", text: "Add to comparison", visible: :all
     assert_selector ".record-actions__row .share__button", text: /Share and embed/, visible: :all
     assert_selector ".record-actions__row .more-actions__button[aria-haspopup=menu][aria-expanded=false][aria-label='More actions']", visible: :all
     assert_no_selector ".access-notice"
   end
 
-  test "Figma option A: Share and More in one row, Cite this record and Copy link in More's menu, Compare under the row" do
+  test "Figma option A: Share and More in one row, Add to list and Cite this record in More's menu (the link is Share's), Compare under the row" do
     render_actions(IMAGES)
 
     assert_no_selector "details", visible: :all
     assert_selector ".record-actions__row .share__button"
     assert_no_selector ".record-actions__row .cite__button", visible: :all
     items = page.all(".more-actions__menu[role=menu] [role=menuitem]", visible: :all).map { |item| item.text(:all).strip }
-    assert_includes items, "Cite this record"
-    assert_equal "Copy link", items.last
+    assert_equal "Cite this record", items.last
+    assert_not_includes items, "Copy link"
     assert_selector "[role=menuitem][data-dialog-id='cite-emu-1']", visible: :all
     assert_selector "dialog#cite-emu-1.cite__dialog", visible: :all
     assert_selector ".record-actions__row ~ .record-actions__compare .compare-actions", visible: :all
@@ -80,15 +80,15 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
     render_actions("digital_asset_large_paths_ssim" => [ "/digital-assets/large/a.jpg" ], "digital_asset_paths_ssim" => [ "/digital-assets/thumbs/a.jpg" ],
                    "licence_type_ssim" => [ "Public domain - Copyright expired" ])
 
-    assert_no_selector ".compare-actions a", text: "Compare images", visible: :all
-    assert_selector ".compare-actions button", text: "Add to compare", visible: :all
+    assert_no_selector ".compare-actions a", text: "Compare this record's images", visible: :all
+    assert_selector ".compare-actions button", text: "Add to comparison", visible: :all
   end
 
   test "a view-only record's actions hold no access notice (Use and access says it) and nothing that downloads" do
     render_actions(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ]))
 
     assert_no_selector ".access-notice"
-    assert_selector ".compare-actions button", text: "Add to compare", visible: :all
+    assert_selector ".compare-actions button", text: "Add to comparison", visible: :all
     assert_no_selector "a[download]"
   end
 
@@ -216,15 +216,13 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   end
 
   # --- about
-  test "About this record: a centred heading, the text and content notice, Suggest a correction, the record URL with Copy link, Print and the downloads" do
+  test "About this record: a centred heading, the text and content notice, Suggest a correction, Print and the downloads (the link is Share's and the permalink's)" do
     render_inline(NexusCcs::RecordAboutComponent.new(document: doc("collection_ssim" => [ "University Art Collection" ]), url: "http://example.test/catalog/emu-1"))
 
     assert_selector "section#about-this-record h2.record-showcase__section-heading", text: "About this record"
     assert_selector ".record-about__text", text: "not appropriate today"
     assert_selector "a.record-about__button", text: "Suggest a correction"
-    assert_selector "[data-controller=clipboard] [data-clipboard-target=source][data-copy='http://example.test/catalog/emu-1']"
-    assert_selector ".record-facts__row dt", text: "Record URL"
-    assert_selector "button.record-copy", text: "Copy link"
+    assert_no_selector ".record-facts__row dt", text: "Record URL"
     assert_selector "button[data-action='print#print']", text: "Print this page"
   end
 

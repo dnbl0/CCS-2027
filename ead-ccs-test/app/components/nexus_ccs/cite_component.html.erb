@@ -5,7 +5,7 @@
     <ul class="cite__list">
       <% citations.each do |style, label, text| %>
         <li class="cite__item" data-controller="clipboard">
-          <h3 class="cite__style"><%= label %></h3>
+          <h4 class="cite__style"><%= label %></h4><%# under the section's own h3 %>
           <p class="cite__text" data-clipboard-target="source" data-copy="<%= text %>"><%= text %></p>
           <button type="button" class="cite__copy" data-action="clipboard#copy" data-clipboard-target="button"
                   aria-label="<%= t('nexus_ccs.cite.copy_named', style: label) %>">

@@ -30,8 +30,10 @@ class MediaSectionTest < ActiveSupport::TestCase
     assert_selector ".media-viewer__licence", text: "In copyright."
     assert_selector "button.media-viewer__tool[hidden][aria-label='Zoom into the image']", visible: :all
     assert_selector "dialog.media-zoom[aria-labelledby=media-zoom-heading] .media-zoom__tools[role=group][aria-label='Image tools']", visible: :all
-    [ "Zoom in", "Zoom out", "Rotate", "Reset zoom and rotation" ].each do |name|
-      assert_selector "dialog.media-zoom button.round-control[aria-label='#{name}'][title]", visible: :all
+    # each tool its round icon with its word under it (never an icon on its own), the full name its accessible name
+    { "Zoom in" => "Zoom in", "Zoom out" => "Zoom out", "Rotate" => "Rotate", "Reset zoom and rotation" => "Reset" }.each do |name, word|
+      assert_selector "dialog.media-zoom button.zoom-tool[aria-label='#{name}'][title] .round-control svg", visible: :all
+      assert_selector "dialog.media-zoom button.zoom-tool[aria-label='#{name}'] .zoom-tool__label", text: word, visible: :all
     end
     assert_selector "dialog.media-zoom button[aria-label='Close zoom']", visible: :all
     # at fit, Reset and Zoom out start unavailable (aria-disabled, still focusable)

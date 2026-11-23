@@ -175,8 +175,8 @@
         <% if images.size > 1 %><p class="media-zoom__position" data-media-viewer-target="position"><%= t("#{VIEWER}.position", position: 1, count: images.size) %></p><% end %>
       </div>
       <%= render NexusCcs::DeepZoomComponent.new(sources: zoom_sources, label: alt(1)) %>
-      <button type="button" class="round-control media-zoom__close" data-action="media-viewer#closeZoom"
-              aria-label="<%= t("#{VIEWER}.close_zoom") %>" title="<%= t("#{VIEWER}.close_zoom") %>"><%= icon(:close) %></button>
+      <button type="button" class="zoom-tool media-zoom__close" data-action="media-viewer#closeZoom"
+              aria-label="<%= t("#{VIEWER}.close_zoom") %>" title="<%= t("#{VIEWER}.close_zoom") %>"><%= zoom_tool_face(:close) %></button>
       <div class="media-zoom__tools" role="group" aria-label="<%= t("#{VIEWER}.tools") %>">
         <%= control(:zoom_in, "zoomIn") %>
         <%= control(:zoom_out, "zoomOut", disabled: true) %>
@@ -198,7 +198,7 @@
       <div class="media-drawer__inner">
         <div class="media-drawer__head">
           <h2 id="media-information-heading" class="media-drawer__heading"><%= t("#{VIEWER}.media_information") %></h2>
-          <button type="button" class="round-control" data-action="media-viewer#closeInfo" aria-label="<%= t("#{VIEWER}.close_information") %>" title="<%= t("#{VIEWER}.close_information") %>"><%= icon(:close) %></button>
+          <button type="button" class="text-button media-drawer__close" data-action="media-viewer#closeInfo" aria-label="<%= t("#{VIEWER}.close_information") %>"><span><%= t("#{VIEWER}.short.close") %></span><%= icon(:close) %></button>
         </div>
         <dl class="media-drawer__fields">
           <% metadata.each do |label, text| %><div class="media-drawer__field"><dt><%= label %></dt><dd><%= text %></dd></div><% end %>

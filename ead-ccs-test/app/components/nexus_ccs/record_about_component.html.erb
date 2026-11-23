@@ -8,16 +8,7 @@
     <a class="record-about__button" href="<%= correction_href %>"<% if correction_new_tab? %> target="_blank" rel="noopener"<% end %>><%= t("nexus_ccs.record_page.showcase.suggest") %><% if correction_new_tab? %><span class="visually-hidden"> <%= t("nexus_ccs.record_page.no_image.ask_new_tab") %></span><% end %></a>
   </p>
 
-  <div class="record-about__use" data-controller="clipboard">
-    <dl class="record-facts__list">
-      <div class="record-facts__row">
-        <dt><%= t("nexus_ccs.record_page.showcase.record_url") %></dt>
-        <dd>
-          <span class="record-facts__value record-about__url" data-clipboard-target="source" data-copy="<%= url %>"><%= url %></span>
-          <button type="button" class="record-copy" data-action="clipboard#copy" data-clipboard-target="button"><span data-clipboard-target="label"><%= t("nexus_ccs.record_page.showcase.copy_link") %></span></button>
-        </dd>
-      </div>
-    </dl>
+  <div class="record-about__use">
     <ul class="record-about__links">
       <li><button type="button" class="record-about__print" data-controller="print" data-action="print#print">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 9V3h12v6M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2" /><path d="M6 14h12v7H6z" /></svg>
@@ -29,6 +20,5 @@
         </li>
       <% end %>
     </ul>
-    <p class="visually-hidden" role="status" data-clipboard-target="status"></p>
   </div>
 <% end %>

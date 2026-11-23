@@ -148,11 +148,12 @@ were removed on both sites). See `docs/styling-inventory.md`.
 (designsystem.web.unimelb.edu.au) and the site's other pages, on white, capped at 1440px (`--layout-page`) with the site's gutters (16px,
 32px from 768px). Header in two columns (5:7 from 1024px), the identity one block at the top level with the media panel's top edge, in three groups
 32px apart (space groups them, no rules): the h1 as every page's (Fraunces regular, navy, 48px; 36px on a phone) with the date, the
-maker and the record's collection with "See more from this collection" (the arrow link) under it; Associated names (a card-level heading; each name an in-content link, `ccs-text-link`, its role and dates under it), the
-actions (`RecordActionsComponent`: Save as the site's outline button, Share, and More, a menu of Add to list, Cite this record and Copy
-link, Compare under them); and the media
-(`DigitalAssetsComponent`, Figma Record/IIIF viewer) on a light grey panel, sticky from 1024px. On a phone: the title, then the media, then
-the names. Then sections, each after a full-width rule with its heading on the left (the site's section heading, `--ccs-heading-section-size`):
+maker (left out when Associated names lists the same names) and the record's collection with "See more from this collection" (the arrow link) under it; then the actions (`RecordActionsComponent`: Save the Gen 3 tertiary button, Share and embed, and More, a menu of Add to list
+and Cite this record, the link being Share's; "Compare this record's images" and "Add to comparison" under them, "Open comparison" from
+two records); then Associated names (a card-level heading; each name an in-content link, `ccs-text-link`, its role and dates under it); and
+the media (`DigitalAssetsComponent`, Figma Record/IIIF viewer) on a light grey panel, sticky from 1024px, the zoom screen's round tools each
+with its word under it. On a phone: the title block and the actions, then the media, then the names. Object overview is the summary (the
+credit line and copyright are Use and access's); All details is every field in CCS-400's sequence; a value is a tag only when short. Then sections, each after a full-width rule with its heading on the left (the site's section heading, `--ccs-heading-section-size`):
 Object overview (the key facts, two columns, label a card-level heading above the value; names of things as the design system's tags,
 `record-tags`), About this object (the description, Read more, CCS-413) and Record details and notes (`record-accordion`: the design
 system's accordion as native `<details>`, title Source Sans 3 600 20px in link blue, the open panel on the pale grey surface). Last, You

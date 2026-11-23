@@ -64,7 +64,7 @@ class MediaViewerTest < ApplicationSystemTestCase
 
   test "Compare images: two panes with synchronised zoom, a selector each, and the link can be switched off" do
     visit "/catalog/#{MULTI}"
-    click_link "Compare images"
+    click_link "Compare this record's images"
 
     assert_selector ".compare.is-ready"
     assert_selector ".compare-pane", count: 2
@@ -106,11 +106,11 @@ class MediaViewerTest < ApplicationSystemTestCase
 
   test "records from different pages are compared once added; each pane has its title, accession number and licence" do
     visit "/catalog/#{MULTI}"
-    click_button "Add to compare"
-    assert_text "Added to compare"
+    click_button "Add to comparison"
+    assert_text "Added to comparison"
     visit "/catalog/#{SINGLE}"
-    click_button "Add to compare"
-    assert_text "Added to compare"
+    click_button "Add to comparison"
+    assert_text "Added to comparison"
     click_link "Open comparison (2)"
 
     assert_selector ".compare-pane", count: 2
@@ -152,6 +152,6 @@ class MediaViewerTest < ApplicationSystemTestCase
     visit "/catalog/#{withheld}"
 
     assert_no_button "Zoom into the image", visible: :all
-    assert_no_button "Add to compare"
+    assert_no_button "Add to comparison"
   end
 end

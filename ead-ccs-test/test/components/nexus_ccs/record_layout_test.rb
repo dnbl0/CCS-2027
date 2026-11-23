@@ -82,9 +82,16 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_equal "Maker, b. 1882 - d. 1961", names.first[2]
   end
 
-  test "Object overview holds the key facts in the sheet's order, the credit line and copyright among them" do
-    labels = component(SHEET.merge("rights_ssim" => [ "© Grainger" ])).overview_rows.map(&:label)
-    assert_equal [ "Object Type", "Place", "Material", "Measurements", "Classification", "Collection", "Accession Number", "Credit line", "Copyright" ], labels
+  test "Object overview holds the key facts in the sheet's order; the credit line and copyright are Use and access's alone" do
+    record = component(SHEET.merge("rights_ssim" => [ "© Grainger" ]))
+    assert_equal [ "Object Type", "Place", "Material", "Measurements", "Classification", "Collection", "Accession Number" ], record.overview_rows.map(&:label)
+    assert_includes record.rights_items.map(&:first), "Copyright"
+  end
+
+  test "the maker line under the title is left out when Associated names lists exactly the same names" do
+    record = component(SHEET)
+    assert_equal record.makers.map(&:first).sort, record.associated_names.map(&:first).sort
+    assert_not record.maker_line?
   end
 
   test "the record's collection, with the way to the rest of it" do

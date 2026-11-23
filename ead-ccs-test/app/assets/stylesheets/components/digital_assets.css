@@ -88,7 +88,19 @@
 .media-zoom .deep-zoom__stage { background: transparent; }
 .media-zoom__close { position: absolute; top: var(--ccs-space-5); right: var(--ccs-space-5); z-index: 2; }
 .media-zoom__tools { position: absolute; left: var(--ccs-space-5); bottom: var(--ccs-space-5); z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-3); max-width: calc(100% - 2 * var(--ccs-space-5)); }
-.media-zoom__divider { width: 1px; height: 1.75rem; background: var(--ccs-neutral-300); }
+.media-zoom__divider { width: 1px; height: 1.75rem; background: var(--ccs-neutral-300); align-self: center; }
+/* Each zoom tool: its round icon with its word under it (never an icon on its own), light on the dark ground */
+.zoom-tool { display: inline-flex; flex-direction: column; align-items: center; gap: var(--ccs-space-1); min-width: 3rem; padding: 0; font: inherit; color: var(--ccs-neutral-100); background: none; border: 0; cursor: pointer; }
+.zoom-tool__label { font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); line-height: 1.2; white-space: nowrap; }
+.zoom-tool .round-control { pointer-events: none; }
+.media-zoom .zoom-tool:hover .round-control { background: rgb(255 255 255 / 10%); border-color: var(--ccs-neutral-100); }
+.zoom-tool:hover .zoom-tool__label { text-decoration: underline; }
+.zoom-tool:focus-visible { outline: none; }
+.zoom-tool:focus-visible .round-control { outline: 3px solid var(--ccs-cyan-400); outline-offset: 2px; }
+.zoom-tool[aria-disabled="true"] { cursor: not-allowed; }
+.zoom-tool[aria-disabled="true"] :is(svg, .zoom-tool__label) { opacity: 0.45; }
+.media-zoom .zoom-tool[aria-disabled="true"]:hover .round-control { background: transparent; border-color: var(--ccs-neutral-300); }
+.zoom-tool[aria-disabled="true"]:hover .zoom-tool__label { text-decoration: none; }
 .media-zoom__readout:empty { display: none; }
 .media-zoom__readout {
   position: absolute; right: var(--ccs-space-5); bottom: var(--ccs-space-5); z-index: 2; margin: 0; padding: var(--ccs-space-1) var(--ccs-space-3);
