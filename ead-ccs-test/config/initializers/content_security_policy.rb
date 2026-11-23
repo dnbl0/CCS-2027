@@ -14,9 +14,9 @@ Rails.application.configure do
     policy.base_uri    :self
     policy.frame_ancestors :self
     policy.form_action :self, "https://search.unimelb.edu.au"
-    policy.script_src  :self
+    policy.script_src  :self, -> { Analytics.enabled? ? [ Analytics.script_origin ] : [] } # the Adobe tag's host once analytics is on (CCS-53)
     policy.style_src   :self, :unsafe_inline # Blacklight sets some inline styles
-    policy.connect_src :self
+    policy.connect_src :self, -> { Analytics.enabled? ? Analytics::CONNECT_HOSTS : [] } # the Adobe tag's services once analytics is on (CCS-53)
     # Audio and video play from this site, from the Nexus DAM's embed links (digital_media_ssim, written by the DAM sync) and from
     # CCS_MEDIA_BASE_URL when that is on another host. Images already come from any https host (img-src), DAM images included.
     media_base = ENV["CCS_MEDIA_BASE_URL"].to_s[%r{\Ahttps://[^/]+}]

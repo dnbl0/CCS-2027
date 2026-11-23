@@ -73,7 +73,7 @@
   </header>
   <ul class="help-section__items">
     <li class="help-section__item">
-      <p class="help-section__text"><%= t("nexus_ccs.cookie_notice.privacy.intro") %> <%= t("nexus_ccs.cookie_notice.privacy.none_optional") %> Your browser also keeps, for the visit only, which filters you had open. <span data-placeholder>[Placeholder: the University to confirm that these cookies need no consent banner, and whether any University-wide analytics will be added.]</span></p>
+      <p class="help-section__text"><%= t("nexus_ccs.cookie_notice.privacy.intro") %> <%= t(CookieNotice.choosable? ? "nexus_ccs.cookie_notice.privacy.with_optional" : "nexus_ccs.cookie_notice.privacy.none_optional") %> Your browser also keeps, for the visit only, which filters you had open. <span data-placeholder>[Placeholder: the University to confirm that these cookies need no consent banner, and whether any University-wide analytics will be added.]</span></p>
     </li>
     <% CookieNotice.essential.each do |cookie| %>
       <li class="help-section__item">

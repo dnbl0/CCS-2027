@@ -29,7 +29,7 @@
         <% media.each do |item| %>
           <figure class="digital-assets__media">
             <%# Each kind of file has its viewer (MediaTypes): one that cannot be previewed, or played by a browser, says so %>
-            <%= helpers.render partial: MediaTypes.viewer_for_item(item), locals: { item: item, title: media_title(item), downloadable: item[:downloadable], request_path: request_path } %>
+            <%= helpers.render partial: MediaTypes.viewer_for_item(item), locals: { item: item, title: media_title(item), downloadable: item[:downloadable], request_path: request_path, unindexed: pdf_unindexed?(item) } %>
             <figcaption><%= media_title(item) %></figcaption>
           </figure>
         <% end %>
@@ -149,7 +149,7 @@
     <div class="media-viewer__media">
       <% media.each do |item| %>
         <figure class="digital-assets__media">
-          <%= helpers.render partial: MediaTypes.viewer_for_item(item), locals: { item: item, title: media_title(item), downloadable: item[:downloadable], request_path: request_path } %>
+          <%= helpers.render partial: MediaTypes.viewer_for_item(item), locals: { item: item, title: media_title(item), downloadable: item[:downloadable], request_path: request_path, unindexed: pdf_unindexed?(item) } %>
           <figcaption><%= media_title(item) %></figcaption>
         </figure>
       <% end %>

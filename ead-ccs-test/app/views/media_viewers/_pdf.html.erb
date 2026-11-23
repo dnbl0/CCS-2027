@@ -1,3 +1,8 @@
 <%# locals: item, title, downloadable. A PDF is read by opening the file in the browser's own reader (a new tab), which the caller
     offers only when the file may be downloaded; an in-page reader would be a new dependency. %>
 <%= link_to "Open #{title} (PDF, opens in a new tab)", item[:url], target: "_blank", rel: "noopener", class: "digital-assets__pdf" %>
+<%# CCS-36: a PDF whose text could not be read (a scanned image with no text layer; OCR is not done) is not found by a full-text
+    search: say so, so the visitor knows to open it %>
+<% if local_assigns[:unindexed] %>
+  <p class="digital-assets__pdf-note"><%= t("nexus_ccs.record_page.media.pdf_not_indexed") %></p>
+<% end %>

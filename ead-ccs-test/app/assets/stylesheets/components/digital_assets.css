@@ -141,3 +141,6 @@
 
 /* On the zoom's dark ground the image's focus ring is cyan (about 6:1 on neutral/800; the blue ring would be about 2:1) */
 .media-zoom .deep-zoom .openseadragon-canvas:focus-visible { outline-color: var(--ccs-cyan-400); }
+
+/* CCS-36: a PDF whose text a search cannot find */
+.digital-assets__pdf-note { max-width: 40rem; margin: var(--ccs-space-2) auto 0; font-size: var(--ccs-font-size-md); color: var(--ccs-text-secondary); }

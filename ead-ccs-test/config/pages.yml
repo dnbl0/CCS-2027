@@ -187,7 +187,7 @@ collections:
       paragraphs:
       - The Henry Forman Atkinson Dental Museum conducts tours of its exhibitions for university students,
         staff, alumni, secondary schools and the community. These tours are free.
-      - For all enquiries, please contact the museum on <a class="contact-box__link" href="mailto:mhm-info@unimelb.edu.au">mhm-info@unimelb.edu.au</a>.
+      - For all enquiries, please contact the museum on <a class="contact-box__link" href="mailto:mhm.info@unimelb.edu.au">mhm.info@unimelb.edu.au</a>.
     - label: Opening hours
       paragraphs:
       - 9:00am – 5:00pm Monday to Friday
@@ -195,7 +195,7 @@ collections:
       paragraphs:
       - The Henry Forman Atkinson Dental Museum is wheelchair accessible and welcomes visitors of all
         abilities. In some circumstances there are access limitations, please contact staff for more information.
-      - For all enquiries, please contact the museum on <a class="contact-box__link" href="mailto:mhm-info@unimelb.edu.au">mhm-info@unimelb.edu.au</a>.
+      - For all enquiries, please contact the museum on <a class="contact-box__link" href="mailto:mhm.info@unimelb.edu.au">mhm.info@unimelb.edu.au</a>.
     - label: Location
       paragraphs:
       - Ground floor of the Royal Dental Hospital,<br/>720 Swanston St, Carlton.
@@ -231,14 +231,14 @@ collections:
       - The Medical History Museum conducts free guided tours of our exhibitions for groups of 15 or more.
         These tours are for university students, staff, alumni, secondary schools and the community.
       - 'Tours are available by appointment. To inquire or book a tour, please contact: <a class="contact-box__link"
-        href="mailto:mhm-info@unimelb.edu.au">mhm-info@unimelb.edu.au</a>'
+        href="mailto:mhm.info@unimelb.edu.au">mhm.info@unimelb.edu.au</a>'
     - label: Opening hours
       paragraphs:
       - Monday to Friday 10.00am to 5.00pm
     - label: Location
       paragraphs:
       - University of Melbourne<br/>233 Bouverie St<br/>Carlton, Victoria
-      - For all enquiries, please contact the museum on <a class="contact-box__link" href="mailto:mhm-info@unimelb.edu.au">mhm-info@unimelb.edu.au</a>.
+      - For all enquiries, please contact the museum on <a class="contact-box__link" href="mailto:mhm.info@unimelb.edu.au">mhm.info@unimelb.edu.au</a>.
     visit_url: https://medicalhistorymuseum.mdhs.unimelb.edu.au/about/contact-us
     website:
       url: https://collections.mdhs.unimelb.edu.au/explore

@@ -1,0 +1,4 @@
+<%# CCS-53: the Adobe tag (Analytics), only when it is configured and only after the visitor accepted analytics cookies %>
+<% if Analytics.enabled? && CookieNotice.optional_allowed?(cookies) %>
+  <%= javascript_include_tag Analytics.script_url, async: true, nonce: true %>
+<% end %>

@@ -90,6 +90,15 @@ class PdfTextTest < ActiveSupport::TestCase
     assert_not sensitive.key?("pdf_text_tim")
   end
 
+  test "CCS-36: a PDF whose text cannot be read is named as not indexed, so the record page can say its text cannot be searched" do
+    ENV["PDF_MEDIA_DIR"] = @dir
+    document = media("missing.pdf").attach("accession_number_ssim" => [ "X.1" ], "licence_type_ssim" => [ "Public domain - Copyright expired" ])
+
+    assert_not document.key?("pdf_text_tim")
+    assert_equal 1, Array(document["pdf_text_unindexed_ssm"]).size
+    assert_match(/missing\.pdf\z/, document["pdf_text_unindexed_ssm"].first)
+  end
+
   test "PDF_TEXT=off, a missing file and a record with no PDF add nothing" do
     PdfFixture.write(@dir, "a.pdf", "Catalogue of violins")
     ENV["PDF_MEDIA_DIR"] = @dir

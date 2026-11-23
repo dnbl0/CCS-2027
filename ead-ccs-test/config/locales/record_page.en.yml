@@ -29,6 +29,8 @@ en:
       about:
         persistent_link: "Persistent link"
       media:
+        # CCS-36: a PDF whose text could not be read for search. PLACEHOLDER WORDING.
+        pdf_not_indexed: "Search unavailable: this document's text could not be read (it may be a scanned image), so a search will not find words inside it. Open the PDF to read it."
         # Under the media of a record that shows some of its digital assets and withholds others (their own licence does not
         # let them be shown: AccessPolicy.withheld_assets). PLACEHOLDER WORDING, NOT YET APPROVED: the University must approve it.
         partly_withheld:

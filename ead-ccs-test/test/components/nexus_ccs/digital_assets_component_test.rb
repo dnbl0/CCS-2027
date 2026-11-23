@@ -69,6 +69,14 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_selector "a.digital-assets__pdf[href='/d.pdf']"
   end
 
+  test "CCS-36: a PDF whose text could not be indexed says a search will not find words inside it; one that was indexed says nothing" do
+    render_for(assets(3).merge("digital_media_ssim" => [ "pdf|application/pdf|/d.pdf|Report", "pdf|application/pdf|/e.pdf|Letter" ],
+                               "pdf_text_unindexed_ssm" => [ "/d.pdf" ]))
+
+    assert_selector ".digital-assets__pdf-note", text: /Search unavailable/, count: 1
+    assert_selector "a.digital-assets__pdf[href='/d.pdf'] + .digital-assets__pdf-note"
+  end
+
   # The DAM holds videos as WMV, which no web browser plays: a player would stay blank (seen 2026-11-18)
   test "a video in a format browsers cannot play says so, and an open one offers the file to download instead" do
     render_for(assets(3).merge("digital_media_ssim" => [ "video|video/x-ms-wmv|/v.wmv|Film" ]))

@@ -41,12 +41,13 @@ module Collections
     def pdf_text?(files) = self.class.pdf_text? && files.any? { |file| file["kind"] == "pdf" }
     private :pdf_text?
 
-    # The text of the record's PDFs, one value each. None for a record whose assets are withheld or sensitive (AccessPolicy,
-    # Sensitivity): its PDF is not searchable, as it is not shown. A file that cannot be read adds nothing.
+    # The text of the record's PDFs ([file, text or nil] each). None for a record whose assets are withheld or sensitive
+    # (AccessPolicy, Sensitivity): its PDF is not searchable, as it is not shown. A file that cannot be read gives nil: it is then
+    # named in pdf_text_unindexed_ssm, so the record page can say its text cannot be searched (CCS-36 "Not indexed").
     def pdf_text(document, files)
       return [] if RobotsPolicy.withheld?(SolrDocument.new(document))
 
-      files.select { |file| file["kind"] == "pdf" }.filter_map { |file| PdfText.extract(self.class.pdf_dir.join(file["file"].to_s)) }
+      files.select { |file| file["kind"] == "pdf" }.map { |file| [ file, PdfText.extract(self.class.pdf_dir.join(file["file"].to_s)) ] }
     end
     private :pdf_text
 
@@ -55,8 +56,11 @@ module Collections
       return document if files.blank?
 
       formats = files.map { |f| FORMATS.fetch(f["kind"]) }
-      texts = pdf_text?(files) ? pdf_text(document, files) : []
+      extracted = pdf_text?(files) ? pdf_text(document, files) : []
+      texts = extracted.filter_map(&:last)
+      unindexed = extracted.select { |_file, text| text.nil? }.map { |file, _text| "#{self.class.base_url}/#{ERB::Util.url_encode(file["file"])}" }
       document = document.merge("pdf_text_tim" => texts) if texts.any?
+      document = document.merge("pdf_text_unindexed_ssm" => unindexed) if unindexed.any?
       document.merge(
         "digital_media_ssim" => files.map { |f| entry(f) },
         "has_digital_asset_bsi" => true,

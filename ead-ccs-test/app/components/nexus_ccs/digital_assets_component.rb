@@ -152,6 +152,12 @@ module NexusCcs
 
     def media_title(item) = item[:label].presence || title
 
+    # CCS-36: a PDF whose text could not be read when the record was indexed (pdf_text_unindexed_ssm), so a full-text search will not
+    # find it; its viewer says so
+    def pdf_unindexed?(item)
+      item[:kind] == "pdf" && Array(@document["pdf_text_unindexed_ssm"]).map { |url| url.split("?").first }.include?(item[:url].to_s.split("?").first)
+    end
+
     def count = large_paths.size
 
     def title
