@@ -70,10 +70,12 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     assert_select ".place-page__summary", /made 1816 to 2019/
     assert_select ".card-layout--mosaic li.mosaic-flow__item", count: 1 # the one record that may be shown
     assert_select "a.btn[href*='f%5Bcreator_ssim%5D%5B%5D=Bunny%2C+Rupert']", text: /See all 730 records/
-    assert_select ".place-chips a", text: /\AAustralia\s/ # a related place, with its count
-    assert_select ".place-chips a", text: /\ATiny, Tim\s/
-    assert_select ".place-chips a", text: /\AUnknown/, count: 0
-    assert_select ".place-chips a[href='/browse/periods/1900-1999']"
+    # the ways in and what is related: tiles in the page's mosaic, each with its number of records
+    assert_select ".mosaic-flow .explore-card__link", text: "Australia" # a related place
+    assert_select ".mosaic-flow li", text: /Australia\s+\d+ records?/
+    assert_select ".mosaic-flow .explore-card__link", text: "Tiny, Tim"
+    assert_select ".mosaic-flow .explore-card__link", text: /\AUnknown/, count: 0
+    assert_select ".mosaic-flow .explore-card__link[href='/browse/periods/1900-1999']"
   end
 
   test "an entity with a stale slug goes to its address, and an unknown or malformed one is a 404" do
@@ -100,7 +102,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     link = css_select(".place-collections h3 a").first
     assert_equal "University Art Collection", link.text
     assert_match %r{\A/browse/collections/|collection_ssim}, link["href"] # the collection's own page, or its records in the search
-    assert_select ".place-chips a.places-chip", text: /Painting\s+400/
+    assert_select ".mosaic-flow li", text: /Painting\s+400 records/ # a kind of record, as a tile
     assert_select "section .card-layout--mosaic ul.mosaic-flow[data-controller=mosaic] li .object-card, section .card-layout--mosaic ul.mosaic-flow li article"
     assert_select "main.browse-main", count: 0 # not the makers' and subjects' profile
   end
@@ -136,7 +138,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     browse entity_path("makers", "Bunny, Rupert"), docs: [ OPEN, WITHHELD, SENSITIVE ], total: 3
 
     assert_response :success
-    assert_select ".result-card", count: 1
+    assert_select ".card-layout .object-card", count: 1 # the records (the ways in are tiles of their own)
     assert_includes response.body, "open-one.jpg"
     %w[withheld-two sensitive-three Withheld\ secret Sensitive\ secret].each { |leak| assert_not_includes response.body, leak }
     assert_select ".browse-note", /not previewed/
@@ -203,16 +205,20 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
 
   # --- Budgets ---
 
-  # A maker's page also asks for its related makers (Browse::Creator.related), kept for six hours: two requests the first time, one after
+  # A maker's page also asks for its related makers (Browse::Creator.related), kept for six hours, and for a picture of each of its ways
+  # in (Browse::FacetPictures), kept for a day: three requests the first time, one after
   test "with the value lists cached an entity page makes one Solr request" do
     with_seeded_menu_cache do
       seed_lists
       with_canned_search(answer) do |seen|
         get entity_path("makers", "Bunny, Rupert")
-        assert_operator seen.size, :<=, 2
+        assert_operator seen.size, :<=, 3
         seen.clear
         get entity_path("makers", "Bunny, Rupert")
         assert_equal 1, seen.size
+        seen.clear
+        get "/browse/periods/1900-1999"
+        assert_operator seen.size, :<=, 2 # its records, and the first time its pictures for the ways in
         seen.clear
         get "/browse/periods/1900-1999"
         assert_equal 1, seen.size

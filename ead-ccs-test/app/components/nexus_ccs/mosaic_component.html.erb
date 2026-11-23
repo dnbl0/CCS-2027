@@ -1,6 +1,6 @@
-<ul class="mosaic-flow" data-controller="mosaic" data-mosaic-lanes-value="<%= lanes %>" aria-label="<%= label %>">
+<%= tag.ul(**list_attributes, aria: { label: label }) do %>
   <% tiles.each do |tile| %>
-    <li class="mosaic-flow__item<%= " mosaic-flow__item--lead" if tile.lead %>" <%= tag.attributes(style: aspect_style(tile.width, tile.height)) %>>
+    <li class="mosaic-flow__item<%= " mosaic-flow__item--lead" if tile.lead %>" <%= tag.attributes(style: item_style(tile)) %>>
       <%# The site's card (result card, as ExploreCardComponent), in its tile variant: the picture whole above, the name and line below
           on white; the lead adds its call to action. The title is the link text, so the picture's own link is hidden. %>
       <article class="result-card explore-card explore-card--tile<%= " explore-card--lead" if tile.lead %>">
@@ -8,13 +8,17 @@
           <%= link_to tile.path, class: "result-card__media", tabindex: -1, "aria-hidden": true do %>
             <%= image_tag tile.image, alt: "", loading: "lazy", decoding: "async", width: tile.width, height: tile.height %>
           <% end %>
+        <% elsif tile.figure %>
+          <%# no picture: its figure (a number of records) where the picture would be, so the tile has the same shape as the others; a screen
+              reader hears the name first and then the same words from the line under it (visually hidden), so the figure is hidden from it %>
+          <div class="result-card__media mosaic-flow__figure" aria-hidden="true"><span class="mosaic-flow__figure-text"><%= tile.figure %></span></div>
         <% end %>
         <div class="result-card__content">
           <h3 class="document-title-heading"><%= link_to tile.title, tile.path, class: "explore-card__link" %><% if tile.external %><span class="visually-hidden"> <%= t("home.external") %></span><% end %></h3>
-          <% if tile.text.present? %><p class="explore-card__intro"><%= tile.text %></p><% end %>
+          <% if tile.text.present? %><p class="explore-card__intro<%= " visually-hidden" if tile.figure && !tile.image %>"><%= tile.text %></p><% end %>
           <% if tile.cta %><p class="explore-card__cta" aria-hidden="true"><%= tile.cta %></p><% end %>
         </div>
       </article>
     </li>
   <% end %>
-</ul>
+<% end %>

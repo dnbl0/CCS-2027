@@ -1,7 +1,7 @@
 <%# One place, maker, subject or period (BrowseEntitiesController#entity and #period), after Google Arts & Culture's place pages (looked at
     2026-11-23, described in our own words): a strip of its own pictures (each whole), its name and what it holds (a maker's dates and
-    roles too); the collections that hold its records; its kinds of record and its centuries (a period: the decades within it); "Discover",
-    its records as the fluid mosaic; and what is related to it. The facts and records are Browse::Profile's (records whose pictures or details
+    roles too); the collections that hold its records; its kinds of record and its centuries (a period: the decades within it), as picture tiles; "Discover",
+    its records as the fluid mosaic; and what is related to it (places, makers, subjects), as picture tiles too. The facts and records are Browse::Profile's (records whose pictures or details
     need permission are left out of the mosaic; the count and the search include them). %>
 <% result = @result %>
 <% entry = @entry %>
@@ -85,28 +85,20 @@
     <% kinds = result.facets["object_type_ssim"].first(10) %>
     <% periods = result.periods.select { |_, count| count.positive? } %>
     <% periods_heading = period ? t("browse.period.within") : t("browse.entity.related_periods") %>
-    <% if kinds.any? || periods.any? %>
-      <section class="place-section place-section--facets" aria-label="<%= t("browse.place.ways_in") %>">
-        <% if kinds.any? %>
-          <div class="place-facets">
-            <h2 class="place-section__heading place-section__heading--small"><%= t("browse.entity.object_types") %></h2>
-            <ul class="place-chips">
-              <% kinds.each do |value, count| %>
-                <li><%= link_to search_catalog_path(refine(@search_query, "object_type_ssim", value)), class: "places-chip" do %><%= value.to_s.upcase_first %> <span class="places-chip__count"><%= number_with_delimiter(count) %></span><% end %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-        <% if periods.any? %>
-          <div class="place-facets">
-            <h2 id="related-periods" class="place-section__heading place-section__heading--small"><%= periods_heading %></h2>
-            <ul class="place-chips">
-              <% periods.each do |related_period, count| %>
-                <li><%= link_to related_period.path, class: "places-chip" do %><%= related_period.label %> <span class="places-chip__count"><%= number_with_delimiter(count) %></span><% end %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
+    <%# Its kinds of record and its periods: picture tiles in the page's mosaic (a picture of one of each value's records), as every section;
+        the periods all one shape, so they read in time order %>
+    <% if kinds.any? %>
+      <section class="place-section" aria-labelledby="place-kinds">
+        <h2 id="place-kinds" class="place-section__heading"><%= t("browse.entity.object_types") %></h2>
+        <%= render NexusCcs::MosaicComponent.new(tiles: kinds.map { |value, count| facet_tile(value, count, search_catalog_path(refine(@search_query, "object_type_ssim", value)), @pictures.value("object_type_ssim", value)) },
+                                                 label: t("browse.entity.object_types"), lanes: 5, even: :auto) %>
+      </section>
+    <% end %>
+    <% if periods.any? %>
+      <section class="place-section" aria-labelledby="related-periods">
+        <h2 id="related-periods" class="place-section__heading"><%= periods_heading %></h2>
+        <%= render NexusCcs::MosaicComponent.new(tiles: periods.map { |related_period, count| facet_tile(related_period.label, count, related_period.path, @pictures.period(related_period)) },
+                                                 label: periods_heading, lanes: 5, even: true) %>
       </section>
     <% end %>
 
@@ -127,18 +119,16 @@
 
     <%# What is related: the places, makers and subjects of its records %>
     <% related = [] %>
-    <% related << [ t("browse.entity.related_places"), related_entities(Browse::Kind.find("places"), result.facets["production_place_ssim"], except: (entry if kind_key == "places")) ] %>
-    <% related << [ t("browse.entity.related_makers"), related_entities(Browse::Kind.find("makers"), result.facets["creator_ssim"], except: (entry if kind_key == "makers")) ] %>
-    <% related << [ t("browse.entity.related_subjects"), related_entities(Browse::Kind.find("subjects"), result.facets["subject_ssim"], except: (entry if kind_key == "subjects")) ] %>
-    <% related.reject! { |_, pairs| pairs.empty? } %>
-    <% related.each_with_index do |(heading, pairs), index| %>
+    <% related << [ t("browse.entity.related_places"), "production_place_ssim", related_entities(Browse::Kind.find("places"), result.facets["production_place_ssim"], except: (entry if kind_key == "places")) ] %>
+    <% related << [ t("browse.entity.related_makers"), "creator_ssim", related_entities(Browse::Kind.find("makers"), result.facets["creator_ssim"], except: (entry if kind_key == "makers")) ] %>
+    <% related << [ t("browse.entity.related_subjects"), "subject_ssim", related_entities(Browse::Kind.find("subjects"), result.facets["subject_ssim"], except: (entry if kind_key == "subjects")) ] %>
+    <% related.reject! { |_, _, pairs| pairs.empty? } %>
+    <% related.each_with_index do |(heading, field, pairs), index| %>
       <section class="place-section" aria-labelledby="related-<%= index %>">
-        <h2 id="related-<%= index %>" class="place-section__heading place-section__heading--small"><%= heading %></h2>
-        <ul class="place-chips">
-          <% pairs.each do |related_entry, count| %>
-            <li><%= link_to related_entry.path, class: "places-chip" do %><%= related_entry.name %> <span class="places-chip__count"><%= number_with_delimiter(count) %></span><% end %></li>
-          <% end %>
-        </ul>
+        <h2 id="related-<%= index %>" class="place-section__heading"><%= heading %></h2>
+        <%# a related value's picture: a record with any of its spellings (Browse::Index::Entry#variants) %>
+        <%= render NexusCcs::MosaicComponent.new(tiles: pairs.map { |related_entry, count| facet_tile(related_entry.name, count, related_entry.path, @pictures.value(field, related_entry.name, *Array(related_entry.variants))) },
+                                                 label: heading, lanes: 5, even: :auto) %>
       </section>
     <% end %>
   </div>

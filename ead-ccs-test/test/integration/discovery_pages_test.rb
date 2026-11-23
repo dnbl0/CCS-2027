@@ -88,7 +88,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Grainger Museum Collection"
     assert_select "[data-placeholder-wording]", text: /Lorem ipsum/
     assert_select "a.btn[href*='f%5Bcollection_ssim%5D%5B%5D=Grainger+Museum+Collection']", text: "See all 12 records"
-    assert_select ".place-chips a[href*='f%5Bobject_type_ssim%5D%5B%5D=Work']", text: /Work/
+    assert_select ".mosaic-flow .explore-card__link[href*='f%5Bobject_type_ssim%5D%5B%5D=Work']", text: "Work"
     assert_select "link[rel='canonical'][href$='/browse/collections/#{slug}']"
 
     get "/browse/collections/wrong-words-#{slug.split('-').last}"

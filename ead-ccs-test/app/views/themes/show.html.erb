@@ -1,4 +1,4 @@
 <% content_for :title, "#{@theme.title} — #{t('nexus_ccs.themes.title')} — Collections Navigator — University of Melbourne" %>
 <% content_for :body_class, "page-browse page-showcase" %>
-<%= render "collection_landings/showcase", showcase: @showcase, search_query: @theme.search_query, intro: @theme.intro, name: @theme.title,
+<%= render "collection_landings/showcase", showcase: @showcase, pictures: @pictures, search_query: @theme.search_query, intro: @theme.intro, name: @theme.title,
            kind_label: t("browse.place.theme"), back: [ t("browse.place.all", hub: t("nexus_ccs.themes.title").downcase), themes_path ], named: false %>

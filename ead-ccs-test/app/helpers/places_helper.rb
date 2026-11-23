@@ -23,6 +23,15 @@ module PlacesHelper
     end
   end
 
+  # One value of an entity page's ways in (a kind of record, a period, a place, a maker, a subject) as a mosaic tile: its name, its number
+  # of records and a picture of one of them (Browse::FacetPictures; nil: a text tile)
+  def facet_tile(label, count, path, picture)
+    records = t("home.records", count: count, number: number_with_delimiter(count))
+    # with no picture, the number of records stands large where the picture would be (the same shape of tile)
+    HomeSections::Tile.new(title: label.to_s.upcase_first, text: records, path: path, image: picture && DamImage.sized(AssetVersion.url(picture.src), 600),
+                           lead: false, cta: nil, external: false, width: nil, height: nil, figure: (records unless picture))
+  end
+
   # A category's value (Categories::Tile) as a mosaic tile: a collection or named collection opens its own page
   def category_tile(tile, dimension)
     image = NexusCcs::ExploreCardComponent.image?(tile, remote: true) ? tile.image : nil

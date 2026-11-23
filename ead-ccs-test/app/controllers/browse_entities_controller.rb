@@ -26,6 +26,7 @@ class BrowseEntitiesController < CatalogController
 
     @result = Browse::Profile.call(fq: @entry.fq, page: params[:page])
     wrap_response(@result)
+    @pictures = Browse::FacetPictures.for(@entry.fq, avoid: @result.documents.map(&:id))
     @search_query = @entry.search_query
     use_meta Browse::Meta.entity(@entry, @result), [ [ t("browse.title"), browse_path ], [ @kind.plural, browse_hub_path(@kind.key) ], [ @entry.name, nil ] ]
     # Every entity's page, after Google Arts & Culture's place pages (browse_entities/showcase)
@@ -40,6 +41,7 @@ class BrowseEntitiesController < CatalogController
     raise ActionController::RoutingError, "Not Found" if @result.total.zero?
 
     wrap_response(@result)
+    @pictures = Browse::FacetPictures.for(@period.fq, avoid: @result.documents.map(&:id))
 
     @search_query = @period.search_query
     trail = [ [ t("browse.title"), browse_path ], [ t("browse.periods"), browse_hub_path("periods") ] ]

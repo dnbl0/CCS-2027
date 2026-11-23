@@ -1,8 +1,8 @@
 <%# The body of a collection, named collection or theme page (Showcase), on the detail-page template (browse_entities/showcase; after
     Google Arts & Culture's place pages): a strip of its own pictures (each whole), its name, its records and its introduction (placeholder
-    wording) with the way to all its records; its object types, eras and named collections as chips (a named collection opens its own page);
+    wording) with the way to all its records; its object types, eras and named collections as picture tiles (a named collection opens its own page);
     and "Discover", its highlights as the fluid mosaic. locals: showcase, search_query, intro, name, kind_label, back ([label, path]),
-    named (a collection: its named collections open their own pages) %>
+    named (a collection: its named collections open their own pages), pictures (Browse::FacetPictures: a picture for each value) %>
 <% documents = showcase.documents %>
 <% pictured = documents.select { |document| document["thumbnail_path_ssi"].present? }.last(5) %>
 <main class="place-page" id="main-content">
@@ -30,19 +30,16 @@
          pairs = showcase.facets[field].to_a.reject { |value, _| Array(search_query.dig(:f, field)).include?(value) }
          [ field, label, pairs ] if pairs.any?
        end %>
-    <% if groups.any? %>
-      <section class="place-section place-section--facets" aria-label="<%= t("browse.place.ways_in") %>">
-        <% groups.each do |field, label, pairs| %>
-          <div class="place-facets">
-            <h2 class="place-section__heading place-section__heading--small"><%= t("nexus_ccs.showcase.#{label}") %></h2>
-            <ul class="place-chips">
-              <% pairs.each do |value, count| %>
-                <% own = named && field == "named_collection_ssim" ? landing_path_for("named-collections", value) : nil %>
-                <li><%= link_to (own || search_catalog_path(search_query.deep_merge(f: { field => Array(search_query.dig(:f, field)) + [ value ] }))), class: "places-chip" do %><%= value.to_s.upcase_first %> <span class="places-chip__count"><%= number_with_delimiter(count) %></span><% end %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
+    <%# Each group a section of picture tiles in the page's mosaic (a picture of one of each value's records), as on the place pages %>
+    <% groups.each do |field, label, pairs| %>
+      <section class="place-section" aria-labelledby="showcase-<%= label %>">
+        <h2 id="showcase-<%= label %>" class="place-section__heading"><%= t("nexus_ccs.showcase.#{label}") %></h2>
+        <% tiles = pairs.map do |value, count|
+             own = named && field == "named_collection_ssim" ? landing_path_for("named-collections", value) : nil
+             to = own || search_catalog_path(search_query.deep_merge(f: { field => Array(search_query.dig(:f, field)) + [ value ] }))
+             facet_tile(value, count, to, pictures&.value(field, value))
+           end %>
+        <%= render NexusCcs::MosaicComponent.new(tiles: tiles, label: t("nexus_ccs.showcase.#{label}"), lanes: 5, even: (field == "date_era_ssim" || :auto)) %>
       </section>
     <% end %>
 
