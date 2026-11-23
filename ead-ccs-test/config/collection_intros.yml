@@ -1,7 +1,19 @@
 # The introductions of the collection and named collection pages (/browse/collections/..., /browse/named-collections/...).
 #
-# PLACEHOLDER: lorem ipsum only. The collections team writes the real text; add an entry under `collections` or `named_collections`
-# keyed by the value exactly as the index spells it. A value with no entry shows `default`.
+# The five collections of CCS-295 to CCS-299 have a DRAFT introduction, written from each museum's own public pages (grainger,
+# Harry Brookes Allen, Henry Forman Atkinson, Medical History Museum and Potter Museum sites, read 23 Nov 2026): the collections
+# team approves or replaces it, and the page still marks it as wording to approve. The others keep the lorem ipsum `default` until
+# their text is written. Add an entry under `collections` or `named_collections`, keyed by the value exactly as the index spells it.
 default: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus posuere velit aliquet."
-collections: {}
-named_collections: {}
+collections:
+  "Grainger Museum Collection": "Percy Grainger, the Australian composer and pianist, founded the Grainger Museum in 1938 to tell the story of his work and the world around it. Its collection of more than 100,000 items ranges from musical instruments, scores and his experiments in sound to costumes, photographs, art and design."
+  "Harry Brookes Allen Museum of Anatomy and Pathology": "One of Australia's largest collections of human tissue specimens, with animal anatomy specimens and historical teaching models, built up over more than a century of teaching anatomy and pathology at the University. It still supports the teaching of students in medicine and the health sciences."
+  "Henry Forman Atkinson Dental Museum": "Australia's oldest and most significant dental collection, begun in 1884. Its more than 4,000 items include dental instruments and equipment, documents, photographs, artworks and trade catalogues that trace the history of dentistry and its teaching."
+  "Medical History Museum": "Since 1967 the Medical History Museum has gathered more than 13,000 documents, photographs, artefacts, artworks, and medical and scientific instruments. It began with the history of the Melbourne Medical School and now spans medicine in Victoria, Australia and beyond."
+  "University Art Collection": "The largest university-based art collection in Australia, with more than 18,000 works cared for by the Potter Museum of Art. It spans Australian and international art, works on paper, and the Classics and Archaeology collection, and is used across the University's teaching and research."
+named_collections:
+  "Grainger Museum Collection": "Percy Grainger, the Australian composer and pianist, founded the Grainger Museum in 1938 to tell the story of his work and the world around it. Its collection of more than 100,000 items ranges from musical instruments, scores and his experiments in sound to costumes, photographs, art and design."
+  "Harry Brookes Allen Museum of Anatomy and Pathology": "One of Australia's largest collections of human tissue specimens, with animal anatomy specimens and historical teaching models, built up over more than a century of teaching anatomy and pathology at the University. It still supports the teaching of students in medicine and the health sciences."
+  "Henry Forman Atkinson Dental Museum": "Australia's oldest and most significant dental collection, begun in 1884. Its more than 4,000 items include dental instruments and equipment, documents, photographs, artworks and trade catalogues that trace the history of dentistry and its teaching."
+  "Medical History Museum": "Since 1967 the Medical History Museum has gathered more than 13,000 documents, photographs, artefacts, artworks, and medical and scientific instruments. It began with the history of the Melbourne Medical School and now spans medicine in Victoria, Australia and beyond."
+  "University Art Collection": "The largest university-based art collection in Australia, with more than 18,000 works cared for by the Potter Museum of Art. It spans Australian and international art, works on paper, and the Classics and Archaeology collection, and is used across the University's teaching and research."
