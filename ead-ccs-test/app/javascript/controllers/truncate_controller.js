@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // The record's description, collapsed with a Show more / Show less button (RecordDocumentComponent). Collapsed (CCS-413), the first paragraph
-// (the lead) is clamped to three lines and the paragraphs after it are hidden (the hidden attribute, so a screen reader skips them
+// (the lead) is clamped to two lines and the paragraphs after it are hidden (the hidden attribute, so a screen reader skips them
 // too); expanded, all of it shows, its paragraphs kept. The button says whether the text is open (aria-expanded) and stays where it
 // is; collapsing a long text brings its start back into view. Nothing to collapse (one short paragraph): no button. Without
 // JavaScript the whole description shows.

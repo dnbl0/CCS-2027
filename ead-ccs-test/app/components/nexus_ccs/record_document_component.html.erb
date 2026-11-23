@@ -99,7 +99,7 @@
           <summary><h3 class="record-accordion__title" id="record-details-title"><%= t("nexus_ccs.record_page.layout.full_record") %></h3></summary>
           <div class="record-accordion__panel">
             <%# CCS-400: every field of the data model sheet the record has, in its sequence %>
-            <%= render NexusCcs::RecordFactRowsComponent.new(rows: lead_rows + object_rows, record: self, id_row: true) %>
+            <%= render NexusCcs::RecordFactRowsComponent.new(rows: full_record_rows, record: self, id_row: true) %>
           </div>
         </details>
         <% if inscriptions.any? %>

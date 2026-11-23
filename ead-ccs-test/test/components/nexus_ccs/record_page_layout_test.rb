@@ -147,6 +147,14 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
     assert_selector "dialog .digital-assets__sizes legend", text: "Size", visible: :all
   end
 
+  test "CCS-44: a rated asset shows its viewing classification on the media toolbar, where it is viewed; an unrated one shows none" do
+    render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ], "digital_asset_advisory_classification_ssim" => [ "PG" ]))
+    assert_selector ".media-viewer__controls-end .classification-badge", text: "PG"
+
+    render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
+    assert_no_selector ".classification-badge"
+  end
+
   test "the panel's toolbar: each tool an icon and its word (Zoom, Download image, Media information), and no IIIF button" do
     render_media(IMAGES.merge("licence_type_ssim" => [ "Public domain - Copyright expired" ]))
 

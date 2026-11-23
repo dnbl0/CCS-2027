@@ -59,7 +59,8 @@
       </nav>
     <% end %>
 
-    <% if (assets_shown? && main) || download_href || metadata.any? %>
+    <% badge = render(NexusCcs::ClassificationBadgeComponent.new(document: @document)) %>
+    <% if (assets_shown? && main) || download_href || metadata.any? || badge.present? %>
       <%# The panel's toolbar, joined to its foot by a rule: Zoom and Download on the left, Media information on the right, each a
           labelled button of one style (an icon and its word) %>
       <div class="media-viewer__controls" role="group" aria-label="<%= t("#{VIEWER}.tools") %>">
@@ -119,6 +120,8 @@
           <% end %>
         </div>
         <div class="media-viewer__controls-end">
+        <%# CCS-44: the asset's viewing classification (G, PG, M, MA 15+...), where the visitor views it %>
+        <%= badge %>
         <% if metadata.any? %>
           <button type="button" class="text-button media-viewer__tool media-viewer__info-button" aria-haspopup="dialog" aria-controls="media-information" data-media-viewer-target="infoButton" data-action="media-viewer#openInfo">
             <%= glyph(:info) %><span><%= t("#{VIEWER}.media_information") %></span>

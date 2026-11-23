@@ -71,6 +71,11 @@ class RecordLayoutTest < ActiveSupport::TestCase
     assert_equal record.object_rows.map(&:seq), record.object_rows.map(&:seq).sort
   end
 
+  test "CCS-400: the full record lists every field in the sheet's sequence exactly, Creator and Place in their own places" do
+    labels = component(SHEET).full_record_rows.map(&:label)
+    assert_equal %w[Object\ Type Date Creator Place Material Measurements Inscription Classification Collection Accession\ Number Source\ URL Related\ Record], labels
+  end
+
   test "associated names: each maker by name, linked to their browse page where there is one, with the record's dates and role under it" do
     names = component(SHEET).associated_names
     assert_equal "Grainger, Percy Aldridge", names.first[0]

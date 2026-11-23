@@ -180,6 +180,9 @@ module NexusCcs
 
     def lead_rows = detail_rows.select { |row| LEAD_SEQS.include?(row.seq) }
 
+    # The full record: every field in the sheet's sequence exactly (CCS-400: Object Type, Date, Creator, ... Place ...), none moved ahead
+    def full_record_rows = detail_rows.select { |row| row.seq.is_a?(Integer) }.sort_by(&:seq)
+
     # --- The record page's header and sections (components/record.css) -----------------------------------------------------------
     # Associated names: each maker as a link to their browse page, with what the record says about them under it, role first
     # has it ("Etcher, b. c. 1804 - d. 1888"). [[name, path or nil, detail]]

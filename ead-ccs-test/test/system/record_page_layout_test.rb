@@ -345,9 +345,9 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
     toggle = find(".record__description button[aria-controls=record-description]")
     assert_equal [ "false", "Read more" ], [ toggle["aria-expanded"], toggle.text ]
     assert_no_selector ".record__description-text p", text: "Made for the specimen collection."
-    # CCS-413: three lines while collapsed
+    # CCS-413: the first 2 lines while collapsed (CCS-532)
     lines = page.evaluate_script("(() => { const p = document.querySelector('.record__lead'); return Math.round(p.clientHeight / parseFloat(getComputedStyle(p).lineHeight)) })()")
-    assert_equal 3, lines
+    assert_equal 2, lines
 
     toggle.click
     assert_equal [ "true", "Read less" ], [ toggle["aria-expanded"], toggle.text ]

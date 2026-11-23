@@ -115,6 +115,7 @@
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;
   mask-image: linear-gradient(to bottom, #000 45%, transparent);
 }
+.record-fade.is-collapsed .record__lead { -webkit-line-clamp: 2; line-clamp: 2; } /* CCS-413: the first 2 lines of the description (CCS-532) */
 .record-fade.is-collapsed .record-fade__clip { -webkit-line-clamp: 4; line-clamp: 4; }
 .record-fade__clip .record-facts__value { display: inline; }
 .record-fade__clip .record-facts__value + .record-facts__value::before { content: " "; }
@@ -192,12 +193,16 @@
 .record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label .blacklight-icons svg { width: 1.25rem; height: 1.25rem; }
 .record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label:hover { color: var(--ccs-text-brand); background: var(--ccs-cyan-150); }
 .record .record-actions__row .save-control .toggle-bookmark-label:hover .save-control__text { text-decoration: none; }
-/* the narrowest phones: the body size, tighter padding and the words without their icons keep the three on one line inside the 16px gutters */
+/* Phones: Share and More in the body size with tighter padding, so the three fit one line (wrapping, never scrolling sideways,
+   if a long translation will not fit); the narrowest also drop Share and More's icons (a text button may be words only) */
+@media (max-width: 479px) {
+  .record .record-actions__row { flex-wrap: wrap; gap: 0 var(--ccs-space-1); }
+  .record .record__actions .record-actions__row :is(.share__button, .more-actions__button) { padding: var(--ccs-space-2); font-size: var(--ccs-font-size-md); }
+}
 @media (max-width: 359px) {
   .record .record-actions__row { gap: 0; }
   .record .record-actions__row .save-control .toggle-bookmark .toggle-bookmark-label { padding: var(--ccs-space-2) var(--ccs-space-2) var(--ccs-space-2) var(--ccs-space-3); font-size: var(--ccs-font-size-md); }
-  .record .record-actions__row :is(.share__button, .more-actions__button) { padding: var(--ccs-space-2); font-size: var(--ccs-font-size-md); }
-  .record .record-actions__row :is(.share__button, .more-actions__button) svg { display: none; } /* the words alone: a text button may be words only */
+  .record .record__actions .record-actions__row :is(.share__button, .more-actions__button) svg { display: none; }
 }
 
 .more-actions { position: relative; }
