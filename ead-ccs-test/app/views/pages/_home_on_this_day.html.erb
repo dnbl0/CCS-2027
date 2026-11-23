@@ -1,10 +1,10 @@
 <%# On this day (OnThisDay): records made on today's day and month, or from this year some years ago; pictures only. Left out when none.
-    Record cards in justified rows, each picture whole at its own shape (the homepage redesign, 2026-11). %>
+    Record cards as a fluid mosaic, each picture whole at its own shape (the homepage redesign, 2026-11). %>
 <% found = OnThisDay.for %>
 <% if found.any? %>
   <% intro = found.kind == :day ? t("nexus_ccs.home_more.on_this_day_day", date: l(found.date, format: "%-d %B")) : t("nexus_ccs.home_more.on_this_day_years", year: found.date.year - found.years_ago, count: found.years_ago) %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "home-on-this-day", heading: t("nexus_ccs.home_more.on_this_day"), intro: intro, extra_class: "home-more home-on-this-day") do %>
-    <%= render NexusCcs::CardLayoutComponent.new(cards: found.documents, layout: :justified, label: t("nexus_ccs.home_more.on_this_day"),
+    <%= render NexusCcs::CardLayoutComponent.new(cards: found.documents, layout: :mosaic, label: t("nexus_ccs.home_more.on_this_day"),
                                                  renderer: ->(document) { NexusCcs::RecordCardComponent.new(document: document) }) %>
   <% end %>
 <% end %>

@@ -32,15 +32,15 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_selector "section.explore-periods a.home-section__link[href='/browse/periods']", text: "See all periods"
   end
 
-  test "Explore the collections: the five museums in justified rows, the University Art Collection first as the lead with its blurb and a call to action" do
+  test "Explore the collections: the five museums as a fluid mosaic, the University Art Collection first as the lead with its blurb and a call to action" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
-    tiles = page.all("section.explore ul.justified[data-controller=justified] > li.justified__item")
+    tiles = page.all("section.explore ul.mosaic-flow[data-controller=mosaic] > li.mosaic-flow__item")
     assert_equal 5, tiles.size
     assert_equal "University Art Collection", tiles.first.find("h3").text
-    assert tiles.first[:class].include?("justified__item--lead")
+    assert tiles.first[:class].include?("mosaic-flow__item--lead")
     assert tiles.all? { |tile| tile[:style].to_s.match?(/--a: \d/) } # each banner's shape, from its size
-    assert_selector "section.explore li.justified__item--lead article.result-card.explore-card--lead .explore-card__cta", text: "Explore the collection"
+    assert_selector "section.explore li.mosaic-flow__item--lead article.result-card.explore-card--lead .explore-card__cta", text: "Explore the collection"
     assert_selector "section.explore article.result-card.explore-card--tile h3.document-title-heading a[href='/browse/collections/#{Browse::Slug.build('collections', 'Grainger Museum Collection')}']", text: "Grainger Museum Collection"
     assert_selector "section.explore a.result-card__media[tabindex='-1'][aria-hidden=true] img[alt=''][loading=lazy]", count: 5 # the name is the link text
     assert_no_selector "section.explore, section.home-named", text: /\d records/ # no record counts on collections
@@ -49,8 +49,8 @@ class ExploreComponentTest < ViewComponent::TestCase
   test "Visit the collections: Grainger leads (first, on the left) with its hours and access, every tile opening the museum's own visitor page" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
-    lead = page.find("section.home-visit ul.justified > li:first-child")
-    assert lead[:class].include?("justified__item--lead")
+    lead = page.find("section.home-visit ul.mosaic-flow > li:first-child")
+    assert lead[:class].include?("mosaic-flow__item--lead")
     assert_equal "https://grainger.unimelb.edu.au/visit", lead.find("h3 a")[:href]
     assert_includes lead.text, "Open Monday, 1-4pm. Grainger Museum is step-free"
     assert_selector "section.home-visit article.explore-card--tile", count: 5

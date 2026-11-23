@@ -1,6 +1,6 @@
-<ul class="justified" data-controller="justified" aria-label="<%= label %>">
+<ul class="mosaic-flow" data-controller="mosaic" data-mosaic-base-value="<%= base %>" aria-label="<%= label %>">
   <% tiles.each do |tile| %>
-    <li class="justified__item<%= " justified__item--lead" if tile.lead %>" <%= tag.attributes(style: aspect_style(tile.width, tile.height)) %>>
+    <li class="mosaic-flow__item<%= " mosaic-flow__item--lead" if tile.lead %>" <%= tag.attributes(style: aspect_style(tile.width, tile.height)) %>>
       <%# The site's card (result card, as ExploreCardComponent), in its tile variant: the picture whole above, the name and line below
           on white; the lead adds its call to action. The title is the link text, so the picture's own link is hidden. %>
       <article class="result-card explore-card explore-card--tile<%= " explore-card--lead" if tile.lead %>">

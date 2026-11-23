@@ -2,7 +2,7 @@
   <% if rail? %>
     <button type="button" class="card-rail__button card-rail__button--previous" data-card-rail-target="previous" data-action="card-rail#previous" aria-label="<%= t("card_layout.previous", label: label) %>" hidden></button>
   <% end %>
-  <ul class="card-layout__list<%= " justified" if justified? %>"<% if rail? %> data-card-rail-target="scroller" tabindex="0" aria-label="<%= label %>"<% end %><% if justified? %> data-controller="justified" aria-label="<%= label %>"<% end %>>
+  <ul class="card-layout__list<%= " justified" if justified? %><%= " mosaic-flow" if mosaic? %>"<% if rail? %> data-card-rail-target="scroller" tabindex="0" aria-label="<%= label %>"<% end %><% if justified? %> data-controller="justified" aria-label="<%= label %>"<% end %><% if mosaic? %> data-controller="mosaic" data-mosaic-base-value="3" aria-label="<%= label %>"<% end %>>
     <% items.each do |kind, item| %>
       <% if kind == :panel %>
         <li class="card-layout__item card-layout__item--panel">
@@ -13,7 +13,7 @@
           </div>
         </li>
       <% else %>
-        <li class="card-layout__item<%= " justified__item" if justified? %>" <%= tag.attributes(style: item_style(item)) %>><%= render card_component(item) %></li>
+        <li class="card-layout__item<%= " justified__item" if justified? %><%= " mosaic-flow__item" if mosaic? %>" <%= tag.attributes(style: item_style(item)) %>><%= render card_component(item) %></li>
       <% end %>
     <% end %>
   </ul>

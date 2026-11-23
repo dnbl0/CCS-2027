@@ -9,11 +9,11 @@ class MosaicComponentTest < ViewComponent::TestCase
   test "a list of tiles, each the site's card in its tile variant: the name an h3 link, the picture's link hidden, the lead marked" do
     render_inline NexusCcs::MosaicComponent.new(tiles: [ tile("Two", lead: true, width: 1100, height: 550), tile("One") ], label: "Museums")
 
-    assert_selector "ul.justified[data-controller=justified][aria-label=Museums] > li.justified__item", count: 2
-    assert_selector "li.justified__item--lead[style='--a: 2.0'] article.result-card.explore-card.explore-card--tile.explore-card--lead h3 a[href='/x/two']", text: "Two"
+    assert_selector "ul.mosaic-flow[data-controller=mosaic][data-mosaic-base-value='4'][aria-label=Museums] > li.mosaic-flow__item", count: 2
+    assert_selector "li.mosaic-flow__item--lead[style='--a: 2.0'] article.result-card.explore-card.explore-card--tile.explore-card--lead h3 a[href='/x/two']", text: "Two"
     assert_selector "a.result-card__media[tabindex='-1'][aria-hidden=true] img[alt='']", count: 2
-    assert_selector "li.justified__item--lead .explore-card__cta[aria-hidden=true]", text: "Go"
-    assert_selector "li.justified__item:not([style])", count: 1 # a picture of unknown size is measured in the browser
+    assert_selector "li.mosaic-flow__item--lead .explore-card__cta[aria-hidden=true]", text: "Go"
+    assert_selector "li.mosaic-flow__item:not([style])", count: 1 # a picture of unknown size is measured in the browser
     assert_selector "h3 a", count: 2
   end
 

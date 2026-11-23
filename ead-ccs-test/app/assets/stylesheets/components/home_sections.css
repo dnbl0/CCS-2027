@@ -91,6 +91,24 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 /* On this day: smaller pictures, more to a row */
 @media (min-width: 1200px) { .home-on-this-day .justified { --row-h: 14rem; } }
 
+/* ---- Fluid mosaic: tiles of different widths and heights interlock, none cropped (mosaic_controller.js) ----
+   After Google Arts & Culture's mixed-size picture layouts (looked at 2026-11-23, described in our own words): their tiles crop the
+   pictures to fixed cells; here the cell follows the picture instead. The controller gives each tile its columns (from the picture's
+   shape) and its rows (from its height), packed where the columns are lowest. Without JavaScript: an even grid of the same cards. */
+.mosaic-flow { --mosaic-gap: var(--ccs-space-4); display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); gap: var(--mosaic-gap); align-items: start; margin: 0; padding: 0; list-style: none; }
+
+.mosaic-flow.is-ready { grid-template-columns: repeat(var(--cols, 12), minmax(0, 1fr)); grid-auto-rows: 8px; row-gap: 0; }
+
+.mosaic-flow > .mosaic-flow__item { --a: 1.333; display: flex; min-width: 0; }
+
+.mosaic-flow > .mosaic-flow__item > * { width: 100%; align-self: start; }
+
+.mosaic-flow .result-card__media,
+.mosaic-flow .object-card__media { position: static; display: block; flex: none; width: 100%; height: auto; aspect-ratio: var(--a); min-height: 0; background: var(--ccs-surface-subtle); }
+
+.mosaic-flow .result-card__media img,
+.mosaic-flow .object-card__image { position: static; display: block; width: 100%; height: 100%; object-fit: contain; }
+
 /* ---- Shelf: pictures whole at one height, as wide as their shape, the name under each ---- */
 .card-layout--shelf { position: relative; }
 

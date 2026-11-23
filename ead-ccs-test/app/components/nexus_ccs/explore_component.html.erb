@@ -1,5 +1,5 @@
 <%# The home page's ways into the collections without a search (the homepage redesign, 2026-11; docs/card-layouts.md): the museums,
-    visiting them and the named collections inside them, and time, as justified rows of cards (each picture whole, at its own shape);
+    visiting them and the named collections inside them as fluid mosaics, and time as justified rows (each picture whole, at its own shape);
     record types as a shelf of pictures; places as a list beside a preview. %>
 <%= render NexusCcs::HomeSectionComponent.new(id: "explore-title", heading: t("home.collections.heading"), intro: t("home.collections.intro"),
                                               link: t("home.collections.see_all"), link_path: helpers.category_path("collections"), extra_class: "explore") do %>
@@ -13,7 +13,7 @@
 <% if named_tiles.any? %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "home-named", heading: t("home.named.heading"), intro: t("home.named.intro"),
                                                 link: t("home.named.see_all"), link_path: helpers.category_path("named-collections"), extra_class: "home-named") do %>
-    <%= render NexusCcs::MosaicComponent.new(tiles: named_tiles, label: t("home.named.label")) %>
+    <%= render NexusCcs::MosaicComponent.new(tiles: named_tiles, label: t("home.named.label"), base: 3) %>
   <% end %>
 <% end %>
 
