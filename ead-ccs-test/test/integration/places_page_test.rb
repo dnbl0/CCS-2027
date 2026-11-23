@@ -23,11 +23,13 @@ class PlacesPageTest < ActionDispatch::IntegrationTest
     assert_select "nav.places-views a[aria-current=page]", "All"
     assert_select "nav.places-views a[href=?]", "/browse/places?view=az", text: "A–Z"
     assert_select "form[role=search] input[name=filter]"
-    assert_select "ul.justified.places-wall[data-controller=justified] li a.places-wall__tile[href*='production_place_ssim']" do
+    assert_select "ul.mosaic-flow[data-controller=mosaic][data-mosaic-lanes-value='6'] li article.explore-card--tile" do
       assert_select "img[alt=''][src*='w=600']" # a smaller rendition of the DAM picture
-      assert_select ".places-wall__name", "Australia"
-      assert_select ".places-wall__count", "8,058 records" # every record, as the A–Z list counts them, not only the pictured ones
+      assert_select "h3 a[href*='production_place_ssim']", "Australia" # the name under the picture
+      assert_select ".explore-card__intro", "8,058 records" # every record, as the A–Z list counts them, not only the pictured ones
     end
+    assert_select "turbo-frame#places-results"
+    assert_select "form[data-turbo-frame=places-results] input#filter[data-action='input->places-search#type']"
     assert_select "a[href=?]", "/browse/places?view=az", text: /See every place, A–Z \(2\)/
   end
 
@@ -41,5 +43,19 @@ class PlacesPageTest < ActionDispatch::IntegrationTest
     assert_select "nav.places-letters a[href=?]", "/browse/places?letter=A", text: "A"
     assert_equal [ "Australia 8,058 records", "Japan 193 records" ], css_select("a.places-list__link").map { |a| a.text.squish }
     assert_select "ul.places-wall", count: 0
+  end
+
+  test "a region narrows the list; the regions are continents, from each place's country" do
+    seed_places([ [ "Carlton", 13 ], [ "Paris", 321 ], [ "Kyoto", 9 ] ])
+    PlaceGeocode.create!(place: "Carlton", normalised: "carlton", country_code: "au", region: "Victoria")
+    PlaceGeocode.create!(place: "Paris", normalised: "paris", country_code: "fr", region: "English")
+    PlaceGeocode.create!(place: "Kyoto", normalised: "kyoto", country_code: "jp")
+
+    get "/browse/places", params: { view: "az", region: "Europe" }
+
+    assert_equal [ "All regions", "Asia 1", "Europe 1", "Oceania 1" ], css_select("nav.places-regions a").map { |a| a.text.squish }.sort
+    assert_select "nav.places-regions a[aria-current=true]", text: /Europe/
+    assert_equal [ "Paris 321 records" ], css_select("a.places-list__link").map { |a| a.text.squish }
+    assert_select "h2", "Places in Europe"
   end
 end

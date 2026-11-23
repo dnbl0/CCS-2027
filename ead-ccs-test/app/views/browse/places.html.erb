@@ -1,67 +1,94 @@
 <%# Places (BrowseController#show for the places hub), after Google Arts & Culture's Places page (looked at 2026-11-23, described in
-    our own words): two views, as tabs. "All" is a wall of the places with the most pictured records, each tile its picture whole (justified
-    rows, never cropped) with the place's name and number of records over its foot; "A–Z" is every place, by letter, with the filter.
-    Both are plain links and forms, so the page works without JavaScript. %>
+    our own words). A toolbar that stays in view: the search (live as you type), the two views as tabs (All: a mosaic of the places with
+    the most pictured records, each picture whole with its name under it; A–Z: every place by letter), the regions, and the map. The search
+    stays outside the results frame so it keeps its focus while the results change; the views, regions, letters and results are one Turbo
+    frame, updated without a reload and with the address kept (places_search_controller.js). Without JavaScript every link and the form
+    load the page as usual. %>
 <% content_for :body_class, "page-browse page-places" %>
 <% content_for :title, "Places — Collections Navigator — University of Melbourne" %>
+<% state = { view: (@places_view == :az ? "az" : nil), region: @list.region }.compact %>
+<% first, last, size = @list.range %>
+<% summary = if @places_view == :all
+     t("browse.places.summary_all", count: @wall.size, region: (@list.region ? t("browse.places.in_region", region: @list.region) : ""))
+   else
+     t("browse.places.summary", first: number_with_delimiter(first), last: number_with_delimiter(last), count: size, total: number_with_delimiter(size))
+   end %>
 <%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", browse_path ], [ @hub.title, nil ] ]) %>
 
-<main class="places-page" id="main-content">
+<main class="places-page" id="main-content" data-controller="places-search">
   <div class="places-page__inner">
     <header class="places-page__head">
       <h1 class="places-page__title"><%= @hub.title %></h1>
       <p class="places-page__intro"><%= @hub.intro %></p>
     </header>
 
-    <div class="places-page__bar">
-      <nav class="places-views" aria-label="<%= t("browse.places.views") %>">
-        <%= link_to t("browse.places.all"), browse_hub_path(@hub.slug), class: "places-views__link", "aria-current": (@places_view == :all ? "page" : nil) %>
-        <%= link_to t("browse.places.az"), browse_hub_path(@hub.slug, view: "az"), class: "places-views__link", "aria-current": (@places_view == :az ? "page" : nil) %>
-      </nav>
-      <%= form_with url: browse_hub_path(@hub.slug), method: :get, class: "places-filter", html: { role: "search", "aria-label": t("browse.filter.label", kind: "places") } do |form| %>
-        <%= form.label :filter, t("browse.filter.label", kind: "places"), class: "visually-hidden" %>
-        <%= form.search_field :filter, value: @list.filter, id: "filter", class: "places-filter__input form-control", autocomplete: "off", maxlength: 80, placeholder: t("browse.places.filter_placeholder") %>
-        <%= form.button t("browse.filter.submit"), type: "submit", class: "btn btn-primary places-filter__submit" %>
+    <div class="places-toolbar">
+      <%= form_with url: browse_hub_path(@hub.slug), method: :get, class: "places-search", data: { turbo_frame: "places-results", turbo_action: "advance", places_search_target: "form" },
+                    html: { role: "search", "aria-label": t("browse.filter.label", kind: "places") } do |form| %>
+        <%= form.label :filter, t("browse.places.search_label"), class: "places-search__label" %>
+        <div class="places-search__row">
+          <%= form.search_field :filter, value: @list.filter, id: "filter", class: "places-search__input form-control", autocomplete: "off", maxlength: 80,
+                                placeholder: t("browse.places.filter_placeholder"), data: { action: "input->places-search#type", places_search_target: "input" } %>
+          <%= hidden_field_tag :region, @list.region, id: nil, disabled: @list.region.blank?, data: { places_search_target: "region" } %>
+          <%= form.button t("browse.filter.submit"), type: "submit", name: nil, class: "btn btn-primary places-search__submit" %>
+        </div>
       <% end %>
+      <p class="visually-hidden" role="status" data-places-search-target="status"><%= summary %></p>
     </div>
 
-    <% if @places_view == :all %>
-      <h2 class="visually-hidden"><%= t("browse.places.all_heading") %></h2>
-      <% if @wall.any? %>
-        <ul class="justified places-wall" data-controller="justified" aria-label="<%= t("browse.places.all_heading") %>">
-          <% @wall.each do |place| %>
-            <li class="justified__item places-wall__item" <%= tag.attributes(style: aspect_style(place.image&.width, place.image&.height)) %>>
-              <%= link_to search_action_path(place.query), class: "places-wall__tile" do %>
-                <% if NexusCcs::ExploreCardComponent.image?(place, remote: true) %>
-                  <%= image_tag DamImage.sized(AssetVersion.url(place.image.path), 600), alt: "", class: "places-wall__image", loading: "lazy", decoding: "async" %>
-                <% end %>
-                <span class="places-wall__caption">
-                  <span class="places-wall__name"><%= place.label %></span>
-                  <span class="places-wall__count"><%= t("home.records", count: (total = @list.count_of(place.label) || place.count), number: number_with_delimiter(total)) %></span>
-                </span>
-              <% end %>
-            </li>
-          <% end %>
-        </ul>
+    <turbo-frame id="places-results" data-places-search-target="frame" data-turbo-action="advance">
+      <%# What the frame now shows, for the announcement and the search's region (Turbo replaces the frame's contents, not its attributes) %>
+      <span hidden data-places-state data-summary="<%= summary %>" data-region="<%= @list.region %>"></span>
+      <div class="places-nav">
+        <nav class="places-views" aria-label="<%= t("browse.places.views") %>">
+          <%= link_to t("browse.places.all"), browse_hub_path(@hub.slug, region: @list.region), class: "places-views__link", "aria-current": (@places_view == :all ? "page" : nil) %>
+          <%= link_to t("browse.places.az"), browse_hub_path(@hub.slug, view: "az", region: @list.region), class: "places-views__link", "aria-current": (@places_view == :az ? "page" : nil) %>
+        </nav>
+        <%= link_to t("browse.places.map"), explore_places_path, class: "arrow-link arrow-link--icon places-nav__map", data: { turbo_frame: "_top" } %>
+      </div>
+
+      <% if @list.regions.any? %>
+        <nav class="places-regions" aria-label="<%= t("browse.places.regions") %>">
+          <ul class="places-regions__list">
+            <li><%= link_to t("browse.places.all_regions"), browse_hub_path(@hub.slug, **state.except(:region), filter: @list.filter, letter: @list.letter), class: "places-chip", "aria-current": (@list.region ? nil : "true") %></li>
+            <% @list.regions.each do |name, count| %>
+              <li><%= link_to browse_hub_path(@hub.slug, **state, region: name, filter: @list.filter, letter: @list.letter), class: "places-chip", "aria-current": (@list.region == name ? "true" : nil) do %><%= name %> <span class="places-chip__count"><%= number_with_delimiter(count) %></span><% end %></li>
+            <% end %>
+          </ul>
+        </nav>
       <% end %>
-      <p class="places-page__more"><%= link_to t("browse.places.every", count: number_with_delimiter(@list.total)), browse_hub_path(@hub.slug, view: "az"), class: "arrow-link arrow-link--icon" %></p>
-    <% else %>
-      <nav class="places-letters" aria-label="<%= t("browse.places.letters") %>">
-        <ul class="places-letters__list">
-          <li><%= link_to t("browse.places.most"), browse_hub_path(@hub.slug, view: "az"), class: "places-letters__link", "aria-current": (@list.letter || @list.filter ? nil : "page") %></li>
-          <% @list.letters.each do |letter| %>
-            <li><%= link_to letter, browse_hub_path(@hub.slug, letter: letter), class: "places-letters__link", "aria-current": (@list.letter == letter ? "page" : nil) %></li>
+
+      <% if @places_view == :all %>
+        <h2 class="places-page__heading"><%= @list.region ? t("browse.places.region_heading", region: @list.region) : t("browse.places.all_heading") %></h2>
+        <% if @wall.any? %>
+          <%= render NexusCcs::MosaicComponent.new(tiles: @wall.map { |place| place_tile(place, @list) }, label: t("browse.places.all_heading"), lanes: 6) %>
+        <% else %>
+          <p class="browse-empty"><%= t("browse.places.no_pictures") %></p>
+        <% end %>
+        <p class="places-page__more"><%= link_to t("browse.places.every", count: number_with_delimiter(@list.region ? @list.range.last : @list.total)), browse_hub_path(@hub.slug, view: "az", region: @list.region), class: "arrow-link arrow-link--icon" %></p>
+      <% else %>
+        <nav class="places-letters" aria-label="<%= t("browse.places.letters") %>">
+          <ul class="places-letters__list">
+            <li><%= link_to t("browse.places.most"), browse_hub_path(@hub.slug, view: "az", region: @list.region), class: "places-letters__link", "aria-current": (@list.letter || @list.filter ? nil : "page") %></li>
+            <% @list.letters.each do |letter| %>
+              <li><%= link_to letter, browse_hub_path(@hub.slug, letter: letter, region: @list.region), class: "places-letters__link", "aria-current": (@list.letter == letter ? "page" : nil) %></li>
+            <% end %>
+          </ul>
+        </nav>
+        <div class="places-list__head">
+          <h2 class="places-page__heading"><%= @list.heading %></h2>
+          <% if size.positive? %><p class="places-list__summary"><%= summary %></p><% end %>
+        </div>
+        <% if (@list.filter || @list.region) && @list.chosen.empty? %>
+          <p class="browse-empty"><%= t("browse.places.none", filter: @list.filter.presence || @list.region) %> <%= link_to t("browse.filter.clear"), browse_hub_path(@hub.slug, view: "az") %></p>
+        <% end %>
+        <ul class="places-list">
+          <% @list.entries.each do |entry| %>
+            <li><%= link_to (entry.path || search_action_path(entry.query)), class: "places-list__link", data: { turbo_frame: "_top" } do %><span class="places-list__name"><%= entry.label.to_s.upcase_first %></span> <span class="places-list__count"><%= t("home.records", count: entry.count, number: number_with_delimiter(entry.count)) %></span><% end %></li>
           <% end %>
         </ul>
-      </nav>
-      <h2 class="places-page__heading"><%= @list.heading %></h2>
-      <% if @list.filter && @list.chosen.empty? %><p class="browse-empty"><%= t("browse.filter.none", filter: @list.filter) %></p><% end %>
-      <ul class="places-list">
-        <% @list.entries.each do |entry| %>
-          <li><%= link_to (entry.path || search_action_path(entry.query)), class: "places-list__link" do %><span class="places-list__name"><%= entry.label.to_s.upcase_first %></span> <span class="places-list__count"><%= t("home.records", count: entry.count, number: number_with_delimiter(entry.count)) %></span><% end %></li>
-        <% end %>
-      </ul>
-      <%= render "browse_entities/pager", page: @list.page, pages: @list.pages, label: t("browse.pagination", kind: "places") if @list.paged? %>
-    <% end %>
+        <%= render "browse_entities/pager", page: @list.page, pages: @list.pages, label: t("browse.pagination", kind: "places") if @list.paged? %>
+      <% end %>
+    </turbo-frame>
   </div>
 </main>

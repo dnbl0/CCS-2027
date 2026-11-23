@@ -242,8 +242,8 @@ body.page-home :is(.card-layout--justified, .card-layout--mosaic) .result-card:f
 body.page-home :is(.card-layout--justified, .card-layout--mosaic) .result-card .result-card__media img { max-height: none; }
 
 /* ---- The Places page (browse/places; after Google Arts & Culture's Places, looked at 2026-11-23) ----
-   A wall of places in tight justified rows, each tile its picture whole (never cropped) with the name and count over its foot on a dark
-   fade (neutral, not navy, so it reads over any picture: white text keeps at least 7:1 where the text sits); then the A–Z view. */
+   The places as the home page's mosaic (each picture whole, the name and count under it); a sticky toolbar with the live search; the
+   views, regions and A–Z list. */
 .places-page { padding: var(--ccs-space-8) var(--ccs-space-4) var(--ccs-space-10, 4rem); }
 
 .places-page__inner { max-width: var(--layout-page, 90rem); margin-inline: auto; }
@@ -254,46 +254,51 @@ body.page-home :is(.card-layout--justified, .card-layout--mosaic) .result-card .
 
 .places-page__intro { max-width: 60ch; margin: 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-lg); text-wrap: pretty; }
 
-.places-page__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ccs-space-4); margin-block-end: var(--ccs-space-5); padding-block-end: var(--ccs-space-3); border-block-end: 1px solid var(--color-border-grey-91); }
+/* The toolbar stays in view while the page scrolls: the search, then (in the frame) the views, the regions and the map */
+.places-toolbar { position: sticky; top: 0; z-index: 5; margin: 0 calc(-1 * var(--ccs-space-4)) var(--ccs-space-4); padding: var(--ccs-space-3) var(--ccs-space-4); background: var(--ccs-white); box-shadow: 0 1px 0 var(--color-border-grey-91); }
+
+.places-search { max-width: 40rem; margin-inline: auto; }
+
+.places-search__label { display: block; margin-block-end: var(--ccs-space-1); font-weight: var(--ccs-font-weight-semibold); }
+
+.places-search__row { display: flex; gap: var(--ccs-space-2); }
+
+.places-search__input { min-height: 48px; font-size: var(--ccs-font-size-lg); }
+
+.places-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ccs-space-3); margin-block: var(--ccs-space-4); }
+
+.places-nav__map { min-height: 44px; align-items: center; font-weight: var(--ccs-font-weight-semibold); }
 
 .places-views { display: flex; gap: var(--ccs-space-2); }
 
-.places-views__link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--ccs-space-4); border-radius: 999px; color: var(--ccs-text-heading, var(--ccs-navy-1100)); font-weight: var(--ccs-font-weight-semibold); text-decoration: none; }
+.places-views__link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--ccs-space-5); border: 1px solid var(--color-border-grey-91); border-radius: 999px; color: var(--ccs-text-heading, var(--ccs-navy-1100)); font-weight: var(--ccs-font-weight-semibold); text-decoration: none; }
 
-.places-views__link:hover { background: var(--ccs-surface-subtle); }
+.places-views__link:hover { border-color: var(--ccs-border-strong); }
 
-.places-views__link[aria-current="page"] { background: var(--ccs-surface-brand); color: var(--ccs-white); }
+.places-views__link[aria-current="page"] { border-color: var(--ccs-surface-brand); background: var(--ccs-surface-brand); color: var(--ccs-white); }
 
-.places-views__link:focus-visible, .places-letters__link:focus-visible, .places-list__link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.places-views__link:focus-visible, .places-chip:focus-visible, .places-letters__link:focus-visible, .places-list__link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
-.places-filter { display: flex; gap: var(--ccs-space-2); flex: 0 1 26rem; }
+/* Regions: chips with how many places each */
+.places-regions__list { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2); margin: 0 0 var(--ccs-space-6); padding: 0; list-style: none; }
 
-.places-filter__input { min-height: 44px; }
+.places-chip { display: inline-flex; align-items: center; gap: var(--ccs-space-2); min-height: 44px; padding: 0 var(--ccs-space-4); background: var(--ccs-surface-subtle); color: var(--ccs-text-heading, var(--ccs-navy-1100)); font-weight: var(--ccs-font-weight-semibold); text-decoration: none; }
 
-/* The wall: tight rows, the picture whole */
-.places-wall { --row-h: 12rem; gap: 4px; }
+.places-chip:hover { background: var(--ccs-neutral-200, #e5e5e5); }
 
-/* A narrow picture keeps its own width (no 12rem floor): widening it would make it taller and stretch its whole row */
-.places-wall > .justified__item { min-width: min(100%, 5rem); }
+.places-chip[aria-current="true"] { background: var(--ccs-text-heading, var(--ccs-navy-1100)); color: var(--ccs-white); }
 
-@media (min-width: 1200px) { .places-wall { --row-h: 14rem; } }
+.places-chip__count { font-weight: 400; opacity: 0.8; }
 
-.places-wall__tile { position: relative; display: block; width: 100%; overflow: hidden; aspect-ratio: var(--a); background: var(--ccs-neutral-800, #2d2d2d); color: var(--ccs-white); text-decoration: none; }
+.places-list__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--ccs-space-2) var(--ccs-space-4); margin-block-end: var(--ccs-space-4); }
 
-.places-wall__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transition: scale var(--ccs-duration-slow, 0.4s) ease; }
+.places-list__head .places-page__heading { margin: 0; }
 
-.places-wall__tile:hover .places-wall__image { scale: 1.03; }
+.places-list__summary { margin: 0; color: var(--ccs-text-secondary); }
 
-.places-wall__caption {
-  position: absolute; inset: auto 0 0; display: flex; flex-direction: column; gap: 2px; padding: 3rem var(--ccs-space-3) var(--ccs-space-3);
-  background: linear-gradient(to top, rgb(0 0 0 / 0.78) calc(100% - 3rem), rgb(0 0 0 / 0));
-}
+turbo-frame#places-results { display: block; }
 
-.places-wall__name { font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-semibold); line-height: 1.25; }
-
-.places-wall__count { font-size: var(--ccs-font-size-sm); opacity: 0.9; }
-
-.places-wall__tile:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: -3px; }
+turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity 0.15s; }
 
 .places-page__more { display: flex; justify-content: center; margin-block-start: var(--ccs-space-8); }
 
@@ -320,6 +325,4 @@ body.page-home :is(.card-layout--justified, .card-layout--mosaic) .result-card .
 
 .places-list__count { flex: none; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
 
-@media (prefers-reduced-motion: reduce) { .places-wall__image { transition: none; } .places-wall__tile:hover .places-wall__image { scale: none; } }
-
-@media (forced-colors: active) { .places-wall__caption { background: Canvas; color: CanvasText; } }
+@media (prefers-reduced-motion: reduce) { turbo-frame#places-results[aria-busy="true"] { transition: none; } }

@@ -10,7 +10,8 @@ class BrowseList
   Entry = Data.define(:label, :count, :query, :path)
   PAGE_SIZE = 120
 
-  def initialize(hub, letter: nil, filter: nil, page: nil, connection: nil)
+  # region: the Places page's region (PlaceRegions), for places only
+  def initialize(hub, letter: nil, filter: nil, page: nil, connection: nil, region: nil)
     @hub = hub
     @connection = connection
     @kind = Browse::Kind.find(hub.slug)
@@ -18,9 +19,13 @@ class BrowseList
     @letter = letter.to_s.upcase if !periods? && letters.include?(letter.to_s.upcase)
     @filter = filter.to_s.squish.first(80).presence unless periods?
     @page = page.to_i
+    @region = region.to_s if hub.slug == "places" && regions.any? { |name, _count| name == region.to_s }
   end
 
-  attr_reader :hub, :letter, :filter
+  attr_reader :hub, :letter, :filter, :region
+
+  # The Places page's regions, with how many places each (none for any other list)
+  def regions = @regions ||= hub.slug == "places" && available? ? PlaceRegions.counts(@all) : []
 
   def available? = !@all.nil?
 
@@ -33,13 +38,14 @@ class BrowseList
     return @all.to_a if periods?
 
     list = @all
+    list = list.select { |value, _count| PlaceRegions.region_of(value) == region } if region
     list = list.select { |value, _count| Browse::Slug.fold(value).include?(Browse::Slug.fold(filter)) } if filter
     return BrowseHubs.for_letter(list, letter) if letter
 
-    filter ? list : list.first(BrowseHubs::MOST_RECORDS)
+    filter || region ? list : list.first(BrowseHubs::MOST_RECORDS)
   end
 
-  def paged? = (letter || filter) && chosen.size > PAGE_SIZE
+  def paged? = (letter || filter || region) && chosen.size > PAGE_SIZE
 
   def pages = [ (chosen.size.to_f / PAGE_SIZE).ceil, 1 ].max
 
@@ -56,13 +62,22 @@ class BrowseList
 
   # "Most records" when no letter is chosen
   def heading
-    return "Matching “#{filter}”" if filter && !letter
+    return [ "Matching “#{filter}”", (" in #{region}" if region) ].join if filter && !letter
+    return "Places in #{region}, starting with #{letter == BrowseHubs::OTHER_LETTER ? 'a number or sign' : letter}" if region && letter
+    return "Places in #{region}" if region && !letter
     return "Starting with #{letter == BrowseHubs::OTHER_LETTER ? 'a number or sign' : letter}" if letter
 
     periods? ? "All periods" : "Most records"
   end
 
   def total = available? ? @all.size : 0
+
+  # "Showing 1–120 of 312": the first and last shown, and how many are chosen
+  def range
+    size = chosen.size
+    first = size.zero? ? 0 : (page - 1) * PAGE_SIZE + 1
+    [ first, [ page * PAGE_SIZE, size ].min, size ]
+  end
 
   # A value's number of records (every record, as the list counts them), nil when the list does not have it: the Places wall's cards
   # are found among the pictured records, so their own counts are smaller

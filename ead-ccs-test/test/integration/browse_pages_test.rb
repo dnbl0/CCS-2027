@@ -165,7 +165,7 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
     assert_select "form label[for=filter]"
     assert_equal [ "Australia 20 records", "Austria 5 records" ], css_select("a.places-list__link").map { |a| a.text.squish } # Places has its own page
     get "/browse/places", params: { filter: "zzz" }
-    assert_select ".browse-empty", /Nothing matches/
+    assert_select ".browse-empty", /No place matches “zzz”/
   end
 
   test "a long list under a letter is paged" do

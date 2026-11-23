@@ -12,7 +12,7 @@ class BrowseController < ApplicationController
   def show
     @hub = BrowseHubs.find(params[:slug]) || raise(ActionController::RoutingError, "Not Found")
     @browse_meta = Browse::Meta.hub(@hub)
-    @list = BrowseList.new(@hub, letter: params[:letter], filter: params[:filter], page: params[:page])
+    @list = BrowseList.new(@hub, letter: params[:letter], filter: params[:filter], page: params[:page], region: params[:region])
     return render(status: :service_unavailable) unless @list.available?
 
     # Places (after Google Arts & Culture's Places): "All", a wall of the places with pictures, or "A–Z", the whole list by letter
@@ -20,6 +20,7 @@ class BrowseController < ApplicationController
 
     @places_view = params[:view] == "az" || @list.letter || @list.filter ? :az : :all
     @wall = @places_view == :all ? Browse::Cards.wall(@hub) : []
+    @wall = @wall.select { |card| PlaceRegions.region_of(card.label) == @list.region } if @list.region
     render "browse/places"
   end
 end
