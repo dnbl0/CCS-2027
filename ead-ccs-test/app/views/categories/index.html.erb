@@ -1,15 +1,17 @@
-<%# Every way of grouping the records, each with its first cards (Categories) and a link to all of them %>
+<%# Every way of grouping the records (Categories), on the Browse list template: the centred head, then a section for each, its first
+    cards as the fluid mosaic, with "See all" %>
 <% content_for :title, "#{t('nexus_ccs.categories.title')} — Collections Navigator — University of Melbourne" %>
-<% content_for :body_class, "page-browse page-categories" %>
-<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.categories.title"), description: t("nexus_ccs.categories.description")) %>
-<main class="browse browse--hubs" id="main-content">
-  <% Categories.all.each do |dimension| %>
-    <% page = Categories.page(dimension) %>
-    <%= render NexusCcs::CardSectionComponent.new(slug: dimension.slug, prefix: "categories", heading: dimension.title, intro: dimension.intro,
-                                                  see_all: t("browse.cards.see_all", kind: dimension.title.downcase), see_all_path: dimension.path) do %>
-      <% if page&.tiles&.any? %>
-        <%= render NexusCcs::CardLayoutComponent.new(cards: page.tiles.first(4), layout: :grid, label: dimension.title) %>
+<% content_for :body_class, "page-browse page-places page-categories" %>
+<main class="places-page" id="main-content">
+  <div class="places-page__inner">
+    <%= render "browse/page_head", title: t("nexus_ccs.categories.title"), intro: t("nexus_ccs.categories.description") %>
+    <% Categories.all.each do |dimension| %>
+      <% page = Categories.page(dimension) %>
+      <% next unless page&.tiles&.any? %>
+      <%= render NexusCcs::HomeSectionComponent.new(id: "categories-#{dimension.slug}", heading: dimension.title, intro: dimension.intro,
+                                                    link: t("browse.cards.see_all", kind: dimension.title.downcase), link_path: dimension.path, extra_class: "browse-section categories-#{dimension.slug}") do %>
+        <%= render NexusCcs::CardLayoutComponent.new(cards: page.tiles.first(8), layout: :mosaic, lanes: 4, label: dimension.title) %>
       <% end %>
     <% end %>
-  <% end %>
+  </div>
 </main>

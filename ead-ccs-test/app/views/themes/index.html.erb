@@ -1,19 +1,13 @@
 <% content_for :title, "#{t('nexus_ccs.themes.title')} — Collections Navigator — University of Melbourne" %>
-<% content_for :body_class, "page-browse page-themes" %>
-<%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.themes.title"), description: t("nexus_ccs.themes.description")) %>
-<main class="browse-main" id="main-content">
-  <div class="browse-main__inner">
+<% content_for :body_class, "page-browse page-places page-themes" %>
+<main class="places-page" id="main-content">
+  <div class="places-page__inner">
+    <%= render "browse/page_head", title: t("nexus_ccs.themes.title"), intro: t("nexus_ccs.themes.description") %>
     <% if @themes.empty? %>
       <p class="browse-empty"><%= t("nexus_ccs.themes.empty") %></p>
     <% else %>
-      <ul class="discovery-index">
-        <% @themes.each do |theme| %>
-          <li class="discovery-index__item">
-            <h2 class="discovery-index__title"><%= link_to theme.title, theme.path %></h2>
-            <p class="discovery-index__text" data-placeholder-wording><%= theme.intro %></p>
-          </li>
-        <% end %>
-      </ul>
+      <h2 class="visually-hidden"><%= t("nexus_ccs.themes.title") %></h2>
+      <%= render NexusCcs::MosaicComponent.new(tiles: discovery_tiles(@themes, text: ->(theme) { theme.intro }, fallback: ->(theme) { theme_picture(theme) }), label: t("nexus_ccs.themes.title"), lanes: 3) %>
     <% end %>
   </div>
 </main>

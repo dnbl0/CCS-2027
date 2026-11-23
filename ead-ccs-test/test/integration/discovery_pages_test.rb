@@ -23,7 +23,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
   def rows(count) = (1..count).map { |n| { "value" => "Value #{format('%03d', n)}", "count" => 1000 - n, "image" => (PICTURE if n == 1) } }
 
   def seed_showcase(fq, total: 12, docs: [])
-    key = "showcase/v1/#{Digest::SHA256.hexdigest(Array(fq).join("\n"))}"
+    key = "showcase/v1/#{Digest::SHA256.hexdigest((Array(fq) + [ Showcase::PAGE_HIGHLIGHTS ]).join("\n"))}" # a page asks for its 16 highlights
     Rails.cache.write(SuppressedRecord.cache_key(key), { "total" => total, "docs" => docs,
                                                          "facets" => { "object_type_ssim" => [ [ "Work", 9 ] ], "date_era_ssim" => [ [ "20th century", 12 ] ], "named_collection_ssim" => [] } })
   end
@@ -36,7 +36,8 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Regions"
     assert_select "article.explore-card", count: 2
-    assert_select "article.explore-card h3 a[href*='f%5Bregion_ssim%5D%5B%5D=Oceania'][href*='any_assets=1']", text: "Oceania (8,638)"
+    assert_select "article.explore-card h3 a[href*='f%5Bregion_ssim%5D%5B%5D=Oceania'][href*='any_assets=1']", text: "Oceania"
+    assert_select "article.explore-card .explore-card__intro", text: "8,638 records"
     assert_select "article.explore-card img[src*='unimelbourne.widen.net']", count: 1
     assert_select "nav[aria-label='Sort categories'] a[aria-current='page']", text: "Most records"
   end
@@ -45,7 +46,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     seed("materials", rows(50).reverse + [ { "value" => "aardvark hide", "count" => 1, "image" => nil } ])
 
     get "/browse/categories/materials", params: { sort: "az" }
-    assert_equal "Aardvark hide (1)", css_select("article.explore-card h3").first.text.squish
+    assert_equal "Aardvark hide", css_select("article.explore-card h3").first.text.squish
     assert_select "article.explore-card", count: Categories::PER_PAGE
     assert_select "nav[aria-label='Sort categories'] a[aria-current='page']", text: "A to Z"
 
@@ -72,8 +73,8 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     get "/browse/categories"
 
     assert_response :success
-    Categories.all.each { |dimension| assert_select "section.categories-#{dimension.slug} a.explore__all[href='/browse/categories/#{dimension.slug}']" }
-    assert_select "section.categories-eras article.explore-card", count: 4
+    Categories.all.each { |dimension| assert_select "section.categories-#{dimension.slug} a.home-section__link[href='/browse/categories/#{dimension.slug}']" }
+    assert_select "section.categories-eras article.explore-card", count: 5 # its first cards, up to eight
   end
 
   test "a collection page has the placeholder introduction, its highlights, links that narrow its search, and its records in the search" do
@@ -87,7 +88,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Grainger Museum Collection"
     assert_select "[data-placeholder-wording]", text: /Lorem ipsum/
     assert_select "a.btn[href*='f%5Bcollection_ssim%5D%5B%5D=Grainger+Museum+Collection']", text: "See all 12 records"
-    assert_select ".browse-facts__links a[href*='f%5Bobject_type_ssim%5D%5B%5D=Work']", text: "Work"
+    assert_select ".place-chips a[href*='f%5Bobject_type_ssim%5D%5B%5D=Work']", text: /Work/
     assert_select "link[rel='canonical'][href$='/browse/collections/#{slug}']"
 
     get "/browse/collections/wrong-words-#{slug.split('-').last}"
@@ -102,7 +103,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
 
     get "/browse/categories/collections"
 
-    assert_select "ul.category-landings a[href='/browse/collections/#{Browse::Slug.build('collections', 'Grainger Museum Collection')}']"
+    assert_select "article.explore-card h3 a[href='/browse/collections/#{Browse::Slug.build('collections', 'Grainger Museum Collection')}']" # its tile opens its own page
   end
 
   test "themes are listed, and a theme page shows its records and opens its search" do

@@ -400,3 +400,16 @@ turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity
 .place-page__facts dt { color: var(--ccs-text-secondary); font-weight: 400; }
 
 .place-page__facts dd { margin: 0; font-weight: var(--ccs-font-weight-semibold); }
+
+.place-page__intro { max-width: 62ch; margin: 0; font-size: var(--ccs-font-size-md); line-height: 1.6; text-wrap: pretty; }
+
+/* The Browse page's timeline and map links, centred under the head */
+.places-nav--centred { justify-content: center; }
+
+/* Sections inside a Browse list page sit on the page's own width (no section padding of their own) */
+.places-page .home-section { background: none; }
+
+.places-page .home-section .ccs-section__inner { padding-inline: 0; }
+
+/* The timeline's and the map's head (explore/time, explore/places): the Browse pages' head, above their own tools */
+.places-page--head { padding-block-end: 0; }

@@ -1,0 +1,6 @@
+<%# The centred head of a Browse list page (browse/hub and the Browse, Categories and Themes pages): the title and its line of introduction %>
+<%# a div, not a header: outside main (the timeline, the map) a header would be a second banner landmark %>
+<div class="places-page__head">
+  <h1 class="places-page__title"><%= title %></h1>
+  <% if local_assigns[:intro].present? %><p class="places-page__intro"><%= intro %></p><% end %>
+</div>

@@ -4,8 +4,11 @@
 <% content_for :title, "#{t('explore_pages.places.title')} — Collections Navigator — University of Melbourne" %>
 <% content_for :head, stylesheet_link_tag("vendor/leaflet", media: "all") if @places&.map? %>
 <%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", browse_path ], [ t("explore_pages.places.title"), nil ] ]) %>
-<%= render NexusCcs::PageBannerComponent.new(title: t("explore_pages.places.title"), description: t("explore_pages.places.intro")) %>
 <main class="browse explore" id="main-content">
+  <%# The head of the Browse pages (browse/_page_head): the title centred with its line of introduction %>
+  <div class="places-page places-page--head"><div class="places-page__inner">
+    <%= render "browse/page_head", title: t("explore_pages.places.title"), intro: t("explore_pages.places.intro") %>
+  </div></div>
   <div class="browse__inner">
     <% if @places.nil? %>
       <p class="browse__unavailable"><%= t("explore_pages.unavailable_html", link: link_to(t("explore_pages.search_all"), search_action_path(any_assets: "1", search_field: "all_fields"))) %></p>

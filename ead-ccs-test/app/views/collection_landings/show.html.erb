@@ -1,4 +1,5 @@
 <% content_for :title, "#{@value} — Collections Navigator — University of Melbourne" %>
 <% content_for :body_class, "page-browse page-showcase" %>
-<%= render NexusCcs::PageBannerComponent.new(title: @value, description: @dimension.title.singularize) %>
-<%= render "collection_landings/showcase", showcase: @showcase, search_query: @search_query, intro: @intro %>
+<%= render "collection_landings/showcase", showcase: @showcase, search_query: @search_query, intro: @intro, name: @value,
+           kind_label: @dimension.title.singularize, back: [ t("browse.place.all", hub: @dimension.title.downcase), category_path(@dimension.slug) ],
+           named: @dimension.slug == "collections" %>

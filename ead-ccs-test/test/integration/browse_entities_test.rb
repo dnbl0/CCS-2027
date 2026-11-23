@@ -97,7 +97,9 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     assert_select ".place-page__strip[aria-hidden=true] img[alt='']", count: 1 # the open record's picture, whole; never the withheld one
     assert_select "a.btn[href*='production_place_ssim']", /See all 730 records/
     assert_select "section h2", /Held in 1 collection/
-    assert_select ".place-collections h3 a[href*='collection_ssim']", "University Art Collection"
+    link = css_select(".place-collections h3 a").first
+    assert_equal "University Art Collection", link.text
+    assert_match %r{\A/browse/collections/|collection_ssim}, link["href"] # the collection's own page, or its records in the search
     assert_select ".place-chips a.places-chip", text: /Painting\s+400/
     assert_select "section .card-layout--mosaic ul.mosaic-flow[data-controller=mosaic] li .object-card, section .card-layout--mosaic ul.mosaic-flow li article"
     assert_select "main.browse-main", count: 0 # not the makers' and subjects' profile

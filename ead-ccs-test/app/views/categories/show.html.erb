@@ -1,27 +1,25 @@
-<%# One way of grouping the records: a card for every value (Categories), most records first or A to Z, 48 a page %>
+<%# One way of grouping the records (Categories), on the Browse list template: the centred head, the sort as tabs, every value as the fluid
+    mosaic (a collection or named collection opens its own page), 48 a page %>
 <% content_for :title, "#{@dimension.title} — #{t('nexus_ccs.categories.title')} — Collections Navigator — University of Melbourne" %>
-<% content_for :body_class, "page-browse page-categories" %>
-<%= render NexusCcs::PageBannerComponent.new(title: @dimension.title, description: @dimension.intro) %>
-<main class="browse browse--hubs" id="main-content">
-  <%= render NexusCcs::CardSectionComponent.new(slug: @dimension.slug, prefix: "category", heading: t("nexus_ccs.categories.showing", count: number_with_delimiter(@page.total)),
-                                                intro: t("nexus_ccs.categories.intro"), see_all: t("nexus_ccs.categories.title"), see_all_path: categories_path) do %>
-    <nav class="category-sort" aria-label="<%= t("nexus_ccs.categories.sort_label") %>">
-      <ul class="category-sort__list">
+<% content_for :body_class, "page-browse page-places page-categories" %>
+<main class="places-page" id="main-content">
+  <div class="places-page__inner">
+    <%= render "browse/page_head", title: @dimension.title, intro: @dimension.intro %>
+    <div class="places-nav">
+      <nav class="places-views" aria-label="<%= t("nexus_ccs.categories.sort_label") %>">
         <% Categories::SORTS.each do |sort| %>
-          <li><%= link_to t("nexus_ccs.categories.sort.#{sort}"), category_path(@dimension.slug, sort: (sort == "count" ? nil : sort)),
-                          class: "category-sort__link", "aria-current": (@page.sort == sort ? "page" : nil) %></li>
+          <%= link_to t("nexus_ccs.categories.sort.#{sort}"), category_path(@dimension.slug, sort: (sort == "count" ? nil : sort)),
+                      class: "places-views__link", "aria-current": (@page.sort == sort ? "page" : nil) %>
         <% end %>
-      </ul>
-    </nav>
-    <%= render NexusCcs::CardLayoutComponent.new(cards: @page.tiles, layout: :grid, label: @dimension.title) if @page.tiles.any? %>
-    <%= render "browse_entities/pager", page: @page.page, pages: @page.pages, label: t("nexus_ccs.categories.pagination", kind: @dimension.title.downcase) %>
-    <% if @dimension.landing? && @page.tiles.any? %>
-      <h3 class="category-landings__title" id="category-landings"><%= t("nexus_ccs.categories.landing_pages") %></h3>
-      <ul class="browse-list category-landings" aria-labelledby="category-landings">
-        <% @page.tiles.each do |tile| %>
-          <li><%= link_to tile.value, collection_landing_path(kind: @dimension.slug, slug: Browse::Slug.build(@dimension.slug, tile.value)), class: "browse-list__link" %></li>
-        <% end %>
-      </ul>
+      </nav>
+      <p class="places-list__summary"><%= t("nexus_ccs.categories.showing", count: number_with_delimiter(@page.total)) %></p>
+    </div>
+    <% if @page.tiles.any? %>
+      <h2 class="visually-hidden"><%= t("nexus_ccs.categories.showing", count: number_with_delimiter(@page.total)) %></h2>
+      <%# a collection or named collection opens its own page; any other value, its records in the search %>
+      <%= render NexusCcs::MosaicComponent.new(tiles: @page.tiles.map { |tile| category_tile(tile, @dimension) }, label: @dimension.title, lanes: 6) %>
     <% end %>
-  <% end %>
+    <%= render "browse_entities/pager", page: @page.page, pages: @page.pages, label: t("nexus_ccs.categories.pagination", kind: @dimension.title.downcase) %>
+    <p class="places-page__more"><%= link_to t("nexus_ccs.categories.title"), categories_path, class: "arrow-link arrow-link--icon" %></p>
+  </div>
 </main>

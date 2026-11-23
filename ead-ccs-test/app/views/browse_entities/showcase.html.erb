@@ -66,11 +66,13 @@
         <ul class="place-collections">
           <% result.facets["collection_ssim"].first(8).each do |name, count| %>
             <% picture = collection_picture(name) %>
+            <%# the collection's own page where it has one; otherwise its records from here in the search %>
+            <% to = landing_path_for("collections", name) || search_catalog_path(refine(@search_query, "collection_ssim", name)) %>
             <li class="place-collections__item">
               <article class="result-card explore-card place-collection">
-                <% if picture %><%= link_to search_catalog_path(refine(@search_query, "collection_ssim", name)), class: "place-collection__media", tabindex: -1, "aria-hidden": true do %><%= image_tag AssetVersion.url(picture.path), alt: "", loading: "lazy", decoding: "async", width: picture.width, height: picture.height %><% end %><% end %>
+                <% if picture %><%= link_to to, class: "place-collection__media", tabindex: -1, "aria-hidden": true do %><%= image_tag AssetVersion.url(picture.path), alt: "", loading: "lazy", decoding: "async", width: picture.width, height: picture.height %><% end %><% end %>
                 <div class="result-card__content">
-                  <h3 class="document-title-heading"><%= link_to name, search_catalog_path(refine(@search_query, "collection_ssim", name)), class: "explore-card__link" %></h3>
+                  <h3 class="document-title-heading"><%= link_to name, to, class: "explore-card__link" %></h3>
                   <p class="explore-card__intro"><%= t("browse.place.records", count: count, number: number_with_delimiter(count)) %></p>
                 </div>
               </article>

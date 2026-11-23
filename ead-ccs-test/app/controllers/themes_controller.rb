@@ -12,7 +12,7 @@ class ThemesController < ApplicationController
 
   def show
     @theme = Themes.find(params[:slug]) || not_found!
-    @showcase = Showcase.call(fq: @theme.fq, first: @theme.hero) || (return unavailable!)
+    @showcase = Showcase.call(fq: @theme.fq, first: @theme.hero, highlights: Showcase::PAGE_HIGHLIGHTS) || (return unavailable!)
     use_meta @theme.title, @theme.intro, [ [ t("nexus_ccs.themes.title"), themes_path ], [ @theme.title, nil ] ]
   end
 end

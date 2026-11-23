@@ -10,6 +10,7 @@ module Showcase
   Result = Data.define(:total, :documents, :facets)
 
   HIGHLIGHTS = 4
+  PAGE_HIGHLIGHTS = 16 # a collection or theme page (the detail-page template): its picture strip and its "Discover" mosaic
   CANDIDATES = 24
   FACET_FIELDS = %w[object_type_ssim date_era_ssim named_collection_ssim].freeze
   FACET_LIMIT = 8

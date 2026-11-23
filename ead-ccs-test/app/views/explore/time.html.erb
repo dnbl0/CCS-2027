@@ -5,8 +5,11 @@
 <% trail = [ [ "Browse", browse_path ], [ t("explore_pages.time.title"), (explore_time_path if @century) ] ] %>
 <% trail << [ period_label, nil ] if @century %>
 <%= render NexusCcs::PageBreadcrumbsComponent.new(trail: trail) %>
-<%= render NexusCcs::PageBannerComponent.new(title: t("explore_pages.time.title"), description: t("explore_pages.time.intro")) %>
 <main class="browse explore" id="main-content">
+  <%# The head of the Browse pages (browse/_page_head): the title centred with its line of introduction %>
+  <div class="places-page places-page--head"><div class="places-page__inner">
+    <%= render "browse/page_head", title: t("explore_pages.time.title"), intro: t("explore_pages.time.intro") %>
+  </div></div>
   <div class="browse__inner">
     <% if @timeline %>
       <section class="explore__section" aria-labelledby="timeline-heading">

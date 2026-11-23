@@ -50,6 +50,7 @@ en:
       all_places: "All places"
       all: "All %{hub}"
       period: "Period"
+      theme: "Theme"
       discover_places: "Discover this place"
       discover_makers: "Discover their work"
       discover_subjects: "Discover this subject"

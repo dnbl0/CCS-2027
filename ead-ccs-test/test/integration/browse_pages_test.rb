@@ -27,10 +27,10 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Browse the collections"
-    assert_select "main > section.ccs-section", count: BrowseHubs.all.size
+    assert_select "main section.home-section", count: BrowseHubs.all.size
     BrowseHubs.all.each do |hub|
       assert_select "section.browse-#{hub.slug}[aria-labelledby='browse-#{hub.slug}'] h2#browse-#{hub.slug}", hub.title
-      assert_select "section.browse-#{hub.slug} a.explore__all[href='/browse/#{hub.slug}']"
+      assert_select "section.browse-#{hub.slug} a.home-section__link[href='/browse/#{hub.slug}']"
     end
   end
 
