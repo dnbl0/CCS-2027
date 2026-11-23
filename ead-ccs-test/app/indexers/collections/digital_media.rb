@@ -1,12 +1,13 @@
 require "yaml"
 
 module Collections
-  # Attaches audio, video and PDF files (config/digital_media.yml) to a document by accession number.
+  # Attaches audio, video, PDF and (CCS-164) Office, OpenOffice, eBook and 3D files (config/digital_media.yml) to a document by
+  # accession number.
   # Each is stored as "kind|type|url|label" in digital_media_ssim (then "|captions|transcript" when the entry has those: the
   # URLs of a WebVTT captions file and a transcript, for audio and video); the format shows in the Format facet.
   class DigitalMedia
     CONFIG = "config/digital_media.yml".freeze
-    FORMATS = { "audio" => "Audio", "video" => "Video", "pdf" => "PDF" }.freeze
+    FORMATS = { "audio" => "Audio", "video" => "Video", "pdf" => "PDF", "document" => "Document", "ebook" => "eBook", "model_3d" => "3D model" }.freeze
 
     def self.default
       @default ||= new(YAML.safe_load_file(Rails.root.join(CONFIG)) || {})
@@ -51,14 +52,29 @@ module Collections
     end
     private :pdf_text
 
+    # CCS-164: an Office or OpenOffice file gets a PDF preview (DocumentPreview), and the preview's text joins the full-text search
+    # as a PDF's does (CCS-36). Not for a withheld or sensitive record, whose files are not shown.
+    def document_previews(document, files)
+      documents = files.select { |file| file["kind"] == "document" }
+      return [] if documents.empty? || !DocumentPreview.enabled? || RobotsPolicy.withheld?(SolrDocument.new(document))
+
+      documents.filter_map do |file|
+        url = "#{self.class.base_url}/#{ERB::Util.url_encode(file["file"])}"
+        preview = DocumentPreview.convert(self.class.pdf_dir.join(file["file"].to_s), url)
+        [ file.merge("file" => nil), PdfText.extract(DocumentPreview.file_for(url)) ] if preview && self.class.pdf_text?
+      end
+    end
+    private :document_previews
+
     def attach(document)
       files = Array(document["accession_number_ssim"]).filter_map { |accession| @files_by_accession[accession] }.first
       return document if files.blank?
 
-      formats = files.map { |f| FORMATS.fetch(f["kind"]) }
+      formats = files.filter_map { |f| FORMATS[f["kind"]] }
       extracted = pdf_text?(files) ? pdf_text(document, files) : []
+      extracted += document_previews(document, files)
       texts = extracted.filter_map(&:last)
-      unindexed = extracted.select { |_file, text| text.nil? }.map { |file, _text| "#{self.class.base_url}/#{ERB::Util.url_encode(file["file"])}" }
+      unindexed = extracted.select { |file, text| text.nil? && file["file"] }.map { |file, _text| "#{self.class.base_url}/#{ERB::Util.url_encode(file["file"])}" }
       document = document.merge("pdf_text_tim" => texts) if texts.any?
       document = document.merge("pdf_text_unindexed_ssm" => unindexed) if unindexed.any?
       document.merge(

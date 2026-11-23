@@ -10,7 +10,10 @@
 #   :video      media_viewers/_video                the browser's own player; captions from the record's captions file
 #   :audio      media_viewers/_audio                as video; a transcript link when the record has one
 #   :pdf        media_viewers/_pdf                  opens in a new tab (no in-page viewer: it would be a new dependency)
-#   :model_3d   none yet                            needs a 3D viewer (model-viewer or three.js): a new dependency, see docs/media-viewer.md
+#   :document   media_viewers/document              Office and OpenOffice files (CCS-164): a PDF preview made by LibreOffice when the
+#                                                   file is indexed (DocumentPreview), and the original to download where allowed
+#   :ebook      none yet                            EPUB (CCS-164): needs an in-page reader (epub.js), a new dependency awaiting approval
+#   :model_3d   none yet                            needs a 3D viewer (model-viewer or three.js): a new dependency awaiting approval
 #   :other      none                                anything the DAM holds that a browser cannot show
 module MediaTypes
   Type = Data.define(:kind, :label, :viewer) do
@@ -23,22 +26,30 @@ module MediaTypes
     image: "media_viewers/image",
     video: "media_viewers/video",
     audio: "media_viewers/audio",
-    pdf: "media_viewers/pdf"
+    pdf: "media_viewers/pdf",
+    document: "media_viewers/document"
   }.freeze
 
-  LABELS = { image: "Image", video: "Video", audio: "Audio", pdf: "PDF document", model_3d: "3D model", other: "File" }.freeze
+  LABELS = { image: "Image", video: "Video", audio: "Audio", pdf: "PDF document", document: "Document", ebook: "eBook", model_3d: "3D model",
+             other: "File" }.freeze
 
   # What the DAM calls a file's format (file_properties.format_type in the ingest's assets_json, and format_types_ssim in the
   # index once it carries it), lower case. Anything not listed is looked up by MIME type, then file extension.
   FORMAT_TYPES = {
     "image" => :image, "video" => :video, "audio" => :audio, "pdf" => :pdf,
-    "3d" => :model_3d, "model" => :model_3d, "3d model" => :model_3d
+    "3d" => :model_3d, "model" => :model_3d, "3d model" => :model_3d,
+    "office" => :document, "document" => :document, "ebook" => :ebook
   }.freeze
+
+  # Office and OpenOffice files (CCS-164): Word, Excel, PowerPoint, OpenDocument text, spreadsheet and presentation, and RTF
+  DOCUMENT_EXTENSIONS = %w[doc docx xls xlsx ppt pptx odt ods odp rtf].freeze
+  EBOOK_EXTENSIONS = %w[epub].freeze
 
   MODEL_EXTENSIONS = %w[glb gltf obj stl usdz fbx ply].freeze
   EXTENSIONS = { "jpg" => :image, "jpeg" => :image, "png" => :image, "gif" => :image, "webp" => :image, "tif" => :image, "tiff" => :image,
                  "mp4" => :video, "webm" => :video, "mov" => :video, "mp3" => :audio, "wav" => :audio, "m4a" => :audio, "pdf" => :pdf,
-                 **MODEL_EXTENSIONS.index_with { :model_3d } }.freeze
+                 **MODEL_EXTENSIONS.index_with { :model_3d }, **DOCUMENT_EXTENSIONS.index_with { :document },
+                 **EBOOK_EXTENSIONS.index_with { :ebook } }.freeze
 
   # The index field that is expected to carry each asset's format type (the ingest's format_types_ssim); not in the index yet
   FORMAT_TYPE_FIELD = "format_types_ssim"
@@ -109,6 +120,9 @@ module MediaTypes
     when %r{\Aaudio/} then :audio
     when "application/pdf" then :pdf
     when %r{\Amodel/} then :model_3d
+    when "application/epub+zip" then :ebook
+    when %r{\Aapplication/(msword|vnd\.ms-(excel|powerpoint)|vnd\.openxmlformats-officedocument\.|vnd\.oasis\.opendocument\.(text|spreadsheet|presentation)|rtf)}
+      :document
     end
   end
 

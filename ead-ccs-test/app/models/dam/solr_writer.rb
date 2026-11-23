@@ -90,7 +90,17 @@ module Dam
     end
 
     def self.image?(asset) = asset.format_type == "image" && asset.urls["large"].present?
-    def self.media?(asset) = MEDIA_KINDS.include?(asset.format_type) && asset.urls["original"].present?
+    # CCS-164: Office, OpenOffice, eBook and 3D files are media too (by their format type, else their file name), shown by their kind's
+    # viewer (MediaTypes) instead of being left out
+    OTHER_MEDIA_KINDS = %i[document ebook model_3d].freeze
+    def self.media_kind(asset)
+      return asset.format_type if MEDIA_KINDS.include?(asset.format_type)
+
+      kind = MediaTypes.for(format_type: asset.format_type, filename: asset.filename).kind
+      kind.to_s if OTHER_MEDIA_KINDS.include?(kind)
+    end
+
+    def self.media?(asset) = media_kind(asset).present? && asset.urls["original"].present?
 
     # tier: the asset's own (AccessPolicy.asset_tiers), kept with its metadata so the page can tell a withheld asset from a shown one
     def self.metadata(asset, tier = nil)
@@ -100,7 +110,7 @@ module Dam
 
     def self.media_entry(asset)
       type = Rack::Mime.mime_type(File.extname(asset.filename.to_s), "application/octet-stream")
-      [ asset.format_type, type, asset.urls["original"], asset.filename.to_s.tr("|", " ") ].join("|")
+      [ media_kind(asset) || asset.format_type, type, asset.urls["original"], asset.filename.to_s.tr("|", " ") ].join("|")
     end
 
     private

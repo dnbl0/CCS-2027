@@ -77,6 +77,25 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_selector "a.digital-assets__pdf[href='/d.pdf'] + .digital-assets__pdf-note"
   end
 
+  test "CCS-164: an open Office document offers its PDF preview and the original; a view-only one only says it cannot be previewed" do
+    preview = DocumentPreview.file_for("/r.docx")
+    FileUtils.mkdir_p(preview.dirname)
+    File.binwrite(preview, "%PDF-1.4 test")
+    begin
+      render_for(assets(1).merge("licence_type_ssim" => [ "Public domain - Copyright expired" ],
+                                 "digital_media_ssim" => [ "document|application/vnd.openxmlformats-officedocument.wordprocessingml.document|/r.docx|Report" ]))
+      assert_selector "a.digital-assets__pdf[href='#{DocumentPreview.public_path('/r.docx')}'][target=_blank]", text: /Read Report \(a PDF preview/
+      assert_selector "a[href='/r.docx']", text: "Download the original (DOCX)"
+
+      render_for(assets(1).merge("licence_type_ssim" => [ "Copyright - Current" ],
+                                 "digital_media_ssim" => [ "document|application/vnd.openxmlformats-officedocument.wordprocessingml.document|/r.docx|Report" ]))
+      assert_no_selector "a[href$='.pdf'], a[href='/r.docx']"
+      assert_selector ".digital-assets__unsupported", text: /This document \(DOCX\) cannot be previewed here/
+    ensure
+      FileUtils.rm_f(preview)
+    end
+  end
+
   # The DAM holds videos as WMV, which no web browser plays: a player would stay blank (seen 2026-11-18)
   test "a video in a format browsers cannot play says so, and an open one offers the file to download instead" do
     render_for(assets(3).merge("digital_media_ssim" => [ "video|video/x-ms-wmv|/v.wmv|Film" ]))

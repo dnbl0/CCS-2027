@@ -64,7 +64,7 @@ module NexusCcs
       items = Array(@document["digital_media_ssim"]).map { |entry| Collections::DigitalMedia.parse(entry) }
                                                     .map { |item| item.merge(downloadable: AccessPolicy.download_path?(@document, item[:url])) }
                                                     .map { |item| item.merge(url: AssetVersion.url(item[:url]), captions: AssetVersion.url(item[:captions]), transcript: AssetVersion.url(item[:transcript])) }
-      items.select { |item| item[:downloadable] || %w[video audio].include?(item[:kind]) }
+      items.select { |item| item[:downloadable] || %w[video audio document ebook model_3d].include?(item[:kind]) }
     end
 
     # Pairs of [large image path, thumbnail path], in display order.
@@ -154,6 +154,10 @@ module NexusCcs
 
     # CCS-36: a PDF whose text could not be read when the record was indexed (pdf_text_unindexed_ssm), so a full-text search will not
     # find it; its viewer says so
+    # CCS-164: an Office or OpenOffice file's PDF preview (DocumentPreview), when it has been made and the file may be downloaded (a
+    # PDF can be saved, so a view-only document gets none, as a view-only PDF is not offered either)
+    def document_preview(item) = (DocumentPreview.url_for(item[:url]) if item[:kind] == "document" && item[:downloadable])
+
     def pdf_unindexed?(item)
       item[:kind] == "pdf" && Array(@document["pdf_text_unindexed_ssm"]).map { |url| url.split("?").first }.include?(item[:url].to_s.split("?").first)
     end
