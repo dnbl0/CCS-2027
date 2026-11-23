@@ -1,5 +1,5 @@
-<%# The record page (components/record.css): a header in two columns (the title, date and maker, Associated names, the actions and
-    the record's collection; the media on its grey panel), then sections each opened by a rule with the heading on the left: Object
+<%# The record page (components/record.css): a header in two columns (the title with its date, maker and collection, Associated
+    names and the actions; the media on its grey panel), then sections each opened by a rule with the heading on the left: Object
     overview (the key facts), About this object (the description) and Record details and notes (an accordion). You may be interested
     in follows (catalog/show). %>
 <%= content_tag @component,
@@ -23,10 +23,18 @@
     <div class="record__header">
       <div class="record__identity">
         <h1 class="record__title"><%= title_markup %></h1>
-        <% if display_date || makers.any? %>
+        <%# What identifies the object, kept together under the title: its date, its maker and the collection it belongs to %>
+        <% collection = collection_link %>
+        <% if display_date || makers.any? || collection %>
           <div class="record__lines">
             <% if display_date %><p><%= display_date %></p><% end %>
             <% if makers.any? %><p><%= makers.map(&:first).join("; ") %></p><% end %>
+            <% if collection %>
+              <p class="record__collection">
+                <span><%= collection.first %></span>
+                <% if collection.last %><%= link_to t("nexus_ccs.record_page.layout.see_collection"), collection.last, class: "arrow-link arrow-link--icon" %><% end %>
+              </p>
+            <% end %>
           </div>
         <% end %>
         <% if associated_names.any? %>
@@ -43,13 +51,6 @@
           </section>
         <% end %>
         <div class="record__actions"><%= render NexusCcs::RecordActionsComponent.new(document: document) %></div>
-        <% if (collection = collection_link) %>
-          <%# The collection the object belongs to, and the way to see more of it %>
-          <p class="record__collection">
-            <span><%= collection.first %></span>
-            <% if collection.last %><%= link_to t("nexus_ccs.record_page.layout.see_collection"), collection.last, class: "arrow-link arrow-link--icon" %><% end %>
-          </p>
-        <% end %>
       </div>
 
       <div class="record__media">

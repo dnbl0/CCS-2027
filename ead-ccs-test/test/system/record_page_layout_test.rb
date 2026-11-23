@@ -218,21 +218,21 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
 
   test "the Tab key moves through the header in the order it reads, and each stop shows a focus ring" do
     open_record(VARIANTS.fetch("one image, open"), "desktop")
-    page.execute_script("document.querySelector('a.record__name').focus()") # start on the first associated name
+    page.execute_script("document.querySelector('.record__title').setAttribute('tabindex', '-1'); document.querySelector('.record__title').focus()") # start on the title
 
     stops = 14.times.map do
       page.driver.browser.keyboard.type(:Tab)
       page.evaluate_script(<<~JS)
-        (() => { const e = document.activeElement, t = e.type === 'checkbox' ? e.closest('label') : e, s = getComputedStyle(t); return { text: (e.getAttribute('aria-label') || e.textContent || e.value || '').trim().replace(/\s+/g, ' ').slice(0, 30), ring: s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) >= 2 } })()
+        (() => { const e = document.activeElement, t = e.type === 'checkbox' ? e.closest('label') : e, s = getComputedStyle(t); return { text: (e.getAttribute('aria-label') || t.textContent || e.value || '').trim().replace(/\s+/g, ' ').slice(0, 30), ring: s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) >= 2 } })()
       JS
     end
     texts = stops.map { |stop| stop["text"] }
 
     assert stops.all? { |stop| stop["ring"] }, stops.reject { |stop| stop["ring"] }.inspect
-    # the title's column (a name, Save, the collection), then the media (Zoom, Download, Media information, Use and access)
-    order = [ "Save", "See more from this collection", "Zoom into the image", "Download image", "Media information", "Use and access" ].map { |label| texts.index { |text| text.include?(label) } }
+    # the title's column (the collection, a name, Save), then the media (Zoom, Download, Media information, Use and access)
+    order = [ "See more from this collection", "Grimwade", "Save", "Zoom into the image", "Download image", "Media information", "Use and access" ].map { |label| texts.index { |text| text.include?(label) } }
     assert_equal order.compact.sort, order.compact, texts.inspect
-    assert_operator order.compact.size, :>=, 5, texts.inspect
+    assert_operator order.compact.size, :>=, 6, texts.inspect
   end
 
   test "Zoom opens the image full screen in a modal; the tools follow the zoom; Next shows the next image; Escape closes and returns focus" do

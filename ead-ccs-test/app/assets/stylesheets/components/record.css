@@ -33,11 +33,12 @@
   .record__identity { display: contents; }
   .record__title, .record__lines { order: 1; }
   .record__media { order: 2; margin-top: var(--ccs-space-6); }
-  .record__names, .record__actions, .record__collection { order: 3; }
+  .record__names, .record__actions { order: 3; }
 }
 @media (min-width: 1024px) {
   .record__header { align-items: start; }
-  .record__identity { display: flex; flex-direction: column; align-self: stretch; padding: var(--ccs-space-8) var(--ccs-space-6) 2.5rem 0; }
+  /* the identity is one block at the top, its first line level with the media panel's top edge (no stretching to the panel's height) */
+  .record__identity { padding-inline-end: var(--ccs-space-6); }
   .record__media { position: sticky; top: 4.5rem; } /* clear of the site's sticky search bar */
 }
 
@@ -47,20 +48,26 @@
   line-height: var(--ccs-line-height-tight); color: var(--ccs-text-brand); text-wrap: balance;
 }
 @media (min-width: 768px) { .record__title { font-size: var(--ccs-font-size-5xl); } }
-.record__lines { margin-top: var(--ccs-space-5); }
+/* Three groups, each 32px from the next, their own parts 8 to 12px apart: the title with what identifies the object, Associated names,
+   and the actions with Compare under them */
+.record__lines { display: grid; gap: var(--ccs-space-1); margin-top: var(--ccs-space-4); }
 .record__lines p { margin: 0; font-size: var(--ccs-font-size-lg); line-height: var(--ccs-line-height-normal); color: var(--ccs-text-primary); }
 
 /* Associated names: a card-level heading, each name an in-content link with its role and dates under it */
-.record__names { margin-top: var(--ccs-space-7); }
-.record__names-heading { margin: 0 0 var(--ccs-space-4); font-family: var(--ccs-font-body); font-size: var(--ccs-heading-card-size); font-weight: var(--ccs-heading-weight-strong); color: var(--ccs-text-primary); }
-.record__name-list { display: grid; gap: var(--ccs-space-4); margin: 0; padding: 0; list-style: none; }
-.record__name-list li { display: flex; flex-direction: column; gap: var(--ccs-space-1); }
+.record__names { margin-top: var(--ccs-space-6); }
+.record__names-heading { margin: 0 0 var(--ccs-space-3); font-family: var(--ccs-font-body); font-size: var(--ccs-heading-card-size); font-weight: var(--ccs-heading-weight-strong); color: var(--ccs-text-primary); }
+.record__name-list { display: grid; gap: var(--ccs-space-3); margin: 0; padding: 0; list-style: none; }
+.record__name-list li { display: flex; flex-direction: column; gap: 0; }
 .record__name { align-self: flex-start; font-size: var(--ccs-font-size-lg); }
 .record__role { font-size: var(--ccs-font-size-md); color: var(--ccs-text-secondary); }
 
-.record__actions { margin-top: var(--ccs-space-7); }
-.record__collection { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--ccs-space-4); margin: var(--ccs-space-6) 0 0; font-size: var(--ccs-font-size-md); color: var(--ccs-text-primary); }
-@media (min-width: 1024px) { .record__collection { margin-top: auto; padding-top: var(--ccs-space-7); } }
+.record__actions { margin-top: var(--ccs-space-6); }
+.record__lines .record__collection { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--ccs-space-4); margin-top: var(--ccs-space-2); }
+.record__collection .arrow-link { font-size: var(--ccs-font-size-md); min-height: 2.75rem; }
+/* Compare under the action buttons: quiet text controls, 24px apart (borderless controls need the room) */
+.record .record-actions { gap: var(--ccs-space-1); } /* the compare links' 44px targets already add room above their text */
+.record .record-actions__compare .compare-actions { gap: var(--ccs-space-2) var(--ccs-space-5); }
+.record .record-actions__compare :is(.compare-actions__link, .compare-actions__button) { min-height: 2.75rem; font-size: var(--ccs-font-size-md); }
 .record__media > .no-image { margin: 0; }
 
 /* Sections: a rule, then the heading on the left (the site's section heading: Fraunces regular, 40px, 30px on a phone) */
