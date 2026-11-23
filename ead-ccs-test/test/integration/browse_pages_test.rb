@@ -163,7 +163,7 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
     assert_select "form[method=get][action='/browse/places'] input[type=search][name=filter][value=austr]"
     assert_select "form label[for=filter]"
-    assert_equal [ "Australia 20 records", "Austria 5 records" ], css_select("a.browse__link").map { |a| a.text.squish }
+    assert_equal [ "Australia 20 records", "Austria 5 records" ], css_select("a.places-list__link").map { |a| a.text.squish } # Places has its own page
     get "/browse/places", params: { filter: "zzz" }
     assert_select ".browse-empty", /Nothing matches/
   end
@@ -172,9 +172,9 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
     seed("places", (1..130).map { |n| [ "Place #{format('%03d', n)}", n ] })
 
     get "/browse/places", params: { letter: "P" }
-    assert_select "a.browse__link", count: BrowseList::PAGE_SIZE
+    assert_select "a.places-list__link", count: BrowseList::PAGE_SIZE
     assert_select "nav.browse-pager a[rel=next]"
     get "/browse/places", params: { letter: "P", page: 2 }
-    assert_select "a.browse__link", count: 10
+    assert_select "a.places-list__link", count: 10
   end
 end

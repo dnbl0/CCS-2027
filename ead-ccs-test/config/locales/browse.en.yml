@@ -2,6 +2,16 @@ en:
   # Entity pages of the browse section (BrowseEntitiesController, Browse) and the filter box and paging of the browse index pages.
   # Placeholder wording: the collections team has not approved it.
   browse:
+    # The Places page (after Google Arts & Culture's Places): views, the wall, the A–Z list
+    places:
+      views: "Show places"
+      all: "All"
+      az: "A–Z"
+      all_heading: "Places with the most records"
+      every: "See every place, A–Z (%{count})"
+      letters: "Places by letter"
+      most: "Most records"
+      filter_placeholder: "Find a place"
     title: "Browse"
     footer_link: "Browse the collections"
     periods: "Periods"

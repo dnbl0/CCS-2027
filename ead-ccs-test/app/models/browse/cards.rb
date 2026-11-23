@@ -47,19 +47,20 @@ module Browse
     end
 
     # [{ "label", "count", "image", "intro", "first", "last" }, ...]; nil when Solr cannot answer
-    def self.build(hub)
-      candidates = candidates(hub)
+    # count: how many cards; describe: false leaves out the line under each (the Places page's wall shows only the name and count)
+    def self.build(hub, count: CARDS, describe: true)
+      candidates = candidates(hub, limit: [ CANDIDATES, count * 2 ].max)
       return if candidates.nil?
 
       used = []
       cards = candidates.each_with_object([]) do |candidate, chosen|
-        break chosen if chosen.size >= CARDS
+        break chosen if chosen.size >= count
 
         image = example_image(hub, candidate, used)
         next unless image
 
         used << image[:id]
-        chosen << candidate.merge("image" => image, "intro" => describe(hub, candidate))
+        chosen << candidate.merge("image" => image, "intro" => (describe(hub, candidate) if describe))
       end
       periods?(hub) ? cards.sort_by { |card| card["first"] } : cards
     rescue *SolrGuard::FAILURES, RSolr::Error::Http, SolrGuard::Unavailable => e
@@ -68,7 +69,7 @@ module Browse
     end
 
     # The values that have records with a thumbnail, most first, from one facet request
-    def self.candidates(hub)
+    def self.candidates(hub, limit: CANDIDATES)
       if periods?(hub)
         list = BrowseHubs.periods
         response = Discovery.search(q: "*:*", rows: 0, facet: true, fq: THUMBNAIL_FILTERS, "facet.query": list.map { |_label, first, last| ExploreEntryPoints.period_query(first, last) })
@@ -76,11 +77,11 @@ module Browse
         list.filter_map do |label, first, last|
           count = found[ExploreEntryPoints.period_query(first, last)].to_i
           { "label" => label, "count" => count, "first" => first, "last" => last } if count.positive?
-        end.sort_by { |candidate| -candidate["count"] }.first(CANDIDATES)
+        end.sort_by { |candidate| -candidate["count"] }.first(limit)
       else
-        response = Discovery.search(q: "*:*", rows: 0, facet: true, fq: THUMBNAIL_FILTERS, "facet.field": field(hub), "facet.limit": CANDIDATES * 2, "facet.mincount": 1, "facet.sort": "count")
+        response = Discovery.search(q: "*:*", rows: 0, facet: true, fq: THUMBNAIL_FILTERS, "facet.field": field(hub), "facet.limit": limit * 2, "facet.mincount": 1, "facet.sort": "count")
         pairs = response.dig("facet_counts", "facet_fields", field(hub)).to_a.each_slice(2).to_a
-        pairs.reject { |value, _count| Browse.noise?(value) || SKIPPED.fetch(hub.slug, []).include?(value) }.first(CANDIDATES).map { |value, count| { "label" => value, "count" => count.to_i } }
+        pairs.reject { |value, _count| Browse.noise?(value) || SKIPPED.fetch(hub.slug, []).include?(value) }.first(limit).map { |value, count| { "label" => value, "count" => count.to_i } }
       end
     end
 
@@ -110,9 +111,21 @@ module Browse
       CardDescription.for(filter: group_filter(hub, candidate), kinds: hub.slug != "object-types", earliest: candidate["first"] == ExploreEntryPoints::EARLIEST_YEAR)
     end
 
-    def self.cached(hub)
-      key = SuppressedRecord.cache_key("#{CACHE_KEY}/#{hub.slug}")
-      last_good = SuppressedRecord.cache_key("#{LAST_GOOD_KEY}/#{hub.slug}")
+    # The Places page's picture wall (after Google Arts & Culture's Places): the WALL places with the most pictured records, each with
+    # one picture, kept for a day as the cards are
+    WALL = 48
+    def self.wall(hub)
+      kept = cached(hub, "wall") { build(hub, count: WALL, describe: false) }
+      return [] if kept.blank?
+
+      kept.map do |entry|
+        Card.new(label: entry["label"].to_s.upcase_first, count: entry["count"], query: query(hub, entry), image: ExploreEntryPoints.build_image(entry["image"]), intro: nil)
+      end
+    end
+
+    def self.cached(hub, kind = nil)
+      key = SuppressedRecord.cache_key([ CACHE_KEY, hub.slug, kind ].compact.join("/"))
+      last_good = SuppressedRecord.cache_key([ LAST_GOOD_KEY, hub.slug, kind ].compact.join("/"))
       # race_condition_ttl: when the day is up one request builds the cards while the others are still given the old ones
       Rails.cache.fetch(key, expires_in: 1.day, race_condition_ttl: 30.seconds, skip_nil: true) do
         fetched = yield
@@ -122,7 +135,10 @@ module Browse
     end
 
     # Builds the cards of every hub now (rake browse:warm_cards), so no visitor waits for the first build of the day
-    def self.warm = BrowseHubs.all.each { |hub| self.for(hub) }
+    def self.warm
+      BrowseHubs.all.each { |hub| self.for(hub) }
+      (place = BrowseHubs.find("places")) && wall(place)
+    end
 
     private_class_method :build, :periods?, :field, :candidates, :group_filter, :example_image, :describe, :cached
   end

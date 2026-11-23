@@ -1,0 +1,67 @@
+<%# Places (BrowseController#show for the places hub), after Google Arts & Culture's Places page (looked at 2026-11-23, described in
+    our own words): two views, as tabs. "All" is a wall of the places with the most pictured records, each tile its picture whole (justified
+    rows, never cropped) with the place's name and number of records over its foot; "A–Z" is every place, by letter, with the filter.
+    Both are plain links and forms, so the page works without JavaScript. %>
+<% content_for :body_class, "page-browse page-places" %>
+<% content_for :title, "Places — Collections Navigator — University of Melbourne" %>
+<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", browse_path ], [ @hub.title, nil ] ]) %>
+
+<main class="places-page" id="main-content">
+  <div class="places-page__inner">
+    <header class="places-page__head">
+      <h1 class="places-page__title"><%= @hub.title %></h1>
+      <p class="places-page__intro"><%= @hub.intro %></p>
+    </header>
+
+    <div class="places-page__bar">
+      <nav class="places-views" aria-label="<%= t("browse.places.views") %>">
+        <%= link_to t("browse.places.all"), browse_hub_path(@hub.slug), class: "places-views__link", "aria-current": (@places_view == :all ? "page" : nil) %>
+        <%= link_to t("browse.places.az"), browse_hub_path(@hub.slug, view: "az"), class: "places-views__link", "aria-current": (@places_view == :az ? "page" : nil) %>
+      </nav>
+      <%= form_with url: browse_hub_path(@hub.slug), method: :get, class: "places-filter", html: { role: "search", "aria-label": t("browse.filter.label", kind: "places") } do |form| %>
+        <%= form.label :filter, t("browse.filter.label", kind: "places"), class: "visually-hidden" %>
+        <%= form.search_field :filter, value: @list.filter, id: "filter", class: "places-filter__input form-control", autocomplete: "off", maxlength: 80, placeholder: t("browse.places.filter_placeholder") %>
+        <%= form.button t("browse.filter.submit"), type: "submit", class: "btn btn-primary places-filter__submit" %>
+      <% end %>
+    </div>
+
+    <% if @places_view == :all %>
+      <h2 class="visually-hidden"><%= t("browse.places.all_heading") %></h2>
+      <% if @wall.any? %>
+        <ul class="justified places-wall" data-controller="justified" aria-label="<%= t("browse.places.all_heading") %>">
+          <% @wall.each do |place| %>
+            <li class="justified__item places-wall__item" <%= tag.attributes(style: aspect_style(place.image&.width, place.image&.height)) %>>
+              <%= link_to search_action_path(place.query), class: "places-wall__tile" do %>
+                <% if NexusCcs::ExploreCardComponent.image?(place, remote: true) %>
+                  <%= image_tag DamImage.sized(AssetVersion.url(place.image.path), 600), alt: "", class: "places-wall__image", loading: "lazy", decoding: "async" %>
+                <% end %>
+                <span class="places-wall__caption">
+                  <span class="places-wall__name"><%= place.label %></span>
+                  <span class="places-wall__count"><%= t("home.records", count: (total = @list.count_of(place.label) || place.count), number: number_with_delimiter(total)) %></span>
+                </span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+      <p class="places-page__more"><%= link_to t("browse.places.every", count: number_with_delimiter(@list.total)), browse_hub_path(@hub.slug, view: "az"), class: "arrow-link arrow-link--icon" %></p>
+    <% else %>
+      <nav class="places-letters" aria-label="<%= t("browse.places.letters") %>">
+        <ul class="places-letters__list">
+          <li><%= link_to t("browse.places.most"), browse_hub_path(@hub.slug, view: "az"), class: "places-letters__link", "aria-current": (@list.letter || @list.filter ? nil : "page") %></li>
+          <% @list.letters.each do |letter| %>
+            <li><%= link_to letter, browse_hub_path(@hub.slug, letter: letter), class: "places-letters__link", "aria-current": (@list.letter == letter ? "page" : nil) %></li>
+          <% end %>
+        </ul>
+      </nav>
+      <h2 class="places-page__heading"><%= @list.heading %></h2>
+      <% if @list.filter && @list.chosen.empty? %><p class="browse-empty"><%= t("browse.filter.none", filter: @list.filter) %></p><% end %>
+      <ul class="places-list">
+        <% @list.entries.each do |entry| %>
+          <li><%= link_to (entry.path || search_action_path(entry.query)), class: "places-list__link" do %><span class="places-list__name"><%= entry.label.to_s.upcase_first %></span> <span class="places-list__count"><%= t("home.records", count: entry.count, number: number_with_delimiter(entry.count)) %></span><% end %></li>
+        <% end %>
+      </ul>
+      <%= render "browse_entities/pager", page: @list.page, pages: @list.pages, label: t("browse.pagination", kind: "places") if @list.paged? %>
+    <% end %>
+  </div>
+</main>

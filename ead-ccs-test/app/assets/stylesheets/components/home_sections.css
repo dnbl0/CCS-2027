@@ -240,3 +240,86 @@ body.page-home :is(.card-layout--justified, .card-layout--mosaic) .explore-card:
 body.page-home :is(.card-layout--justified, .card-layout--mosaic) .explore-card .explore-card__link::after { content: ""; position: absolute; inset: 0; }
 body.page-home :is(.card-layout--justified, .card-layout--mosaic) .result-card:focus-within { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
 body.page-home :is(.card-layout--justified, .card-layout--mosaic) .result-card .result-card__media img { max-height: none; }
+
+/* ---- The Places page (browse/places; after Google Arts & Culture's Places, looked at 2026-11-23) ----
+   A wall of places in tight justified rows, each tile its picture whole (never cropped) with the name and count over its foot on a dark
+   fade (neutral, not navy, so it reads over any picture: white text keeps at least 7:1 where the text sits); then the A–Z view. */
+.places-page { padding: var(--ccs-space-8) var(--ccs-space-4) var(--ccs-space-10, 4rem); }
+
+.places-page__inner { max-width: var(--layout-page, 90rem); margin-inline: auto; }
+
+.places-page__head { display: flex; flex-direction: column; align-items: center; gap: var(--ccs-space-3); margin-block-end: var(--ccs-space-6); text-align: center; }
+
+.places-page__title { margin: 0; color: var(--ccs-text-heading, var(--ccs-navy-1100)); font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-5xl); font-weight: 400; line-height: 1.1; }
+
+.places-page__intro { max-width: 60ch; margin: 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-lg); text-wrap: pretty; }
+
+.places-page__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ccs-space-4); margin-block-end: var(--ccs-space-5); padding-block-end: var(--ccs-space-3); border-block-end: 1px solid var(--color-border-grey-91); }
+
+.places-views { display: flex; gap: var(--ccs-space-2); }
+
+.places-views__link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--ccs-space-4); border-radius: 999px; color: var(--ccs-text-heading, var(--ccs-navy-1100)); font-weight: var(--ccs-font-weight-semibold); text-decoration: none; }
+
+.places-views__link:hover { background: var(--ccs-surface-subtle); }
+
+.places-views__link[aria-current="page"] { background: var(--ccs-surface-brand); color: var(--ccs-white); }
+
+.places-views__link:focus-visible, .places-letters__link:focus-visible, .places-list__link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+.places-filter { display: flex; gap: var(--ccs-space-2); flex: 0 1 26rem; }
+
+.places-filter__input { min-height: 44px; }
+
+/* The wall: tight rows, the picture whole */
+.places-wall { --row-h: 12rem; gap: 4px; }
+
+/* A narrow picture keeps its own width (no 12rem floor): widening it would make it taller and stretch its whole row */
+.places-wall > .justified__item { min-width: min(100%, 5rem); }
+
+@media (min-width: 1200px) { .places-wall { --row-h: 14rem; } }
+
+.places-wall__tile { position: relative; display: block; width: 100%; overflow: hidden; aspect-ratio: var(--a); background: var(--ccs-neutral-800, #2d2d2d); color: var(--ccs-white); text-decoration: none; }
+
+.places-wall__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transition: scale var(--ccs-duration-slow, 0.4s) ease; }
+
+.places-wall__tile:hover .places-wall__image { scale: 1.03; }
+
+.places-wall__caption {
+  position: absolute; inset: auto 0 0; display: flex; flex-direction: column; gap: 2px; padding: 3rem var(--ccs-space-3) var(--ccs-space-3);
+  background: linear-gradient(to top, rgb(0 0 0 / 0.78) calc(100% - 3rem), rgb(0 0 0 / 0));
+}
+
+.places-wall__name { font-size: var(--ccs-font-size-md); font-weight: var(--ccs-font-weight-semibold); line-height: 1.25; }
+
+.places-wall__count { font-size: var(--ccs-font-size-sm); opacity: 0.9; }
+
+.places-wall__tile:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: -3px; }
+
+.places-page__more { display: flex; justify-content: center; margin-block-start: var(--ccs-space-8); }
+
+/* A–Z: the letters across the top, the places in columns */
+.places-letters__list { display: flex; flex-wrap: wrap; gap: var(--ccs-space-1); margin: 0 0 var(--ccs-space-5); padding: 0; list-style: none; }
+
+.places-letters__link { display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; padding: 0 var(--ccs-space-2); color: var(--ccs-text-link); font-weight: var(--ccs-font-weight-semibold); text-decoration: none; }
+
+.places-letters__link:hover { background: var(--ccs-surface-subtle); }
+
+.places-letters__link[aria-current="page"] { background: var(--ccs-surface-brand); color: var(--ccs-white); }
+
+.places-page__heading { margin: 0 0 var(--ccs-space-4); font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-3xl); font-weight: 400; }
+
+.places-list { columns: 16rem auto; column-gap: var(--ccs-space-8); margin: 0; padding: 0; list-style: none; }
+
+.places-list li { break-inside: avoid; }
+
+.places-list__link { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ccs-space-3); min-height: 44px; padding: var(--ccs-space-2) 0; border-block-end: 1px solid var(--color-border-grey-91); color: var(--ccs-text-link); text-decoration: none; }
+
+.places-list__link:hover .places-list__name { text-decoration: underline; }
+
+.places-list__name { font-weight: var(--ccs-font-weight-semibold); }
+
+.places-list__count { flex: none; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
+
+@media (prefers-reduced-motion: reduce) { .places-wall__image { transition: none; } .places-wall__tile:hover .places-wall__image { scale: none; } }
+
+@media (forced-colors: active) { .places-wall__caption { background: Canvas; color: CanvasText; } }

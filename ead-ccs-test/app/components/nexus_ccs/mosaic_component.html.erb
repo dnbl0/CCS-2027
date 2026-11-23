@@ -6,7 +6,7 @@
       <article class="result-card explore-card explore-card--tile<%= " explore-card--lead" if tile.lead %>">
         <% if tile.image %>
           <%= link_to tile.path, class: "result-card__media", tabindex: -1, "aria-hidden": true do %>
-            <%= image_tag tile.image, alt: "", loading: "lazy", decoding: "async" %>
+            <%= image_tag tile.image, alt: "", loading: "lazy", decoding: "async", width: tile.width, height: tile.height %>
           <% end %>
         <% end %>
         <div class="result-card__content">

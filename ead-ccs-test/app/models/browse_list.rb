@@ -64,6 +64,13 @@ class BrowseList
 
   def total = available? ? @all.size : 0
 
+  # A value's number of records (every record, as the list counts them), nil when the list does not have it: the Places wall's cards
+  # are found among the pictured records, so their own counts are smaller
+  def count_of(label)
+    @counts ||= Array(@all).to_h { |value, count| [ value.to_s.downcase, count ] }
+    @counts[label.to_s.downcase]
+  end
+
   private
 
   # Makers, places and subjects are grouped (spelling variants are one); nil if Solr cannot answer and nothing is kept
