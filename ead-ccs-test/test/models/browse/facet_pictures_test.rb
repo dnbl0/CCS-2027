@@ -42,4 +42,15 @@ class Browse::FacetPicturesTest < ActiveSupport::TestCase
     assert_equal "far", pictures.value("subject_ssim", "England, London").id
     assert_nil pictures.value("subject_ssim", "Nowhere")
   end
+
+  test "a record whose first value is the one shown is chosen before one that only mentions it (an image mostly orange for Orange)" do
+    pictures = Browse::FacetPictures.new([])
+    found = [ doc("mostly-white", colour_ssim: %w[white orange]), doc("mostly-orange", colour_ssim: %w[orange white]) ]
+    pictures.define_singleton_method(:elsewhere) do |queries|
+      queries.to_h { |query| [ query, found ] }
+    end
+
+    pictures.prepare([ [ "colour_ssim", [ "orange" ] ] ])
+    assert_equal "mostly-orange", pictures.value("colour_ssim", "orange").id
+  end
 end

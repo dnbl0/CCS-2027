@@ -6,6 +6,8 @@ en:
     description: "Find records by the colours in their images. The colours are worked out by a computer from each image, so they are a guide, not a description."
     heading: "Colours"
     intro: "Choose a colour to see the records whose images have a lot of it."
+    band: "The colours of the collections' images: the most common is %{busiest} (%{count} records). Each colour's width is scaled so the rarer ones stay visible."
+    list_label: "Colours, in the order of the spectrum"
     count:
       one: "%{formatted} record"
       other: "%{formatted} records"

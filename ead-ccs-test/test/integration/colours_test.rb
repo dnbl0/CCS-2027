@@ -14,19 +14,23 @@ class ColoursTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the colour page lists each colour by name with its count, linking to the results filtered by it" do
+  test "the colour page: the colours' share as a band, then each colour by name and count, in the palette's order, opening its results" do
     with_seeded_menu_cache { with_canned_search(colour_counts("blue" => 12, "red" => 1_234, "white" => 3)) { get "/explore/colours" } }
 
     assert_response :success
     assert_select "title", /Explore by colour/
     assert_select "h1", "Explore by colour"
-    assert_select "ul.colours__list > li", 3
-    assert_select "ul.colours__list li:first-child a.colours__link[href=?]", "/catalog?f%5Bcolour_ssim%5D%5B%5D=red" do
-      assert_select ".colours__swatch.colours__swatch--red[aria-hidden=true]"
-      assert_select ".colours__name", "Red"
-      assert_select ".colours__count", "1,234 records"
+    assert_select "nav li", /Browse/
+    assert_select "figure.colour-band" do
+      assert_select "figcaption", /most common is red \(1,234 records\)/
+      assert_select "ol.colour-band__bar[aria-hidden=true] > li.colour-band__part", 3
+      assert_select "li.colour-band__part.colours__swatch--red[style*='--w: 1.0']"
     end
-    assert_equal %w[Red Blue White], css_select(".colours__name").map { |name| name.text.strip }
+    assert_select "h2#colours-heading", "Colours"
+    # the canned Solr has no pictures: every colour is a link after the (empty) mosaic, none lost
+    links = css_select("#colours-heading ~ * a[href*='colour_ssim']")
+    assert_equal [ "Red 1,234 records", "Blue 12 records", "White 3 records" ], links.map { |link| link.text.squish }
+    assert_equal "/catalog?f%5Bcolour_ssim%5D%5B%5D=red", links.first["href"]
   end
 
   test "with no colours yet, or Solr down, the page says so" do

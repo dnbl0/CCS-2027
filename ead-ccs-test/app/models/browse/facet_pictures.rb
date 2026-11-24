@@ -13,7 +13,8 @@ module Browse
     ROWS = 400
     ELSEWHERE = 12 # pictures kept for each value from the whole collection (enough to pass over the ones the page already shows)
     # the fields whose values the sections show (an entity page's, and a collection or theme page's eras and named collections)
-    VALUE_FIELDS = %w[object_type_ssim creator_ssim production_place_ssim subject_ssim date_era_ssim named_collection_ssim].freeze
+    # (and Explore by colour's colours: their names are ranked, the biggest share of the image first)
+    VALUE_FIELDS = %w[object_type_ssim creator_ssim production_place_ssim subject_ssim date_era_ssim named_collection_ssim colour_ssim].freeze
     FIELDS = (Profile::FIELDS + VALUE_FIELDS).uniq.freeze
     Picture = Data.define(:id, :src)
 
@@ -54,7 +55,7 @@ module Browse
       missing = wants.uniq.to_h { |want| [ query(want), want ] }
       return self if missing.empty?
 
-      key = SuppressedRecord.cache_key("facet_pictures/elsewhere/v2/#{Digest::SHA1.hexdigest(missing.keys.sort.join("\n"))}")
+      key = SuppressedRecord.cache_key("facet_pictures/elsewhere/v3/#{Digest::SHA1.hexdigest(missing.keys.sort.join("\n"))}")
       found = Rails.cache.fetch(key, expires_in: 1.day, skip_nil: true) { elsewhere(missing.keys) } || {}
       found.each { |solr_query, pictures| @elsewhere[missing[solr_query]] = pictures }
       assign(missing.values)
@@ -78,7 +79,8 @@ module Browse
       options = wants.to_h do |want|
         own = @documents.select { |document| !@avoid.include?(document["id"]) && carries?(document, want) }
         far = Array(@elsewhere[want]).reject { |picture| @avoid.include?(picture["id"]) }
-        [ want, (own + far).uniq { |picture| picture["id"] } ]
+        # a record whose first value is this one (its main maker, its image's biggest colour) before one that only mentions it
+        [ want, (own + far).uniq { |picture| picture["id"] }.each_with_index.sort_by { |picture, index| [ leading?(picture, want) ? 0 : 1, index ] }.map(&:first) ]
       end
       @assigned = {}
       wants.sort_by.with_index { |want, index| [ options[want].size, index ] }.each do |want|
@@ -96,6 +98,8 @@ module Browse
       end
     end
 
+    def leading?(picture, want) = want.is_a?(Array) && want.last.include?(Array(picture[want.first]).first)
+
     def query(want)
       return Browse.field_query(want.first, want.last) if want.is_a?(Array)
 
@@ -110,7 +114,7 @@ module Browse
       queries.to_h do |solr_query|
         docs = Array(response.dig("grouped", solr_query, "doclist", "docs")).map { |hash| SolrDocument.new(hash) }
         pictures = docs.select { |document| AccessPolicy.view?(document) && !Sensitivity.sensitive?(document) && document["thumbnail_path_ssi"].present? }
-        [ solr_query, pictures.first(ELSEWHERE).map { |document| { "id" => document.id.to_s, "src" => document["thumbnail_path_ssi"].to_s } } ]
+        [ solr_query, pictures.first(ELSEWHERE).map { |document| { "id" => document.id.to_s, "src" => document["thumbnail_path_ssi"].to_s, **VALUE_FIELDS.to_h { |field| [ field, Array(document[field]) ] } } } ]
       end
     rescue *SolrGuard::FAILURES, RSolr::Error::Http, SolrGuard::Unavailable => e
       Rails.logger.warn("Facet pictures elsewhere unavailable: #{e.class}")

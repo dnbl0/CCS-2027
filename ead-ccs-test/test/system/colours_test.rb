@@ -26,8 +26,9 @@ class ColoursSystemTest < ApplicationSystemTestCase
       visit "/explore/colours"
 
       assert_selector "h1", text: "Explore by colour"
-      assert_selector "a.colours__link", count: 12
-      assert_selector "a.colours__link", text: /White\s+84 records/
+      assert_selector "figure.colour-band .colour-band__part", count: 12
+      assert_selector "main a[href*='colour_ssim']:not([aria-hidden])", count: 12
+      assert_text(/White\s+84 records/)
       assert_not sideways_scroll?, "no sideways scroll at #{width}px"
       assert_accessible
     end

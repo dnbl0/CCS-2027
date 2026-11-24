@@ -1,28 +1,42 @@
-<% content_for :body_class, "page-colours" %>
+<%# Explore by colour (ColoursController), on the Explore template (explore/time's head): the colours' share of the collections' images as
+    one band (a picture of the counts, hidden from screen readers; its caption says what it shows), then each colour as a picture tile in
+    the site's mosaic, in the palette's order, so the tiles read as a spectrum. A picture shows a record whose image has a lot of that
+    colour; a colour with no picture to show is a link after the tiles. Each opens the results filtered by its colour. %>
+<% content_for :body_class, "page-browse page-explore page-explore-colours" %>
 <% content_for :title, "#{t('colours.title')} — Collections Navigator — University of Melbourne" %>
-<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ t("colours.title"), nil ] ]) %>
-<%= render NexusCcs::PageBannerComponent.new(title: t("colours.title"), description: t("colours.description")) %>
-<main class="colours" id="main-content">
-  <section class="ccs-section" aria-labelledby="colours-heading">
-    <div class="ccs-section__inner">
-      <h2 id="colours-heading" class="ccs-section__heading"><%= t("colours.heading") %></h2>
-      <% if @colours.present? %>
-        <p class="colours__intro"><%= t("colours.intro") %></p>
-        <%# Every colour is named in text and counted: the swatch is decoration (aria-hidden), never the only cue %>
-        <ul class="colours__list">
-          <% @colours.each do |colour| %>
-            <li class="colours__item">
-              <%= link_to search_catalog_path(f: { CatalogConfig::Facets::COLOUR_FIELD => [ colour.name ] }), class: "colours__link" do %>
-                <span class="colours__swatch colours__swatch--<%= colour.name %>" aria-hidden="true"></span>
-                <span class="colours__name"><%= colour_facet_label(colour.name) %></span>
-                <span class="colours__count"><%= t("colours.count", count: colour.count, formatted: number_with_delimiter(colour.count)) %></span>
-              <% end %>
-            </li>
-          <% end %>
-        </ul>
-      <% else %>
+<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", browse_path ], [ t("colours.title"), nil ] ]) %>
+<main class="browse explore" id="main-content">
+  <div class="place-explorer-wrap">
+    <div class="time-explorer colour-explorer">
+      <div class="place-explorer__head">
+        <div class="place-explorer__title">
+          <h1 class="place-explorer__heading"><%= t("colours.title") %></h1>
+          <p class="place-explorer__intro"><%= t("colours.intro") %></p>
+        </div>
+      </div>
+
+      <% if @colours.blank? %>
         <p class="colours__empty"><%= @colours.nil? ? t("colours.unavailable") : t("colours.empty") %></p>
+      <% else %>
+        <% field = CatalogConfig::Facets::COLOUR_FIELD %>
+        <% busiest = @colours.max_by(&:count) %>
+        <% widest = Math.sqrt(busiest.count) %>
+        <figure class="time-chart colour-band">
+          <figcaption class="time-chart__caption"><%= t("colours.band", busiest: colour_facet_label(busiest.name).downcase, count: number_with_delimiter(busiest.count)) %></figcaption>
+          <ol class="colour-band__bar" aria-hidden="true">
+            <% @colours.each do |colour| %>
+              <li class="colour-band__part colours__swatch--<%= colour.name %>" style="--w: <%= (Math.sqrt(colour.count) / widest).round(3) %>" title="<%= colour_facet_label(colour.name) %>: <%= number_with_delimiter(colour.count) %>"></li>
+            <% end %>
+          </ol>
+          <p class="colour-band__note"><%= t("colours.description") %></p>
+        </figure>
+
+        <section class="place-section time-explorer__periods" aria-labelledby="colours-heading">
+          <h2 class="place-section__heading" id="colours-heading"><%= t("colours.heading") %></h2>
+          <% tiles = @colours.map { |colour| facet_tile(colour_facet_label(colour.name), colour.count, search_catalog_path(f: { field => [ colour.name ] }), @pictures.value(field, colour.name)) } %>
+          <%= render "browse_entities/facet_tiles", tiles: tiles, label: t("colours.list_label"), ordered: true %>
+        </section>
       <% end %>
     </div>
-  </section>
+  </div>
 </main>

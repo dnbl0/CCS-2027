@@ -58,3 +58,11 @@
 
 /* Looks similar sits after More like this, in the same column; its cards are the record page's (object_cards.css) */
 .looks-similar .object-cards__list { margin-top: var(--ccs-space-5); }
+
+/* Explore by colour on the Explore template (colours/index; explore_pages.css .time-explorer, .time-chart): the colours' share of the
+   records as one band, each part as wide as the square root of its count beside the busiest's (white and grey would otherwise leave
+   purple a hairline). The white part has a hairline edge so it shows on the pale panel. */
+.colour-band__bar { display: flex; gap: 3px; height: 3rem; margin: 0; padding: 0; list-style: none; }
+.colour-band__part { flex: var(--w) 1 0; min-width: 6px; border-radius: var(--ccs-radius-sm); }
+.colour-band__part.colours__swatch--white { box-shadow: inset 0 0 0 1px var(--ccs-border-default); }
+.colour-band__note { margin: var(--ccs-space-3) 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-xs); max-width: 65ch; }
