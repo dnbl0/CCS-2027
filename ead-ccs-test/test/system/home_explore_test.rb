@@ -81,8 +81,8 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     page.current_window.resize_to(1440, 900)
     visit "/"
 
-    assert_selector "section.explore ul.simple-listing > li.simple-listing__item", count: HomeCollections.museums.size
-    assert_selector "section.home-art-collection ul.simple-listing > li.simple-listing__item", count: HomeCollections.art_collection.size
+    assert_selector "section.explore ul.simple-listing > li.simple-listing__item", count: HomeCollections.museums.size + HomeCollections.art_collection.size
+    assert_selector "section.explore .home-art-collection ul.simple-listing > li.simple-listing__item", count: HomeCollections.art_collection.size
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
     assert_empty small_targets
     assert_not sideways_scroll?
@@ -109,7 +109,7 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     page.current_window.resize_to(390, PHONE_HEIGHT)
     visit "/"
 
-    assert_selector "section.explore ul.simple-listing > li.simple-listing__item", count: HomeCollections.museums.size
+    assert_selector "section.explore ul.simple-listing > li.simple-listing__item", count: HomeCollections.museums.size + HomeCollections.art_collection.size
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
     assert_empty small_targets
     assert_not sideways_scroll?

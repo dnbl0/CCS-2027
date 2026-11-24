@@ -28,8 +28,8 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "section[aria-labelledby=explore-title] h2#explore-title", text: "Explore the collections"
-    assert_select "section.explore ul.simple-listing > li.simple-listing__item", count: HomeCollections.museums.size
-    assert_select "section.home-art-collection ul.simple-listing > li.simple-listing__item", count: HomeCollections.art_collection.size
+    assert_select "section.explore ul.simple-listing > li.simple-listing__item", count: HomeCollections.museums.size + HomeCollections.art_collection.size
+    assert_select "section.explore .home-art-collection ul.simple-listing > li.simple-listing__item", count: HomeCollections.art_collection.size
     assert_select "section.explore-kinds article.explore-card--tile h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints']", text: "Prints and drawings"
     assert_select "section.home-places article.explore-card--tile h3 a", text: "Japan"
     assert_select "section.home-visit", count: 0

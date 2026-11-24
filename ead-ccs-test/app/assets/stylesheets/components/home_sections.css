@@ -351,3 +351,10 @@ turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity
 .simple-listing__item:hover .simple-listing__link { color: var(--ccs-text-link-hover); text-decoration-thickness: 2px; }
 .simple-listing__link:focus-visible { outline: none; }
 .simple-listing__link:focus-visible::after { outline: 3px solid var(--ccs-focus-ring); outline-offset: 4px; }
+
+/* Explore the collections' second group: the collections within the University of Melbourne Art Collection, under their own heading */
+.home-art-collection { margin-top: var(--ccs-space-8); }
+.home-art-collection__head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--ccs-space-3) var(--ccs-space-6); margin-bottom: var(--ccs-space-6); }
+.home-art-collection__heading { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-2xl); font-weight: 400; }
+.home-art-collection__intro { max-width: 60ch; margin: var(--ccs-space-2) 0 0; color: var(--ccs-text-secondary); }
+.home-art-collection__link { min-height: 44px; align-items: center; }

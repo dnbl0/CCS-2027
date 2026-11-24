@@ -25,7 +25,7 @@ class ExploreComponentTest < ViewComponent::TestCase
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
     headings = page.all("section.home-section h2").map(&:text)
-    assert_equal [ "Explore the collections", "University of Melbourne Art Collection", "Record types", "Places", "Time" ], headings
+    assert_equal [ "Explore the collections", "Record types", "Places", "Time" ], headings
     assert_selector "section.explore .home-section__head a.home-section__link[href='/browse/categories/collections']", text: "See all collections"
     assert_selector "section.explore-kinds a.home-section__link[href='/browse/object-types']", text: "See all object types"
     assert_selector "section.home-places a.home-section__link[href='/browse/places']", text: "See all places"
@@ -37,12 +37,13 @@ class ExploreComponentTest < ViewComponent::TestCase
     render_inline NexusCcs::ExploreComponent.new(overview: overview(image: IMAGE, indigenous_image: IMAGE))
 
     museums = page.all("section.explore ul.simple-listing.simple-listing--four > li.simple-listing__item")
-    assert_equal HomeCollections.museums.size, museums.size
+    assert_equal HomeCollections.museums.size + HomeCollections.art_collection.size, museums.size # the Art Collection's are in the section too
     assert_equal "Architecture, Building and Planning Library Rare Material Collection", museums.first.find("h3").text
     assert_selector "section.explore li.simple-listing__item:first-child img.simple-listing__img[alt=''][src*='museumsandcollections.unimelb.edu.au']"
     assert_selector "section.explore h3 a.simple-listing__link[href*='f%5Bcollection_ssim%5D%5B%5D=Medical+History+Museum'], section.explore h3 a.simple-listing__link[href^='/browse/collections/medical-history-museum']",
                     text: "Medical History Museum"
-    art = page.all("section.home-art-collection ul.simple-listing > li h3").map(&:text)
+    assert_selector "section.explore .home-art-collection h3#home-art-collection-heading", text: "University of Melbourne Art Collection"
+    art = page.all("section.explore .home-art-collection ul.simple-listing > li h4").map(&:text)
     assert_equal HomeCollections.art_collection.map(&:title), art
     assert_includes art, "Gerard Herbst Poster Collection"
     assert_no_selector ".explore-card__cta" # no call to action on any card

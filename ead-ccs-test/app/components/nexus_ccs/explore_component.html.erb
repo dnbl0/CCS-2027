@@ -1,18 +1,23 @@
-<%# The home page's ways into the collections without a search (docs/card-layouts.md): the collections and the collections within the
-    University of Melbourne Art Collection as the University's Museums and Collections index lists them (its simple listing); the record
-    types and the places as the same
-    picture tiles in the site's mosaic (MosaicComponent), and time too, each section led by its first tile. Every picture whole, at its own shape. %>
+<%# The home page's ways into the collections without a search (docs/card-layouts.md): Explore the collections as the University's
+    Museums and Collections index lists them (its simple listing): its collections, then those within the University of Melbourne Art
+    Collection; the record types and the places as picture tiles in the site's mosaic (MosaicComponent), and time too, each section led by its first tile. Every picture whole, at its own shape. %>
 <%= render NexusCcs::HomeSectionComponent.new(id: "explore-title", heading: t("home.collections.heading"), intro: t("home.collections.intro"),
                                               link: t("home.collections.see_all"), link_path: helpers.category_path("collections"), extra_class: "explore") do %>
-  <%# The collections as the University's Museums and Collections index lists them (its simple listing: the same titles and pictures) %>
+  <%# The collections as the University's Museums and Collections index lists them (its simple listing: the same titles and pictures), then,
+      as on that page, the collections within the University of Melbourne Art Collection under their own heading %>
   <%= render NexusCcs::SimpleListingComponent.new(items: HomeCollections.museums, label: t("home.collections.label"), path: ->(item) { HomeCollections.path(item, helpers) }) %>
-<% end %>
-
-<%# The collections within the University of Melbourne Art Collection, as the University's index lists them %>
-<%= render NexusCcs::HomeSectionComponent.new(id: "home-art-collection", heading: t("home.art_collection.heading"), intro: t("home.art_collection.intro"),
-                                              link: t("home.art_collection.see_all"), link_path: (helpers.landing_path_for("collections", "University Art Collection") || helpers.category_path("named-collections")),
-                                              extra_class: "home-art-collection") do %>
-  <%= render NexusCcs::SimpleListingComponent.new(items: HomeCollections.art_collection, label: t("home.art_collection.label"), path: ->(item) { HomeCollections.path(item, helpers) }) %>
+  <div class="home-art-collection" aria-labelledby="home-art-collection-heading" role="group">
+    <div class="home-art-collection__head">
+      <div>
+        <h3 class="home-art-collection__heading" id="home-art-collection-heading"><%= t("home.art_collection.heading") %></h3>
+        <p class="home-art-collection__intro"><%= t("home.art_collection.intro") %></p>
+      </div>
+      <%= link_to t("home.art_collection.see_all"), (helpers.landing_path_for("collections", "University Art Collection") || helpers.category_path("named-collections")),
+                  class: "arrow-link arrow-link--icon home-art-collection__link" %>
+    </div>
+    <%= render NexusCcs::SimpleListingComponent.new(items: HomeCollections.art_collection, label: t("home.art_collection.label"), heading_tag: :h4,
+                                                    path: ->(item) { HomeCollections.path(item, helpers) }) %>
+  </div>
 <% end %>
 
 <% if kind_tiles.any? %>
