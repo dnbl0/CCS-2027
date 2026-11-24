@@ -28,10 +28,10 @@ class ColoursTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "title", /Explore by colour/
     assert_select "h1", "Explore by colour"
-    assert_select "turbo-frame#colour-explorer[data-turbo-action=advance] nav.colour-strip[aria-label=Colours]" do
-      labels = css_select("a.colour-strip__swatch").map { |swatch| swatch["aria-label"] }
+    assert_select "turbo-frame#colour-explorer[data-turbo-action=advance] nav.explore-strip[aria-label=Colours]" do
+      labels = css_select("a.explore-strip__swatch").map { |swatch| swatch["aria-label"] }
       assert_equal [ "Red: 1,234 records", "Blue: 12 records", "White: 3 records" ], labels
-      assert_select "a.colour-strip__swatch.colours__swatch--red[href=?][title=?]", "/explore/colours?colour=red", "Red: 1,234 records"
+      assert_select "a.explore-strip__swatch.colours__swatch--red[href=?][title=?]", "/explore/colours?colour=red", "Red: 1,234 records"
       assert_select "a[aria-current]", 0, "no colour chosen yet"
     end
     assert_select "h2#colours-heading", "Colours"
@@ -48,22 +48,22 @@ class ColoursTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "title", /\ATeal — Explore by colour/
-    assert_select "a.colour-strip__swatch[aria-current=page]", 1
-    assert_select "a.colour-strip__swatch.colours__swatch--teal[aria-current=page]"
-    assert_select "section.colour-wall[aria-labelledby=colour-wall-heading]" do
-      assert_select "h2#colour-wall-heading", "Teal"
-      assert_select ".colour-wall__count", "43 records"
-      assert_select "a.colour-wall__all[data-turbo-frame=_top][href=?]", "/catalog?f%5Bcolour_ssim%5D%5B%5D=teal", text: "See all 43 in the search"
-      assert_equal %w[/catalog/emu-a /catalog/emu-b], css_select("a.colour-wall__link").map { |link| link["href"] }, "mostly teal first; no sensitive record"
-      assert_select "a.colour-wall__link[data-turbo-frame=_top] img[alt='']", 2
-      assert_select "a.colour-wall__link .colour-wall__title", "Title of emu-a"
+    assert_select "a.explore-strip__swatch[aria-current=page]", 1
+    assert_select "a.explore-strip__swatch.colours__swatch--teal[aria-current=page]"
+    assert_select "section.picture-wall[aria-labelledby=picture-wall-heading]" do
+      assert_select "h2#picture-wall-heading", "Teal"
+      assert_select ".picture-wall__count", "43 records"
+      assert_select ".picture-wall__links a[data-turbo-frame=_top][href=?]", "/catalog?f%5Bcolour_ssim%5D%5B%5D=teal", text: "See all 43 in the search"
+      assert_equal %w[/catalog/emu-a /catalog/emu-b], css_select("a.picture-wall__link").map { |link| link["href"] }, "mostly teal first; no sensitive record"
+      assert_select "a.picture-wall__link[data-turbo-frame=_top] img[alt='']", 2
+      assert_select "a.picture-wall__link .picture-wall__title", "Title of emu-a"
     end
   end
 
   test "a colour the index does not have is no choice: the page as it is before a colour is chosen" do
     with_seeded_menu_cache { with_canned_search(colour_counts("red" => 5)) { get "/explore/colours?colour=mauve" } }
     assert_response :success
-    assert_select "section.colour-wall", 0
+    assert_select "section.picture-wall", 0
     assert_select "h2#colours-heading", "Colours"
   end
 

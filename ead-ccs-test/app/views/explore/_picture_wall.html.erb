@@ -1,0 +1,30 @@
+<%# A wall of square pictures (PictureWall; Explore by colour and by time, after Google Arts & Culture's Color Explorer): a head with what
+    was chosen, its number of records and the ways on (links: [label, path]), then the records, five to a row on a wide screen, each the
+    record's link, its title showing on the picture when pointed at or focused. records nil: Solr could not answer. The links leave the
+    page's Turbo frame. %>
+<%# locals: (heading:, count:, records:, links: [], unavailable:) %>
+<section class="picture-wall" aria-labelledby="picture-wall-heading">
+  <div class="picture-wall__head">
+    <h2 class="place-section__heading picture-wall__heading" id="picture-wall-heading"><%= heading %></h2>
+    <p class="picture-wall__count"><%= count %></p>
+    <% if links.any? %>
+      <p class="picture-wall__links">
+        <% links.each do |label, path| %><%= link_to label, path, class: "arrow-link arrow-link--icon", data: { turbo_frame: "_top" } %><% end %>
+      </p>
+    <% end %>
+  </div>
+  <% if records.nil? %>
+    <p class="picture-wall__empty"><%= unavailable %></p>
+  <% elsif records.any? %>
+    <ul class="picture-wall__grid">
+      <% records.each do |record| %>
+        <li class="picture-wall__item">
+          <%= link_to solr_document_path(record.id), class: "picture-wall__link", data: { turbo_frame: "_top" } do %>
+            <img src="<%= DamImage.sized(AssetVersion.url(record.src), 500) %>" alt="" loading="lazy" decoding="async">
+            <span class="picture-wall__title"><%= record.title %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

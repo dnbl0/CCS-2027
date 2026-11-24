@@ -5,10 +5,17 @@
 class ExploreController < ApplicationController
   layout "pages"
 
+  # Every century, as the strip; with ?century=, that century's records as a wall of pictures and its decades as tiles
   def time
+    @centuries = Explore::Timeline.call
+    return render status: :service_unavailable unless @centuries
+
     @century = Explore::Timeline.century_param(params[:century])
+    @century = nil unless @centuries.periods.any? { |period| period.first == @century }
+    return unless @century
+
     @timeline = Explore::Timeline.call(century: @century)
-    render status: :service_unavailable unless @timeline
+    @records = PictureWall.for("time/#{@century}", "#{Explore::Timeline::FIELD}:[#{@century} TO #{@century + 99}]")
   end
 
   def places

@@ -1,62 +1,87 @@
-<%# Explore by time (Explore::Timeline), on the Explore template (explore/places' head): the shape of the collections in time (how many
-    records each century, or each decade of one century, holds, as bars), then the periods as picture tiles in the site's mosaic, in time
-    order. A period opens its own page where it has one (Browse::Periods: from 1000; its decades are listed there), else its records in the
-    search. The eras the records are catalogued under mostly repeat the centuries, so they are a folded list after. %>
-<% period_label = @century && Explore::Timeline::Period.new(first: @century, last: @century + 99, count: 0, images: []).label %>
+<%# Explore by time (Explore::Timeline), on the Explore template, after Google Arts & Culture's Color Explorer as Explore by colour is: a
+    strip of the centuries, earliest first, each the same width with a bar for its number of records (the square root of its share of the
+    busiest, so the small centuries stay visible; the note says so), the chosen one marked by a notch and kept in view
+    (explore_strip_controller.js). Before a century is chosen, the centuries as picture tiles, each opening its own page where it has one
+    (Browse::Periods, from 1000), and the eras folded after; with ?century=, its records as a wall of square pictures (explore/_picture_wall)
+    and its decades as tiles. The strip and what is under it are one Turbo frame, so choosing a century swaps them in place and the address
+    follows; the breadcrumb and the heading, outside the frame, are the same for every century. Without JavaScript the strip's items are
+    plain links. The earliest period ("Earlier", before 3000 BCE) is not a century: it opens its records. %>
+<% periods = @centuries&.periods || [] %>
+<% chosen = periods.find { |period| period.first == @century } if @century %>
+<% title = "#{[ chosen&.label, t('explore_pages.time.title') ].compact.join(' — ')} — Collections Navigator — University of Melbourne" %>
 <% content_for :body_class, "page-browse page-explore page-explore-time" %>
-<% content_for :title, "#{[ period_label, t('explore_pages.time.title') ].compact.join(' — ')} — Collections Navigator — University of Melbourne" %>
-<% trail = [ [ "Browse", browse_path ], [ t("explore_pages.time.title"), (explore_time_path if @century) ] ] %>
-<% trail << [ period_label, nil ] if @century %>
-<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: trail) %>
+<% content_for :title, title %>
+<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", browse_path ], [ t("explore_pages.time.title"), nil ] ]) %>
 <main class="browse explore" id="main-content">
   <div class="place-explorer-wrap">
     <div class="time-explorer">
       <div class="place-explorer__head">
         <div class="place-explorer__title">
-          <h1 class="place-explorer__heading"><%= period_label ? t("explore_pages.time.decades", period: period_label) : t("explore_pages.time.title") %></h1>
-          <p class="place-explorer__intro"><%= period_label ? t("explore_pages.time.decades_intro") : t("explore_pages.time.intro") %></p>
+          <h1 class="place-explorer__heading"><%= t("explore_pages.time.title") %></h1>
+          <p class="place-explorer__intro"><%= t("explore_pages.time.intro") %></p>
         </div>
-        <% if @century %><p class="time-explorer__back"><%= link_to t("explore_pages.time.all_centuries"), explore_time_path, class: "arrow-link arrow-link--icon" %></p><% end %>
       </div>
 
-      <% if @timeline.nil? %>
+      <% if @centuries.nil? %>
         <p class="browse__unavailable"><%= t("explore_pages.unavailable_html", link: link_to(t("explore_pages.search_all"), search_action_path(any_assets: "1", search_field: "all_fields"))) %></p>
-      <% elsif @timeline.periods.empty? %>
+      <% elsif periods.empty? %>
         <p><%= t("explore_pages.time.empty") %></p>
       <% else %>
-        <% periods = @timeline.periods %>
         <% most = Math.sqrt(periods.map(&:count).max.to_f) %>
-        <%# The shape of the collections in time: one bar a period, its height the square root of its share of the busiest, so the small
-            periods stay visible beside the 20th century's thousands (the caption says so); a picture of the counts below, so it is hidden from
-            screen readers, and its words say what it shows %>
-        <figure class="time-chart">
-          <figcaption class="time-chart__caption"><%= t("explore_pages.time.chart", busiest: periods.max_by(&:count).label, count: number_with_delimiter(periods.max_by(&:count).count)) %></figcaption>
-          <ol class="time-chart__bars" aria-hidden="true">
-            <% periods.each do |period| %>
-              <li class="time-chart__bar" style="--h: <%= [ (Math.sqrt(period.count) / most * 100).round(1), 2 ].max %>%" title="<%= period.label %>: <%= number_with_delimiter(period.count) %>"></li>
-            <% end %>
-          </ol>
-          <p class="time-chart__ends" aria-hidden="true"><span><%= periods.first.label %></span><span><%= periods.last.label %></span></p>
-        </figure>
-
-        <section class="place-section time-explorer__periods" aria-labelledby="timeline-heading">
-          <h2 class="place-section__heading" id="timeline-heading"><%= @century ? t("explore_pages.time.decades_heading") : t("explore_pages.time.centuries") %></h2>
-          <% tiles = periods.map { |period| facet_tile(period.label, period.count, timeline_period_path(period) || search_action_path(period.search_query), period.images.first) } %>
-          <%= render "browse_entities/facet_tiles", tiles: tiles, label: t("explore_pages.time.list_label"), ordered: true %>
-        </section>
-
-        <% if @timeline.eras.any? && !@century %>
-          <details class="place-explorer__all time-explorer__eras">
-            <summary><%= t("explore_pages.time.eras_folded", count: @timeline.eras.size) %></summary>
-            <p class="time-explorer__eras-intro"><%= t("explore_pages.time.eras_intro") %></p>
-            <ul class="place-chips">
-              <%# Most records first (the source data has a few impossible eras, "30th century", with one or two records: they fall to the end) %>
-              <% @timeline.eras.sort_by { |era| -era.count }.each do |era| %>
-                <li><%= link_to search_action_path(era.search_query), class: "places-chip" do %><%= era.name %> <span class="places-chip__count"><%= number_with_delimiter(era.count) %></span><% end %></li>
+        <% busiest = periods.max_by(&:count) %>
+        <%# The frame's links leave it (target _top: the tiles open the periods' own pages) unless they name it (the strip, All centuries) %>
+        <turbo-frame id="time-explorer" target="_top" data-turbo-action="advance">
+          <nav class="explore-strip explore-strip--time" aria-label="<%= t("explore_pages.time.strip_label") %>" data-controller="explore-strip" data-explore-strip-title-value="<%= title %>">
+            <ul class="explore-strip__list">
+              <% periods.each do |period| %>
+                <% words = t("explore_pages.time.strip_item", short: period.short_label, period: period.label, count: period.count, formatted: number_with_delimiter(period.count)) %>
+                <% path = period.before? ? (timeline_period_path(period) || search_action_path(period.search_query)) : explore_time_path(century: period.first) %>
+                <li class="explore-strip__item">
+                  <%= link_to path, class: "explore-strip__period", title: words, aria: { label: words, current: ("page" if period == chosen) },
+                                    data: { explore_strip_target: ("chosen" if period == chosen), turbo_frame: ("time-explorer" unless period.before?) } do %>
+                    <span class="explore-strip__bar" style="--h: <%= [ (Math.sqrt(period.count) / most * 100).round(1), 2 ].max %>" aria-hidden="true"></span>
+                    <span class="explore-strip__year"><%= period.short_label %></span>
+                  <% end %>
+                </li>
               <% end %>
             </ul>
-          </details>
-        <% end %>
+          </nav>
+          <p class="explore-strip__note"><%= t("explore_pages.time.strip_note", busiest: busiest.label, count: number_with_delimiter(busiest.count)) %></p>
+
+          <% if chosen %>
+            <% numbers = { count: chosen.count, formatted: number_with_delimiter(chosen.count) } %>
+            <%= render "explore/picture_wall", records: @records, heading: chosen.label, count: t("explore_pages.time.count", **numbers),
+                       unavailable: t("explore_pages.unavailable_html", link: link_to(t("explore_pages.search_all"), search_action_path(chosen.search_query))),
+                       links: [ [ t("explore_pages.time.see_all", **numbers), timeline_period_path(chosen) || search_action_path(chosen.search_query) ] ] %>
+            <% if @timeline&.periods.present? %>
+              <section class="place-section time-explorer__periods" aria-labelledby="timeline-heading">
+                <h2 class="place-section__heading" id="timeline-heading"><%= t("explore_pages.time.decades", period: chosen.label) %></h2>
+                <% tiles = @timeline.periods.map { |period| facet_tile(period.label, period.count, timeline_period_path(period) || search_action_path(period.search_query), period.images.first) } %>
+                <%= render "browse_entities/facet_tiles", tiles: tiles, label: t("explore_pages.time.list_label"), ordered: true %>
+              </section>
+            <% end %>
+            <p class="time-explorer__back"><%= link_to t("explore_pages.time.all_centuries"), explore_time_path, class: "arrow-link arrow-link--icon", data: { turbo_frame: "time-explorer" } %></p>
+          <% else %>
+            <section class="place-section time-explorer__periods" aria-labelledby="timeline-heading">
+              <h2 class="place-section__heading" id="timeline-heading"><%= t("explore_pages.time.centuries") %></h2>
+              <% tiles = periods.map { |period| facet_tile(period.label, period.count, timeline_period_path(period) || search_action_path(period.search_query), period.images.first) } %>
+              <%= render "browse_entities/facet_tiles", tiles: tiles, label: t("explore_pages.time.list_label"), ordered: true %>
+            </section>
+
+            <% if @centuries.eras.any? %>
+              <details class="place-explorer__all time-explorer__eras">
+                <summary><%= t("explore_pages.time.eras_folded", count: @centuries.eras.size) %></summary>
+                <p class="time-explorer__eras-intro"><%= t("explore_pages.time.eras_intro") %></p>
+                <ul class="place-chips">
+                  <%# Most records first (the source data has a few impossible eras, "30th century", with one or two records: they fall to the end) %>
+                  <% @centuries.eras.sort_by { |era| -era.count }.each do |era| %>
+                    <li><%= link_to search_action_path(era.search_query), class: "places-chip" do %><%= era.name %> <span class="places-chip__count"><%= number_with_delimiter(era.count) %></span><% end %></li>
+                  <% end %>
+                </ul>
+              </details>
+            <% end %>
+          <% end %>
+        </turbo-frame>
       <% end %>
     </div>
   </div>

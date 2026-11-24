@@ -38,7 +38,7 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
         assert_no_horizontal_scroll
 
         visit "/explore/time?century=1900"
-        assert_selector "h1", text: /Decades of/
+        assert_selector "h2", text: /Decades of/
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
 
         visit "/explore/places"
@@ -73,6 +73,26 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
     assert century, "a century from 1000 has its own page"
     century.click
     assert_selector "main.place-page h1"
+  end
+
+  test "choosing a century in the strip swaps in its wall in place: the address, the title and focus follow, and the strip scrolls to it" do
+    page.driver.resize(1440, 900)
+    visit "/explore/time"
+    century = find("a.explore-strip__period[href='/explore/time?century=1900']")
+    century.click
+    assert_selector "h2#picture-wall-heading", text: "1900–1999"
+    assert_selector "turbo-frame#time-explorer[complete]:not([aria-busy])", visible: :all
+    assert_no_selector "html[aria-busy]", visible: :all
+    assert_equal "/explore/time?century=1900", page.evaluate_script("location.pathname + location.search")
+    assert_match(/\A1900–1999 — Explore by time/, page.evaluate_script("document.title"))
+    assert_equal "1900s", page.evaluate_script("document.activeElement.textContent.trim()"), "focus stays on the chosen century"
+    assert_selector "a.explore-strip__period[aria-current=page]", text: "1900s"
+    assert_selector ".picture-wall__link", minimum: 1
+    assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
+
+    click_link "All centuries"
+    assert_selector "h2", text: "Centuries"
+    assert_equal "/explore/time", page.evaluate_script("location.pathname + location.search")
   end
 
   test "the map loads only when asked, is remembered, and a place is reached with the keyboard" do

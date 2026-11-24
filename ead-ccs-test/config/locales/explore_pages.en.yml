@@ -10,9 +10,6 @@ en:
     time:
       title: "Explore by time"
       intro: "The centuries the records come from, earliest first. Each opens its own page, with its decades and its records."
-      decades_intro: "The decades of this century, earliest first. Each opens its own page, with its records."
-      decades_heading: "Decades"
-      chart: "Records by period, earliest first: most are from %{busiest} (%{count} records). Bar heights are scaled so the smaller periods stay visible."
       eras_folded: "Eras as catalogued (%{count})"
       centuries: "Centuries"
       decades: "Decades of %{period}"
@@ -25,6 +22,18 @@ en:
       eras: "Eras"
       eras_intro: "The eras the records are catalogued under, most records first. Most repeat the centuries above."
       empty: "No records have a date in this period."
+      earlier: "Earlier"
+      strip_label: "Centuries"
+      strip_item:
+        one: "%{short} (%{period}): %{formatted} record"
+        other: "%{short} (%{period}): %{formatted} records"
+      strip_note: "Choose a century to see its records. Each bar shows how many records it has, scaled so the smaller centuries stay visible: most are from %{busiest} (%{count} records)."
+      count:
+        one: "%{formatted} record"
+        other: "%{formatted} records"
+      see_all:
+        one: "See the record"
+        other: "See all %{formatted}"
     places:
       title: "Explore by place"
       intro: "Where the objects were made: on a map, and as lists of regions, countries and places. Each opens its records in the search."

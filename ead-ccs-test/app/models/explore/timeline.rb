@@ -24,6 +24,12 @@ module Explore
         last.negative? ? "#{first.abs}–#{last.abs} BCE" : "#{first}–#{last}"
       end
 
+      # The strip's short name: a century by its first year ("1900s", "500s BCE"), the earliest period "Earlier"
+      def short_label
+        return I18n.t("explore_pages.time.earlier") if before?
+        first.negative? ? "#{first.abs}s BCE" : "#{first}s"
+      end
+
       def search_query
         range = before? ? { end: last } : { begin: first, end: last }
         { any_assets: "1", search_field: "all_fields", range: { FIELD => range } }

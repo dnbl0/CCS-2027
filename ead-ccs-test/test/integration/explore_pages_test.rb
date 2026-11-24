@@ -26,13 +26,22 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the timeline: the shape of the collections as bars, the periods as tiles in time order opening their own pages, and the eras folded" do
+  test "the timeline: a strip of the centuries, each the same width and named, the periods as tiles opening their own pages, the eras folded" do
     visit("/explore/time") { seed("timeline/all", timeline) }
 
     assert_response :success
     assert_select "h1", "Explore by time"
-    assert_select "figure.time-chart figcaption", /most are from 1900–1999 \(1,200 records\)/
-    assert_select ".time-chart__bars[aria-hidden='true'] li", 2
+    assert_select "turbo-frame#time-explorer[target=_top][data-turbo-action=advance] nav.explore-strip--time[aria-label=Centuries]" do
+      items = css_select("a.explore-strip__period")
+      assert_equal [ "Earlier (Before 3000 BCE): 2 records", "1900s (1900–1999): 1,200 records" ], items.map { |item| item["aria-label"] }
+      assert_equal %w[Earlier 1900s], items.map { |item| item.text.squish }, "the name shown is the start of the name read out"
+      # a century swaps in place (the link names the frame); the earliest period, not a century, opens its records
+      assert_select "a.explore-strip__period[href='/explore/time?century=1900'][data-turbo-frame=time-explorer]"
+      assert_select "a.explore-strip__period[href*='range%5Bdate_start_isi%5D%5Bend%5D=-3001']:not([data-turbo-frame])"
+      assert_select "a[aria-current]", 0, "no century chosen yet"
+      assert_select ".explore-strip__bar[aria-hidden=true]", 2
+    end
+    assert_select ".explore-strip__note", /most are from 1900–1999 \(1,200 records\)/
     # the periods, earliest first: a century from 1000 opens its own page (its decades are there), an earlier one its records in the search
     assert_select ".time-explorer__periods a[href='/browse/periods/1900-1999']", text: /\A1900–1999/
     assert_select ".time-explorer__periods a[href*='range%5Bdate_start_isi%5D%5Bend%5D=-3001']", text: /\ABefore 3000 BCE/
@@ -42,15 +51,31 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     assert_select "details.time-explorer__eras a[href*='f%5Bdate_era_ssim%5D%5B%5D=20th+century']", text: /20th century/
   end
 
-  test "a century's decades, with the way back; a century that is not one shows every century" do
-    visit("/explore/time?century=1900") { seed("timeline/1900", timeline(century: 1900)) }
-    assert_select "h1", "Decades of 1900–1999"
-    assert_select "h2", "Decades"
-    assert_select "a[href='/explore/time']", text: "All centuries"
+  test "a chosen century: marked in the strip, its records as a wall of squares, its decades, and the way back; a century not in the strip is no choice" do
+    wall = [ PictureWall::Record.new(id: "emu-1", title: "A print", src: "https://example.org/1.jpg") ]
+    visit("/explore/time?century=1900") do
+      seed("timeline/all", timeline)
+      seed("timeline/1900", timeline(century: 1900))
+      Rails.cache.write(SuppressedRecord.cache_key("picture_wall/v1/time/1900"), wall.map { |record| record.to_h.transform_keys(&:to_s) }, expires_in: 1.hour)
+    end
+    assert_select "title", /\A1900–1999 — Explore by time/
+    assert_select "h1", "Explore by time"
+    assert_select "a.explore-strip__period[aria-current=page][data-explore-strip-target=chosen]", "1900s"
+    assert_select "section.picture-wall" do
+      assert_select "h2#picture-wall-heading", "1900–1999"
+      assert_select ".picture-wall__count", "1,200 records"
+      assert_select ".picture-wall__links a[href='/browse/periods/1900-1999']", "See all 1,200"
+      assert_select "a.picture-wall__link[href='/catalog/emu-1'] .picture-wall__title", "A print"
+    end
+    assert_select "h2", "Decades of 1900–1999"
     assert_select ".time-explorer__periods a[href='/browse/periods/1920-1929']", text: /\A1920–1929/
+    assert_select "a[href='/explore/time'][data-turbo-frame=time-explorer]", text: "All centuries"
     assert_select "details.time-explorer__eras", 0
 
     visit("/explore/time?century=1950") { seed("timeline/all", timeline) }
+    assert_select "h2", "Centuries"
+    visit("/explore/time?century=1200") { seed("timeline/all", timeline) }
+    assert_select "section.picture-wall", 0
     assert_select "h2", "Centuries"
   end
 

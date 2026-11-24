@@ -1,14 +1,13 @@
 <%# Explore by colour (ColoursController), after Google Arts & Culture's Color Explorer: the Explore template's head, then a strip of the
     colours, each swatch the same width, in the palette's order (a spectrum), the chosen one marked by a notch and kept in view
-    (colour_strip_controller.js). Under it the chosen colour's records as a wall of square pictures, or, before a colour is chosen, each
-    colour as a picture tile. The strip and what is under it are one Turbo frame, so choosing a colour swaps the wall in place and the
-    address follows (?colour=); without JavaScript the swatches are plain links. A swatch's name is its link's name and its tooltip: the
-    colour is never the only cue. %>
+    (explore_strip_controller.js). Under it the chosen colour's records as a wall of square pictures (explore/_picture_wall), or, before a
+    colour is chosen, each colour as a picture tile. The strip and what is under it are one Turbo frame, so choosing a colour swaps the wall
+    in place and the address follows (?colour=); the breadcrumb, outside the frame, is the same for every colour. Without JavaScript the
+    swatches are plain links. A swatch's name is its link's name and its tooltip: the colour is never the only cue. %>
+<% title = "#{[ (colour_facet_label(@colour.name) if @colour), t('colours.title') ].compact.join(' — ')} — Collections Navigator — University of Melbourne" %>
 <% content_for :body_class, "page-browse page-explore page-explore-colours" %>
-<% content_for :title, "#{[ (colour_facet_label(@colour.name) if @colour), t('colours.title') ].compact.join(' — ')} — Collections Navigator — University of Melbourne" %>
-<% trail = [ [ "Browse", browse_path ], [ t("colours.title"), (explore_colours_path if @colour) ] ] %>
-<% trail << [ colour_facet_label(@colour.name), nil ] if @colour %>
-<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: trail) %>
+<% content_for :title, title %>
+<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", browse_path ], [ t("colours.title"), nil ] ]) %>
 <main class="browse explore" id="main-content">
   <div class="place-explorer-wrap">
     <div class="time-explorer colour-explorer">
@@ -24,46 +23,26 @@
       <% else %>
         <% field = CatalogConfig::Facets::COLOUR_FIELD %>
         <turbo-frame id="colour-explorer" data-turbo-action="advance">
-          <nav class="colour-strip" aria-label="<%= t("colours.strip_label") %>" data-controller="colour-strip">
-            <ul class="colour-strip__list">
+          <nav class="explore-strip" aria-label="<%= t("colours.strip_label") %>" data-controller="explore-strip" data-explore-strip-title-value="<%= title %>">
+            <ul class="explore-strip__list">
               <% @colours.each do |colour| %>
                 <% name = colour_facet_label(colour.name) %>
                 <% words = t("colours.swatch", name: name, count: colour.count, formatted: number_with_delimiter(colour.count)) %>
-                <li class="colour-strip__item">
-                  <%= link_to explore_colours_path(colour: colour.name), class: "colour-strip__swatch colours__swatch--#{colour.name}", title: words,
-                              aria: { label: words, current: ("page" if colour == @colour) }, data: { colour_strip_target: ("chosen" if colour == @colour) } do %><% end %>
+                <li class="explore-strip__item">
+                  <%= link_to explore_colours_path(colour: colour.name), class: "explore-strip__swatch colours__swatch--#{colour.name}", title: words,
+                              aria: { label: words, current: ("page" if colour == @colour) }, data: { explore_strip_target: ("chosen" if colour == @colour) } do %><% end %>
                 </li>
               <% end %>
             </ul>
           </nav>
-          <p class="colour-strip__note"><%= t("colours.description") %></p>
+          <p class="explore-strip__note"><%= t("colours.description") %></p>
 
           <% if @colour %>
-            <section class="colour-wall" aria-labelledby="colour-wall-heading">
-              <div class="colour-wall__head">
-                <h2 class="place-section__heading colour-wall__heading" id="colour-wall-heading">
-                  <span class="colour-wall__dot colours__swatch--<%= @colour.name %>" aria-hidden="true"></span><%= colour_facet_label(@colour.name) %>
-                </h2>
-                <p class="colour-wall__count"><%= t("colours.count", count: @colour.count, formatted: number_with_delimiter(@colour.count)) %></p>
-                <%= link_to t("colours.see_all", count: @colour.count, formatted: number_with_delimiter(@colour.count)), search_catalog_path(f: { field => [ @colour.name ] }),
-                            class: "arrow-link arrow-link--icon colour-wall__all", data: { turbo_frame: "_top" } %>
-              </div>
-              <% if @records.nil? %>
-                <p class="colours__empty"><%= t("colours.unavailable") %></p>
-              <% else %>
-                <%# Square pictures, five to a row on a wide screen, each the record's link (its title shows on the picture when pointed at or focused) %>
-                <ul class="colour-wall__grid">
-                  <% @records.each do |record| %>
-                    <li class="colour-wall__item">
-                      <%= link_to solr_document_path(record.id), class: "colour-wall__link", data: { turbo_frame: "_top" } do %>
-                        <img src="<%= DamImage.sized(AssetVersion.url(record.src), 500) %>" alt="" loading="lazy" decoding="async">
-                        <span class="colour-wall__title"><%= record.title %></span>
-                      <% end %>
-                    </li>
-                  <% end %>
-                </ul>
-              <% end %>
-            </section>
+            <% name = colour_facet_label(@colour.name) %>
+            <% numbers = { count: @colour.count, formatted: number_with_delimiter(@colour.count) } %>
+            <%= render "explore/picture_wall", records: @records, unavailable: t("colours.unavailable"), count: t("colours.count", **numbers),
+                       heading: safe_join([ tag.span(class: "picture-wall__dot colours__swatch--#{@colour.name}", aria: { hidden: true }), name ]),
+                       links: [ [ t("colours.see_all", **numbers), search_catalog_path(f: { field => [ @colour.name ] }) ] ] %>
           <% else %>
             <section class="place-section time-explorer__periods" aria-labelledby="colours-heading">
               <h2 class="place-section__heading" id="colours-heading"><%= t("colours.heading") %></h2>

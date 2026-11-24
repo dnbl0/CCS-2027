@@ -243,3 +243,68 @@
 
 .time-explorer__periods { margin-top: 0; padding-top: 0; border-top: 0; }
 .time-explorer__eras-intro { margin: var(--ccs-space-2) 0 var(--ccs-space-3); color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
+
+/* An Explore page's strip and wall (Explore by colour, Explore by time), after Google Arts & Culture's Color Explorer (measured
+   2026-11-24). The strip: its items side by side on a pale track the width of the page, each the same width whatever its number of
+   records, in their own order (a spectrum, time); the chosen one has a notch under it pointing at its wall. A strip too long for the
+   screen scrolls sideways (explore_strip_controller.js keeps the chosen item in its middle). Then the wall: square pictures 4px apart,
+   five to a row on a wide screen (Google's 236px squares at 1200px), each filling its square, the record's title showing on it when
+   pointed at or focused. */
+.explore-strip { background: var(--ccs-surface-subtle); }
+.explore-strip__list {
+  display: flex; justify-content: safe center; margin: 0; padding: 0; list-style: none;
+  overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth;
+}
+.explore-strip__list::-webkit-scrollbar { display: none; }
+.explore-strip__item { flex: 0 0 auto; }
+.explore-strip [aria-current="page"]::after {
+  content: ""; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+  border: 8px solid transparent; border-bottom-color: var(--ccs-surface-default); border-top-width: 0;
+}
+.explore-strip a:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: -3px; }
+.explore-strip__note { margin: var(--ccs-space-3) 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-xs); max-width: 65ch; }
+@media (prefers-reduced-motion: reduce) { .explore-strip__list { scroll-behavior: auto; } }
+
+/* Explore by time's strip: a century is a column with its start under it ("1900s") and a bar for its share of the busiest (the square
+   root, as the chart was, so the small centuries stay visible; --h, out of 100, of 56px); the strip is longer than the screen, so it keeps a thin
+   scroll bar and its ends fade, the cues that there is more to either side. The chosen century's bar is the brand blue, the rest a paler blue. */
+.explore-strip--time .explore-strip__list {
+  justify-content: flex-start; scrollbar-width: thin; padding-inline: var(--ccs-space-6);
+  /* the ends fade out: where the strip runs on past the screen, the centuries there show as fading into the edge */
+  mask-image: linear-gradient(to right, transparent, #000 var(--ccs-space-8), #000 calc(100% - var(--ccs-space-8)), transparent);
+}
+.explore-strip--time .explore-strip__list::-webkit-scrollbar { display: block; height: 6px; }
+.explore-strip__period {
+  position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: var(--ccs-space-1);
+  width: 72px; height: 104px; padding: var(--ccs-space-2) 0 var(--ccs-space-3); color: var(--ccs-text-primary); text-decoration: none;
+}
+.explore-strip__bar { width: 28px; height: calc(56px * var(--h) / 100); min-height: 3px; border-radius: 3px 3px 0 0; background: var(--ccs-text-brand); opacity: 0.35; }
+.explore-strip__period:hover .explore-strip__bar { opacity: 0.6; }
+.explore-strip__period[aria-current="page"] .explore-strip__bar { opacity: 1; }
+.explore-strip__year { font-size: var(--ccs-font-size-xs); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.explore-strip__period[aria-current="page"] .explore-strip__year { font-weight: 700; }
+.explore-strip__period:hover .explore-strip__year { text-decoration: underline; }
+
+.picture-wall { margin-top: var(--ccs-space-6); }
+.picture-wall__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ccs-space-2) var(--ccs-space-4); margin-bottom: var(--ccs-space-4); }
+.picture-wall__heading { display: inline-flex; align-items: center; gap: var(--ccs-space-3); margin: 0; }
+.picture-wall__count { margin: 0; color: var(--ccs-text-secondary); }
+.picture-wall__links { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2) var(--ccs-space-5); margin: 0 0 0 auto; }
+.picture-wall__links a { min-height: 44px; align-items: center; }
+.picture-wall__empty { margin: 0; color: var(--ccs-text-secondary); }
+.picture-wall__grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin: 0; padding: 0; list-style: none; }
+@media (max-width: 991.98px) { .picture-wall__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 575.98px) { .picture-wall__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.picture-wall__link { position: relative; display: block; aspect-ratio: 1; overflow: hidden; background: var(--ccs-surface-subtle); }
+.picture-wall__link img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 300ms cubic-bezier(0, 0, 0.25, 1); }
+.picture-wall__title {
+  position: absolute; inset: auto 0 0; padding: var(--ccs-space-2) var(--ccs-space-3);
+  background: rgb(0 15 70 / 0.85); color: #fff; font-size: var(--ccs-font-size-sm); line-height: 1.35;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  opacity: 0; transition: opacity 200ms ease-out;
+}
+.picture-wall__link:hover .picture-wall__title, .picture-wall__link:focus-visible .picture-wall__title { opacity: 1; }
+.picture-wall__link:hover img { transform: scale(1.04); }
+.picture-wall__link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: -3px; }
+@media (hover: none) { .picture-wall__title { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .picture-wall__link img, .picture-wall__title { transition: none; } }
