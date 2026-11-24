@@ -98,7 +98,12 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     first = find(".explore-kinds li.stack__item", match: :first)
     first.hover
     assert_selector ".explore-kinds li.stack__item.is-centre[data-away='0']", text: first.find("h3").text # pointing at a card makes it the centre
-    %w[.home-places .explore-periods .home-on-this-day].each do |section|
+    # Places: the same fan, without the band of colour; the close-ups band, when today's record can be shown, edge to edge
+    assert_selector ".home-places ul.stack > li.stack__item", minimum: 1, maximum: NexusCcs::ExploreComponent::PLACES_SHOWN if page.has_css?(".home-places", wait: 0)
+    if page.has_css?(".look-closer", wait: 0)
+      assert_equal 1440, page.evaluate_script("Math.round(document.querySelector('.look-closer').getBoundingClientRect().width)"), "the band runs edge to edge"
+    end
+    %w[.explore-periods .home-on-this-day].each do |section|
       next unless page.has_css?(section, wait: 0)
 
       assert_selector "#{section} ul.mosaic-flow.is-ready > li > article.explore-card--tile", minimum: 1
@@ -106,7 +111,7 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     assert_no_selector ".explore-card--collage, .place-spot, .home-section .object-card, .explore-card__cta"
     assert_no_overlaps
     assert_no_selector ".home-visit, #home-ways-in"
-    colours = page.evaluate_script("[...document.querySelectorAll('main > .ccs-section:not(.ccs-section--hero)')].map(s => getComputedStyle(s).backgroundColor)")
+    colours = page.evaluate_script("[...document.querySelectorAll('main > .ccs-section:not(.ccs-section--hero), main > .look-closer')].map(s => getComputedStyle(s).backgroundColor)")
     assert_equal colours.each_cons(2).count { |a, b| a != b }, colours.size - 1, "the sections' backgrounds alternate"
   end
 

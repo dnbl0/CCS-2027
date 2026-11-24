@@ -1,0 +1,64 @@
+/* The home page's "Look closer" band (NexusCcs::LookCloserComponent; after Google Arts & Culture's "Guess the artwork from the pieces",
+   measured 2026-11-24: a 530px band at 1440px, square close-ups in columns of a wide 454px, a narrow 265px and the text panel's 454px,
+   running off both sides, the panel's heading 32px regular in the band's dark ink, and each close-up easing in over 0.3s).
+   Every size is a share of the band's height (--h), so the pattern keeps its shape from a phone to a wide screen. The squares meet with
+   a thin line of the band's colour between them. The close-up inside a square is the whole picture, as wide as the square over the
+   close-up's share of its width, moved so the close-up's corner sits at the square's corner. */
+.look-closer {
+  --band: var(--ccs-surface-subtle);
+  --h: clamp(22.5rem, 37vw, 33.125rem);
+  overflow: hidden;
+  background: var(--band);
+}
+.look-closer__band { display: flex; justify-content: center; height: var(--h); }
+.look-closer__column { position: relative; flex: 0 0 auto; height: var(--h); }
+.look-closer__column--narrow { width: calc(var(--h) * 0.5); }
+.look-closer__column--wide, .look-closer__column--text { width: calc(var(--h) * 0.858); }
+
+.look-closer__piece { position: absolute; display: block; overflow: hidden; }
+.look-closer__piece::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 2px var(--band); pointer-events: none; }
+.look-closer__zoom { position: absolute; inset: 0; transition: transform 300ms cubic-bezier(0, 0, 0.25, 1); }
+.look-closer__piece:hover .look-closer__zoom { transform: scale(1.08); }
+.look-closer__zoom img {
+  position: absolute; max-width: none; height: auto;
+  width: calc(100% / var(--s));
+  left: calc(var(--x) * -100% / var(--s));
+  top: calc(var(--y) * -100% / (var(--s) * var(--a)));
+}
+
+/* narrow: two squares, one above the other */
+.look-closer__column--narrow .look-closer__piece { left: 0; width: calc(var(--h) * 0.5); height: calc(var(--h) * 0.5); }
+.look-closer__column--narrow .look-closer__piece:nth-child(1) { top: 0; }
+.look-closer__column--narrow .look-closer__piece:nth-child(2) { top: calc(var(--h) * 0.5); }
+/* wide: a large square with two small ones beside it, then two middling ones */
+.look-closer__column--wide .look-closer__piece:nth-child(1) { left: 0; top: 0; width: calc(var(--h) * 0.572); height: calc(var(--h) * 0.572); }
+.look-closer__column--wide .look-closer__piece:nth-child(2),
+.look-closer__column--wide .look-closer__piece:nth-child(3) { left: calc(var(--h) * 0.572); width: calc(var(--h) * 0.286); height: calc(var(--h) * 0.286); }
+.look-closer__column--wide .look-closer__piece:nth-child(2) { top: 0; }
+.look-closer__column--wide .look-closer__piece:nth-child(3) { top: calc(var(--h) * 0.286); }
+.look-closer__column--wide .look-closer__piece:nth-child(4),
+.look-closer__column--wide .look-closer__piece:nth-child(5),
+.look-closer__column--text .look-closer__piece { top: calc(var(--h) * 0.572); width: calc(var(--h) * 0.429); height: calc(var(--h) * 0.429); }
+.look-closer__column--wide .look-closer__piece:nth-child(4),
+.look-closer__column--text .look-closer__piece:nth-child(1) { left: 0; }
+.look-closer__column--wide .look-closer__piece:nth-child(5),
+.look-closer__column--text .look-closer__piece:nth-child(2) { left: calc(var(--h) * 0.429); }
+
+/* the text panel: above its two squares, on the band's colour */
+.look-closer__panel {
+  position: absolute; inset: 0 0 auto; height: calc(var(--h) * 0.572);
+  display: flex; flex-direction: column; justify-content: center; gap: var(--ccs-space-4);
+  padding: clamp(var(--ccs-space-5), 3vw, 40px);
+}
+.look-closer__heading {
+  margin: 0; color: var(--ccs-text-brand);
+  font-family: var(--ccs-font-heading); font-size: clamp(1.5rem, 2.3vw, 2rem); font-weight: 400; line-height: 1.25; text-wrap: balance;
+}
+.look-closer__answer {
+  align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px;
+  color: var(--ccs-text-brand); font-weight: var(--ccs-font-weight-semibold); text-decoration: underline; text-underline-offset: 3px;
+}
+.look-closer__answer:hover { text-decoration-thickness: 2px; }
+.look-closer__answer:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) { .look-closer__zoom { transition: none; } }

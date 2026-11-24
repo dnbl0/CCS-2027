@@ -20,18 +20,32 @@
   </div>
 <% end %>
 
+<%# The sections after Google Arts & Culture's home page (2026-11-24): its picture-only stack ("What do you want explore?"), its stack on a
+    band of colour (Object types), its close-ups band ("Guess the artwork from the pieces"), its plain stack (Places), then Time in the
+    mosaic. The tiles are worked out in the order the pictures are shared out (no picture twice), whatever order they are drawn in. %>
+<% ways = way_tiles %>
+<% if ways.count(&:image) == ways.size %>
+  <%= render NexusCcs::HomeSectionComponent.new(id: "explore-ways", heading: t("home.ways.heading"), intro: t("home.ways.intro"), extra_class: "home-ways") do %>
+    <%= render NexusCcs::StackComponent.new(tiles: ways, label: t("home.ways.label"), captions: false) %>
+  <% end %>
+<% end %>
+
 <% if kind_tiles.any? %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "explore-kinds", heading: t("home.kinds.heading"), intro: t("home.kinds.intro"),
-                                                link: t("explore.kinds.see_all"), link_path: helpers.browse_hub_path("object-types"), extra_class: "explore-kinds") do %>
-    <%# Five object types as a fanned stack of cards (after Google Arts & Culture's "SimpleStack") %>
+                                                link: t("explore.kinds.see_all"), link_path: helpers.browse_hub_path("object-types"), extra_class: "explore-kinds",
+                                                tint: "var(--ccs-explore-tint-3)") do %>
+    <%# Five object types as a fanned stack of cards (after Google Arts & Culture's "SimpleStack"), on a band of colour as its sections are %>
     <%= render NexusCcs::StackComponent.new(tiles: kind_tiles.first(NexusCcs::ExploreComponent::KINDS_SHOWN), label: t("home.kinds.heading")) %>
   <% end %>
 <% end %>
 
+<%= render NexusCcs::LookCloserComponent.new(pick: look_closer) %>
+
 <% if place_tiles.any? %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "explore-places", heading: t("explore.place_time.places"), intro: t("home.places.intro"),
                                                 link: t("explore.place_time.see_all_places"), link_path: helpers.browse_hub_path("places"), extra_class: "home-places") do %>
-    <%= render NexusCcs::MosaicComponent.new(tiles: place_tiles, label: t("explore.place_time.places"), lanes: 4) %>
+    <%# The places as Google's plain stack: five, each with its picture, name and a line on what its page holds %>
+    <%= render NexusCcs::StackComponent.new(tiles: place_tiles, label: t("explore.place_time.places")) %>
   <% end %>
 <% end %>
 

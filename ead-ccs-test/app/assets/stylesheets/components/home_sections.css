@@ -369,7 +369,7 @@ turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity
 .stack__item { flex: 0 0 min(78%, 18rem); scroll-snap-align: start; }
 
 .stack__card { position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--ccs-radius-md); background: var(--ccs-surface-default); box-shadow: var(--ccs-shadow-md); }
-.stack__media { aspect-ratio: 757 / 817; background: var(--ccs-surface-subtle); }
+.stack__media { aspect-ratio: 757 / 817; overflow: hidden; background: var(--ccs-surface-subtle); } /* overflow: its picture never stretches it */
 .stack__media img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .stack__body { display: flex; flex-direction: column; gap: var(--ccs-space-1); height: 7.5rem; padding: 19px var(--ccs-space-4) var(--ccs-space-4); overflow: hidden; }
 .stack__title { margin: 0; font-family: var(--ccs-font-family-sans); font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); line-height: 1.25; }
@@ -406,3 +406,16 @@ turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity
   .stack__shade { opacity: var(--shade); }
 }
 @media (prefers-reduced-motion: reduce) { .stack__item, .stack__shade { transition: none; } }
+
+/* Google's picture-only stack ("What do you want explore?"): nearly square pictures (844 by 817) with nothing under them; the card's name
+   sits on a white label in the picture's lower corner, so it reads on any picture */
+.stack--bare .stack__media { aspect-ratio: 844 / 817; }
+.stack--bare .stack__body { position: absolute; inset: auto auto var(--ccs-space-4) var(--ccs-space-4); height: auto; padding: var(--ccs-space-2) var(--ccs-space-3); border-radius: var(--ccs-radius-sm); background: var(--ccs-surface-default); }
+@container (min-width: 48rem) {
+  .stack--bare { height: calc(var(--card) * 817 / 844); }
+  /* a card right of the centre shows only its right-hand slice: its label goes in that corner, where it can be read */
+  .stack--bare .stack__item[data-side="1"] .stack__body { left: auto; right: var(--ccs-space-4); }
+}
+
+/* A home section on a band of colour (Google Arts & Culture's sections with a --section-background-color: Object types) */
+body.page-home main > .ccs-section.home-section.home-section--tinted:not(.ccs-section--hero) { background: var(--section-background-color); }

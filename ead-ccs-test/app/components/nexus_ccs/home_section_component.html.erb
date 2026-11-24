@@ -1,4 +1,4 @@
-<section class="ccs-section home-section <%= extra_class %>" aria-labelledby="<%= id %>">
+<section class="ccs-section home-section <%= extra_class %><%= " home-section--tinted" if tint %>" aria-labelledby="<%= id %>" <%= tag.attributes(style: ("--section-background-color: #{tint}" if tint)) %>>
   <div class="ccs-section__inner home-section__inner">
     <header class="home-section__head">
       <div class="home-section__titles">

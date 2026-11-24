@@ -1,7 +1,7 @@
 <%# The fan is drawn by CSS from each card's place (--i) and its steps from the centre (data-away), so it is in place at first paint, with
     no layout shift; stack_controller.js only moves the centre %>
 <div class="stack-frame">
-  <ul class="stack" data-controller="stack" aria-label="<%= label %>" style="--n: <%= tiles.size %>">
+  <ul class="stack<%= " stack--bare" unless captions %>" data-controller="stack" aria-label="<%= label %>" style="--n: <%= tiles.size %>">
     <% tiles.each_with_index do |tile, index| %>
       <li class="stack__item<%= " is-centre" if index == centre %>" style="--i: <%= index %>" data-away="<%= (index - centre).abs %>" data-side="<%= index <=> centre %>"
           data-stack-target="card" data-action="mouseenter->stack#point focusin->stack#point">
@@ -11,7 +11,7 @@
           </div>
           <div class="stack__body">
             <h3 class="stack__title"><%= link_to tile.title, tile.path, class: "stack__link" %></h3>
-            <% if tile.text.present? %><p class="stack__text"><%= tile.text %></p><% end %>
+            <% if captions && tile.text.present? %><p class="stack__text"><%= tile.text %></p><% end %>
           </div>
           <span class="stack__shade" aria-hidden="true"></span>
         </article>

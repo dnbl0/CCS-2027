@@ -10,6 +10,7 @@ module NexusCcs
   # Renders nothing when there is nothing to show (Solr down and nothing kept).
   class ExploreComponent < ViewComponent::Base
     KINDS_SHOWN = 5 # object types in the home page's stack
+    PLACES_SHOWN = 5 # places in the home page's stack
     def initialize(overview: ExploreEntryPoints.overview)
       @overview = overview
     end
@@ -51,7 +52,7 @@ module NexusCcs
     end
 
     def place_tiles
-      @place_tiles ||= place_collages.each_with_index.map do |collage, index|
+      @place_tiles ||= place_collages.first(PLACES_SHOWN).each_with_index.map do |collage, index|
         collage_tile(collage, Browse.path_for("places", collage.title) || collage.path, collage.intro, index.zero?)
       end
     end
@@ -75,6 +76,28 @@ module NexusCcs
                                image: image, lead: index.zero?, cta: nil, external: false, width: (tile.image.width if image), height: (tile.image.height if image))
       end
     end
+
+    # "What do you want to explore?": Explore by place, by time and by colour, and the stories, as Google's picture-only stack. Each takes a
+    # picture no section above has used, from its own kind where it can (a place's for Places), else any record type's or place's
+    def way_tiles
+      @way_tiles ||= begin
+        kind_tiles
+        place_tiles
+        period_tiles
+        pool = (place_collages + kind_collages).flat_map(&:pictures)
+        own = { places: place_collages.flat_map(&:pictures), time: [], colour: [], stories: kind_collages.flat_map(&:pictures) }
+        paths = { places: helpers.explore_places_path, time: helpers.explore_time_path, colour: helpers.explore_colours_path, stories: helpers.stories_path }
+        paths.map do |key, path|
+          picture = (own[key] + pool).find { |candidate| fresh?(candidate[:src]) }
+          used_pictures << picture_key(picture[:src]) if picture
+          HomeSections::Tile.new(title: t("home.ways.#{key}"), text: nil, path: path, image: picture && DamImage.sized(picture[:src], 800),
+                                 lead: false, cta: nil, external: false, width: nil, height: nil)
+        end
+      end
+    end
+
+    # Today's "Look closer" band (HomeLookCloser), or nil
+    def look_closer = defined?(@look_closer) ? @look_closer : (@look_closer = HomeLookCloser.today)
 
     def used_pictures = @used_pictures ||= Set.new
 

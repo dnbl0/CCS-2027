@@ -22,6 +22,9 @@ module Colour
     # Returns [ [ r, g, b ], ... ] for the pixels that are not (mostly) transparent
     def self.pixels(bytes) = new(bytes).pixels
 
+    # The image's size, once #pixels has read it (HomeLookCloser reads the pixels as a grid)
+    attr_reader :width, :height
+
     def initialize(bytes)
       @bytes = bytes.to_s.b
       raise Unsupported, "not a PNG" unless self.class.png?(@bytes)

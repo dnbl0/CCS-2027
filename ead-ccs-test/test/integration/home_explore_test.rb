@@ -33,7 +33,8 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
     assert_select "section.explore-kinds h2", text: "Object types"
     assert_select "section.explore-kinds ul.stack > li.stack__item", minimum: 1, maximum: NexusCcs::ExploreComponent::KINDS_SHOWN
     assert_select "section.explore-kinds .stack__card h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints']", text: "Prints and drawings"
-    assert_select "section.home-places article.explore-card--tile h3 a", text: "Japan"
+    assert_select "section.home-places ul.stack > li.stack__item", maximum: NexusCcs::ExploreComponent::PLACES_SHOWN
+    assert_select "section.home-places .stack__card h3 a.stack__link", text: "Japan"
     assert_select "section.home-visit", count: 0
     assert_select "section.explore-periods article.explore-card--tile h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999']", text: "1900s"
   end

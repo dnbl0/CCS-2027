@@ -17,6 +17,17 @@ en:
       intro: "A major university art collection featuring Australian and international works spanning painting, sculpture and works on paper. These are the collections within it."
       see_all: "Explore the collection"
       label: "Collections within the University of Melbourne Art Collection"
+    ways:
+      heading: "What do you want to explore?"
+      intro: "Four more ways into the collections."
+      label: "Ways to explore the collections"
+      places: "Places"
+      time: "Time"
+      colour: "Colour"
+      stories: "Stories"
+    look_closer:
+      heading: "Guess the work from the pieces"
+      answer: "Find out what it is"
     kinds:
       heading: "Object types"
       intro: "From prints and paintings to scientific instruments: browse by what a record is."

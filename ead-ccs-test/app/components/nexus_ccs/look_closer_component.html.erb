@@ -1,0 +1,22 @@
+<section class="look-closer" aria-labelledby="look-closer-heading" <%= tag.attributes(style: band_style) %>>
+  <div class="look-closer__band">
+    <% COLUMNS.each_with_index do |kind, column| %>
+      <div class="look-closer__column look-closer__column--<%= kind %>">
+        <% if kind == :text %>
+          <div class="look-closer__panel">
+            <h2 class="look-closer__heading" id="look-closer-heading"><%= t("home.look_closer.heading") %></h2>
+            <%= link_to t("home.look_closer.answer"), helpers.solr_document_path(pick.id), class: "look-closer__answer" %>
+          </div>
+        <% end %>
+        <div class="look-closer__pieces">
+          <% SQUARES.fetch(kind).each_index do |place| %>
+            <% crop = crop_for[[ column, place ]] %>
+            <%= link_to helpers.solr_document_path(pick.id), class: "look-closer__piece", tabindex: -1, "aria-hidden": true, style: piece_style(crop) do %>
+              <span class="look-closer__zoom"><img src="<%= pick.image %>" alt="" loading="lazy" decoding="async"></span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>

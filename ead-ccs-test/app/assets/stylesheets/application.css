@@ -75,3 +75,4 @@
 @import url("components/card_tiles.css");
 /* Last of all: the home page sections of the homepage redesign (2026-11), over card_tiles.css */
 @import url("components/home_sections.css");
+@import url("components/look_closer.css");

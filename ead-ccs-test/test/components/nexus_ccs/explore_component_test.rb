@@ -49,18 +49,18 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_no_selector ".explore-card__cta" # no call to action on any card
   end
 
-  test "Object types as a fanned stack of cards; Places and Time as picture tiles in the mosaic" do
+  test "Object types (on a band of colour) and Places as fanned stacks of cards; Time as picture tiles in the mosaic" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
     tile = "ul.mosaic-flow[data-controller=mosaic] li.mosaic-flow__item article.explore-card--tile"
-    assert_selector "section.explore-kinds h2", text: "Object types"
+    assert_selector "section.explore-kinds.home-section--tinted[style*='--section-background-color'] h2", text: "Object types"
     assert_selector "section.explore-kinds ul.stack[data-controller=stack] li.stack__item article.stack__card", count: 2
     assert_selector "section.explore-kinds li.stack__item.is-centre[data-away='0']", text: "Paintings" # the middle card starts at the centre
     assert_selector "section.explore-kinds li.stack__item[data-away='1']", text: "Prints and drawings"
     assert_selector "section.explore-kinds .stack__card h3 a.stack__link[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings']", text: "Prints and drawings"
     # a line on what the page holds where the number of records was (none here: the test has no index to describe them from)
     assert_no_selector "section.explore-kinds, section.home-places, section.explore-periods", text: /\d records/
-    assert_selector "section.home-places #{tile} h3 a", text: "Australia" # its own page, or its records where it has none
+    assert_selector "section.home-places ul.stack:not(.stack--bare) .stack__card h3 a.stack__link", text: "Australia" # its own page, or its records where it has none
     assert_selector "section.explore-periods ul.mosaic-flow[data-mosaic-ordered-value=true] li.mosaic-flow__item article.explore-card--tile h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900']", text: "1900s"
     assert_no_selector ".explore-card--collage, .place-spot" # the shelf of collages and the place tabs are gone
   end
