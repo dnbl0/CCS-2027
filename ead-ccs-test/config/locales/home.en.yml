@@ -11,11 +11,12 @@ en:
       see_all: "See all collections"
       label: "The University's museums"
       cta: "Explore the collection"
-    named:
-      heading: "Collections within the collections"
-      intro: "Named bequests, gifts and archives held inside the University's museums."
-      see_all: "See all named collections"
-      label: "Named collections"
+    # The collections within the University of Melbourne Art Collection (config/home_collections.yml). Placeholder wording.
+    art_collection:
+      heading: "University of Melbourne Art Collection"
+      intro: "A major university art collection featuring Australian and international works spanning painting, sculpture and works on paper. These are the collections within it."
+      see_all: "Explore the collection"
+      label: "Collections within the University of Melbourne Art Collection"
     kinds:
       intro: "From prints and paintings to scientific instruments: browse by what a record is."
     places:

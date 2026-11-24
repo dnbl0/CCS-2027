@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-# The cards of the home page's picture sections (the 2026-11 homepage redesign, after Google Arts & Culture's mixed layouts): the
-# collections and the named collections inside them as tiles for a fluid mosaic (NexusCcs::MosaicComponent), and the multi-picture
-# cards of Record types and Places (Collage). Each section's first tile is its lead, with a line of text and a call to action. A tile
-# carries its picture's size when it is known, so the mosaic can give it its own shape without cropping. The words and pictures come
-# from what the site already has: config/pages.yml (the lead's blurb), the Explore tiles (ExploreEntryPoints) and the index.
+# The record types and places of the home page (the 2026-11 homepage redesign): for each, a few of its records that may be shown
+# (Collage), from which ExploreComponent takes a picture for its tile in the mosaic (NexusCcs::MosaicComponent), and a line on what it
+# holds. The collections themselves are the University's listing (HomeCollections, config/home_collections.yml).
 module HomeSections
   Tile = Data.define(:title, :text, :path, :image, :lead, :cta, :external, :width, :height)
 
@@ -12,44 +10,11 @@ module HomeSections
   # licensed, not sensitive), each picture whole
   Collage = Data.define(:title, :text, :path, :pictures, :intro)
 
-  # The collection that leads the Explore section
-  EXPLORE_LEAD = "university-art-collection"
-  NAMED_SHOWN = 8
   IMAGES = Rails.root.join("app/assets/images") # the site's own pictures, for their sizes (ImageDimensions)
   KIND_PICTURES = 3
   PLACE_PICTURES = 6
 
   module_function
-
-  # Explore the collections: every collection (Dean, 2026-11-23), the University Art Collection first as the lead with its blurb.
-  # tiles: the Explore tiles (ExploreEntryPoints, each with its picture and size); a tile kept text only (Indigenous Collections,
-  # ExploreEntryPoints.text_only?) has no picture.
-  def collections(tiles, helpers)
-    lead_name = museum(EXPLORE_LEAD)["facet_value"]
-    leads, others = tiles.partition { |tile| tile.label == lead_name }
-    (leads + others).map.with_index do |tile, index|
-      lead = index.zero? && tile.label == lead_name
-      image = NexusCcs::ExploreCardComponent.image?(tile) ? tile.image : nil
-      Tile.new(title: tile.label, text: (museum(EXPLORE_LEAD)["blurb"] if lead), path: helpers.search_action_path(tile.query),
-               image: image && AssetVersion.url(image.path), lead: lead, cta: (I18n.t("home.collections.cta") if lead), external: false,
-               width: image&.width, height: image&.height)
-    end
-  end
-
-  # Collections within the collections: the named collections that have a picture, largest first; the largest leads. values:
-  # Categories.values for named collections ([{ "value", "count", "image" => { "path" } }]).
-  def named(values, helpers)
-    pictured = Array(values).select { |value| value.dig("image", "path").present? }.first(NAMED_SHOWN)
-    return [] if pictured.size < NAMED_SHOWN
-
-    pictured.map.with_index do |value, index|
-      name = value["value"]
-      Tile.new(title: name, text: nil,
-               path: helpers.collection_landing_path(kind: "named-collections", slug: Browse::Slug.build("named-collections", name)),
-               image: value.dig("image", "path"), lead: index.zero?, cta: nil, external: false,
-               width: value.dig("image", "width"), height: value.dig("image", "height"))
-    end
-  end
 
   # Record types: every kind (ExploreEntryPoints.kinds), each with three of its own records and a line on what it holds (the collections
   # that hold most of it, CardDescription; kept for a day). links: the overview's kinds (counts, paths).
@@ -85,6 +50,4 @@ module HomeSections
     text = count && I18n.t("home.records", count: count, number: helpers.number_with_delimiter(count))
     Collage.new(title: title, text: text, path: path, pictures: shown.first(pictures), intro: intro)
   end
-
-  def museum(slug) = SitePages.collection(slug)
 end

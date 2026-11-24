@@ -25,7 +25,7 @@ class ExploreComponentTest < ViewComponent::TestCase
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
     headings = page.all("section.home-section h2").map(&:text)
-    assert_equal [ "Explore the collections", "Record types", "Places", "Time" ], headings # no named collections without the index
+    assert_equal [ "Explore the collections", "University of Melbourne Art Collection", "Record types", "Places", "Time" ], headings
     assert_selector "section.explore .home-section__head a.home-section__link[href='/browse/categories/collections']", text: "See all collections"
     assert_selector "section.explore-kinds a.home-section__link[href='/browse/object-types']", text: "See all object types"
     assert_selector "section.home-places a.home-section__link[href='/browse/places']", text: "See all places"
@@ -33,17 +33,19 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_no_selector "section.home-visit"
   end
 
-  test "Explore the collections: every collection as a fluid mosaic, the University Art Collection first as the lead; Indigenous Collections has no picture" do
+  test "Explore the collections and the University of Melbourne Art Collection: the University's simple listing, its titles and pictures" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview(image: IMAGE, indigenous_image: IMAGE))
 
-    tiles = page.all("section.explore ul.mosaic-flow[data-controller=mosaic] > li.mosaic-flow__item")
-    assert_equal [ "University Art Collection", "Indigenous Collections", "Medical History Museum" ], tiles.map { |tile| tile.find("h3").text }
-    assert tiles.first[:class].include?("mosaic-flow__item--lead")
-    assert_equal "--a: 1.333", tiles.first[:style] # its picture's shape, from its size
-    assert_selector "section.explore li.mosaic-flow__item--lead .explore-card__cta", text: "Explore the collection"
-    assert_selector "section.explore h3 a[href*='f%5Bcollection_ssim%5D%5B%5D=University+Art+Collection']", text: "University Art Collection"
-    assert_no_selector "section.explore li:nth-child(2) img" # Indigenous Collections is kept text only
-    assert_no_selector "section.explore, section.home-named", text: /\d records/ # no record counts on collections
+    museums = page.all("section.explore ul.simple-listing.simple-listing--four > li.simple-listing__item")
+    assert_equal HomeCollections.museums.size, museums.size
+    assert_equal "Architecture, Building and Planning Library Rare Material Collection", museums.first.find("h3").text
+    assert_selector "section.explore li.simple-listing__item:first-child img.simple-listing__img[alt=''][src*='museumsandcollections.unimelb.edu.au']"
+    assert_selector "section.explore h3 a.simple-listing__link[href*='f%5Bcollection_ssim%5D%5B%5D=Medical+History+Museum'], section.explore h3 a.simple-listing__link[href^='/browse/collections/medical-history-museum']",
+                    text: "Medical History Museum"
+    art = page.all("section.home-art-collection ul.simple-listing > li h3").map(&:text)
+    assert_equal HomeCollections.art_collection.map(&:title), art
+    assert_includes art, "Gerard Herbst Poster Collection"
+    assert_no_selector ".explore-card__cta" # no call to action on any card
   end
 
   test "Record types, Places and Time are the same picture tiles as the collections, in the same mosaic" do

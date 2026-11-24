@@ -1,0 +1,8 @@
+<ul class="simple-listing simple-listing--four" aria-label="<%= label %>">
+  <% items.each do |item| %>
+    <li class="simple-listing__item">
+      <img class="simple-listing__img" src="<%= item.image %>" alt="" loading="lazy" decoding="async">
+      <%= content_tag heading_tag, class: "simple-listing__heading" do %><%= link_to item.title, path_for(item), class: "simple-listing__link" %><% end %>
+    </li>
+  <% end %>
+</ul>

@@ -34,9 +34,7 @@ module NexusCcs
 
     def image_path(tile) = AssetVersion.url(tile.image.path)
 
-    # The homepage redesign's mosaics (HomeSections)
-    def collection_tiles = @collection_tiles ||= HomeSections.collections(overview.collections, helpers)
-
+    # The homepage redesign's record types and places (HomeSections)
     def kind_collages = @kind_collages ||= HomeSections.kind_collages(overview.kinds, helpers)
 
     def place_collages = @place_collages ||= HomeSections.place_collages(overview.place_tiles, helpers)
@@ -83,12 +81,5 @@ module NexusCcs
 
     # The same picture at any size or address: its file name
     def picture_key(src) = File.basename(URI.parse(src.to_s).path.to_s) rescue src.to_s
-
-    def named_tiles
-      @named_tiles ||= begin
-        dimension = Categories.find("named-collections")
-        dimension ? HomeSections.named(Categories.values(dimension), helpers) : []
-      end
-    end
   end
 end

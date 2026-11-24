@@ -21,15 +21,15 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
 
   teardown { Rails.cache = @cache }
 
-  test "the home page's sections: the museums as a fluid mosaic, record types, places and periods, each linking to its records" do
+  test "the home page's sections: the collections and the Art Collection's as the University's listing, record types, places and periods" do
     Rails.cache.write(ExploreEntryPoints::CACHE_KEY, COUNTS, expires_in: 1.day)
 
     get "/"
 
     assert_response :success
     assert_select "section[aria-labelledby=explore-title] h2#explore-title", text: "Explore the collections"
-    assert_select "section.explore ul.mosaic-flow > li.mosaic-flow__item", count: COUNTS["collections"].size
-    assert_select "section.explore li.mosaic-flow__item--lead:first-child h3", text: "University Art Collection"
+    assert_select "section.explore ul.simple-listing > li.simple-listing__item", count: HomeCollections.museums.size
+    assert_select "section.home-art-collection ul.simple-listing > li.simple-listing__item", count: HomeCollections.art_collection.size
     assert_select "section.explore-kinds article.explore-card--tile h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints']", text: "Prints and drawings"
     assert_select "section.home-places article.explore-card--tile h3 a", text: "Japan"
     assert_select "section.home-visit", count: 0

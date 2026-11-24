@@ -1,16 +1,18 @@
-<%# The home page's ways into the collections without a search (the homepage redesign, 2026-11, after Google Arts & Culture's mixed
-    layouts; docs/card-layouts.md): every collection, the named collections inside them, the record types and the places, all as the same
+<%# The home page's ways into the collections without a search (docs/card-layouts.md): the collections and the collections within the
+    University of Melbourne Art Collection as the University's Museums and Collections index lists them (its simple listing); the record
+    types and the places as the same
     picture tiles in the site's mosaic (MosaicComponent), and time too, each section led by its first tile. Every picture whole, at its own shape. %>
 <%= render NexusCcs::HomeSectionComponent.new(id: "explore-title", heading: t("home.collections.heading"), intro: t("home.collections.intro"),
                                               link: t("home.collections.see_all"), link_path: helpers.category_path("collections"), extra_class: "explore") do %>
-  <%= render NexusCcs::MosaicComponent.new(tiles: collection_tiles, label: t("home.collections.label"), lanes: 5) %>
+  <%# The collections as the University's Museums and Collections index lists them (its simple listing: the same titles and pictures) %>
+  <%= render NexusCcs::SimpleListingComponent.new(items: HomeCollections.museums, label: t("home.collections.label"), path: ->(item) { HomeCollections.path(item, helpers) }) %>
 <% end %>
 
-<% if named_tiles.any? %>
-  <%= render NexusCcs::HomeSectionComponent.new(id: "home-named", heading: t("home.named.heading"), intro: t("home.named.intro"),
-                                                link: t("home.named.see_all"), link_path: helpers.category_path("named-collections"), extra_class: "home-named") do %>
-    <%= render NexusCcs::MosaicComponent.new(tiles: named_tiles, label: t("home.named.label"), lanes: 4) %>
-  <% end %>
+<%# The collections within the University of Melbourne Art Collection, as the University's index lists them %>
+<%= render NexusCcs::HomeSectionComponent.new(id: "home-art-collection", heading: t("home.art_collection.heading"), intro: t("home.art_collection.intro"),
+                                              link: t("home.art_collection.see_all"), link_path: (helpers.landing_path_for("collections", "University Art Collection") || helpers.category_path("named-collections")),
+                                              extra_class: "home-art-collection") do %>
+  <%= render NexusCcs::SimpleListingComponent.new(items: HomeCollections.art_collection, label: t("home.art_collection.label"), path: ->(item) { HomeCollections.path(item, helpers) }) %>
 <% end %>
 
 <% if kind_tiles.any? %>

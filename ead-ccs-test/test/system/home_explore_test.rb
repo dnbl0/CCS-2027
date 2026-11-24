@@ -35,13 +35,14 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
 
   # A card's title link covers the whole card (its ::after), so the card is its target, not the line of text
   def small_targets
-    page.evaluate_script("[...document.querySelectorAll('main .home-section a, main .home-section summary')].filter(e => !e.matches('.explore-card__link, .object-card__link') && e.getAttribute('tabindex') !== '-1' && e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().height < 44).map(e => e.textContent.trim())")
+    page.evaluate_script("[...document.querySelectorAll('main .home-section a, main .home-section summary')].filter(e => !e.matches('.explore-card__link, .object-card__link, .simple-listing__link') && e.getAttribute('tabindex') !== '-1' && e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().height < 44).map(e => e.textContent.trim())")
   end
 
-  # No picture in the home sections is cropped: each is fitted (contain) or shown at its own shape
+  # No picture in the home sections is cropped: each is fitted (contain) or shown at its own shape. The University's listing of its
+  # collections (simple-listing) is the exception by design: its own site fills each 16:10 frame, and the home page follows it.
   def cropped_pictures
     page.evaluate_script(<<~JS)
-      [...document.querySelectorAll('main .home-section img')].filter(img => {
+      [...document.querySelectorAll('main .home-section img:not(.simple-listing__img)')].filter(img => {
         if (!img.naturalWidth || !img.getBoundingClientRect().width) return false
         if (getComputedStyle(img).objectFit !== 'cover') return false
         const r = img.getBoundingClientRect()
@@ -61,7 +62,7 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     assert_empty overlaps, "tiles overlap"
   end
 
-  def explore_boxes = page.evaluate_script("[...document.querySelectorAll('section.explore ul.mosaic-flow > li')].map(t => { const r = t.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)] })")
+  def explore_boxes = page.evaluate_script("[...document.querySelectorAll('section.explore ul.simple-listing > li')].map(t => { const r = t.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)] })")
 
   def sideways_scroll? = page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
@@ -75,63 +76,54 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     JS
   end
 
-  test "on a desktop: no axe violations (WCAG 2.2 AA), every collection in a fluid mosaic led by a wider tile, 44px targets, no cropped picture" do
+  test "on a desktop: no axe violations (WCAG 2.2 AA), the collections as the University's listing four to a row, the other sections one mosaic" do
     keep(counts(with_image: true))
     page.current_window.resize_to(1440, 900)
     visit "/"
 
-    assert_selector "section.explore ul.mosaic-flow.is-ready > li.mosaic-flow__item", count: 6
+    assert_selector "section.explore ul.simple-listing > li.simple-listing__item", count: HomeCollections.museums.size
+    assert_selector "section.home-art-collection ul.simple-listing > li.simple-listing__item", count: HomeCollections.art_collection.size
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
     assert_empty small_targets
     assert_not sideways_scroll?
     assert_empty cropped_pictures
     boxes = explore_boxes
-    assert_operator boxes[0][2], :>, boxes[1][2], "the lead (University Art Collection) is the widest tile"
-    assert_operator boxes.map(&:first).uniq.size, :>, 1, "the tiles sit side by side"
-    assert_operator boxes.map { |box| box[1] }.uniq.size, :>=, 2, "a mosaic, not one row: the tiles start at different heights"
-    # every picture section is the same tile in the same mosaic (the collections, record types, places, time, on this day)
-    %w[.explore .home-named .explore-kinds .home-places .explore-periods .home-on-this-day].each do |section|
+    assert_equal 4, boxes.first(4).map(&:first).uniq.size, "four to a row"
+    assert_equal 1, boxes.first(4).map { |box| box[1] }.uniq.size, "the first four share a row"
+    assert_equal 1, boxes.map { |box| box[2] }.uniq.size, "every card the same width"
+    # every other picture section is the same tile in the same mosaic (record types, places, time, on this day)
+    %w[.explore-kinds .home-places .explore-periods .home-on-this-day].each do |section|
       next unless page.has_css?(section, wait: 0)
 
       assert_selector "#{section} ul.mosaic-flow.is-ready > li > article.explore-card--tile", minimum: 1
     end
-    assert_no_selector ".explore-card--collage, .place-spot, .home-section .object-card"
+    assert_no_selector ".explore-card--collage, .place-spot, .home-section .object-card, .explore-card__cta"
     assert_no_overlaps
-    assert_no_selector ".home-visit"
+    assert_no_selector ".home-visit, #home-ways-in"
     colours = page.evaluate_script("[...document.querySelectorAll('main > .ccs-section:not(.ccs-section--hero)')].map(s => getComputedStyle(s).backgroundColor)")
     assert_equal colours.each_cons(2).count { |a, b| a != b }, colours.size - 1, "the sections' backgrounds alternate"
   end
 
-  test "on a phone: no axe violations, 44px targets, no sideways scroll, one tile to a row" do
+  test "on a phone: no axe violations, 44px targets, no sideways scroll, one card to a row" do
     keep(counts(with_image: true))
     page.current_window.resize_to(390, PHONE_HEIGHT)
     visit "/"
 
-    assert_selector "section.explore ul.mosaic-flow.is-ready > li.mosaic-flow__item", count: 6
+    assert_selector "section.explore ul.simple-listing > li.simple-listing__item", count: HomeCollections.museums.size
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
     assert_empty small_targets
     assert_not sideways_scroll?
-    assert_equal 1, explore_boxes.map(&:first).uniq.size, "every tile starts at the left edge"
+    assert_equal 1, explore_boxes.map(&:first).uniq.size, "every card starts at the left edge"
   end
 
-  test "the Indigenous Collections tile is text only, even with pictures for the others" do
-    keep(counts(with_image: true))
-    visit "/"
-
-    assert_selector "section.explore li", text: "University Art Collection"
-    assert page.find("section.explore li", text: "University Art Collection").has_css?("img")
-    assert_not page.find("section.explore li", text: "Indigenous Collections").has_css?("img")
-    assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
-  end
-
-  test "the whole card is the link: a click anywhere on a collection tile lands on its link" do
+  test "the whole card is the link: a click on a collection's picture lands on its title's link" do
     keep(counts(with_image: true))
     page.current_window.resize_to(1440, 900)
     visit "/"
 
-    assert_selector "section.explore ul.mosaic-flow.is-ready"
-    hit = page.evaluate_script("(() => { const t = document.querySelector('section.explore li:nth-child(2) article'); t.scrollIntoView({ block: 'center' }); const r = t.getBoundingClientRect(); const e = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 3); return e && (e.closest('a') || {}).className })()")
-    assert_includes %w[explore-card__link result-card__media], hit.to_s.split.first
+    assert_selector "section.explore ul.simple-listing"
+    hit = page.evaluate_script("(() => { const t = document.querySelector('section.explore li:nth-child(2) img'); t.scrollIntoView({ block: 'center' }); const r = t.getBoundingClientRect(); const e = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return e && (e.closest('a') || {}).className })()")
+    assert_equal "simple-listing__link", hit.to_s
   end
 
   test "the section causes no layout shift on desktop or phone, with or without pictures" do

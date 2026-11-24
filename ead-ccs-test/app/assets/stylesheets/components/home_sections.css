@@ -336,3 +336,18 @@ turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity
 /* An entity page's values with no picture anywhere: after the mosaic, a quiet line of links (browse_entities/_facet_tiles) */
 .place-facets__plain { display: flex; flex-direction: column; gap: var(--ccs-space-2); margin-top: var(--ccs-space-5); }
 .place-facets__plain-label { margin: 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
+
+/* The University's simple listing (NexusCcs::SimpleListingComponent; museumsandcollections.unimelb.edu.au/collections, measured
+   2026-11-24): four to a row, 24px apart; a 16:10 picture filling its frame, 24px, then the title, 24px semibold, underlined. The title's
+   link covers the item (the picture is part of the target); the focus ring goes round the whole item. */
+.simple-listing { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin: 0; padding: 0; list-style: none; }
+@media (max-width: 991.98px) { .simple-listing { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 575.98px) { .simple-listing { grid-template-columns: minmax(0, 1fr); } }
+.simple-listing__item { position: relative; min-width: 0; }
+.simple-listing__img { display: block; width: 100%; aspect-ratio: 16 / 10; margin: 0 0 24px; object-fit: cover; background: var(--ccs-surface-subtle); }
+.simple-listing__heading { margin: 0; font-family: var(--ccs-font-family-sans); font-size: 1.5rem; font-weight: var(--ccs-font-weight-semibold); line-height: 1.2; }
+.simple-listing__link { color: var(--ccs-text-link); text-decoration: underline; text-underline-offset: 0.12em; }
+.simple-listing__link::after { content: ""; position: absolute; inset: 0; }
+.simple-listing__item:hover .simple-listing__link { color: var(--ccs-text-link-hover); text-decoration-thickness: 2px; }
+.simple-listing__link:focus-visible { outline: none; }
+.simple-listing__link:focus-visible::after { outline: 3px solid var(--ccs-focus-ring); outline-offset: 4px; }
