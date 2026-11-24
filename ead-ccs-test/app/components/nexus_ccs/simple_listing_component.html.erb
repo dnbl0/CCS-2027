@@ -1,8 +1,12 @@
 <ul class="simple-listing simple-listing--four" aria-label="<%= label %>">
-  <% items.each do |item| %>
+  <% items.each_with_index do |item, index| %>
+    <% path = path_for(item) %>
+    <% note_id = "#{label.parameterize}-away-#{index}" if HomeCollections.external?(path) %>
     <li class="simple-listing__item">
       <img class="simple-listing__img" src="<%= item.image %>" alt="" loading="lazy" decoding="async">
-      <%= content_tag heading_tag, class: "simple-listing__heading" do %><%= link_to item.title, path_for(item), class: "simple-listing__link" %><% end %>
+      <%= content_tag heading_tag, class: "simple-listing__heading" do %><%= link_to item.title, path, class: "simple-listing__link", aria: { describedby: note_id } %><% end %>
+      <%# a collection whose records are not here opens its page on the University's sites: said under its title, before it is followed %>
+      <% if note_id %><p class="simple-listing__away" id="<%= note_id %>"><%= t("home.collections.away") %></p><% end %>
     </li>
   <% end %>
 </ul>

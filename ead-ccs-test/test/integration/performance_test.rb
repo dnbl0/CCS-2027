@@ -122,8 +122,9 @@ class PerformanceTest < ActionDispatch::IntegrationTest
   # The showcase's Record types, Places and Time rows of tiles add about 2 kB, so it rose from 70 to 74 kB (compressed stays 14 kB)
   # The University's listing of its 24 collections and the Art Collection's 12 (their pictures' full addresses) adds about 2 kB: 78 kB;
   # Time as a carousel and On this day as a cluster (their slide names and buttons), 24 Nov 2026: 80 kB; the IA fixes' menus and the
-  # footer's two labelled columns (every page), 24 Nov 2026: 82 kB
-  { "/" => 82_000, "/help" => 56_000, "/about" => 50_000 }.each do |path, budget|
+  # footer's two labelled columns (every page), 24 Nov 2026: 82 kB; collections with no page here open the University's page with a note
+  # under the title, 25 Nov 2026: here, with no index, all 35 do (the worst case; the real page has most on their own pages): 88 kB
+  { "/" => 88_000, "/help" => 56_000, "/about" => 50_000 }.each do |path, budget|
     test "#{path} stays within its HTML size budget (#{budget / 1000} kB, #{14} kB compressed)" do
       get path, headers: { "Accept-Encoding" => "identity" }
       assert_operator response.body.bytesize, :<=, budget

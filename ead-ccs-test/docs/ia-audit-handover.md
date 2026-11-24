@@ -130,7 +130,7 @@ Dean asked for all of them ("proceed with the ia audit fixes based on all of the
 | 7 | Labels follow the field: "Object types" is `object_type_ssim` everywhere; the home section of classifications is "Classifications", linking to `/browse/classifications` |
 | 8 | Time: `/browse/time` is the one page; `/browse/periods` → 301; eras section and period pages link there |
 | 9 | Places: `/browse/places` is the map and cards page; its A to Z list and filter answer at the same address with `?view=az`, `?letter=`, `?filter=`, `?region=`, `?view=all` (the old hub); the map page links to the A to Z |
-| 10 | The header's collections open their collection pages (address built, no Solr lookup) |
+| 10 | The header's collections open their collection pages (address built, no Solr lookup); the home page's collections with no page here open their page on the University's sites (`url:` in `config/home_collections.yml`, from its listing), with "On the University's website" under the title; MONIAC has none and opens the search |
 | 11 | Browse menu lists every way in in the Browse page's order, plus themes and stories; About stays one top-level link |
 | 12 | Themes and stories: breadcrumbs Home › Browse › …; still in the menu (their placeholder wording is for Dean and the collections team to replace) |
 | 13 | One breadcrumb component (`PageBreadcrumbsComponent`; `BreadcrumbComponent` deleted); a record's trail is Browse when the visitor came from a Browse, collection, theme or story page (`HeaderComponent#record_parent`), else Search results |

@@ -347,6 +347,7 @@ turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity
 .simple-listing__img { display: block; width: 100%; aspect-ratio: 16 / 10; margin: 0 0 24px; object-fit: cover; background: var(--ccs-surface-subtle); }
 .simple-listing__heading { margin: 0; font-family: var(--ccs-font-family-sans); font-size: 1.5rem; font-weight: var(--ccs-font-weight-semibold); line-height: 1.2; }
 .simple-listing__link { color: var(--ccs-text-link); text-decoration: underline; text-underline-offset: 0.12em; }
+.simple-listing__away { margin: var(--ccs-space-2) 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
 .simple-listing__link::after { content: ""; position: absolute; inset: 0; }
 .simple-listing__item:hover .simple-listing__link { color: var(--ccs-text-link-hover); text-decoration-thickness: 2px; }
 .simple-listing__link:focus-visible { outline: none; }

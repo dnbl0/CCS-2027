@@ -6,6 +6,7 @@ en:
       other: "%{number} records"
     external: "(the museum's website)"
     collections:
+      away: "On the University's website"
       heading: "Explore the collections"
       intro: "No search term needed. Start from a collection, a record type, a place or a time."
       see_all: "See all collections"

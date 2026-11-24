@@ -40,8 +40,9 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_equal HomeCollections.museums.size + HomeCollections.art_collection.size, museums.size # the Art Collection's are in the section too
     assert_equal "Architecture, Building and Planning Library Rare Material Collection", museums.first.find("h3").text
     assert_selector "section.explore li.simple-listing__item:first-child img.simple-listing__img[alt=''][src*='museumsandcollections.unimelb.edu.au']"
-    assert_selector "section.explore h3 a.simple-listing__link[href*='f%5Bcollection_ssim%5D%5B%5D=Medical+History+Museum'], section.explore h3 a.simple-listing__link[href^='/browse/collections/medical-history-museum']",
-                    text: "Medical History Museum"
+    # no index here, so no collection page: the collection's page on the University's sites, said under its title
+    assert_selector "section.explore h3 a.simple-listing__link[href='https://medicalhistorymuseum.mdhs.unimelb.edu.au/home'][aria-describedby]", text: "Medical History Museum"
+    assert_selector "section.explore li.simple-listing__item p.simple-listing__away", text: "On the University's website", minimum: 1
     assert_selector "section.explore .home-art-collection h3#home-art-collection-heading", text: "University of Melbourne Art Collection"
     art = page.all("section.explore .home-art-collection ul.simple-listing > li h4").map(&:text)
     assert_equal HomeCollections.art_collection.map(&:title), art
