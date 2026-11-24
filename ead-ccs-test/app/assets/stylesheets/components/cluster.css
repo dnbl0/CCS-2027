@@ -1,0 +1,38 @@
+/* A cluster (NexusCcs::ClusterComponent; after Google Arts & Culture's "Clusters", measured 2026-11-24): three or four cards of different
+   sizes in one block. Four: two tall cards then two wide ones stacked (Google's 858, 496 and 746 pixel columns, its wide cards 453 high
+   to the tall ones' 935); three: one large card and two wide ones stacked (1200 and 838). The block's height follows the page's width.
+   Each picture fills its card; the title and its line are white on a navy shade that deepens to the card's foot. On a phone: the first
+   card the full width, then two side by side, a fourth the full width. */
+.cluster {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ccs-space-3);
+  margin: 0; padding: 0; list-style: none;
+}
+.cluster__item { min-width: 0; aspect-ratio: 1; }
+.cluster__item:first-child, .cluster[data-count="4"] .cluster__item:nth-child(4) { grid-column: 1 / -1; aspect-ratio: 4 / 3; }
+@media (min-width: 768px) {
+  .cluster { gap: var(--ccs-space-4); height: clamp(26rem, 42vw, 36rem); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .cluster .cluster__item, .cluster .cluster__item:first-child, .cluster[data-count="4"] .cluster__item:nth-child(4) { aspect-ratio: auto; grid-column: auto; }
+  .cluster[data-count="4"] { grid-template-columns: 858fr 496fr 746fr; }
+  .cluster[data-count="4"] .cluster__item:nth-child(-n + 2) { grid-row: 1 / -1; }
+  .cluster[data-count="3"] { grid-template-columns: 1200fr 838fr; }
+  .cluster[data-count="3"] .cluster__item:first-child { grid-row: 1 / -1; }
+}
+
+.cluster__card { position: relative; height: 100%; overflow: hidden; border-radius: var(--ccs-tile-radius, var(--ccs-radius-md)); background: var(--ccs-surface-subtle); }
+.cluster__image { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 300ms cubic-bezier(0, 0, 0.25, 1); }
+.cluster__body {
+  position: absolute; inset: auto 0 0; display: flex; flex-direction: column; gap: var(--ccs-space-1);
+  padding: var(--ccs-space-8) var(--ccs-space-4) var(--ccs-space-4);
+  background: linear-gradient(to bottom, rgb(0 15 70 / 0), rgb(0 15 70 / 0.85) 55%, rgb(0 15 70 / 0.92));
+  color: #fff;
+}
+.cluster__title { margin: 0; font-family: var(--ccs-font-family-sans); font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); line-height: 1.25;
+                  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.cluster__text { margin: 0; font-size: var(--ccs-font-size-sm); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cluster .cluster__card .cluster__link { color: #fff; text-decoration: none; } /* over the home sections' link colour */
+.cluster__link::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.cluster__card:hover .cluster__link { text-decoration: underline; }
+.cluster__card:hover .cluster__image { transform: scale(1.04); }
+.cluster__link:focus-visible { outline: none; }
+.cluster__link:focus-visible::after { outline: 3px solid var(--ccs-focus-ring); outline-offset: -3px; border-radius: inherit; }
+@media (prefers-reduced-motion: reduce) { .cluster__image { transition: none; } }

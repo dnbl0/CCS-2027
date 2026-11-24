@@ -69,7 +69,7 @@ module NexusCcs
     # Time as the same tiles: the period's picture (one no tile above has used, else none), its name and what it holds, the first leading
     def period_tiles
       @period_tiles ||= overview.period_tiles.each_with_index.map do |tile, index|
-        image = ExploreCardComponent.image?(tile, remote: true) ? DamImage.sized(AssetVersion.url(tile.image.path), 600) : nil
+        image = ExploreCardComponent.image?(tile, remote: true) ? DamImage.sized(AssetVersion.url(tile.image.path), 1000) : nil # a carousel slide: large
         image = nil if image && !fresh?(image)
         used_pictures << picture_key(image) if image
         HomeSections::Tile.new(title: tile.label, text: tile.intro.presence, path: helpers.search_action_path(tile.query),

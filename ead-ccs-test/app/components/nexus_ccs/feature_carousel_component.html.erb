@@ -1,0 +1,28 @@
+<%# The slides are groups in a plain container, not a list: the ARIA carousel pattern gives each one the role of a group, named "2 of 4" %>
+<div class="feature-carousel" role="region" aria-roledescription="carousel" aria-label="<%= label %>" data-controller="carousel">
+  <div class="feature-carousel__controls" data-js-only>
+    <button type="button" class="feature-carousel__button" aria-label="<%= previous %>" data-carousel-target="previous" data-action="carousel#previous" aria-disabled="true">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z" /></svg>
+    </button>
+    <button type="button" class="feature-carousel__button" aria-label="<%= following %>" data-carousel-target="next" data-action="carousel#next">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 13h12.17l-5.59 5.59L12 20l8-8-8-8-1.41 1.41L16.17 11H4z" /></svg>
+    </button>
+  </div>
+  <div class="feature-carousel__track" data-carousel-target="track" data-action="scroll->carousel#update">
+    <% tiles.each_with_index do |tile, index| %>
+      <div class="feature-carousel__slide" role="group" aria-roledescription="slide" aria-label="<%= index + 1 %> of <%= tiles.size %>" style="--i: <%= index %>">
+        <article class="feature-carousel__card">
+          <div class="feature-carousel__media">
+            <% if tile.image %><img src="<%= tile.image %>" alt="" loading="lazy" decoding="async"><% end %>
+          </div>
+          <div class="feature-carousel__panel">
+            <p class="feature-carousel__kind"><%= kind %></p>
+            <h3 class="feature-carousel__title"><%= link_to tile.title, tile.path, class: "feature-carousel__link" %></h3>
+            <% if tile.text.present? %><p class="feature-carousel__text"><%= tile.text %></p><% end %>
+            <p class="feature-carousel__cta" aria-hidden="true"><span class="feature-carousel__dot"></span><%= cta %></p>
+          </div>
+        </article>
+      </div>
+    <% end %>
+  </div>
+</div>

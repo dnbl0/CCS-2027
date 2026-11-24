@@ -38,5 +38,10 @@ en:
       records: "Records from %{place}"
     periods:
       intro: "The centuries the records come from."
+      carousel: "The periods, earliest first"
+      kind: "Period"
+      cta: "Explore the period"
+      previous: "Previous period"
+      next: "Next period"
     on_this_day:
       see_all: "See all records with pictures"

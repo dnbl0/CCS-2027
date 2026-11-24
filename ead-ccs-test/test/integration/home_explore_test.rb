@@ -36,7 +36,7 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
     assert_select "section.home-places ul.stack > li.stack__item", maximum: NexusCcs::ExploreComponent::PLACES_SHOWN
     assert_select "section.home-places .stack__card h3 a.stack__link", text: "Japan"
     assert_select "section.home-visit", count: 0
-    assert_select "section.explore-periods article.explore-card--tile h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999']", text: "1900s"
+    assert_select "section.explore-periods .feature-carousel__card h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999']", text: "1900s"
   end
 
   test "every way in opens all the matching records, not only those with images" do

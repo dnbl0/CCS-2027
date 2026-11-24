@@ -21,8 +21,8 @@
 <% end %>
 
 <%# The sections after Google Arts & Culture's home page (2026-11-24): its picture-only stack ("What do you want explore?"), its stack on a
-    band of colour (Object types), its close-ups band ("Guess the artwork from the pieces"), its plain stack (Places), then Time in the
-    mosaic. The tiles are worked out in the order the pictures are shared out (no picture twice), whatever order they are drawn in. %>
+    band of colour (Object types), its close-ups band ("Guess the artwork from the pieces"), its plain stack (Places), then Time as its
+    story carousel (a slide for each period, in time order). The tiles are worked out in the order the pictures are shared out (no picture twice), whatever order they are drawn in. %>
 <% ways = way_tiles %>
 <% if ways.count(&:image) == ways.size %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "explore-ways", heading: t("home.ways.heading"), intro: t("home.ways.intro"), extra_class: "home-ways") do %>
@@ -52,6 +52,7 @@
 <% if overview.period_tiles.any? %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "explore-periods", heading: t("explore.place_time.periods"), intro: t("home.periods.intro"),
                                                 link: t("explore.place_time.see_all_periods"), link_path: helpers.browse_hub_path("periods"), extra_class: "explore-periods") do %>
-    <%= render NexusCcs::MosaicComponent.new(tiles: period_tiles, label: t("explore.place_time.periods"), lanes: 3, ordered: true) %>
+    <%= render NexusCcs::FeatureCarouselComponent.new(tiles: period_tiles, label: t("home.periods.carousel"), kind: t("home.periods.kind"), cta: t("home.periods.cta"),
+                                                      previous: t("home.periods.previous"), following: t("home.periods.next")) %>
   <% end %>
 <% end %>

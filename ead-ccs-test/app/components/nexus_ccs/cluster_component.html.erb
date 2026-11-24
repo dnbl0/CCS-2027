@@ -1,0 +1,13 @@
+<ul class="cluster" data-count="<%= tiles.size %>" aria-label="<%= label %>">
+  <% tiles.each do |tile| %>
+    <li class="cluster__item">
+      <article class="cluster__card">
+        <img class="cluster__image" src="<%= tile.image %>" alt="" loading="lazy" decoding="async">
+        <div class="cluster__body">
+          <h3 class="cluster__title"><%= link_to tile.title, tile.path, class: "cluster__link" %></h3>
+          <% if tile.text.present? %><p class="cluster__text"><%= tile.text %></p><% end %>
+        </div>
+      </article>
+    </li>
+  <% end %>
+</ul>

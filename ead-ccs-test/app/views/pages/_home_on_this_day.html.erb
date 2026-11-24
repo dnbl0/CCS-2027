@@ -1,9 +1,12 @@
 <%# On this day (OnThisDay): records made on today's day and month, or from this year some years ago; pictures only. Left out when none.
-    The same picture tiles as every other section of the page (MosaicComponent, record_tile: the title, the maker and date), each picture whole. %>
+    Google Arts & Culture's cluster on a band of colour (ClusterComponent: three or four cards of different sizes, each card's title and
+    its maker and date on the picture); fewer than three pictures, the site's mosaic. %>
 <% found = OnThisDay.for %>
 <% if found.any? %>
   <% intro = found.kind == :day ? t("nexus_ccs.home_more.on_this_day_day", date: l(found.date, format: "%-d %B")) : t("nexus_ccs.home_more.on_this_day_years", year: found.date.year - found.years_ago, count: found.years_ago) %>
-  <%= render NexusCcs::HomeSectionComponent.new(id: "home-on-this-day", heading: t("nexus_ccs.home_more.on_this_day"), intro: intro, extra_class: "home-more home-on-this-day") do %>
-    <%= render NexusCcs::MosaicComponent.new(tiles: found.documents.each_with_index.map { |document, index| record_tile(document, lead: index.zero?) }, label: t("nexus_ccs.home_more.on_this_day"), lanes: 3) %>
+  <%= render NexusCcs::HomeSectionComponent.new(id: "home-on-this-day", heading: t("nexus_ccs.home_more.on_this_day"), intro: intro, extra_class: "home-more home-on-this-day", tint: "var(--ccs-explore-tint-2)") do %>
+    <% tiles = found.documents.each_with_index.map { |document, index| record_tile(document, lead: index.zero?) } %>
+    <% cluster = NexusCcs::ClusterComponent.new(tiles: tiles, label: t("nexus_ccs.home_more.on_this_day")) %>
+    <%= cluster.render? ? render(cluster) : render(NexusCcs::MosaicComponent.new(tiles: tiles, label: t("nexus_ccs.home_more.on_this_day"), lanes: 3)) %>
   <% end %>
 <% end %>

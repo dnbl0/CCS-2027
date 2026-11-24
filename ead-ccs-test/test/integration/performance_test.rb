@@ -120,8 +120,9 @@ class PerformanceTest < ActionDispatch::IntegrationTest
   # CCS-471: the cookie notice adds about 1.7 kB to a page a visitor has not answered it on (the test's first visit), so the home budget rose from 62 to 64 kB
   # All University collections (25 links with their addresses) add about 5 kB to the home page, so the home budget rose from 64 to 70 kB
   # The showcase's Record types, Places and Time rows of tiles add about 2 kB, so it rose from 70 to 74 kB (compressed stays 14 kB)
-  # The University's listing of its 24 collections and the Art Collection's 12 (their pictures' full addresses) adds about 2 kB: 78 kB
-  { "/" => 78_000, "/help" => 56_000, "/about" => 50_000 }.each do |path, budget|
+  # The University's listing of its 24 collections and the Art Collection's 12 (their pictures' full addresses) adds about 2 kB: 78 kB;
+  # Time as a carousel and On this day as a cluster (their slide names and buttons), 24 Nov 2026: 80 kB
+  { "/" => 80_000, "/help" => 56_000, "/about" => 50_000 }.each do |path, budget|
     test "#{path} stays within its HTML size budget (#{budget / 1000} kB, #{14} kB compressed)" do
       get path, headers: { "Accept-Encoding" => "identity" }
       assert_operator response.body.bytesize, :<=, budget
@@ -146,8 +147,8 @@ class PerformanceTest < ActionDispatch::IntegrationTest
     assert_empty site.grep(/openseadragon|stock_/), "the site's pages preload the record viewer"
     assert_not_empty stock.grep(/openseadragon/), "the stock record page needs the viewer"
     # Each Stimulus controller is one small file, so this count grows with features (53 after the selection and media viewer
-    # controllers, 3 Nov 2026; 57 with the Explore disclosure controller; 58 with the record page's sections controller, 11 Nov 2026; 59 with the card rail controller, 17 Nov 2026; 61 with the timeline and place map controllers, 18 Nov 2026; 64 with the home page's mosaic, justified rows and place preview controllers, 23 Nov 2026; 65 with the Places page's live search, 23 Nov 2026). The size that matters is the script bytes budget; this only stops a library sneaking in.
-    assert_operator site.size, :<=, 65, "the site's pages preload more scripts than the budget allows"
+    # controllers, 3 Nov 2026; 57 with the Explore disclosure controller; 58 with the record page's sections controller, 11 Nov 2026; 59 with the card rail controller, 17 Nov 2026; 61 with the timeline and place map controllers, 18 Nov 2026; 64 with the home page's mosaic, justified rows and place preview controllers, 23 Nov 2026; 65 with the Places page's live search, 23 Nov 2026; 66 with the home page's carousel, 24 Nov 2026). The size that matters is the script bytes budget; this only stops a library sneaking in.
+    assert_operator site.size, :<=, 66, "the site's pages preload more scripts than the budget allows"
     assert_empty site.grep(/leaflet/), "the map library loads only when a visitor asks for the map"
   end
 
