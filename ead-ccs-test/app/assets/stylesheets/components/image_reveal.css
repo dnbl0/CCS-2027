@@ -1,0 +1,26 @@
+/* Pictures come in gracefully (page_loader.js marks each one is-revealed once it has loaded; after Google Arts & Culture): until then a
+   picture is hidden and its frame shows a flat colour (the picture's own main colour where the page knows it, --tint, else the pale
+   surface the frames already have), then it fades in over 300ms, so the pictures of a wall never draw in strips at their own pace.
+   Only where scripts run (no-js: shown as they load), never longer than six seconds whatever happens (the late animation), and with
+   reduced motion they simply appear. The frames below are the site's picture frames: walls, clusters, carousels, stacks, the mosaic's
+   cards and close-ups (not the University's listing: its picture is its own frame). */
+:root:not(.no-js) :is(
+  .picture-wall__link, .cluster__card, .feature-carousel__media, .stack__media,
+  .look-closer__piece, .place-tile__media, .colour-card__pictures, .result-card__media, .object-card__media
+) img:not(.is-revealed) {
+  opacity: 0;
+  animation: image-reveal-late 300ms ease-out 6s forwards;
+}
+:root:not(.no-js) :is(
+  .picture-wall__link, .cluster__card, .feature-carousel__media, .stack__media,
+  .look-closer__piece, .place-tile__media, .colour-card__pictures, .result-card__media, .object-card__media
+) img { transition: opacity 300ms ease-out; }
+@keyframes image-reveal-late { to { opacity: 1; } }
+
+/* the picture's own colour behind it while it loads (PictureWall's records: their palette's first colour) */
+.picture-wall__link[style*="--tint"], .colour-card__picture[style*="--tint"] { background-color: var(--tint); }
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not(.no-js) :is(.picture-wall__link, .cluster__card, .feature-carousel__media, .stack__media,
+    .look-closer__piece, .place-tile__media, .colour-card__pictures, .result-card__media, .object-card__media) img { transition: none; }
+}

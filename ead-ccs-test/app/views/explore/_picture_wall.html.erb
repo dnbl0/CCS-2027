@@ -1,25 +1,32 @@
 <%# A wall of square pictures (PictureWall; Explore by colour and by time, after Google Arts & Culture's Color Explorer): a head with what
     was chosen, its number of records and the ways on (links: [label, path]), then the records, five to a row on a wide screen, each the
     record's link, its title showing on the picture when pointed at or focused. records nil: Solr could not answer. The links leave the
-    page's Turbo frame. %>
-<%# locals: (heading:, count:, records:, links: [], unavailable:) %>
+    page's Turbo frame; steps ([label, name, path]) stay in it (the colour before and after). band: the classes of a bar under the head
+    (the chosen colour's). Each picture's frame shows its own main colour while it loads (components/image_reveal.css). %>
+<%# locals: (heading:, count:, records:, unavailable:, links: [], steps: [], band: nil) %>
 <section class="picture-wall" aria-labelledby="picture-wall-heading">
   <div class="picture-wall__head">
     <h2 class="place-section__heading picture-wall__heading" id="picture-wall-heading"><%= heading %></h2>
     <p class="picture-wall__count"><%= count %></p>
+    <% if steps.any? %>
+      <p class="picture-wall__steps">
+        <% steps.each do |label, name, path| %><%= link_to path, class: "picture-wall__step", aria: { label: label } do %><span aria-hidden="true"><%= name %></span><% end %><% end %>
+      </p>
+    <% end %>
     <% if links.any? %>
       <p class="picture-wall__links">
         <% links.each do |label, path| %><%= link_to label, path, class: "arrow-link arrow-link--icon", data: { turbo_frame: "_top" } %><% end %>
       </p>
     <% end %>
   </div>
+  <% if band %><span class="picture-wall__band <%= band %>" aria-hidden="true"></span><% end %>
   <% if records.nil? %>
     <p class="picture-wall__empty"><%= unavailable %></p>
   <% elsif records.any? %>
     <ul class="picture-wall__grid">
       <% records.each do |record| %>
         <li class="picture-wall__item">
-          <%= link_to solr_document_path(record.id), class: "picture-wall__link", data: { turbo_frame: "_top" } do %>
+          <%= link_to solr_document_path(record.id), class: "picture-wall__link", data: { turbo_frame: "_top" }, style: ("--tint: #{record.tint}" if record.tint) do %>
             <img src="<%= DamImage.sized(AssetVersion.url(record.src), 500) %>" alt="" loading="lazy" decoding="async">
             <span class="picture-wall__title"><%= record.title %></span>
           <% end %>

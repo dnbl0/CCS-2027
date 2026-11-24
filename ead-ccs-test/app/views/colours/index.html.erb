@@ -1,7 +1,7 @@
 <%# Explore by colour (ColoursController), after Google Arts & Culture's Color Explorer: the Explore template's head, then a strip of the
     colours, each swatch the same width, in the palette's order (a spectrum), the chosen one marked by a notch and kept in view
     (explore_strip_controller.js). Under it the chosen colour's records as a wall of square pictures (explore/_picture_wall), or, before a
-    colour is chosen, each colour as a picture tile. The strip and what is under it are one Turbo frame, so choosing a colour swaps the wall
+    colour is chosen, each colour as a card of four of its pictures. The strip and what is under it are one Turbo frame, so choosing a colour swaps the wall
     in place and the address follows (?colour=); the breadcrumb, outside the frame, is the same for every colour. Without JavaScript the
     swatches are plain links. A swatch's name is its link's name and its tooltip: the colour is never the only cue. %>
 <% title = "#{[ (colour_facet_label(@colour.name) if @colour), t('colours.title') ].compact.join(' — ')} — Collections Navigator — University of Melbourne" %>
@@ -42,12 +42,28 @@
             <% numbers = { count: @colour.count, formatted: number_with_delimiter(@colour.count) } %>
             <%= render "explore/picture_wall", records: @records, unavailable: t("colours.unavailable"), count: t("colours.count", **numbers),
                        heading: safe_join([ tag.span(class: "picture-wall__dot colours__swatch--#{@colour.name}", aria: { hidden: true }), name ]),
-                       links: [ [ t("colours.see_all", **numbers), search_catalog_path(f: { field => [ @colour.name ] }) ] ] %>
+                       links: [ [ t("colours.see_all", **numbers), search_catalog_path(f: { field => [ @colour.name ] }) ] ], band: "colours__swatch--#{@colour.name}",
+                       steps: [ @previous && [ t("colours.previous", name: colour_facet_label(@previous.name)), "← #{colour_facet_label(@previous.name)}", explore_colours_path(colour: @previous.name) ],
+                                @next && [ t("colours.next", name: colour_facet_label(@next.name)), "#{colour_facet_label(@next.name)} →", explore_colours_path(colour: @next.name) ] ].compact %>
           <% else %>
-            <section class="place-section time-explorer__periods" aria-labelledby="colours-heading">
+            <%# Before a colour is chosen: a card for each, in the spectrum's order: four of its pictures (those mostly that colour first) in a
+                square, a bar of the colour, its name and number of records; the card opens its wall here %>
+            <section class="colour-cards-section" aria-labelledby="colours-heading">
               <h2 class="place-section__heading" id="colours-heading"><%= t("colours.heading") %></h2>
-              <% tiles = @colours.map { |colour| facet_tile(colour_facet_label(colour.name), colour.count, explore_colours_path(colour: colour.name), @pictures.value(field, colour.name)) } %>
-              <%= render "browse_entities/facet_tiles", tiles: tiles, label: t("colours.list_label"), ordered: true %>
+              <ul class="colour-cards" aria-label="<%= t("colours.list_label") %>">
+                <% @cards.each do |colour, pictures| %>
+                  <li class="colour-card">
+                    <div class="colour-card__pictures colours__swatch--<%= colour.name %>" aria-hidden="true">
+                      <% pictures.each do |record| %>
+                        <span class="colour-card__picture" <%= tag.attributes(style: ("--tint: #{record.tint}" if record.tint)) %>><img src="<%= DamImage.sized(AssetVersion.url(record.src), 300) %>" alt="" loading="lazy" decoding="async"></span>
+                      <% end %>
+                    </div>
+                    <span class="colour-card__band colours__swatch--<%= colour.name %>" aria-hidden="true"></span>
+                    <h3 class="colour-card__name"><%= link_to colour_facet_label(colour.name), explore_colours_path(colour: colour.name), class: "colour-card__link" %></h3>
+                    <p class="colour-card__count"><%= t("colours.count", count: colour.count, formatted: number_with_delimiter(colour.count)) %></p>
+                  </li>
+                <% end %>
+              </ul>
             </section>
           <% end %>
         </turbo-frame>

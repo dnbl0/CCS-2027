@@ -52,11 +52,11 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
   end
 
   test "a chosen century: marked in the strip, its records as a wall of squares, its decades, and the way back; a century not in the strip is no choice" do
-    wall = [ PictureWall::Record.new(id: "emu-1", title: "A print", src: "https://example.org/1.jpg") ]
+    wall = [ PictureWall::Record.new(id: "emu-1", title: "A print", src: "https://example.org/1.jpg", tint: "#97b2be") ]
     visit("/explore/time?century=1900") do
       seed("timeline/all", timeline)
       seed("timeline/1900", timeline(century: 1900))
-      Rails.cache.write(SuppressedRecord.cache_key("picture_wall/v1/time/1900"), wall.map { |record| record.to_h.transform_keys(&:to_s) }, expires_in: 1.hour)
+      Rails.cache.write(SuppressedRecord.cache_key("picture_wall/v2/time/1900"), wall.map { |record| record.to_h.transform_keys(&:to_s) }, expires_in: 1.hour)
     end
     assert_select "title", /\A1900–1999 — Explore by time/
     assert_select "h1", "Explore by time"

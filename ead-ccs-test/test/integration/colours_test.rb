@@ -22,7 +22,7 @@ class ColoursTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the colour page: a strip of the colours, each named, in the palette's order; each colour's tile opens its wall" do
+  test "the colour page: a strip of the colours, each named, in the palette's order; each colour's card opens its wall" do
     with_seeded_menu_cache { with_canned_search(colour_counts("blue" => 12, "red" => 1_234, "white" => 3)) { get "/explore/colours" } }
 
     assert_response :success
@@ -35,14 +35,16 @@ class ColoursTest < ActionDispatch::IntegrationTest
       assert_select "a[aria-current]", 0, "no colour chosen yet"
     end
     assert_select "h2#colours-heading", "Colours"
-    # the canned Solr has no pictures: every colour is a link after the (empty) mosaic, none lost, each opening its wall
-    links = css_select("#colours-heading ~ * a[href*='colour=']")
-    assert_equal [ "Red 1,234 records", "Blue 12 records", "White 3 records" ], links.map { |link| link.text.squish }
-    assert_equal "/explore/colours?colour=red", links.first["href"]
+    # a card for each colour, in the strip's order, its name the link to its wall and its number of records under it; the canned Solr
+    # has no pictures, so the cards show the colour itself
+    assert_equal %w[Red Blue White], css_select("ul.colour-cards li.colour-card h3 a.colour-card__link").map { |link| link.text.squish }
+    assert_select "li.colour-card:first-child a.colour-card__link[href='/explore/colours?colour=red']"
+    assert_select "li.colour-card:first-child .colour-card__count", "1,234 records"
+    assert_select "li.colour-card:first-child .colour-card__pictures.colours__swatch--red[aria-hidden=true]"
   end
 
   test "a chosen colour: its swatch marked, then its records as a wall of squares, those mostly that colour first, and a way to all of them" do
-    records = [ open_record("emu-b", colour_ssim: %w[white teal]), open_record("emu-a", colour_ssim: %w[teal white]),
+    records = [ open_record("emu-b", colour_ssim: %w[white teal]), open_record("emu-a", colour_ssim: %w[teal white], colour_palette_ssm: %w[#0497d1 #ffffff]),
                 sensitive_record("emu-s", colour_ssim: %w[teal]) ]
     with_seeded_menu_cache { with_canned_search(colour_page({ "teal" => 43, "red" => 5 }, records: records)) { get "/explore/colours?colour=teal" } }
 
@@ -52,11 +54,17 @@ class ColoursTest < ActionDispatch::IntegrationTest
     assert_select "a.explore-strip__swatch.colours__swatch--teal[aria-current=page]"
     assert_select "section.picture-wall[aria-labelledby=picture-wall-heading]" do
       assert_select "h2#picture-wall-heading", "Teal"
+      # the colour before and after it in the strip, staying on this page
+      assert_select "a.picture-wall__step[aria-label='Previous colour: Red'][href='/explore/colours?colour=red']:not([data-turbo-frame])", text: "← Red"
+      assert_select "a.picture-wall__step[aria-label^='Next']", 0 # teal is last here (the spectrum's order)
+      # while a picture loads, its frame shows the picture's own main colour
+      assert_select "a.picture-wall__link[href='/catalog/emu-a'][style='--tint: #0497d1']"
       assert_select ".picture-wall__count", "43 records"
       assert_select ".picture-wall__links a[data-turbo-frame=_top][href=?]", "/catalog?f%5Bcolour_ssim%5D%5B%5D=teal", text: "See all 43 in the search"
       assert_equal %w[/catalog/emu-a /catalog/emu-b], css_select("a.picture-wall__link").map { |link| link["href"] }, "mostly teal first; no sensitive record"
       assert_select "a.picture-wall__link[data-turbo-frame=_top] img[alt='']", 2
       assert_select "a.picture-wall__link .picture-wall__title", "Title of emu-a"
+      assert_select "span.picture-wall__band.colours__swatch--teal[aria-hidden=true]"
     end
   end
 

@@ -138,3 +138,14 @@ No picture is shown twice on the page; a value with no picture of its own (most 
 in the collections (`Browse::FacetPictures#prepare`, one grouped request a section, kept a day). Too few pictures for a layout, the
 section is the mosaic. On each category's own page (`/browse/categories/:slug`), the first page by most records opens with the four with
 the most records as a cluster ("Most records"), then the rest in the mosaic; A to Z and later pages are the mosaic alone.
+
+## Pictures load gracefully, everywhere (24 Nov 2026)
+
+After Google Arts & Culture: a picture is hidden on its frame's flat colour until it has fully loaded, then fades in over 300ms
+(`page_loader.js` marks it `is-revealed`; `components/image_reveal.css` lists the frames: walls, clusters, carousels, stacks, the mosaic's
+cards, close-ups, Explore by colour's cards). On the colour and time walls the frame's colour is the picture's own main colour (its
+palette's first, `PictureWall::Record#tint`). Without scripts pictures show as they load; whatever happens they show after six seconds;
+with reduced motion they appear without fading.
+
+Explore by colour, before a colour is chosen, is a card for each colour (four of its pictures in a square on the colour, a bar of the
+colour, its name and count); a chosen colour's wall has the colours before and after it beside its head and a bar of the colour under it.

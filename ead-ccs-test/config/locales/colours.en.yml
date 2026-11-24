@@ -7,6 +7,8 @@ en:
     heading: "Colours"
     intro: "Choose a colour to see the records whose images have a lot of it."
     list_label: "Colours, in the order of the spectrum"
+    previous: "Previous colour: %{name}"
+    next: "Next colour: %{name}"
     strip_label: "Colours"
     swatch:
       one: "%{name}: %{formatted} record"
