@@ -21,22 +21,22 @@ class AccessibilityAuditTest < ApplicationSystemTestCase
     "advanced search" => "/catalog/advanced",
     "browse" => "/browse",
     "category pages" => "/browse/categories",
-    "a category" => "/browse/categories/eras",
+    "a category" => "/browse/materials",
     "themes" => "/themes",
     "stories" => "/stories",
     "a story" => "/stories/example-story",
-    "explore by time" => "/explore/time",
-    "explore by place" => "/explore/places",
-    "explore by colour" => "/explore/colours",
+    "explore by time" => "/browse/time",
+    "explore by place" => "/browse/places",
+    "explore by colour" => "/browse/colours",
     "discover" => "/discover",
     "lists" => "/lists",
-    "search history" => "/search_history",
+    "search history" => "/search-history",
     "help" => "/help",
     "about" => "/about",
     "privacy" => "/privacy",
     "accessibility statement" => "/accessibility",
     "language in our records" => "/language-in-our-records",
-    "access request form" => "/access_requests/new?document_id=RECORD"
+    "access request form" => "/access-requests/new?document_id=RECORD"
   }.freeze
 
   WIDTHS = { "desktop" => [ 1440, 900 ], "phone" => [ 390, 844 ] }.freeze

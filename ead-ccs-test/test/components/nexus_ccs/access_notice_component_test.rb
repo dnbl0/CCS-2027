@@ -24,7 +24,7 @@ class AccessNoticeComponentTest < ActiveSupport::TestCase
     assert_selector ".access-notice--view-only", text: "You can view this item, but not download it"
     assert_text "ask the collection team for access"
     assert_text "Your request needs approval"
-    assert_selector "a[href='/access_requests/new?document_id=emu-1']", text: "Request access to download this item"
+    assert_selector "a[href='/access-requests/new?document_id=emu-1']", text: "Request access to download this item"
   end
 
   test "a request record says the asset is not shown, and links to the request form" do
@@ -32,7 +32,7 @@ class AccessNoticeComponentTest < ActiveSupport::TestCase
 
     assert_selector ".access-notice--request", text: "This item is available on request"
     assert_text "not shown here"
-    assert_selector "a[href='/access_requests/new?document_id=emu-1']", text: "Request access to this item"
+    assert_selector "a[href='/access-requests/new?document_id=emu-1']", text: "Request access to this item"
   end
 
   test "it is static text: no role, no live region, no heading to disturb the page's outline" do

@@ -2,6 +2,7 @@ en:
   nexus_ccs:
     compare:
       title: "Compare"
+      menu: "Compare images"
       description: "Look at images side by side. Zoom and pan one and the others can follow."
       added: "Added to compare: %{title}."
       removed: "Removed from compare."

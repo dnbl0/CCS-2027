@@ -17,7 +17,7 @@ class MyDataTest < ActionDispatch::IntegrationTest
   end
 
   test "an empty page says there is nothing to delete, and the button is disabled" do
-    get "/my_data"
+    get "/my-data"
 
     assert_response :success
     assert_select "h1", "Delete my data"
@@ -28,7 +28,7 @@ class MyDataTest < ActionDispatch::IntegrationTest
 
   test "opening the page removes nothing, and it lists what is held" do
     save_a_record_and_a_list
-    get "/my_data"
+    get "/my-data"
 
     assert_select "section ul", text: /1 list/
     assert_select "section ul", text: /1 saved record/
@@ -42,9 +42,9 @@ class MyDataTest < ActionDispatch::IntegrationTest
     search = Search.create!(query_params: { q: "emu" })
     SavedSearch.create!(user_id: @user_id, name: "Mine", query_params: { q: "a" })
 
-    delete "/my_data"
+    delete "/my-data"
 
-    assert_redirected_to "/my_data"
+    assert_redirected_to "/my-data"
     assert_equal 0, Bookmark.where(user_id: @user_id).count
     assert_equal 0, List.where(user_id: @user_id).count
     assert_equal 0, ListItem.count
@@ -60,10 +60,10 @@ class MyDataTest < ActionDispatch::IntegrationTest
 
   test "access requests are not removed, and the page says so" do
     request = AccessRequest.create!(document_id: "emu-1", document_title: "T", request_type: "view", name: "A Person", email: "a@example.org", purpose: "Research")
-    get "/my_data"
+    get "/my-data"
     assert_match "Requests for access to a record are not removed here", response.body
 
-    delete "/my_data"
+    delete "/my-data"
 
     assert AccessRequest.exists?(request.id)
   end
@@ -74,21 +74,21 @@ class MyDataTest < ActionDispatch::IntegrationTest
     ids = Array(session[:history])
     assert_not_empty ids
 
-    delete "/my_data"
+    delete "/my-data"
 
     assert_equal 0, Search.where(id: ids).count
     assert_empty Array(session[:history])
   end
 
   test "the page is a 404 while saved records are off, and says noindex, nofollow" do
-    get "/my_data"
+    get "/my-data"
     assert_match(/\Anoindex, nofollow/, response.headers["X-Robots-Tag"])
 
     was = Rails.configuration.x.saved_records
     Rails.configuration.x.saved_records = false
-    get "/my_data"
+    get "/my-data"
     assert_response :not_found
-    delete "/my_data"
+    delete "/my-data"
     assert_response :not_found
   ensure
     Rails.configuration.x.saved_records = was unless was.nil?

@@ -131,7 +131,7 @@ class RecordRemovalTest < ActionDispatch::IntegrationTest
     assert_gone "/catalog/#{ID}/manifest.json"
     assert_gone "/catalog/#{ID}/sensitivity", method: :post, params: { choice: "view" }
     assert_gone "/compare/items", method: :post, params: { id: ID }
-    assert_gone "/access_requests/new?document_id=#{ID}"
+    assert_gone "/access-requests/new?document_id=#{ID}"
   end
 
   test "the embed answers 410 inside the frame, with no title and no image" do

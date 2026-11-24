@@ -9,6 +9,8 @@ en:
     links_label: "Explore by time or place"
     time:
       title: "Explore by time"
+      short: "Time"
+      short_intro: "When the objects were made, century by century, and the eras they are catalogued under."
       intro: "The centuries the records come from, earliest first. Each opens its own page, with its decades and its records."
       eras_folded: "Eras as catalogued (%{count})"
       centuries: "Centuries"
@@ -36,6 +38,8 @@ en:
         other: "See all %{formatted}"
     places:
       title: "Explore by place"
+      short: "Places"
+      short_intro: "Where the objects were made: the world's regions, its countries and places, on a map if you like."
       intro: "Where the objects were made: on a map, and as lists of regions, countries and places. Each opens its records in the search."
       map: "Map"
       map_note: "The map shows %{count} places, grouped where they are close together: zoom in to separate them. The map is drawn from OpenStreetMap: your browser contacts its server only when you show the map. Every place on the map is also in the lists of regions and countries."

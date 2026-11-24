@@ -140,7 +140,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
 
       assert_selector ".digital-assets__main img[src^='#{LARGE.first}']"
       assert_selector ".digital-assets .access-notice--partly-withheld", text: "1 other digital asset of this record is not shown here"
-      assert_selector ".access-notice--partly-withheld a[href='/access_requests/new?document_id=emu-9044']", text: "Request access to it"
+      assert_selector ".access-notice--partly-withheld a[href='/access-requests/new?document_id=emu-9044']", text: "Request access to it"
       assert_selector ".digital-assets__toolbar a.digital-assets__primary[download]", text: "Download image"
       assert_selector ".digital-assets__licence", text: "CC BY"
       notice = page.evaluate_script("(() => { const r = document.querySelector('.access-notice--partly-withheld').getBoundingClientRect(); return [r.left >= 0, r.right <= window.innerWidth] })()")

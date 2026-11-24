@@ -22,46 +22,31 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
   def entry(label, **extra) = { "label" => label, "count" => 5, "intro" => "Includes prints. Held in University Art Collection.", "image" => nil }.merge(extra.transform_keys(&:to_s))
 
-  test "the browse page is one section for each way in, with its heading and a link to every value" do
+  test "the Browse page: makers and subjects as their hubs' cards, each section linking to its full list, and the other ways in last" do
+    image = { id: "r1", title: "A print", path: "https://dam.example.org/a.jpg", width: nil, height: nil }
+    seed_cards("makers", [ entry("Ramsay, Hugh", "image" => image) ] + (1..7).map { |number| entry("Maker #{number}") })
+    seed_cards("subjects", [ entry("Portraits") ])
+
     get "/browse"
 
     assert_response :success
     assert_select "h1", "Browse the collections"
-    assert_select "main section.home-section", count: BrowseHubs.all.size
-    BrowseHubs.all.each do |hub|
-      assert_select "section.browse-#{hub.slug}[aria-labelledby='browse-#{hub.slug}'] h2#browse-#{hub.slug}", hub.title
-      assert_select "section.browse-#{hub.slug} a.home-section__link[href='/browse/#{hub.slug}']"
+    { "makers" => "Makers", "subjects" => "Subjects" }.each do |slug, title|
+      assert_select "section.browse-#{slug}[aria-labelledby='browse-#{slug}'] h2#browse-#{slug}", title
+      assert_select "section.browse-#{slug} a.home-section__link[href='/browse/#{slug}']"
     end
+    assert_select "section.browse-makers article.explore-card", count: 8
+    assert_select "section.browse-makers .explore-card__intro", text: "Includes prints. Held in University Art Collection.", count: 8
+    assert_select "section.browse-makers article.explore-card img[src*='dam.example.org']", count: 1
+    assert_select "section.browse-more h2", "More ways in"
   end
 
-  test "each section shows its cards, each with its description and opening the results with its filter applied" do
-    image = { id: "r1", title: "A print", path: "https://dam.example.org/a.jpg", width: nil, height: nil }
-    seed_cards("object-types", [ entry("Medical device", "image" => image) ] + (1..7).map { |number| entry("Type #{number}") })
-
-    get "/browse"
-
-    assert_select "section.browse-object-types article.explore-card", count: 8
-    assert_select "section.browse-object-types h3.document-title-heading a[href*='f%5Bclassification_ssim%5D%5B%5D=Medical+device'][href*='any_assets=1']", text: "Medical device"
-    assert_select "section.browse-object-types .explore-card__intro", text: "Includes prints. Held in University Art Collection.", count: 8
-    assert_select "section.browse-object-types article.explore-card img[src*='dam.example.org']", count: 1
-    assert_select "section.browse-object-types article.explore-card svg", count: 0 # no arrow
-    assert_select "section.browse-object-types .explore-card__intro", text: /records/, count: 0 # a description, not a count
-  end
-
-  test "the periods section opens each period's own page" do
-    seed_cards("periods", [ entry("1950–1959", "first" => 1950, "last" => 1959) ])
-
-    get "/browse"
-
-    assert_select "section.browse-periods h3 a[href='/browse/periods/1950-1959']", text: "1950–1959"
-  end
-
-  test "a section whose list is unavailable keeps its heading and link but has no cards" do
+  test "with nothing to show, a way in is left out and the page still answers" do
     with_solr_down { get "/browse" }
 
     assert_response :success
-    assert_select "section.browse-makers h2", "Makers"
-    assert_select "section.browse-makers article", count: 0
+    assert_select "section.browse-makers", count: 0
+    assert_select "section.browse-more h2", "More ways in"
   end
 
   test "a way in lists the most common values first, each opening all its records with its count" do
@@ -96,16 +81,6 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
     assert_select "a.places-list__link", count: 5
   end
 
-  test "the periods page lists the periods in order, from Before 1000 to now" do
-    Rails.cache.write("browse_hubs/v1/periods", [ [ "Before 1000", 2, -10_000, 999 ], [ "1950–1959", 12, 1950, 1959 ] ], expires_in: 1.day)
-
-    get "/browse/periods", params: { view: "az" }
-
-    assert_response :success
-    assert_equal [ "Before 1000 2 records", "1950–1959 12 records" ], css_select("a.places-list__link").map { |a| a.text.squish }
-    assert_select "a.places-list__link[href='/browse/periods/1950-1959']" # each period has a page of its own, which links to the search
-  end
-
   test "an unknown way in is not found" do
     get "/browse/nonsense"
 
@@ -122,7 +97,7 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :service_unavailable
-    assert_select "h1", "Browse places"
+    assert_select "h1", "Explore by place"
     assert_select ".browse__unavailable"
   end
 
@@ -131,9 +106,9 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
     get "/"
 
-    assert_select "section.explore-kinds a.home-section__link[href='/browse/object-types']"
+    assert_select "section.explore-kinds a.home-section__link[href='/browse/classifications']"
     assert_select "section.home-places a.home-section__link[href='/browse/places']"
-    assert_select "section.explore-periods a.home-section__link[href='/browse/periods']"
+    assert_select "section.explore-periods a.home-section__link[href='/browse/time']"
   end
 
   # --- Entity pages (BrowseEntitiesController) and the filter box ---
@@ -145,15 +120,6 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
     assert_equal [ "Portraits 193 records", "Archaeology 20 records" ], css_select("a.places-list__link").map { |a| a.text.squish }
     assert_select "a.places-list__link[href='#{Browse.path_for('subjects', 'Portraits')}']"
-  end
-
-  test "periods link to their pages" do
-    Rails.cache.write("browse_hubs/v1/periods", [ [ "Before 1000", 2, -10_000, 999 ], [ "1950–1959", 12, 1950, 1959 ] ], expires_in: 1.day)
-
-    get "/browse/periods", params: { view: "az" }
-
-    assert_select "a.places-list__link[href='/browse/periods/before-1000']"
-    assert_select "a.places-list__link[href='/browse/periods/1950-1959']"
   end
 
   test "the type-to-filter box is a plain GET form, narrows the list and says when nothing matches" do

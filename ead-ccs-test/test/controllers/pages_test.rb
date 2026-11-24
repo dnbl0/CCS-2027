@@ -1,13 +1,11 @@
 require "test_helper"
 
 class PagesTest < ActionDispatch::IntegrationTest
-  test "Browse collections is gone: its address goes to the collection cards on the home page" do
+  test "Browse collections is gone: its address goes to the collections' page in Browse" do
     get "/collections"
 
     assert_response :moved_permanently
-    assert_redirected_to "/#browse-collections"
-    follow_redirect!
-    assert_response :success
+    assert_redirected_to "/browse/collections"
   end
 
   test "the collection landing pages are gone: their addresses go to the results filtered to that collection" do
@@ -20,10 +18,10 @@ class PagesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the header's Search collections menu opens the whole collection" do
+  test "the header's Search collections menu opens each collection's own page, as every other collection link does" do
     get "/"
     NexusCcs::SiteNavigation.collections.each do |label, facet_value, _slug|
-      assert_select "#site-nav-records .site-nav__panel-list a[href=?]", whole_collection_path(facet_value), text: /\A#{Regexp.escape(label)}/
+      assert_select "#site-nav-records .site-nav__panel-list a[href=?]", "/browse/collections/#{Browse::Slug.build('collections', facet_value)}", text: /\A#{Regexp.escape(label)}/
     end
   end
 
@@ -132,7 +130,7 @@ class PagesTest < ActionDispatch::IntegrationTest
   test "the site header links to the pages, and has no Contact page of its own" do
     get "/help"
 
-    assert_select "#site-nav-records li a[href^='/catalog?any_assets=1&f%5Bcollection_ssim%5D']", count: 5
+    assert_select "#site-nav-records li a[href^='/browse/collections/']", count: 5
     assert_select "#site-nav-collections", count: 0
     assert_select "#site-nav a[href='/collections']", count: 0
     assert_select "#site-nav-help a[href='/help#faq']"

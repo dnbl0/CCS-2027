@@ -65,10 +65,10 @@ class ContactCollectionComponentTest < ActiveSupport::TestCase
 
   test "it keeps Contact us apart from Request access: the access link appears only when the assets are gated" do
     render_card
-    assert_no_selector "a[href^='/access_requests/new']"
+    assert_no_selector "a[href^='/access-requests/new']"
 
     render_card("licence_type_ssim" => [ "Copyright - Current" ])
-    assert_selector "a[href='/access_requests/new?document_id=vernon-MHM00394']", text: "Request access"
+    assert_selector "a[href='/access-requests/new?document_id=vernon-MHM00394']", text: "Request access"
   end
 
   test "the help tip beside the heading is a button that controls real text" do

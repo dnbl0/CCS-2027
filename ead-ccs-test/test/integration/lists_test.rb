@@ -14,7 +14,7 @@ class ListsTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :success
-    assert_select "h1", text: "Your lists"
+    assert_select "h1", text: "Saved lists"
     assert_select ".saved-empty__text", text: /not made any lists/
     assert_select "a[href='/lists/new']"
   end
@@ -62,7 +62,7 @@ class ListsTest < ActionDispatch::IntegrationTest
 
     get "/lists"
 
-    assert_select "table.lists caption.visually-hidden", text: "Your lists"
+    assert_select "table.lists caption.visually-hidden", text: "Saved lists"
     assert_select "table.lists tbody th a", count: 2
     assert_equal %w[Alpha beta], css_select("table.lists tbody th a").map(&:text)
     assert_select "table.lists tbody tr:nth-child(2) td:nth-child(2)", text: "1"
@@ -162,11 +162,11 @@ class ListsTest < ActionDispatch::IntegrationTest
     assert_equal 0, theirs.list_items.count
   end
 
-  test "the saved records page links to Your lists" do
+  test "the saved records page links to Saved lists" do
     needs_solr
     get "/bookmarks"
 
-    assert_select "a[href='/lists']", text: "Your lists"
+    assert_select "a[href='/lists']", text: "Saved lists"
   end
 
   # The pages below read the Solr core at SOLR_URL; the "rails" CI job has none, so they skip themselves

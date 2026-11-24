@@ -10,14 +10,14 @@ class StoriesController < ApplicationController
 
   def index
     @stories = Stories.all
-    use_meta t("nexus_ccs.stories.title"), t("nexus_ccs.stories.description"), [ [ t("nexus_ccs.stories.title"), nil ] ]
+    use_meta t("nexus_ccs.stories.title"), t("nexus_ccs.stories.description"), [ [ t("browse.title"), browse_path ], [ t("nexus_ccs.stories.title"), nil ] ]
   end
 
   def show
     @story = Stories.find(params[:slug]) || not_found!
     @parts = @story.parts
     @embedded = embedded(@parts.grep(Stories::Embed), @story.hero)
-    use_meta @story.title, @story.summary, [ [ t("nexus_ccs.stories.title"), stories_path ], [ @story.title, nil ] ]
+    use_meta @story.title, @story.summary, [ [ t("browse.title"), browse_path ], [ t("nexus_ccs.stories.title"), stories_path ], [ @story.title, nil ] ]
   end
 
   private

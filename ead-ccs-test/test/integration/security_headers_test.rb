@@ -36,7 +36,7 @@ class SecurityHeadersTest < ActionDispatch::IntegrationTest
   end
 
   test "every inline script carries the page's nonce, so the policy can be enforced without breaking a page" do
-    (PAGES + %w[/search_history /lists]).each do |path|
+    (PAGES + %w[/search-history /lists]).each do |path|
       get path
       nonce = response.headers["Content-Security-Policy-Report-Only"].to_s[/'nonce-([^']+)'/, 1]
       assert nonce, path

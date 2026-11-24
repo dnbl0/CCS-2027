@@ -11,7 +11,7 @@ en:
       other: "%{number} records"
     kinds:
       heading: "Record types"
-      see_all: "See all object types"
+      see_all: "See all classifications"
     place_time:
       heading: "Place and time"
       places: "Places"

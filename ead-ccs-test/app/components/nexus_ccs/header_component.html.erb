@@ -108,7 +108,7 @@
           <li>
             <button type="button" class="site-nav__trigger" aria-expanded="false" aria-controls="site-nav-saved"
                     data-site-header-target="trigger" data-action="site-header#toggleSection">
-              My saved items<%= image_tag "site/icon-expand.svg", alt: "" %>
+              Saved<%= image_tag "site/icon-expand.svg", alt: "" %>
             </button>
             <div id="site-nav-saved" class="site-nav__panel">
               <button type="button" class="site-nav__back" data-action="site-header#back"><%= back_label %></button>
@@ -146,7 +146,8 @@
 
 <%= render NexusCcs::StickySearchComponent.new(blacklight_config: blacklight_config) %>
 
-<%= render NexusCcs::BreadcrumbComponent.new(items: breadcrumbs) %>
+<%# One breadcrumb for every page (docs/ia-audit-handover.md): the content pages' bar, the whole trail at every width %>
+<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: breadcrumbs) if breadcrumbs.any? %>
 
 <%= search_bar if chrome.banner == :search %>
 <%= render NexusCcs::PageBannerComponent.new(title: helpers.t("blacklight.advanced_search.form.title"), description: helpers.t("blacklight.advanced_search.form.description")) if chrome.banner == :advanced_search %>

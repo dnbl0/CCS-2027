@@ -48,7 +48,8 @@
       <span hidden data-places-state data-summary="<%= summary %>" data-region="<%= @list.region %>"></span>
       <div class="places-nav">
         <nav class="places-views" aria-label="<%= t("browse.places.views") %>">
-          <%= link_to t("browse.places.all"), browse_hub_path(@hub.slug, region: @list.region), class: "places-views__link", "aria-current": (@hub_view == :all ? "page" : nil) %>
+          <%# Places' plain address is the places page (the map and cards, ExploreController#places): its All asks for the hub by name %>
+          <%= link_to t("browse.places.all"), browse_hub_path(@hub.slug, region: @list.region, view: (@hub.slug == "places" ? "all" : nil)), class: "places-views__link", "aria-current": (@hub_view == :all ? "page" : nil) %>
           <%= link_to (periods ? t("browse.hub.in_order") : t("browse.places.az")), browse_hub_path(@hub.slug, view: "az", region: @list.region), class: "places-views__link", "aria-current": (@hub_view == :az ? "page" : nil) %>
         </nav>
         <% if places %><%= link_to t("browse.places.map"), explore_places_path, class: "arrow-link arrow-link--icon places-nav__map", data: { turbo_frame: "_top" } %><% end %>

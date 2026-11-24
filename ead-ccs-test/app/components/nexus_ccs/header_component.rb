@@ -27,6 +27,16 @@ module NexusCcs
       search_action_url(params || { f: { has_digital_asset: [ "with" ] }, search_field: "all_fields", view: "masonry" })
     end
 
+    # A record page's parent in the trail (docs/ia-audit-handover.md): Browse when the visitor came to it from a Browse page, a collection,
+    # a theme or a story on this site (the referrer), else their search results
+    BROWSE_REFERRER = %r{\A/(browse|themes|stories)(/|\z)}
+
+    def record_parent
+      referrer = URI.parse(helpers.request.referer.to_s) rescue nil
+      from_browse = referrer && referrer.host == helpers.request.host && referrer.path.to_s.match?(BROWSE_REFERRER)
+      from_browse ? [ I18n.t("browse.title"), helpers.browse_path ] : [ "Search results", results_url ]
+    end
+
     # The trail of a browse page, set by BrowseController as [label, href] pairs
     def browse_trail = helpers.instance_variable_get(:@browse_trail) || []
 
@@ -42,7 +52,13 @@ module NexusCcs
 
     def browse_groups = BrowseMenu.groups(browse_counts)
 
-    def browse_path(item) = helpers.search_action_path(BrowseMenu.query(item.field, item.value))
+    # a collection opens its own page (as everywhere else on the site: the menu lists only collections with records, so each has one; the
+    # address is built, never looked up, so the header asks Solr nothing); any other value, its records in the search
+    def browse_path(item)
+      return helpers.collection_landing_path(kind: "collections", slug: Browse::Slug.build("collections", item.value)) if item.field == BrowseMenu::COLLECTION_FIELD
+
+      helpers.search_action_path(BrowseMenu.query(item.field, item.value))
+    end
 
     def with_images_path = helpers.search_action_path(f: { has_digital_asset: [ "with" ] }, search_field: "all_fields")
 
@@ -70,17 +86,25 @@ module NexusCcs
         links << SiteNavigation::Link.new(I18n.t("nexus_ccs.lists.title"), helpers.lists_path)
         links << SiteNavigation::Link.new(I18n.t("nexus_ccs.saved_searches.title"), helpers.saved_searches_path)
       end
-      links << SiteNavigation::Link.new(I18n.t("nexus_ccs.search_history.title"), helpers.blacklight.search_history_path)
+      links << SiteNavigation::Link.new(I18n.t("nexus_ccs.search_history.title"), helpers.search_history_page_path)
+      links << SiteNavigation::Link.new(I18n.t("nexus_ccs.compare.menu"), helpers.compare_path) # reachable again once items are added
       # How Save, lists and shared galleries work: a short explainer on the lists page
       links << SiteNavigation::Link.new(I18n.t("nexus_ccs.lists_help.link"), helpers.lists_path(anchor: "how-saving-works")) if Rails.configuration.x.saved_records
       links
     end
 
-    # The Browse menu: the category picture pages, themes and stories (docs/categories-themes-stories.md)
+    # The Browse menu: every way in, in the order of the Browse page's sections (docs/ia-audit-handover.md), then themes and stories
     def browse_more_links
-      [ SiteNavigation::Link.new(I18n.t("nexus_ccs.categories.title"), helpers.categories_path),
-        SiteNavigation::Link.new(I18n.t("nexus_ccs.themes.title"), helpers.themes_path),
-        SiteNavigation::Link.new(I18n.t("nexus_ccs.stories.title"), helpers.stories_path) ]
+      [ [ I18n.t("nexus_ccs.categories.dimensions.collections.title"), helpers.category_path("collections") ],
+        [ "Object types", helpers.browse_hub_path("object-types") ],
+        [ I18n.t("nexus_ccs.categories.dimensions.classifications.title"), helpers.category_path("classifications") ],
+        [ I18n.t("explore_pages.places.title"), helpers.explore_places_path ],
+        [ I18n.t("explore_pages.time.title"), helpers.explore_time_path ],
+        [ I18n.t("colours.title"), helpers.explore_colours_path ],
+        [ "Makers", helpers.browse_hub_path("makers") ],
+        [ "Subjects", helpers.browse_hub_path("subjects") ],
+        [ I18n.t("nexus_ccs.themes.title"), helpers.themes_path ],
+        [ I18n.t("nexus_ccs.stories.title"), helpers.stories_path ] ].map { |label, href| SiteNavigation::Link.new(label, href) }
     end
 
     def about = SiteNavigation::Link.new(SiteNavigation::ABOUT_LABEL, helpers.about_path)

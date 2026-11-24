@@ -1,13 +1,13 @@
 require "test_helper"
 
-# CCS-143 uses Blacklight's own search history (searches saved in the session, the /search_history page with its
-# recent-searches table and Clear history button). CCS-206 only adds the grouping by day: app/views/search_history/index.html.erb.
+# CCS-143 uses Blacklight's own search history (searches saved in the session, the /search-history page with its
+# recent-searches table and Clear history button). CCS-206 only adds the grouping by day: app/views/search-history/index.html.erb.
 class SearchHistoryTest < ActionDispatch::IntegrationTest
   test "searches are saved and listed on Blacklight's own history page, newest first" do
     get "/catalog", params: { q: "skull" }
     get "/catalog", params: { q: "violin" }
 
-    get "/search_history"
+    get "/search-history"
 
     assert_response :success
     assert_select ".page-banner h1, h1", text: "Search history"
@@ -23,7 +23,7 @@ class SearchHistoryTest < ActionDispatch::IntegrationTest
     Search.update_all(created_at: 2.days.ago)
     get "/catalog", params: { q: "violin" }
 
-    get "/search_history"
+    get "/search-history"
 
     assert_select ".search-history-day h3", count: 2
     assert_select ".search-history-day:first-of-type h3", text: "Today"
@@ -35,7 +35,7 @@ class SearchHistoryTest < ActionDispatch::IntegrationTest
     get "/catalog", params: { q: "skull" }
     follow_redirect! # the default "With a digital asset" filter (SearchDefaults)
 
-    get "/search_history"
+    get "/search-history"
 
     assert_select "td.filters .applied-filter .filter-value", text: "Yes"
     assert_select "td.filters .applied-filter .filter-name", text: /With Digital Asset/
@@ -44,7 +44,7 @@ class SearchHistoryTest < ActionDispatch::IntegrationTest
   end
 
   test "a visitor with no searches is told so" do
-    get "/search_history"
+    get "/search-history"
 
     assert_select ".saved-empty__text", text: /no search history/i
     assert_select ".search-history-day", count: 0

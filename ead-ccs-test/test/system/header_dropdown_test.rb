@@ -33,15 +33,15 @@ class HeaderDropdownTest < ApplicationSystemTestCase
     assert_nil page.evaluate_script(dim)
   end
 
-  test "My saved items opens a panel with the visitor's own pages, and a link in it opens that page" do
+  test "Saved opens a panel with the visitor's own pages, and a link in it opens that page" do
     visit root_path
-    find(".site-nav__trigger", text: "My saved items").click
+    find(".site-nav__trigger", text: "Saved").click
     assert_selector "#site-nav-saved", visible: :visible
-    %w[Saved\ records Your\ lists Saved\ searches Search\ history].each { |label| assert_selector "#site-nav-saved a", text: label }
+    %w[Saved\ records Saved\ lists Saved\ searches Search\ history Compare\ images].each { |label| assert_selector "#site-nav-saved a", text: label }
     page.save_screenshot(Rails.root.join("tmp/screenshots/my_saved_items_desktop.png").to_s)
 
     within("#site-nav-saved") { click_link "Search history" }
-    assert_current_path "/search_history"
+    assert_current_path "/search-history"
     assert_selector "h1", text: "Search history"
   end
 

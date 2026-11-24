@@ -15,6 +15,15 @@ module CategoriesHelper
     "named-collections" => [ :stack, 5, nil ]
   }.freeze
 
+  # The Browse page's sections, in order (docs/ia-audit-handover.md): a category's values in its layout, or a hub's own cards (makers,
+  # subjects). heading and intro, where given, name the section by the page its "See all" opens (regions are Places, eras Time).
+  BROWSE_SECTIONS = [
+    { dimension: "collections" }, { dimension: "object-types" }, { dimension: "classifications" }, { dimension: "materials" },
+    { dimension: "regions", heading: "explore_pages.places.short", intro: "explore_pages.places.short_intro", link: "explore_pages.places.title" },
+    { dimension: "eras", heading: "explore_pages.time.short", intro: "explore_pages.time.short_intro", link: "explore_pages.time.title" },
+    { hub: "makers" }, { hub: "subjects" }, { dimension: "named-collections" }
+  ].freeze
+
   def category_layout(dimension) = CATEGORY_LAYOUTS.fetch(dimension.slug, [ :stack, 5, nil ])
 
   # A section's cards: the values with the most records whose picture no earlier section used (the page shows no picture twice), a value

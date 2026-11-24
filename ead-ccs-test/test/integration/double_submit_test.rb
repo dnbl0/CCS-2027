@@ -88,7 +88,7 @@ class DoubleSubmitTest < ActionDispatch::IntegrationTest
     search = Search.last
 
     assert_difference "SavedSearch.count", 1 do
-      2.times { post "/saved_searches", params: { search_id: search.id } }
+      2.times { post "/saved-searches", params: { search_id: search.id } }
     end
   end
 

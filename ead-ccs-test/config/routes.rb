@@ -1,5 +1,12 @@
 # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
+  # Hyphenated addresses (docs/ia-audit-handover.md): the visitor's own pages answer at /saved-searches, /search-history, /my-data and
+  # /access-requests; the old underscored ones answer 301 with the query kept. Before Blacklight's engine, so its /search_history redirects.
+  %w[saved_searches search_history my_data].each do |old|
+    get old, as: "legacy_#{old}", to: redirect(status: 301) { |_params, request| [ "/#{old.tr('_', '-')}", request.query_string.presence ].compact.join("?") }
+  end
+  get "access_requests/new", as: :legacy_access_request, to: redirect(status: 301) { |_params, request| [ "/access-requests/new", request.query_string.presence ].compact.join("?") }
+  get "search-history", to: "search_history#index", as: :search_history_page
   concern :range_searchable, BlacklightRangeLimit::Routes::RangeSearchable.new
   mount Blacklight::Engine => "/"
   root to: "pages#home"
@@ -39,9 +46,9 @@ Rails.application.routes.draw do
           get "citations"
         end
       end
-      resources :saved_searches, only: [ :index, :create, :destroy ]
+      resources :saved_searches, only: [ :index, :create, :destroy ], path: "saved-searches"
       # Delete my data (CCS-148): what the site holds against the visitor's cookie, shown, then removed
-      resource :my_data, only: [ :show, :destroy ], controller: "my_data", path: "my_data"
+      resource :my_data, only: [ :show, :destroy ], controller: "my_data", path: "my-data"
       # Bulk download of the selected records' digital assets (CCS-167): review what will be sent, then the zip
       post "downloads/review", to: "bulk_downloads#review", as: :review_bulk_download
       post "downloads", to: "bulk_downloads#create", as: :bulk_download
@@ -54,7 +61,7 @@ Rails.application.routes.draw do
   end
 
   # Asking for access to a record (CCS-69): the form, and the confirmation only the requester's own session can open
-  resources :access_requests, only: [ :new, :create, :show ]
+  resources :access_requests, only: [ :new, :create, :show ], path: "access-requests"
 
   # The new record page, for the records in StockRecords only (any other id is a 404): Blacklight out of the box (StockCatalogController),
   # and the same page in the UoM header, breadcrumb and footer (BrandedStockCatalogController). The site's own record page, /catalog/:id,
@@ -74,9 +81,9 @@ Rails.application.routes.draw do
   # Browse collections is gone (the sitemap keeps Blacklight's own pages): its address goes to the collection cards on the home
   # page, and each old collection landing page goes to the results filtered to that collection.
   # Take one search out of the history (Blacklight draws /search_history and /search_history/clear)
-  delete "search_history/:id", to: "search_history#destroy", as: :search_history_entry, constraints: { id: /\d+/ }
+  delete "search-history/:id", to: "search_history#destroy", as: :search_history_entry, constraints: { id: /\d+/ }
 
-  get "collections", to: redirect("/#browse-collections", status: 301)
+  get "collections", to: redirect("/browse/collections", status: 301)
   get "collections/:slug", to: redirect(status: 301) { |params, _request|
     "/catalog?#{NexusCcs::SiteNavigation.whole_collection_query(params[:slug]).to_query}"
   }, constraints: ->(request) { NexusCcs::SiteNavigation.facet_value(request.path_parameters[:slug]) }
@@ -91,8 +98,25 @@ Rails.application.routes.draw do
   get "browse", to: "browse#index", as: :browse
   # Category picture pages, collection and named collection pages, themes and stories (docs/categories-themes-stories.md). Every
   # list of records on them opens the search page (/catalog) with filters.
-  get "browse/categories", to: "categories#index", as: :categories
-  get "browse/categories/:slug", to: "categories#show", as: :category, constraints: { slug: /[a-z-]+/ }
+  # One Browse (the IA fixes, 24 Nov 2026, docs/ia-audit-handover.md): every way in lives under /browse. Browse by category merged into
+  # /browse; a category's "See all" page is /browse/<its name>; its duplicates (object types, regions, eras) open the one page for each.
+  # The Explore pages moved here from /explore. Every old address answers 301 with its query kept.
+  get "browse/categories", to: redirect("/browse", status: 301)
+  get "browse/categories/:slug", to: redirect(status: 301) { |params, request|
+    target = { "object-types" => "/browse/object-types", "regions" => "/browse/places", "eras" => "/browse/time" }[params[:slug]] || "/browse/#{params[:slug]}"
+    [ target, request.query_string.presence ].compact.join("?")
+  }, constraints: { slug: /[a-z-]+/ }
+  get "browse/:slug", to: "categories#show", as: :category, constraints: { slug: /classifications|materials|collections|named-collections/ }
+  get "browse/time", to: "explore#time", as: :explore_time
+  # the places' A to Z list and its filter (the Places hub, browse/hub) answer at the same address, asked for by their options
+  get "browse/places", to: "browse#show", defaults: { slug: "places" },
+                       constraints: ->(request) { request.query_parameters.keys.intersect?(%w[view letter filter page region]) }
+  get "browse/places", to: "explore#places", as: :explore_places
+  get "browse/colours", to: "colours#index", as: :explore_colours
+  get "browse/periods", to: redirect("/browse/time", status: 301)
+  %w[time places colours].each do |page|
+    get "explore/#{page}", to: redirect(status: 301) { |_params, request| [ "/browse/#{page}", request.query_string.presence ].compact.join("?") }
+  end
   get "browse/:kind/:slug", to: "collection_landings#show", as: :collection_landing,
                             constraints: { kind: /collections|named-collections/, slug: /[a-z0-9-]+/ }
   get "themes", to: "themes#index", as: :themes
@@ -156,12 +180,9 @@ Rails.application.routes.draw do
   get "discover/frame", to: "discover#frame", as: :discover_frame
   get "catalog/:id/similar", to: "similar#show", as: :similar, constraints: { id: %r{[^/]+} }, format: false
   # Colour (docs/colour-and-clean-up.md): browse by colour, and a record's "Looks similar" (a lazy frame on the record page)
-  get "explore/colours", to: "colours#index", as: :explore_colours
   get "catalog/:id/looks-similar", to: "looks_similar#show", as: :looks_similar, constraints: { id: %r{[^/]+} }, format: false
 
   # Explore by time and by place (docs/time-and-place.md): lists that open the search with a filter
-  get "explore/time", to: "explore#time", as: :explore_time
-  get "explore/places", to: "explore#places", as: :explore_places
 
   # Entity pages (BrowseEntitiesController), under the browse index pages (BrowseController): one maker, place or subject, one century or decade
   scope "/browse", controller: "browse_entities" do

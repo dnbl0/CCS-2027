@@ -240,7 +240,7 @@ class StockCatalogTest < ActionDispatch::IntegrationTest
     get "/branded-stock/vernon-MHM00394"
     assert_response :success
     assert_select ".site-header"
-    assert_select ".breadcrumb-bar [aria-current=page]", text: "Test record"
+    assert_select ".page-breadcrumbs [aria-current=page]", text: "Test record"
     assert_select "footer, .site-footer"
     assert_select "#document.document h1"
     assert_select "table.document-metadata"
@@ -263,7 +263,7 @@ class StockCatalogTest < ActionDispatch::IntegrationTest
 
     assert_select "picture[data-openseadragon]"
     assert_select "[data-media-thumbnails] button", 3
-    assert_select ".access-notice--view-only a[href='/access_requests/new?document_id=multi']", text: "Request access to download this item"
+    assert_select ".access-notice--view-only a[href='/access-requests/new?document_id=multi']", text: "Request access to download this item"
     assert_select "a[href*='/digital-assets/']", false
   end
 
@@ -273,7 +273,7 @@ class StockCatalogTest < ActionDispatch::IntegrationTest
       get path
 
       assert_response :success
-      assert_select ".access-notice--request a[href='/access_requests/new?document_id=multi']", text: "Request access to this item"
+      assert_select ".access-notice--request a[href='/access-requests/new?document_id=multi']", text: "Request access to this item"
       assert_select "picture[data-openseadragon], [data-media-thumbnails], [id$=-full-page]", false
       assert_not_includes response.body, "/digital-assets/"
       assert_select "#document h1", text: "Test record" # the metadata is still shown

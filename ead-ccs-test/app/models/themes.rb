@@ -11,6 +11,8 @@ module Themes
 
   Theme = Data.define(:slug, :title, :intro, :filters, :range, :hero) do
     def path = Rails.application.routes.url_helpers.theme_path(slug)
+    # wording the collections team has not written yet: kept out of the sitemap until it is
+    def placeholder? = title.include?("(placeholder)")
 
     # The theme's records on the search page (the any_assets marker keeps the default "With a digital asset" filter off, docs/adr/0004)
     def search_query

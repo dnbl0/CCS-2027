@@ -32,20 +32,20 @@ class CompliancePagesTest < ActionDispatch::IntegrationTest
   test "the footer keeps the University's own pages and adds this site's two statements" do
     get "/help"
 
-    assert_select ".site-footer__legal a[href='https://www.unimelb.edu.au/accessibility']", text: "Accessibility"
-    assert_select ".site-footer__legal a[href='https://about.unimelb.edu.au/strategy/governance/compliance-obligations/privacy']", text: "Privacy"
+    assert_select ".site-footer__legal a[href='https://www.unimelb.edu.au/accessibility']", text: "Accessibility at the University"
+    assert_select ".site-footer__legal a[href='https://about.unimelb.edu.au/strategy/governance/compliance-obligations/privacy']", text: "Privacy at the University"
     assert_select ".site-footer__links a[href='/accessibility']" # this site's own statements sit in the link column, not the legal row
     assert_select ".site-footer__links a[href='/privacy']"
   end
 
   test "the privacy notice links to Delete my data only while saved records are on" do
     get "/privacy"
-    assert_select "#your-choices a[href='/my_data']"
+    assert_select "#your-choices a[href='/my-data']"
 
     was = Rails.configuration.x.saved_records
     Rails.configuration.x.saved_records = false
     get "/privacy"
-    assert_select "#your-choices a[href='/my_data']", count: 0
+    assert_select "#your-choices a[href='/my-data']", count: 0
   ensure
     Rails.configuration.x.saved_records = was unless was.nil?
   end

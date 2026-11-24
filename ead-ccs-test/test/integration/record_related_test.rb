@@ -47,10 +47,10 @@ class RecordRelatedTest < ActionDispatch::IntegrationTest
     get path_for(first)
     get path_for(second)
 
-    get "/my_data"
+    get "/my-data"
     assert_select "section ul", text: /2 records in your recently viewed list/
 
-    delete "/my_data"
+    delete "/my-data"
     get path_for(second)
     assert_select "section#recently-viewed", count: 0
   end

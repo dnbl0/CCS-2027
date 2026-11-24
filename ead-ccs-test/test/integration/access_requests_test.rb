@@ -45,7 +45,7 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
   test "a view-only record is asked for as a download" do
     needs_solr
     @tier = :view_only
-    get "/access_requests/new", params: { document_id: DOC }
+    get "/access-requests/new", params: { document_id: DOC }
 
     assert_select "dd", text: "A copy of this record to download"
   end
@@ -53,16 +53,16 @@ class AccessRequestsTest < ActionDispatch::IntegrationTest
   test "an open record has nothing to request, so the visitor goes to it" do
     needs_solr
     @tier = :open
-    get "/access_requests/new", params: { document_id: DOC }
+    get "/access-requests/new", params: { document_id: DOC }
 
     assert_redirected_to "/catalog/#{DOC}"
   end
 
   test "an unknown or missing record is a 404" do
     needs_solr
-    get "/access_requests/new", params: { document_id: "no-such-record-xyz" }
+    get "/access-requests/new", params: { document_id: "no-such-record-xyz" }
     assert_response :not_found
-    get "/access_requests/new"
+    get "/access-requests/new"
     assert_response :not_found
     submit({}, document_id: "no-such-record-xyz")
     assert_response :not_found

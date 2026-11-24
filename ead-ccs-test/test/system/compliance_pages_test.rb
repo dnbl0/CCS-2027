@@ -4,7 +4,7 @@ require "application_system_test_case"
 class CompliancePagesTest < ApplicationSystemTestCase
   setup { page.driver.set_cookie("country_acknowledged", "1") }
 
-  { "accessibility statement" => "/accessibility", "privacy notice" => "/privacy", "Delete my data (nothing held)" => "/my_data" }.each do |name, path|
+  { "accessibility statement" => "/accessibility", "privacy notice" => "/privacy", "Delete my data (nothing held)" => "/my-data" }.each do |name, path|
     test "the #{name} has no axe violations (WCAG 2.2 AA and best practice), one h1 and a skip link target" do
       visit path
 

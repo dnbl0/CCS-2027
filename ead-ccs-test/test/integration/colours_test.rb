@@ -1,7 +1,7 @@
 require "test_helper"
 require_relative "../support/discovery_records"
 
-# Explore by colour (/explore/colours), the Colour filter and the record page's "Looks similar" (docs/colour-and-clean-up.md).
+# Explore by colour (/browse/colours), the Colour filter and the record page's "Looks similar" (docs/colour-and-clean-up.md).
 # Solr is stood in for, so these run in the CI job that has no core.
 class ColoursTest < ActionDispatch::IntegrationTest
   include DiscoveryRecords
@@ -23,7 +23,7 @@ class ColoursTest < ActionDispatch::IntegrationTest
   end
 
   test "the colour page: a strip of the colours, each named, in the palette's order; each colour's card opens its wall" do
-    with_seeded_menu_cache { with_canned_search(colour_counts("blue" => 12, "red" => 1_234, "white" => 3)) { get "/explore/colours" } }
+    with_seeded_menu_cache { with_canned_search(colour_counts("blue" => 12, "red" => 1_234, "white" => 3)) { get "/browse/colours" } }
 
     assert_response :success
     assert_select "title", /Explore by colour/
@@ -31,14 +31,14 @@ class ColoursTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#colour-explorer[data-turbo-action=advance] nav.explore-strip[aria-label=Colours]" do
       labels = css_select("a.explore-strip__swatch").map { |swatch| swatch["aria-label"] }
       assert_equal [ "Red: 1,234 records", "Blue: 12 records", "White: 3 records" ], labels
-      assert_select "a.explore-strip__swatch.colours__swatch--red[href=?][title=?]", "/explore/colours?colour=red", "Red: 1,234 records"
+      assert_select "a.explore-strip__swatch.colours__swatch--red[href=?][title=?]", "/browse/colours?colour=red", "Red: 1,234 records"
       assert_select "a[aria-current]", 0, "no colour chosen yet"
     end
     assert_select "h2#colours-heading", "Colours"
     # a card for each colour, in the strip's order, its name the link to its wall and its number of records under it; the canned Solr
     # has no pictures, so the cards show the colour itself
     assert_equal %w[Red Blue White], css_select("ul.colour-cards li.colour-card h3 a.colour-card__link").map { |link| link.text.squish }
-    assert_select "li.colour-card:first-child a.colour-card__link[href='/explore/colours?colour=red']"
+    assert_select "li.colour-card:first-child a.colour-card__link[href='/browse/colours?colour=red']"
     assert_select "li.colour-card:first-child .colour-card__count", "1,234 records"
     assert_select "li.colour-card:first-child .colour-card__pictures.colours__swatch--red[aria-hidden=true]"
   end
@@ -46,7 +46,7 @@ class ColoursTest < ActionDispatch::IntegrationTest
   test "a chosen colour: its swatch marked, then its records as a wall of squares, those mostly that colour first, and a way to all of them" do
     records = [ open_record("emu-b", colour_ssim: %w[white teal]), open_record("emu-a", colour_ssim: %w[teal white], colour_palette_ssm: %w[#0497d1 #ffffff]),
                 sensitive_record("emu-s", colour_ssim: %w[teal]) ]
-    with_seeded_menu_cache { with_canned_search(colour_page({ "teal" => 43, "red" => 5 }, records: records)) { get "/explore/colours?colour=teal" } }
+    with_seeded_menu_cache { with_canned_search(colour_page({ "teal" => 43, "red" => 5 }, records: records)) { get "/browse/colours?colour=teal" } }
 
     assert_response :success
     assert_select "title", /\ATeal — Explore by colour/
@@ -55,7 +55,7 @@ class ColoursTest < ActionDispatch::IntegrationTest
     assert_select "section.picture-wall[aria-labelledby=picture-wall-heading]" do
       assert_select "h2#picture-wall-heading", "Teal"
       # the colour before and after it in the strip, staying on this page
-      assert_select "a.picture-wall__step[aria-label='Previous colour: Red'][href='/explore/colours?colour=red']:not([data-turbo-frame])", text: "← Red"
+      assert_select "a.picture-wall__step[aria-label='Previous colour: Red'][href='/browse/colours?colour=red']:not([data-turbo-frame])", text: "← Red"
       assert_select "a.picture-wall__step[aria-label^='Next']", 0 # teal is last here (the spectrum's order)
       # while a picture loads, its frame shows the picture's own main colour
       assert_select "a.picture-wall__link[href='/catalog/emu-a'][style='--tint: #0497d1']"
@@ -69,17 +69,17 @@ class ColoursTest < ActionDispatch::IntegrationTest
   end
 
   test "a colour the index does not have is no choice: the page as it is before a colour is chosen" do
-    with_seeded_menu_cache { with_canned_search(colour_counts("red" => 5)) { get "/explore/colours?colour=mauve" } }
+    with_seeded_menu_cache { with_canned_search(colour_counts("red" => 5)) { get "/browse/colours?colour=mauve" } }
     assert_response :success
     assert_select "section.picture-wall", 0
     assert_select "h2#colours-heading", "Colours"
   end
 
   test "with no colours yet, or Solr down, the page says so" do
-    with_seeded_menu_cache { with_canned_search(colour_counts({})) { get "/explore/colours" } }
+    with_seeded_menu_cache { with_canned_search(colour_counts({})) { get "/browse/colours" } }
     assert_select ".colours__empty", "No colours are available yet."
 
-    with_seeded_menu_cache { get "/explore/colours" }
+    with_seeded_menu_cache { get "/browse/colours" }
     assert_response :service_unavailable
     assert_select ".colours__empty", /cannot be shown just now/
   end

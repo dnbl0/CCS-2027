@@ -73,11 +73,11 @@ class DegradedModeTest < ActionDispatch::IntegrationTest
       assert_select "[role=status] a[href='/catalog/emu-1']", text: "emu-1"
       assert_equal "30", response.headers["Retry-After"]
 
-      get "/saved_searches"
+      get "/saved-searches"
       assert_response :success
       assert_select "a", text: /skull/
 
-      get "/search_history"
+      get "/search-history"
       assert_response :success
     end
   end

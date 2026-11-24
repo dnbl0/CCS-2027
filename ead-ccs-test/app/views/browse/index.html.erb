@@ -1,22 +1,47 @@
-<%# The Browse page, on the Browse list template (browse/hub): the centred head, the timeline and the map, then a section for each way in
-    (object types, places, periods, makers, subjects), each its eight cards (Browse::Cards) as the fluid mosaic, with "See all" %>
-<% content_for :body_class, "page-browse page-places" %>
-<% content_for :title, "Browse the collections — Collections Navigator — University of Melbourne" %>
-<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", nil ] ]) %>
-<main class="places-page" id="main-content">
-  <div class="places-page__inner">
-    <%= render "browse/page_head", title: "Browse the collections", intro: "No search term needed. Start from what the records are, where they come from, when they were made, who made them or what they are about." %>
-    <nav class="places-nav places-nav--centred" aria-label="<%= t("explore_pages.links_label") %>">
-      <div class="places-views">
-        <%= link_to t("explore_pages.time.title"), explore_time_path, class: "places-views__link" %>
-        <%= link_to t("explore_pages.places.title"), explore_places_path, class: "places-views__link" %>
-      </div>
-    </nav>
-    <% @sections.each do |hub, cards| %>
+<%# The Browse page: every way into the collections without a search, on the home page's layouts (docs/ia-audit-handover.md; Browse by
+    category merged in, 24 Nov 2026). The Browse pages' centred head, then a full-width section for each way in
+    (CategoriesHelper::BROWSE_SECTIONS), its heading and "See all" as the home page's, its cards in one of the home page's layouts
+    (Google Arts & Culture's stacks, clusters and story carousel; makers and subjects the site's mosaic), the backgrounds taking turns and
+    two on bands of colour; no picture twice. Last, the other ways in: colour, themes, stories and the pick of the day. %>
+<% content_for :body_class, "page-browse page-places page-categories" %>
+<% content_for :title, "#{t('browse.footer_link')} — Collections Navigator — University of Melbourne" %>
+<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ t("browse.title"), nil ] ]) %>
+<main class="categories-page" id="main-content">
+  <div class="places-page places-page--head"><div class="places-page__inner">
+    <%= render "browse/page_head", title: t("browse.footer_link"), intro: t("browse.index_intro") %>
+  </div></div>
+  <% CategoriesHelper::BROWSE_SECTIONS.each do |section| %>
+    <% if section[:hub] %>
+      <% hub, cards = @hub_cards[section[:hub]] %>
+      <% next unless cards&.any? %>
       <%= render NexusCcs::HomeSectionComponent.new(id: "browse-#{hub.slug}", heading: hub.title, intro: hub.intro,
                                                     link: t("browse.cards.see_all", kind: hub.title.downcase), link_path: browse_hub_path(hub.slug), extra_class: "browse-section browse-#{hub.slug}") do %>
         <%= render NexusCcs::CardLayoutComponent.new(cards: cards, layout: :mosaic, lanes: 4, label: hub.title) %>
       <% end %>
+    <% else %>
+      <% dimension = Categories.find(section[:dimension]) %>
+      <% page = Categories.page(dimension) %>
+      <% next unless page&.tiles&.any? %>
+      <% layout, count, tint = category_layout(dimension) %>
+      <% heading = section[:heading] ? t(section[:heading]) : dimension.title %>
+      <%= render NexusCcs::HomeSectionComponent.new(id: "browse-#{dimension.slug}", heading: heading, intro: (section[:intro] ? t(section[:intro]) : dimension.intro), tint: tint,
+                                                    link: (section[:link] ? t(section[:link]) : t("browse.cards.see_all", kind: heading.downcase)), link_path: dimension.path,
+                                                    extra_class: "browse-section browse-#{dimension.slug}") do %>
+        <%= render "categories/section_cards", dimension: dimension, layout: layout, tiles: category_section_tiles(dimension, page.tiles, count), all: page.tiles %>
+      <% end %>
     <% end %>
-  </div>
+  <% end %>
+
+  <%# The ways in that are not a list of values %>
+  <%= render NexusCcs::HomeSectionComponent.new(id: "browse-more", heading: t("browse.more.heading"), intro: t("browse.more.intro"), extra_class: "browse-section browse-more") do %>
+    <ul class="browse-more__list">
+      <% [ [ t("colours.title"), t("browse.more.colours"), explore_colours_path ], [ t("nexus_ccs.themes.title"), t("browse.more.themes"), themes_path ],
+           [ t("nexus_ccs.stories.title"), t("browse.more.stories"), stories_path ], [ t("nexus_ccs.discover.title"), t("browse.more.discover"), discover_path ] ].each do |title, text, path| %>
+        <li class="browse-more__item">
+          <h3 class="browse-more__title"><%= link_to title, path, class: "browse-more__link" %></h3>
+          <p class="browse-more__text"><%= text %></p>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
 </main>

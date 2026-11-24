@@ -30,6 +30,6 @@
       <%= render NexusCcs::MosaicComponent.new(tiles: rest, label: @dimension.title, lanes: 6) %>
     <% end %>
     <%= render "browse_entities/pager", page: @page.page, pages: @page.pages, label: t("nexus_ccs.categories.pagination", kind: @dimension.title.downcase) %>
-    <p class="places-page__more"><%= link_to t("nexus_ccs.categories.title"), categories_path, class: "arrow-link arrow-link--icon" %></p>
+    <p class="places-page__more"><%= link_to t("browse.footer_link"), browse_path, class: "arrow-link arrow-link--icon" %></p>
   </div>
 </main>

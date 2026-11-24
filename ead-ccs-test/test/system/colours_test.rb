@@ -23,7 +23,7 @@ class ColoursSystemTest < ApplicationSystemTestCase
   test "the colour page at a desktop and a phone width: every colour named and counted, accessible, no sideways scroll" do
     [ [ 1400, 900 ], [ 390, 844 ], [ 320, 700 ] ].each do |width, height|
       page.current_window.resize_to(width, height)
-      visit "/explore/colours"
+      visit "/browse/colours"
 
       assert_selector "h1", text: "Explore by colour"
       assert_selector "nav.explore-strip a.explore-strip__swatch", count: 12
@@ -34,11 +34,11 @@ class ColoursSystemTest < ApplicationSystemTestCase
     end
     # choosing a colour swaps the wall in place (a Turbo frame) and the address follows
     page.current_window.resize_to(1400, 900)
-    visit "/explore/colours"
+    visit "/browse/colours"
     find("a.explore-strip__swatch.colours__swatch--teal").click
     assert_selector "h2#picture-wall-heading", text: "Teal"
     assert_selector "a.explore-strip__swatch.colours__swatch--teal[aria-current=page]"
-    assert_current_path "/explore/colours?colour=teal"
+    assert_current_path "/browse/colours?colour=teal"
     # the pictures come in gracefully: hidden on their frame's colour until loaded, then shown (none left hidden once loaded)
     assert page.evaluate_script("[...document.querySelectorAll('.picture-wall__link img')].every(img => img.classList.contains('is-revealed') || !img.complete)")
     page.document.synchronize(10) do
@@ -52,7 +52,7 @@ class ColoursSystemTest < ApplicationSystemTestCase
     assert_no_selector "html[aria-busy]", visible: :all
     assert_accessible
     page.current_window.resize_to(390, 844)
-    visit "/explore/colours?colour=white"
+    visit "/browse/colours?colour=white"
     assert_not sideways_scroll?
     assert_operator page.evaluate_script("document.querySelector('.explore-strip__list').scrollLeft"), :>, 0, "the chosen colour scrolled into the strip's middle"
   end

@@ -40,7 +40,7 @@ module NexusCcs
       Link.new("Careers at Melbourne", "https://about.unimelb.edu.au/careers"),
       Link.new("Safety and respect", "https://www.unimelb.edu.au/respect"),
       Link.new("Newsroom", "https://www.unimelb.edu.au/newsroom"),
-      Link.new("Contact", "https://www.unimelb.edu.au/contact"),
+      Link.new("Contact the University", "https://www.unimelb.edu.au/contact"),
       Link.new("Campus locations", "https://about.unimelb.edu.au/priorities-and-partnerships/campus-development/campus-locations")
     ].freeze
 
@@ -55,13 +55,17 @@ module NexusCcs
     FOOTER_LEGAL = [
       Link.new("Emergency", "https://safety.unimelb.edu.au/emergency"),
       Link.new("Terms and privacy", "https://www.unimelb.edu.au/legal"),
-      Link.new("Accessibility", "https://www.unimelb.edu.au/accessibility"),
-      Link.new("Privacy", "https://about.unimelb.edu.au/strategy/governance/compliance-obligations/privacy")
+      Link.new("Accessibility at the University", "https://www.unimelb.edu.au/accessibility"),
+      Link.new("Privacy at the University", "https://about.unimelb.edu.au/strategy/governance/compliance-obligations/privacy")
     ].freeze
 
     # This site's own statements (CCS-148): what the University's pages above cannot say about this site's data and checks.
     # They sit in the footer's link column, so the legal row stays the University's short one.
     FOOTER_SITE = [
+      Link.new("Search all records", "/catalog?search_field=all_fields"),
+      Link.new("Browse the collections", "/browse"),
+      Link.new("Help and support", "/help"),
+      Link.new("About Collections Navigator", "/about"),
       Link.new("Accessibility of this site", "/accessibility"),
       Link.new("Privacy and data on this site", "/privacy"),
       Link.new("Language in our records", "/language-in-our-records")

@@ -14,7 +14,7 @@ class ResponsiveTest < ApplicationSystemTestCase
     "advanced search" => "/catalog/advanced",
     "help" => "/help",
     "about" => "/about",
-    "the access request form" => "/access_requests/new?document_id=vernon-MHM00394",
+    "the access request form" => "/access-requests/new?document_id=vernon-MHM00394",
     "the new record page" => "/branded-stock/emu-9044"
   }.freeze
 
@@ -69,7 +69,7 @@ class ResponsiveTest < ApplicationSystemTestCase
 
   test "a results page, a record and the access request form have no axe violations at 320px" do
     page.current_window.resize_to(320, 844)
-    [ "/catalog?any_assets=1&q=skull&view=list", "/catalog/emu-10133", "/access_requests/new?document_id=vernon-MHM00394" ].each do |path|
+    [ "/catalog?any_assets=1&q=skull&view=list", "/catalog/emu-10133", "/access-requests/new?document_id=vernon-MHM00394" ].each do |path|
       visit path
       assert_selector "main"
       assert_accessible

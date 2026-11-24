@@ -100,7 +100,7 @@ class RecordPageLayoutTest < ActiveSupport::TestCase
   test "a view-only record's access notice is in the actions, with the request link and nothing that downloads" do
     render_actions(IMAGES.merge("licence_type_ssim" => [ "Copyright - Current" ]))
 
-    assert_selector ".record-actions .access-notice--view-only a[href='/access_requests/new?document_id=emu-1']", text: "Request access to download this item"
+    assert_selector ".record-actions .access-notice--view-only a[href='/access-requests/new?document_id=emu-1']", text: "Request access to download this item"
     assert_selector ".compare-actions button", text: "Add to compare", visible: :all
     assert_no_selector "a[download]"
   end

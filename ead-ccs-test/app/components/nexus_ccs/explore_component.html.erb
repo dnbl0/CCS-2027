@@ -32,7 +32,7 @@
 
 <% if kind_tiles.any? %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "explore-kinds", heading: t("home.kinds.heading"), intro: t("home.kinds.intro"),
-                                                link: t("explore.kinds.see_all"), link_path: helpers.browse_hub_path("object-types"), extra_class: "explore-kinds",
+                                                link: t("explore.kinds.see_all"), link_path: helpers.category_path("classifications"), extra_class: "explore-kinds",
                                                 tint: "var(--ccs-explore-tint-3)") do %>
     <%# Five object types as a fanned stack of cards (after Google Arts & Culture's "SimpleStack"), on a band of colour as its sections are %>
     <%= render NexusCcs::StackComponent.new(tiles: kind_tiles.first(NexusCcs::ExploreComponent::KINDS_SHOWN), label: t("home.kinds.heading")) %>
@@ -43,7 +43,7 @@
 
 <% if place_tiles.any? %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "explore-places", heading: t("explore.place_time.places"), intro: t("home.places.intro"),
-                                                link: t("explore.place_time.see_all_places"), link_path: helpers.browse_hub_path("places"), extra_class: "home-places") do %>
+                                                link: t("explore.place_time.see_all_places"), link_path: helpers.explore_places_path, extra_class: "home-places") do %>
     <%# The places as Google's plain stack: five, each with its picture, name and a line on what its page holds %>
     <%= render NexusCcs::StackComponent.new(tiles: place_tiles, label: t("explore.place_time.places")) %>
   <% end %>
@@ -51,7 +51,7 @@
 
 <% if overview.period_tiles.any? %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "explore-periods", heading: t("explore.place_time.periods"), intro: t("home.periods.intro"),
-                                                link: t("explore.place_time.see_all_periods"), link_path: helpers.browse_hub_path("periods"), extra_class: "explore-periods") do %>
+                                                link: t("explore.place_time.see_all_periods"), link_path: helpers.explore_time_path, extra_class: "explore-periods") do %>
     <%= render NexusCcs::FeatureCarouselComponent.new(tiles: period_tiles, label: t("home.periods.carousel"), kind: t("home.periods.kind"), cta: t("home.periods.cta"),
                                                       previous: t("home.periods.previous"), following: t("home.periods.next")) %>
   <% end %>

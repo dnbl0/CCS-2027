@@ -102,6 +102,7 @@
               <ul class="place-explorer__more-list" data-place-explorer-target="moreList"></ul>
             </div>
 
+            <p class="place-explorer__az"><%= link_to t("explore_pages.places.all_places"), explore_places_path(view: "az"), class: "arrow-link arrow-link--icon" %></p>
             <details class="place-explorer__all">
               <summary><%= t("explore_pages.places.explorer.all", count: number_with_delimiter(@places.markers.size)) %></summary>
               <% @places.regions.each do |region| %>
@@ -143,7 +144,6 @@
       <section class="explore__section" aria-labelledby="places-heading">
         <h2 class="browse__heading" id="places-heading"><%= t("explore_pages.places.top_places") %></h2>
         <%= render "explore/entries", entries: @places.top_places %>
-        <p><%= link_to t("explore_pages.places.all_places"), browse_hub_path("places") %></p>
       </section>
     <% end %>
   </div>

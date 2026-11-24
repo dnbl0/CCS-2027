@@ -11,7 +11,7 @@ class SavedSearchesController < ApplicationController
 
   def create
     search = searches_in_history.find_by(id: params[:search_id])
-    return redirect_to(blacklight.search_history_path, alert: t("nexus_ccs.saved_searches.not_found")) unless search
+    return redirect_to(search_history_page_path, alert: t("nexus_ccs.saved_searches.not_found")) unless search
 
     params_hash = search.query_params.to_h
     user = guest_owner
@@ -21,7 +21,7 @@ class SavedSearchesController < ApplicationController
       redirect_to saved_searches_path, notice: t("nexus_ccs.saved_searches.saved")
     else
       reason = saved.errors.where(:base, :too_many_saved_searches).any? ? t("nexus_ccs.saved_searches.too_many", count: SavedSearch::MAX_PER_USER) : t("nexus_ccs.saved_searches.failure")
-      redirect_to blacklight.search_history_path, alert: reason
+      redirect_to search_history_page_path, alert: reason
     end
   end
 

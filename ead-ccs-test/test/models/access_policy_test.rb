@@ -146,7 +146,7 @@ class AccessPolicyTest < ActiveSupport::TestCase
   end
 
   test "request_path is the access request form for the record" do
-    assert_equal "/access_requests/new?document_id=emu-1%2F2", AccessPolicy.request_path(SolrDocument.new("id" => "emu-1/2"))
+    assert_equal "/access-requests/new?document_id=emu-1%2F2", AccessPolicy.request_path(SolrDocument.new("id" => "emu-1/2"))
   end
 
   test "Community Restricted access withholds the asset whatever the licence and the case" do

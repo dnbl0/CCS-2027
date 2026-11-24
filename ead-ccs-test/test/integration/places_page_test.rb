@@ -16,7 +16,7 @@ class PlacesPageTest < ActionDispatch::IntegrationTest
     Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/places/wall/v2"), wall, expires_in: 1.day)
     seed_places([ [ "Australia", 8058 ], [ "Japan", 193 ] ])
 
-    get "/browse/places"
+    get "/browse/places", params: { view: "all" } # the plain address is the places page with the map (ExplorePagesTest)
 
     assert_response :success
     assert_select "h1", "Places"

@@ -46,7 +46,7 @@ class ListsSystemTest < ApplicationSystemTestCase
 
     click_link "Saved records" if false # the header bar is a link to /bookmarks; the lists page is reached from there
     visit lists_path
-    assert_selector "h1", text: "Your lists"
+    assert_selector "h1", text: "Saved lists"
     assert_selector "table.lists tbody tr", count: 1
     assert_accessible
     click_link "Skulls"

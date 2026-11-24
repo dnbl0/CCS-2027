@@ -33,7 +33,7 @@ en:
     # Bookmarks are "saved records" on this site (Blacklight ships "Bookmarks")
     bookmarks:
       title: "Saved records"
-      page_title: "Saved records - %{application_name}"
+      page_title: "Saved records — %{application_name} — University of Melbourne"
       list_title: "Your saved records"
       no_bookmarks: "You have not saved any records yet."
       clear:
@@ -213,7 +213,7 @@ en:
       failure: "Sorry, there was a problem saving the search."
       too_many: "You can keep at most %{count} saved searches. Remove one to save another."
     lists:
-      title: "Your lists"
+      title: "Saved lists"
       description: "Lists you have made on this device. Add records to a list from a search result or a record page."
       count:
         one: "%{count} list"
@@ -231,11 +231,11 @@ en:
       create: "Create list"
       save_name: "Save name"
       cancel: "Cancel"
-      back_to_lists: "Back to your lists"
+      back_to_lists: "Back to saved lists"
       saved_records: "Saved records"
-      your_lists: "Your lists"
+      your_lists: "Saved lists"
       error_summary: "There is a problem"
-      caption: "Your lists"
+      caption: "Saved lists"
       column_name: "List"
       column_records: "Records"
       column_actions: "Actions"
@@ -262,7 +262,7 @@ en:
         delete_named: "Delete list: %{name}"
       menu:
         button: "Add to list"
-        heading: "Your lists"
+        heading: "Saved lists"
         add: "Add to %{name}"
         remove: "Remove from %{name}"
         new_label: "New list name"

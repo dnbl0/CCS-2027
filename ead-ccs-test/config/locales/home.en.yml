@@ -29,8 +29,8 @@ en:
       heading: "Guess the work from the pieces"
       answer: "Find out what it is"
     kinds:
-      heading: "Object types"
-      intro: "From prints and paintings to scientific instruments: browse by what a record is."
+      heading: "Classifications"
+      intro: "From prints and paintings to scientific instruments: the kinds of record the collections group them by."
     places:
       intro: "Where the records were made, from Melbourne to the other side of the world."
       explore: "Explore every record from %{place}"

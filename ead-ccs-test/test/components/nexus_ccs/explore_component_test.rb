@@ -25,11 +25,11 @@ class ExploreComponentTest < ViewComponent::TestCase
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
     headings = page.all("section.home-section h2").map(&:text)
-    assert_equal [ "Explore the collections", "Object types", "Places", "Time" ], headings
-    assert_selector "section.explore .home-section__head a.home-section__link[href='/browse/categories/collections']", text: "See all collections"
-    assert_selector "section.explore-kinds a.home-section__link[href='/browse/object-types']", text: "See all object types"
+    assert_equal [ "Explore the collections", "Classifications", "Places", "Time" ], headings
+    assert_selector "section.explore .home-section__head a.home-section__link[href='/browse/collections']", text: "See all collections"
+    assert_selector "section.explore-kinds a.home-section__link[href='/browse/classifications']", text: "See all classifications"
     assert_selector "section.home-places a.home-section__link[href='/browse/places']", text: "See all places"
-    assert_selector "section.explore-periods a.home-section__link[href='/browse/periods']", text: "See all periods"
+    assert_selector "section.explore-periods a.home-section__link[href='/browse/time']", text: "See all periods"
     assert_no_selector "section.home-visit"
   end
 
@@ -49,10 +49,10 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_no_selector ".explore-card__cta" # no call to action on any card
   end
 
-  test "Object types (on a band of colour) and Places as fanned stacks of cards; Time as a carousel of slides" do
+  test "Classifications (on a band of colour) and Places as fanned stacks of cards; Time as a carousel of slides" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
-    assert_selector "section.explore-kinds.home-section--tinted[style*='--section-background-color'] h2", text: "Object types"
+    assert_selector "section.explore-kinds.home-section--tinted[style*='--section-background-color'] h2", text: "Classifications"
     assert_selector "section.explore-kinds ul.stack[data-controller=stack] li.stack__item article.stack__card", count: 2
     assert_selector "section.explore-kinds li.stack__item.is-centre[data-away='0']", text: "Paintings" # the middle card starts at the centre
     assert_selector "section.explore-kinds li.stack__item[data-away='1']", text: "Prints and drawings"

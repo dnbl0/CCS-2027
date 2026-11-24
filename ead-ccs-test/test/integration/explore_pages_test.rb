@@ -27,7 +27,7 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
   end
 
   test "the timeline: a strip of the centuries, each the same width and named, the periods as tiles opening their own pages, the eras folded" do
-    visit("/explore/time") { seed("timeline/all", timeline) }
+    visit("/browse/time") { seed("timeline/all", timeline) }
 
     assert_response :success
     assert_select "h1", "Explore by time"
@@ -36,7 +36,7 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
       assert_equal [ "Earlier (Before 3000 BCE): 2 records", "1900s (1900–1999): 1,200 records" ], items.map { |item| item["aria-label"] }
       assert_equal %w[Earlier 1900s], items.map { |item| item.text.squish }, "the name shown is the start of the name read out"
       # a century swaps in place (the link names the frame); the earliest period, not a century, opens its records
-      assert_select "a.explore-strip__period[href='/explore/time?century=1900'][data-turbo-frame=time-explorer]"
+      assert_select "a.explore-strip__period[href='/browse/time?century=1900'][data-turbo-frame=time-explorer]"
       assert_select "a.explore-strip__period[href*='range%5Bdate_start_isi%5D%5Bend%5D=-3001']:not([data-turbo-frame])"
       assert_select "a[aria-current]", 0, "no century chosen yet"
       assert_select ".explore-strip__bar[aria-hidden=true]", 2
@@ -53,7 +53,7 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
 
   test "a chosen century: marked in the strip, its records as a wall of squares, its decades, and the way back; a century not in the strip is no choice" do
     wall = [ PictureWall::Record.new(id: "emu-1", title: "A print", src: "https://example.org/1.jpg", tint: "#97b2be") ]
-    visit("/explore/time?century=1900") do
+    visit("/browse/time?century=1900") do
       seed("timeline/all", timeline)
       seed("timeline/1900", timeline(century: 1900))
       Rails.cache.write(SuppressedRecord.cache_key("picture_wall/v2/time/1900"), wall.map { |record| record.to_h.transform_keys(&:to_s) }, expires_in: 1.hour)
@@ -69,12 +69,12 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     end
     assert_select "h2", "Decades of 1900–1999"
     assert_select ".time-explorer__periods a[href='/browse/periods/1920-1929']", text: /\A1920–1929/
-    assert_select "a[href='/explore/time'][data-turbo-frame=time-explorer]", text: "All centuries"
+    assert_select "a[href='/browse/time'][data-turbo-frame=time-explorer]", text: "All centuries"
     assert_select "details.time-explorer__eras", 0
 
-    visit("/explore/time?century=1950") { seed("timeline/all", timeline) }
+    visit("/browse/time?century=1950") { seed("timeline/all", timeline) }
     assert_select "h2", "Centuries"
-    visit("/explore/time?century=1200") { seed("timeline/all", timeline) }
+    visit("/browse/time?century=1200") { seed("timeline/all", timeline) }
     assert_select "section.picture-wall", 0
     assert_select "h2", "Centuries"
   end
@@ -86,7 +86,7 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     english = P::Node.new(path: "English", count: 3, children: []) # not a region: a stray value of the hierarchy, offered as no chip
     result = P::Result.new(markers: [ melbourne, paris ], regions: [ P::Node.new(path: "Oceania", count: 12, children: [ country ]), english ], plain_regions: [], top_places: [])
     cards = [ { "label" => "Melbourne", "count" => 8, "total" => 9, "image" => { "id" => "r1", "title" => "A tram", "path" => "https://unimelbourne.widen.net/content/a/jpeg/a.jpeg?w=1000&u=x", "width" => 800, "height" => 600 } } ]
-    visit("/explore/places") do
+    visit("/browse/places") do
       seed("places", result)
       Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/places/map/v1"), cards, expires_in: 1.day)
     end
@@ -130,7 +130,7 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
   test "before any place is located: no map, the regions and the commonest places" do
     result = P::Result.new(markers: [], regions: [], plain_regions: [ P::Entry.new("region_ssim", "Oceania", 5) ],
                            top_places: [ P::Entry.new("production_place_ssim", "Melbourne", 3) ])
-    visit("/explore/places") { seed("places", result) }
+    visit("/browse/places") { seed("places", result) }
 
     assert_select "button", text: "Show the map", count: 0
     assert_select "link[href*='leaflet']", 0
@@ -141,9 +141,9 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
   test "Solr down and nothing kept: a plain 503 with a way to the search" do
     with_seeded_menu_cache do
       with_solr_down do
-        get "/explore/time"
+        get "/browse/time"
         assert_response :service_unavailable
-        get "/explore/places"
+        get "/browse/places"
         assert_response :service_unavailable
       end
     end

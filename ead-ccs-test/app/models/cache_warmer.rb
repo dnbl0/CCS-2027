@@ -9,7 +9,7 @@ require "rack/mock_request"
 # Started from config/puma.rb; CACHE_WARM=off turns it off. Each page goes through the whole app, as a local request, so the
 # pages decide what to cache and the warmer never needs to know.
 module CacheWarmer
-  PATHS = %w[/ /browse /browse/categories /explore/time /explore/places /explore/colours /themes /stories].freeze
+  PATHS = %w[/ /browse /browse/time /browse/places /browse/colours /themes /stories].freeze
   FIRST_RUN_SECONDS = 5
   USER_AGENT = "CCS cache warmer"
 

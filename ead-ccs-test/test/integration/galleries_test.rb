@@ -128,10 +128,10 @@ class GalleriesTest < ActionDispatch::IntegrationTest
   test "Delete my data revokes the link, and its page counts the shared lists" do
     list = shared_list
     token = list.share_token
-    get "/my_data"
+    get "/my-data"
     assert_select "section ul", text: /1 list shared by a link/
 
-    delete "/my_data"
+    delete "/my-data"
     get "/galleries/#{token}"
     assert_response :not_found
   end

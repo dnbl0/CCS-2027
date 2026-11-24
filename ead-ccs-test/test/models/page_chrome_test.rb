@@ -2,7 +2,9 @@ require "test_helper"
 
 class PageChromeTest < ActiveSupport::TestCase
   # Stands in for the header: the record's title and the way back to the results, asked for on a record page only
-  Record = Struct.new(:record_title, :results_url)
+  Record = Struct.new(:record_title, :results_url) do
+    def record_parent = [ "Search results", results_url ] # HeaderComponent#record_parent: the results, unless the visitor came from Browse
+  end
   RECORD = Record.new("Bust of Percy Grainger", "/catalog?q=grainger")
 
   def chrome(controller, action, searching: false, page: RECORD)
@@ -96,7 +98,7 @@ class PageChromeTest < ActiveSupport::TestCase
   end
 
   test "the search history and saved searches pages: a trail with their own name and no banner, as the page brings one" do
-    { "search_history" => "Search history", "saved_searches" => "Saved searches", "lists" => "Your lists", "my_data" => "Delete my data" }.each do |controller, name|
+    { "search_history" => "Search history", "saved_searches" => "Saved searches", "lists" => "Saved lists", "my_data" => "Delete my data" }.each do |controller, name|
       page = chrome(controller, "index")
 
       assert_equal [ [ name, nil ] ], page.breadcrumbs

@@ -6,8 +6,8 @@ class PersonalPagesRobotsTest < ActionDispatch::IntegrationTest
   include EnvOverride
 
   GET_PATHS = %w[
-    /bookmarks /bookmarks/citations /saved_searches /search_history /lists /lists/1 /lists/1/citations /access_requests/new
-    /access_requests/1 /my_data /catalog/emu-9044/metadata /catalog/emu-9044/citation /catalog/facet/collection_ssim /catalog/range_limit
+    /bookmarks /bookmarks/citations /saved-searches /search-history /lists /lists/1 /lists/1/citations /access-requests/new
+    /access_requests/1 /my-data /catalog/emu-9044/metadata /catalog/emu-9044/citation /catalog/facet/collection_ssim /catalog/range_limit
     /downloads /404 /selection /selection/citations /compare
   ].freeze
 
@@ -27,7 +27,7 @@ class PersonalPagesRobotsTest < ActionDispatch::IntegrationTest
 
   test "the page that is a real personal page also says so in its head" do
     with_env("SEO_INDEXING" => "on") do
-      get "/search_history"
+      get "/search-history"
       assert_equal "noindex, nofollow, noai, noimageai", css_select("meta[name=robots]").first["content"]
       assert_empty css_select("link[rel=canonical]")
     end

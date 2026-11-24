@@ -6,7 +6,7 @@ require "application_system_test_case"
 # (docs/categories-themes-stories.md): axe (WCAG 2.2 AA) and no sideways scroll on a desktop and at 390px wide. The category lists are given
 # to the pages through the cache; the theme and story pages read the test index (they say so plainly when it is down).
 class DiscoveryPagesSystemTest < ApplicationSystemTestCase
-  PAGES = %w[/browse/categories /browse/categories/regions /themes /themes/twentieth-century-prints /stories /stories/example-story /lists /].freeze
+  PAGES = %w[/browse/categories /browse/classifications /themes /themes/twentieth-century-prints /stories /stories/example-story /lists /].freeze
 
   setup do
     page.driver.set_cookie("country_acknowledged", "1")
@@ -35,7 +35,7 @@ class DiscoveryPagesSystemTest < ApplicationSystemTestCase
 
   test "a category card's count stays visible on a phone" do
     page.current_window.resize_to(320, 700)
-    visit "/browse/categories/regions"
+    visit "/browse/classifications"
 
     # the count, its own line under the name (the mosaic's cards) or on the picture (the four that lead, as a cluster)
     assert_selector "article.explore-card .explore-card__intro, .cluster__card .cluster__text", text: /\A\d{3} records\z/, count: 12

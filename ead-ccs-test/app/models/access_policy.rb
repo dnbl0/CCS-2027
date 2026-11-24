@@ -187,5 +187,5 @@ module AccessPolicy
   def self.download?(document) = tier(document) == :open
 
   # Where a visitor asks for access to a record (the access request form, app/controllers/access_requests_controller.rb)
-  def self.request_path(document) = "/access_requests/new?document_id=#{ERB::Util.url_encode(document.id)}"
+  def self.request_path(document) = "/access-requests/new?document_id=#{ERB::Util.url_encode(document.id)}"
 end

@@ -3,7 +3,7 @@ require "test_helper"
 # What every page of the site shares (the design consistency pass): the saved-records link is in the page once, a page's
 # <title> starts with its h1 (in sentence case), and the Advanced search page has the same hero as the others.
 class PageConsistencyTest < ActionDispatch::IntegrationTest
-  PAGES = %w[/ /browse /browse/makers /discover /help /about /accessibility /privacy /selection /bookmarks /my_data /lists/new /catalog/advanced].freeze
+  PAGES = %w[/ /browse /browse/makers /discover /help /about /accessibility /privacy /selection /bookmarks /my-data /lists/new /catalog/advanced].freeze
   # Pages with an h1 of their own that is the start of the <title> (the home page and /discover have a longer h1 or title)
   TITLED = { "/help" => "Help and support", "/about" => "About Collections Navigator", "/browse" => "Browse the collections", "/catalog/advanced" => "Advanced search",
              "/selection" => "Selected records" }.freeze

@@ -9,7 +9,8 @@ en:
       # Sentence case (Blacklight ships "Search Results"): the page title and the visually hidden results heading
       search_results: Search results
       page_title:
-        title: "%{constraints} - %{application_name} search results"
+        # every page's title: "Page — Collections Navigator — University of Melbourne" (docs/ia-audit-handover.md)
+        title: "Search results for %{constraints} — %{application_name} — University of Melbourne"
       # The names of the result views: button names, tooltips and the screen reader captions
       view:
         list: List view
@@ -24,6 +25,7 @@ en:
       # Record and result field labels carry no trailing colon (the static CCS design)
       show:
         label: "%{label}"
+        title: "%{document_title} — %{application_name} — University of Melbourne"
       index:
         label: "%{label}"
       facets:

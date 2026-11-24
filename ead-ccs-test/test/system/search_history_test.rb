@@ -12,7 +12,7 @@ class SearchHistoryTest < ApplicationSystemTestCase
       visit search_catalog_path(q: term)
       assert_selector ".search-banner"
     end
-    visit "/search_history"
+    visit "/search-history"
     assert_selector "table.search-history tbody tr", count: 3
   end
 

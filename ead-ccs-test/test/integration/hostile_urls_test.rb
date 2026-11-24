@@ -23,13 +23,13 @@ class HostileUrlsTest < ActionDispatch::IntegrationTest
     "/catalog?q=skull&format=nope", "/catalog.json?q=skull&page=0", "/catalog.json?q=skull&per_page=abc",
     "/catalog/%00", "/catalog/#{"a" * 3000}", "/catalog/a%2Fb", "/catalog/emu-9044.nope", "/stock/does-not-exist", "/branded-stock/%00",
     "/catalog/facet/nope", "/catalog/facet/collection_ssim?facet.page=-1", "/catalog/facet/collection_ssim?facet.page=abc", "/catalog/facet/collection_ssim?facet.sort=bad",
-    "/bookmarks?page=0", "/bookmarks?per_page=abc", "/bookmarks/nope", "/search_history?page=abc",
+    "/bookmarks?page=0", "/bookmarks?per_page=abc", "/bookmarks/nope", "/search-history?page=abc",
     # Malformed and oversized parameters (CCS-147)
     "/catalog?#{"a[b]" * 200}=1", "/catalog?#{(1..5000).map { |n| "p#{n}=1" }.join("&")}", "/catalog?q=skull&q[a]=b&q=c", "/catalog?%00=1",
     "/catalog?q=%FF%FE", "/catalog?f[collection_ssim][]=%E0%A4%A", "/catalog?q=skull&page=1e5", "/catalog?q=skull&page=%00",
     "/catalog?q=skull&per_page=%FF", "/catalog?range[date_start_isi][begin][]=1", "/catalog?clause[0]=x", "/catalog?sort[]=a",
-    "/catalog/facet/collection_ssim?facet.prefix[]=a", "/bookmarks?page[]=1", "/search_history?page[a]=1", "/lists/%00", "/lists/abc/items",
-    "/access_requests/new?document_id[]=a", "/access_requests/new?document_id=#{"a" * 5000}", "/saved_searches?page=%FF",
+    "/catalog/facet/collection_ssim?facet.prefix[]=a", "/bookmarks?page[]=1", "/search-history?page[a]=1", "/lists/%00", "/lists/abc/items",
+    "/access-requests/new?document_id[]=a", "/access-requests/new?document_id=#{"a" * 5000}", "/saved-searches?page=%FF",
     "/help?topic=nope", "/help/nope", "/collections/NOPE", "/collections/%00", "/nope", "/%00", "/a/b/c/d", "/catalog/suggest?q=%00"
   ].freeze
 
@@ -56,7 +56,7 @@ class HostileUrlsTest < ActionDispatch::IntegrationTest
     post "/access_requests", params: { document_id: "emu-1", access_request: "a string, not fields" }
     assert_includes [ 400, 404, 503 ], response.status # 503 where there is no Solr to look the record up
 
-    post "/saved_searches", params: { search_id: [ 1, 2 ], name: { a: 1 } }
+    post "/saved-searches", params: { search_id: [ 1, 2 ], name: { a: 1 } }
     assert_includes [ 200, 302, 303, 400, 404, 422, 503 ], response.status
 
     post "/downloads/review", params: { ids: "not-an-array" }

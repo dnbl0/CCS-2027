@@ -33,7 +33,7 @@ class AccessRequestSystemTest < ApplicationSystemTestCase
   end
 
   test "sending the form empty puts focus on the error summary, and its links go to the fields" do
-    visit "/access_requests/new?document_id=#{DOC}"
+    visit "/access-requests/new?document_id=#{DOC}"
     click_button "Send request"
 
     assert_selector "h2", text: "There is a problem"
@@ -49,7 +49,7 @@ class AccessRequestSystemTest < ApplicationSystemTestCase
   end
 
   test "a keyboard visitor fills the form and reaches the confirmation, which has no axe violations" do
-    visit "/access_requests/new?document_id=#{DOC}"
+    visit "/access-requests/new?document_id=#{DOC}"
     fill_in "Your name", with: "Test Person"
     fill_in "Email address", with: "test.person@example.invalid"
     fill_in "How you plan to use this record", with: "Fake research purpose"
@@ -63,7 +63,7 @@ class AccessRequestSystemTest < ApplicationSystemTestCase
   end
 
   test "the trap field is out of the tab order and out of sight" do
-    visit "/access_requests/new?document_id=#{DOC}"
+    visit "/access-requests/new?document_id=#{DOC}"
 
     trap = find("#access_request_website", visible: :all)
     assert_equal "-1", trap["tabindex"]

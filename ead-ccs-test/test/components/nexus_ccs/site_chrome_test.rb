@@ -25,7 +25,7 @@ class SiteChromeTest < ActiveSupport::TestCase
     assert_selector "header.site-header"
     assert_selector ".site-header__utility nav a", count: NexusCcs::SiteNavigation::AUDIENCE.size
     assert_selector "button.site-header__search-toggle[aria-label='Open search']"
-    assert_selector "#site-nav-records li a[href^='/catalog?any_assets=1&f%5Bcollection_ssim%5D']", count: NexusCcs::SiteNavigation.collections.size
+    assert_selector "#site-nav-records li a[href^='/browse/collections/']", count: NexusCcs::SiteNavigation.collections.size
     assert_selector "#search-overlay form[role=search]"
     assert_selector "#site-nav form[role=search]"
   end
@@ -43,7 +43,7 @@ class SiteChromeTest < ActiveSupport::TestCase
     render_header
 
     assert_selector "header[data-controller='site-header']"
-    assert_selector "button.site-nav__trigger[aria-expanded='false'][data-action='site-header#toggleSection']", count: 4 # Search collections, Browse, Help and My saved items
+    assert_selector "button.site-nav__trigger[aria-expanded='false'][data-action='site-header#toggleSection']", count: 4 # Search collections, Browse, Help and Saved
     assert_selector "button.site-header__menu[aria-controls='site-nav'][aria-expanded='false']"
     assert_selector "#site-nav-records button.site-nav__back"
   end
@@ -51,7 +51,7 @@ class SiteChromeTest < ActiveSupport::TestCase
   test "search results show the breadcrumb and a banner with the search form" do
     render_header
 
-    assert_selector "nav.breadcrumb-bar[aria-label=Breadcrumb] li span[aria-current=page]", text: "Search results"
+    assert_selector "nav.page-breadcrumbs[aria-label=Breadcrumb] li span[aria-current=page]", text: "Search results"
     assert_selector "section.search-banner .search-banner__title", text: "Search the collections"
     assert_selector "section.search-banner form.search-banner__form"
     assert_no_selector "h1" # the banner title is not a heading: pages render their own h1
@@ -70,34 +70,34 @@ class SiteChromeTest < ActiveSupport::TestCase
     assert_selector "#site-nav-records .site-nav__browse-more a[href='/catalog/advanced']", text: "Advanced search"
   end
 
-  test "My saved items lists the visitor's own pages: saved records, lists, saved searches and the search history" do
+  test "Saved lists the visitor's own pages: saved records, lists, saved searches and the search history" do
     render_header(url: "/catalog")
-    assert_selector "button.site-nav__trigger[aria-controls='site-nav-saved']", text: "My saved items"
+    assert_selector "button.site-nav__trigger[aria-controls='site-nav-saved']", text: "Saved"
     assert_selector "#site-nav-saved a[href='/bookmarks']", text: "Saved records"
-    assert_selector "#site-nav-saved a[href='/lists']", text: "Your lists"
-    assert_selector "#site-nav-saved a[href='/saved_searches']", text: "Saved searches"
-    assert_selector "#site-nav-saved a[href='/search_history']", text: "Search history"
+    assert_selector "#site-nav-saved a[href='/lists']", text: "Saved lists"
+    assert_selector "#site-nav-saved a[href='/saved-searches']", text: "Saved searches"
+    assert_selector "#site-nav-saved a[href='/search-history']", text: "Search history"
   end
 
   test "the bare search page has no breadcrumb" do
     render_header(url: "/catalog")
-    assert_no_selector "nav.breadcrumb-bar"
+    assert_no_selector "nav.page-breadcrumbs"
   end
 
   test "breadcrumb links every item but the last" do
-    render_inline(NexusCcs::BreadcrumbComponent.new(items: [ [ "Search results", "/catalog" ], [ "A skull", nil ] ]))
+    render_inline(NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Search results", "/catalog" ], [ "A skull", nil ] ]))
 
     assert_selector "a[href='/catalog']", text: "Search results"
     assert_selector "li > span[aria-current=page]", text: "A skull"
     assert_no_selector "li[aria-current]"
     assert_no_selector "a[aria-current]"
-    assert_no_selector ".breadcrumb-bar a[title]"
+    assert_no_selector ".page-breadcrumbs a[title]"
   end
 
   test "the saved-records bar is the last child of the breadcrumb strip, and nowhere else on a page with a breadcrumb" do
     render_header(url: "/catalog/abc", action: "show")
 
-    assert_selector ".breadcrumb-strip > nav.breadcrumb-bar + a.site-nav__saved[href='/bookmarks']", count: 1
+    assert_selector ".breadcrumb-strip > nav.page-breadcrumbs + a.site-nav__saved[href='/bookmarks']", count: 1
     assert_selector "a.site-nav__saved", count: 1
     assert_no_selector ".site-header .site-nav__saved"
     assert_no_selector ".site-nav__drawer-saved"
@@ -132,16 +132,19 @@ class SiteChromeTest < ActiveSupport::TestCase
     assert_no_selector "a.site-nav__saved--drawer"
   end
 
-  test "breadcrumb renders nothing without items" do
-    render_inline(NexusCcs::BreadcrumbComponent.new(items: []))
-    assert_no_selector "nav"
+  test "a page with no trail has no breadcrumb" do
+    render_header(url: "/catalog") # the search page before a search: no trail
+    assert_no_selector "nav.page-breadcrumbs"
   end
 
   test "footer has the acknowledgement, links, social icons and identifiers" do
     render_inline(NexusCcs::SiteFooterComponent.new)
 
     assert_selector "footer.site-footer h2", text: "Acknowledgement of Country"
-    assert_selector ".site-footer__links a", count: NexusCcs::SiteNavigation::FOOTER_ABOUT.size + NexusCcs::SiteNavigation::FOOTER_SITE.size + 1 # this site's statements and the Browse link
+    # two labelled columns: this site's pages, then the University's
+    assert_selector ".site-footer__label", text: "This site"
+    assert_selector ".site-footer__label", text: "The University"
+    assert_selector ".site-footer__links a", count: NexusCcs::SiteNavigation::FOOTER_ABOUT.size + NexusCcs::SiteNavigation::FOOTER_SITE.size
     assert_selector ".site-footer__links a", text: "Browse the collections"
     assert_selector ".site-footer__social a[aria-label]", count: NexusCcs::SiteNavigation::FOOTER_SOCIAL.size
     assert_selector ".site-footer__identifiers", text: "CRICOS: 00116K"

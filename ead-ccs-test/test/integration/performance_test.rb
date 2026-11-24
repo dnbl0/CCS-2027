@@ -99,7 +99,7 @@ class PerformanceTest < ActionDispatch::IntegrationTest
   test "no page that sets a cookie, and no personal page, is publicly cacheable" do
     post "/lists", params: { list: { name: "Violins" } }
     list = List.order(:id).last
-    paths = [ "/", "/help", "/about", "/lists", "/lists/new", "/lists/#{list.id}", "/saved_searches", "/search_history", "/access_requests/new" ]
+    paths = [ "/", "/help", "/about", "/lists", "/lists/new", "/lists/#{list.id}", "/saved-searches", "/search-history", "/access-requests/new" ]
 
     paths.each do |path|
       get path
@@ -121,8 +121,9 @@ class PerformanceTest < ActionDispatch::IntegrationTest
   # All University collections (25 links with their addresses) add about 5 kB to the home page, so the home budget rose from 64 to 70 kB
   # The showcase's Record types, Places and Time rows of tiles add about 2 kB, so it rose from 70 to 74 kB (compressed stays 14 kB)
   # The University's listing of its 24 collections and the Art Collection's 12 (their pictures' full addresses) adds about 2 kB: 78 kB;
-  # Time as a carousel and On this day as a cluster (their slide names and buttons), 24 Nov 2026: 80 kB
-  { "/" => 80_000, "/help" => 56_000, "/about" => 50_000 }.each do |path, budget|
+  # Time as a carousel and On this day as a cluster (their slide names and buttons), 24 Nov 2026: 80 kB; the IA fixes' menus and the
+  # footer's two labelled columns (every page), 24 Nov 2026: 82 kB
+  { "/" => 82_000, "/help" => 56_000, "/about" => 50_000 }.each do |path, budget|
     test "#{path} stays within its HTML size budget (#{budget / 1000} kB, #{14} kB compressed)" do
       get path, headers: { "Accept-Encoding" => "identity" }
       assert_operator response.body.bytesize, :<=, budget
@@ -195,10 +196,10 @@ class PerformanceTest < ActionDispatch::IntegrationTest
     post "/lists", params: { list: { name: "To make a session" } } # the guest's cookie
     guest = User.find(List.order(:id).last.user_id)
     guest.saved_searches.create!(name: "one", query_params: { "q" => "skull" })
-    one = count_requests { get "/saved_searches" }
+    one = count_requests { get "/saved-searches" }
 
     8.times { |n| guest.saved_searches.create!(name: "more #{n}", query_params: { "q" => "violin #{n}" }) }
-    many = count_requests { get "/saved_searches" }
+    many = count_requests { get "/saved-searches" }
 
     assert_response :success
     assert_operator many.sql, :<=, 3, "saved searches page SQL (budget 3):\n#{many.statements.join("\n")}"

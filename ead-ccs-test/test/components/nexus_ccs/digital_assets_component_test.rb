@@ -80,7 +80,7 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     render_for(assets(3).merge("licence_type_ssim" => [ "Copyright - Current" ], "digital_media_ssim" => [ "video|video/x-ms-wmv|/v.wmv|Film" ]))
 
     assert_no_selector "video, a[href='/v.wmv']"
-    assert_selector ".digital-assets__unplayable a[href^='/access_requests/new']", text: "Ask the collection team for a copy of Film"
+    assert_selector ".digital-assets__unplayable a[href^='/access-requests/new']", text: "Ask the collection team for a copy of Film"
   end
 
   test "the unplayable link takes the media band's light text, as specific as the site's ID-scoped link rule" do
@@ -149,7 +149,7 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
     assert_no_selector ".digital-assets__others"
     assert_not_includes rendered_content, "/content/unlicensed/"
     assert_selector ".access-notice--partly-withheld", text: "1 other digital asset of this record is not shown"
-    assert_selector ".access-notice--partly-withheld a[href='/access_requests/new?document_id=emu-1']", text: "Request access to it"
+    assert_selector ".access-notice--partly-withheld a[href='/access-requests/new?document_id=emu-1']", text: "Request access to it"
     assert_selector "a.digital-assets__primary[download][href^='#{dam_url('licensed')}']"
     assert_selector ".digital-assets__licence", text: "CC BY" # the shown asset's licence, not the withheld one's "None"
   end

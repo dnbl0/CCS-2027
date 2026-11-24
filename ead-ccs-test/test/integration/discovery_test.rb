@@ -289,7 +289,7 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
     get "/privacy"
     assert_select "#view-counts", text: /does not store who looked/
 
-    get "/my_data"
+    get "/my-data"
     assert_select "main", text: /no cookie, visitor number or address/
   end
 

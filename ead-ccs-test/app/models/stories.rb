@@ -23,6 +23,8 @@ module Stories
 
   Story = Data.define(:slug, :title, :summary, :hero, :author, :date, :body) do
     def path = Rails.application.routes.url_helpers.story_path(slug)
+    # wording the collections team has not written yet: kept out of the sitemap until it is
+    def placeholder? = title.include?("(placeholder)")
     def parts = Stories.parts(body)
   end
 

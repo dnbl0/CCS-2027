@@ -7,7 +7,7 @@ class SavedSearchesSystemTest < ApplicationSystemTestCase
   def save_a_search(term)
     visit search_catalog_path(q: term)
     assert_selector ".search-banner"
-    visit "/search_history"
+    visit "/search-history"
     first("tbody tr").find("button[data-action-tooltip-text='Save']").click
     assert_selector "table.saved-searches"
   end

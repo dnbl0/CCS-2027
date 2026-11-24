@@ -30,7 +30,7 @@ class SeoFilesTest < ActionDispatch::IntegrationTest
     assert_no_match(/Googlebot|Bingbot/i, response.body)
     star = groups(response.body).find { |group| group.first == "User-agent: *" }
     assert_not_includes star, "Disallow: /"
-    %w[/bookmarks /saved_searches /search_history /lists /access_requests /downloads /catalog/facet/ /stock/ /digital-assets/ /catalog/*/metadata].each do |path|
+    %w[/bookmarks /saved-searches /search-history /lists /access_requests /downloads /catalog/facet/ /stock/ /digital-assets/ /catalog/*/metadata].each do |path|
       assert_includes star, "Disallow: #{path}", path
     end
     assert_includes response.body, "Sitemap: http://www.example.com/sitemap.xml"

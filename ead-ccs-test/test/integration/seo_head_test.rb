@@ -54,7 +54,7 @@ class SeoHeadTest < ActionDispatch::IntegrationTest
     assert_equal "http://www.example.com/", canonical
     assert_match(/cultural collections/, meta("description"))
     assert_equal "website", meta("og:type")
-    assert_equal "Collections Navigator - University of Melbourne", meta("og:title")
+    assert_equal "Collections Navigator — University of Melbourne", meta("og:title")
     assert_equal SHARE_CARD, meta("og:image"), "a page with no record image shares the site's card"
     assert_equal SHARE_CARD_ALT, meta("og:image:alt")
     assert_equal "summary_large_image", meta("twitter:card")

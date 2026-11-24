@@ -198,7 +198,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     end
 
     assert_includes paths, "/browse"
-    assert_includes paths, "/browse/periods"
+    assert_not_includes paths, "/browse/periods" # it redirects to the time page, listed with the Explore pages (DiscoverySitemap)
     assert_includes paths, entity_path("makers", "Bunny, Rupert")
     assert_includes paths, "/browse/periods/1900-1909"
     assert_includes paths, "/browse/periods/1900-1999" # the century of a listed decade

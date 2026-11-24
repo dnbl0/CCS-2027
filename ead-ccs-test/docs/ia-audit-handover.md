@@ -116,3 +116,31 @@ Rerun the audit's crawl (save as a scratchpad script): fetch the site's own page
 fixes every public page has at least 3 inbound links, no page has 0, every redirect lands on a page whose heading matches, every
 page's breadcrumb matches its address and menu, and the title test passes. Update `docs/card-layouts.md` and this file (mark each item
 done with its commit).
+
+## Status (25 Nov 2026): all 20 items done on design/home-bento
+
+Dean asked for all of them ("proceed with the ia audit fixes based on all of the issues"). Decisions taken for him, all reversible:
+
+| # | Done |
+|---|---|
+| 1 | `/collections` → `/browse/collections` (301) |
+| 2 | Sitemap: `/browse/time`, `/browse/places`, `/browse/colours` added; placeholder themes and stories (title contains "(placeholder)") left out; `/browse/categories` and `/browse/periods` out |
+| 3 | One title pattern everywhere ("Page — Collections Navigator — University of Melbourne"; search results "Search results for …"); `test/integration/page_titles_test.rb` |
+| 4–6 | One Browse at `/browse` (`CategoriesHelper::BROWSE_SECTIONS`): Collections, Object types, Classifications, Materials, Places, Time, Makers, Subjects, Named collections, More ways in (colour, themes, stories, Discover). Category pages at `/browse/<name>`; Explore pages at `/browse/time`, `/browse/places`, `/browse/colours`; every old address 301s with its query |
+| 7 | Labels follow the field: "Object types" is `object_type_ssim` everywhere; the home section of classifications is "Classifications", linking to `/browse/classifications` |
+| 8 | Time: `/browse/time` is the one page; `/browse/periods` → 301; eras section and period pages link there |
+| 9 | Places: `/browse/places` is the map and cards page; its A to Z list and filter answer at the same address with `?view=az`, `?letter=`, `?filter=`, `?region=`, `?view=all` (the old hub); the map page links to the A to Z |
+| 10 | The header's collections open their collection pages (address built, no Solr lookup) |
+| 11 | Browse menu lists every way in in the Browse page's order, plus themes and stories; About stays one top-level link |
+| 12 | Themes and stories: breadcrumbs Home › Browse › …; still in the menu (their placeholder wording is for Dean and the collections team to replace) |
+| 13 | One breadcrumb component (`PageBreadcrumbsComponent`; `BreadcrumbComponent` deleted); a record's trail is Browse when the visitor came from a Browse, collection, theme or story page (`HeaderComponent#record_parent`), else Search results |
+| 14 | "Saved" menu; "Saved lists" (was "Your lists") |
+| 15 | `/saved-searches`, `/search-history`, `/my-data`, `/access-requests` with 301s from the underscored ones. Left as is: Blacklight's own `DELETE /search_history/clear` (engine route) |
+| 16 | Footer: "This site" and "The University" columns; legal row "Accessibility at the University", "Privacy at the University"; "Contact the University" |
+| 17 | Discover linked from Browse's More ways in, breadcrumb Home › Browse › Discover (not removed) |
+| 18 | Makers and subjects in the Browse menu and page |
+| 19 | "Compare images" in the Saved menu |
+| 20 | `/stock/` and `/branded-stock/` noindex and disallowed in robots.txt (not removed) |
+
+Known system-test failures that predate this work (the local index lacks their records): `access_request_test.rb`, `responsive_test.rb`
+record and access-form checks, `colours_test.rb` "Looks similar".

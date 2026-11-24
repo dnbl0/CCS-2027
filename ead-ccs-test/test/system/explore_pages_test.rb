@@ -32,16 +32,16 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
     test "both pages have no axe violations at #{name}" do
       page.driver.resize(*size)
       with_env("MAP_TILE_URL" => "http://127.0.0.1:1/{z}/{x}/{y}.png") do
-        visit "/explore/time"
+        visit "/browse/time"
         assert_selector ".time-explorer__periods a", minimum: 2
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
         assert_no_horizontal_scroll
 
-        visit "/explore/time?century=1900"
+        visit "/browse/time?century=1900"
         assert_selector "h2", text: /Decades of/
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
 
-        visit "/explore/places"
+        visit "/browse/places"
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS) # the cards, and the map's preview before it is loaded
         click_button "Show map" if name == "390px" # a phone shows the list first
         click_button "Show the map"
@@ -54,7 +54,7 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
 
   test "the periods read in time order as picture tiles that do not overlap, and a century opens its own page" do
     page.driver.resize(1440, 900)
-    visit "/explore/time"
+    visit "/browse/time"
     assert_selector ".time-explorer__periods .mosaic-flow.is-ready li", minimum: 2
 
     tiles = page.evaluate_script(<<~JS)
@@ -77,13 +77,13 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
 
   test "choosing a century in the strip swaps in its wall in place: the address, the title and focus follow, and the strip scrolls to it" do
     page.driver.resize(1440, 900)
-    visit "/explore/time"
-    century = find("a.explore-strip__period[href='/explore/time?century=1900']")
+    visit "/browse/time"
+    century = find("a.explore-strip__period[href='/browse/time?century=1900']")
     century.click
     assert_selector "h2#picture-wall-heading", text: "1900–1999"
     assert_selector "turbo-frame#time-explorer[complete]:not([aria-busy])", visible: :all
     assert_no_selector "html[aria-busy]", visible: :all
-    assert_equal "/explore/time?century=1900", page.evaluate_script("location.pathname + location.search")
+    assert_equal "/browse/time?century=1900", page.evaluate_script("location.pathname + location.search")
     assert_match(/\A1900–1999 — Explore by time/, page.evaluate_script("document.title"))
     assert_equal "1900s", page.evaluate_script("document.activeElement.textContent.trim()"), "focus stays on the chosen century"
     assert_selector "a.explore-strip__period[aria-current=page]", text: "1900s"
@@ -92,14 +92,14 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
 
     click_link "All centuries"
     assert_selector "h2", text: "Centuries"
-    assert_equal "/explore/time", page.evaluate_script("location.pathname + location.search")
+    assert_equal "/browse/time", page.evaluate_script("location.pathname + location.search")
   end
 
   test "the map loads only when asked, is remembered, and a place is reached with the keyboard" do
     with_env("MAP_TILE_URL" => "http://127.0.0.1:1/{z}/{x}/{y}.png") do
-      visit "/explore/places"
+      visit "/browse/places"
       page.execute_script("localStorage.removeItem('ccs:place-map')")
-      visit "/explore/places"
+      visit "/browse/places"
       assert_equal false, page.evaluate_script("!!document.querySelector('.leaflet-container')")
       click_button "Show the map"
       assert_selector ".leaflet-container"
@@ -115,7 +115,7 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
       assert_equal "Melbourne: 1,391 records", page.evaluate_script("document.activeElement.getAttribute('aria-label')")
       assert_selector ".leaflet-control-attribution a[href='https://www.openstreetmap.org/copyright']"
 
-      visit "/explore/places" # remembered: the map is back without asking
+      visit "/browse/places" # remembered: the map is back without asking
       assert_selector ".leaflet-container"
       click_button "Hide the map"
       assert_no_selector ".leaflet-container"
@@ -127,7 +127,7 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
   test "the chips and the name box narrow the cards; a card marks its pin; the places with no card are listed by name" do
     page.driver.resize(1440, 900)
     with_env("MAP_TILE_URL" => "http://127.0.0.1:1/{z}/{x}/{y}.png") do
-      visit "/explore/places"
+      visit "/browse/places"
       assert_selector ".place-tile", count: 1
       assert_selector ".place-explorer__more-link", text: "Paris"
 

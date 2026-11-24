@@ -10,4 +10,4 @@ en:
         description: Search by several fields at once, then narrow the results by details such as maker, date or collection.
         # The CCS design's wording (Figma, Advanced search)
         query_criteria_heading_html: "Find items that match %{select_menu} of the fields below"
-      page_title: Advanced search - %{application_name}
+      page_title: "Advanced search — %{application_name} — University of Melbourne"

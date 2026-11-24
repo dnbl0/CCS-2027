@@ -109,7 +109,7 @@ class AccessibilityTest < ApplicationSystemTestCase
       StockSolr.documents = { "emu-9044" => stock_document("emu-9044", %w[a b], licence: licence) }
       visit "/stock/emu-9044"
       assert_selector "h1"
-      assert_selector ".access-notice a[href='/access_requests/new?document_id=emu-9044']"
+      assert_selector ".access-notice a[href='/access-requests/new?document_id=emu-9044']"
       assert_no_selector ".access-notice [role], .access-notice [aria-live]"
       assert_selector "picture[data-openseadragon]" if tier == "view-only"
       assert_no_selector "picture[data-openseadragon]" if tier == "request"

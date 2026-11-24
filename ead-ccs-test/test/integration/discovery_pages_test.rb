@@ -29,14 +29,14 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
   end
 
   test "a category page shows a card for each value, with its count, opening the search with that value as a filter" do
-    seed("regions", [ { "value" => "Oceania", "count" => 8638, "image" => PICTURE }, { "value" => "Europe", "count" => 6840, "image" => nil } ])
+    seed("classifications", [ { "value" => "Prints", "count" => 8638, "image" => PICTURE }, { "value" => "Paintings", "count" => 6840, "image" => nil } ])
 
-    get "/browse/categories/regions"
+    get "/browse/classifications"
 
     assert_response :success
-    assert_select "h1", "Regions"
+    assert_select "h1", "Classifications"
     assert_select "article.explore-card", count: 2
-    assert_select "article.explore-card h3 a[href*='f%5Bregion_ssim%5D%5B%5D=Oceania'][href*='any_assets=1']", text: "Oceania"
+    assert_select "article.explore-card h3 a[href*='f%5Bclassification_ssim%5D%5B%5D=Prints'][href*='any_assets=1']", text: "Prints"
     assert_select "article.explore-card .explore-card__intro", text: "8,638 records"
     assert_select "article.explore-card img[src*='unimelbourne.widen.net']", count: 1
     assert_select "nav[aria-label='Sort categories'] a[aria-current='page']", text: "Most records"
@@ -45,36 +45,53 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
   test "a category page sorts A to Z and pages 48 cards at a time" do
     seed("materials", rows(50).reverse + [ { "value" => "aardvark hide", "count" => 1, "image" => nil } ])
 
-    get "/browse/categories/materials", params: { sort: "az" }
+    get "/browse/materials", params: { sort: "az" }
     assert_equal "Aardvark hide", css_select("article.explore-card h3").first.text.squish
     assert_select "article.explore-card", count: Categories::PER_PAGE
     assert_select "nav[aria-label='Sort categories'] a[aria-current='page']", text: "A to Z"
 
-    get "/browse/categories/materials", params: { page: 2 }
+    get "/browse/materials", params: { page: 2 }
     assert_select "article.explore-card", count: 3
     assert_select "meta[name='robots'][content*='noindex']" # page 2 on is not indexed
   end
 
   test "an unknown category is not found, and with the index down and nothing kept the page says so" do
-    get "/browse/categories/nonsense"
+    get "/browse/nonsense"
     assert_response :not_found
 
     Outages::SolrDown.active = true
-    get "/browse/categories/eras"
+    get "/browse/materials"
     assert_response :service_unavailable
     assert_select "h1", "This page cannot be shown right now"
   ensure
     Outages::SolrDown.active = false
   end
 
-  test "the categories page lists every way of grouping, each with a link to its page" do
+  test "the Browse page has a section for each way in, each linking to its one page; the old addresses answer 301" do
     Categories.all.each { |dimension| seed(dimension.slug, rows(5)) }
 
-    get "/browse/categories"
+    get "/browse"
 
     assert_response :success
-    Categories.all.each { |dimension| assert_select "section.categories-#{dimension.slug} a.home-section__link[href='/browse/categories/#{dimension.slug}']" }
-    assert_select "section.categories-eras article.explore-card", count: 5 # its first cards, up to eight
+    { "collections" => "/browse/collections", "object-types" => "/browse/object-types", "classifications" => "/browse/classifications",
+      "materials" => "/browse/materials", "regions" => "/browse/places", "eras" => "/browse/time", "named-collections" => "/browse/named-collections" }.each do |slug, path|
+      assert_select "section.browse-#{slug} a.home-section__link[href='#{path}']"
+    end
+    assert_select "section.browse-regions h2", "Places"
+    assert_select "section.browse-eras h2", "Time"
+    assert_select "section.browse-eras article.explore-card", count: 5 # too few pictures for its carousel: its first cards, up to eight
+    # the other ways in, Discover among them (it had no link since the home page's Featured and trending section went)
+    assert_select "section.browse-more a.browse-more__link[href='/browse/colours']", "Explore by colour"
+    assert_select "section.browse-more a.browse-more__link[href='/discover']"
+
+    { "/browse/categories" => "/browse", "/browse/categories/regions" => "/browse/places", "/browse/categories/eras" => "/browse/time",
+      "/browse/categories/object-types" => "/browse/object-types", "/browse/categories/materials?sort=az" => "/browse/materials?sort=az",
+      "/explore/colours?colour=teal" => "/browse/colours?colour=teal", "/browse/periods" => "/browse/time", "/collections" => "/browse/collections",
+      "/saved_searches" => "/saved-searches", "/search_history" => "/search-history" }.each do |old, new|
+      get old
+      assert_redirected_to new
+      assert_response :moved_permanently
+    end
   end
 
   # rows each with a picture of its own (a different file each, so none is a repeat); eras named so their time order differs from their counts
@@ -85,45 +102,45 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the categories page on the home page's layouts: stacks, clusters and the eras' carousel, two on bands of colour, no picture twice" do
+  test "the Browse page on the home page's layouts: stacks, clusters and the eras' carousel, two on bands of colour, no picture twice" do
     Categories.all.each { |dimension| seed(dimension.slug, pictured(dimension.slug, 9)) }
 
-    get "/browse/categories"
+    get "/browse"
 
-    assert_select "main.categories-page > section.home-section", Categories.all.size
-    assert_select "section.categories-object-types.home-section--tinted ul.stack:not(.stack--bare) li.stack__item", 5
-    assert_select "section.categories-classifications ul.cluster[data-count='4'] li", 4
-    assert_select "section.categories-materials ul.stack.stack--bare li.stack__item", 4
-    assert_select "section.categories-regions ul.stack li.stack__item", 5
-    assert_select "section.categories-collections.home-section--tinted ul.cluster[data-count='4']"
-    assert_select "section.categories-named-collections ul.stack li.stack__item", 5
+    assert_select "main.categories-page > section.home-section.browse-section", Categories.all.size + 1 # and More ways in
+    assert_select "section.browse-object-types.home-section--tinted ul.stack:not(.stack--bare) li.stack__item", 5
+    assert_select "section.browse-classifications ul.cluster[data-count='4'] li", 4
+    assert_select "section.browse-materials ul.stack.stack--bare li.stack__item", 4
+    assert_select "section.browse-regions ul.stack li.stack__item", 5
+    assert_select "section.browse-collections.home-section--tinted ul.cluster[data-count='4']"
+    assert_select "section.browse-named-collections ul.stack li.stack__item", 5
     # the eras: the eight with the most records, as slides in time order
-    eras = css_select("section.categories-eras .feature-carousel__slide h3").map { |title| title.text.strip }
+    eras = css_select("section.browse-eras .feature-carousel__slide h3").map { |title| title.text.strip }
     assert_equal %w[2th 3th 4th 5th 6th 7th 8th 9th].map { |n| "#{n} century" }, eras
-    assert_select "section.categories-eras [aria-roledescription=carousel][aria-label='The eras, earliest first']"
+    assert_select "section.browse-eras [aria-roledescription=carousel][aria-label='The eras, earliest first']"
     pictures = css_select("main img").map { |img| img["src"][%r{[^/?]+\.jpeg}] }
     assert_equal pictures.uniq, pictures, "no picture twice"
   end
 
   test "a category page: the four with the most records lead as a cluster, the rest in the mosaic after; not on later pages or A to Z" do
-    seed("regions", pictured("regions", 60))
+    seed("classifications", pictured("classifications", 60))
 
-    get "/browse/categories/regions"
+    get "/browse/classifications"
     assert_select "section.categories-lead h2", "Most records"
     assert_select "section.categories-lead ul.cluster[data-count='4'] a.cluster__link", 4
-    assert_select "section.categories-lead a.cluster__link", text: "Regions 1"
-    assert_select ".mosaic-flow h3", text: "Regions 1", count: 0 # not twice
+    assert_select "section.categories-lead a.cluster__link", text: "Classifications 1"
+    assert_select ".mosaic-flow h3", text: "Classifications 1", count: 0 # not twice
     assert_select ".mosaic-flow > li", 44
 
-    get "/browse/categories/regions", params: { page: 2 }
+    get "/browse/classifications", params: { page: 2 }
     assert_select "section.categories-lead", 0
 
     # values that share one picture: it is shown once, so too few for a cluster, and the page is the mosaic alone
-    seed("regions", rows(12).map { |row| row.merge("image" => PICTURE) })
-    get "/browse/categories/regions"
+    seed("classifications", rows(12).map { |row| row.merge("image" => PICTURE) })
+    get "/browse/classifications"
     assert_select "section.categories-lead", 0
     assert_select ".mosaic-flow > li", 12
-    get "/browse/categories/regions", params: { sort: "az" }
+    get "/browse/classifications", params: { sort: "az" }
     assert_select "section.categories-lead", 0
   end
 
@@ -151,7 +168,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
   test "the collections category page links each collection to its own page" do
     seed("collections", [ { "value" => "Grainger Museum Collection", "count" => 12, "image" => nil } ])
 
-    get "/browse/categories/collections"
+    get "/browse/collections"
 
     assert_select "article.explore-card h3 a[href='/browse/collections/#{Browse::Slug.build('collections', 'Grainger Museum Collection')}']" # its tile opens its own page
   end
@@ -193,29 +210,34 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
 
   test "the new pages are indexed with a canonical address, and are in the sitemap" do
     seed("collections", [ { "value" => "Grainger Museum Collection", "count" => 12, "image" => nil }, { "value" => "Tiny", "count" => 2, "image" => nil } ])
-    seed("regions", rows(2))
+    seed("classifications", rows(2))
     with_env("SEO_INDEXING" => "on") do
-      get "/browse/categories/regions", params: { sort: "az" }
+      get "/browse/classifications", params: { sort: "az" }
       assert_select "meta[name='robots']:not([content*='noindex'])"
-      assert_select "link[rel='canonical'][href='http://www.example.com/browse/categories/regions']"
+      assert_select "link[rel='canonical'][href='http://www.example.com/browse/classifications']"
 
       Rails.cache.write(SuppressedRecord.cache_key("sitemap/records/v1"), []) # the record pages, as if already listed
       get "/sitemaps/1.xml"
     end
 
     assert_response :success
-    %w[/browse/categories /browse/categories/regions /themes /themes/grainger-in-the-1920s /stories /stories/example-story].each do |path|
+    %w[/browse/classifications /browse/time /browse/places /browse/colours /themes /stories].each do |path|
       assert_includes response.body, "<loc>http://www.example.com#{path}</loc>", path
     end
     assert_includes response.body, "/browse/collections/#{Browse::Slug.build('collections', 'Grainger Museum Collection')}"
     assert_not_includes response.body, Browse::Slug.build("collections", "Tiny") # fewer than 5 records
+    assert_not_includes response.body, "/themes/grainger-in-the-1920s" # placeholder wording: kept out until it is written
+    assert_not_includes response.body, "/browse/categories"
   end
 
-  test "the header's Browse menu opens the browse page, categories, themes and stories; My saved items explains saving" do
+  test "the header's Browse menu opens the browse page and every way in, in the Browse page's order; Saved explains saving and compares" do
     get "/stories"
 
     assert_select "#site-nav-browse a[href='/browse']"
-    %w[/browse/categories /themes /stories].each { |path| assert_select "#site-nav-browse li a[href='#{path}']" }
+    expected = %w[/browse/collections /browse/object-types /browse/classifications /browse/places /browse/time /browse/colours /browse/makers /browse/subjects /themes /stories]
+    assert_equal expected, css_select("#site-nav-browse li a").map { |link| link["href"] }
+    assert_select "#site-nav-saved a[href='/compare']", text: "Compare images"
+    assert_select "#site-nav-saved a[href='/search-history']"
     assert_select "#site-nav-saved a[href='/lists#how-saving-works']", text: "How saving and sharing work"
   end
 

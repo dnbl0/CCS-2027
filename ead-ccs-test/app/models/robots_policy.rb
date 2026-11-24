@@ -24,7 +24,8 @@ module RobotsPolicy
   NOINDEX_NOFOLLOW = "noindex, nofollow"
 
   # Paths of personal or action pages; also the Disallow lines of robots.txt (RobotsTxt), prefix match
-  PERSONAL_PREFIXES = %w[/bookmarks /selection /saved_searches /search_history /lists /galleries /embed /oembed /compare /my_data /access_requests /downloads /errors /400 /404 /406 /410 /422 /429 /500 /503 /healthz /readyz].freeze
+  # (/stock and /branded-stock: the two demonstration record pages, copies of a record page; kept out of search engines)
+  PERSONAL_PREFIXES = %w[/stock/ /branded-stock/ /bookmarks /selection /saved_searches /saved-searches /search_history /search-history /lists /galleries /embed /oembed /compare /my_data /my-data /access_requests /access-requests /downloads /errors /400 /404 /406 /410 /422 /429 /500 /503 /healthz /readyz].freeze
   # /catalog/:id/<this>
   PERSONAL_RECORD_ACTIONS = %w[metadata sensitivity citation manifest manifest.json].freeze
   # Parts of /catalog that are not a results page or a record: the facet lists, the range chart data, suggestions, OpenSearch

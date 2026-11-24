@@ -429,3 +429,15 @@ body.page-categories main.categories-page > .ccs-section.home-section.home-secti
 /* A category's page (categories/show): the four with the most records as the home page's cluster, above the mosaic of the rest */
 .categories-lead { margin-block: var(--ccs-space-6) var(--ccs-space-8); }
 .categories-lead__heading { margin: 0 0 var(--ccs-space-4); }
+
+/* The Browse page's last section, the ways in that are not lists of values (browse/index): plain cards, two to four to a row, each one a
+   link with its line */
+.browse-more__list { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: var(--ccs-space-4); margin: 0; padding: 0; list-style: none; }
+.browse-more__item { position: relative; padding: var(--ccs-space-5); border: 1px solid var(--ccs-border-default); border-radius: var(--ccs-radius-md); background: var(--ccs-surface-default); }
+.browse-more__item:hover { border-color: var(--ccs-border-strong); }
+.browse-more__title { margin: 0 0 var(--ccs-space-2); font-family: var(--ccs-font-family-sans); font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); }
+.browse-more__link { color: var(--ccs-text-link); }
+.browse-more__link::after { content: ""; position: absolute; inset: 0; }
+.browse-more__link:focus-visible { outline: none; }
+.browse-more__link:focus-visible::after { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; border-radius: var(--ccs-radius-md); }
+.browse-more__text { margin: 0; color: var(--ccs-text-secondary); }

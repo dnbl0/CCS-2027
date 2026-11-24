@@ -7,8 +7,8 @@ class RobotsPolicyTest < ActiveSupport::TestCase
   def directive(path, params = {}, **options) = RobotsPolicy.directive(path, params, indexing: true, **options)
 
   PERSONAL_PATHS = %w[
-    /bookmarks /bookmarks/citations /bookmarks/clear /saved_searches /search_history /search_history/12 /lists /lists/3 /lists/3/citations
-    /lists/3/items /galleries/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa /galleries/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/citations /embed/records/emu-9044 /embed/galleries/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa /oembed /compare /compare/items /compare/items/emu-9044 /catalog/emu-9044/manifest.json /access_requests/new /access_requests/9 /downloads /downloads/review /catalog/emu-9044/metadata
+    /bookmarks /bookmarks/citations /bookmarks/clear /saved-searches /search-history /search-history/12 /lists /lists/3 /lists/3/citations
+    /lists/3/items /galleries/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa /galleries/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/citations /embed/records/emu-9044 /embed/galleries/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa /oembed /compare /compare/items /compare/items/emu-9044 /catalog/emu-9044/manifest.json /access-requests/new /access_requests/9 /downloads /downloads/review /catalog/emu-9044/metadata
     /catalog/emu-9044/sensitivity /catalog/emu-9044/citation /stock/emu-9044/citation /404 /500
   ].freeze
 
