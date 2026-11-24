@@ -419,3 +419,13 @@ turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity
 
 /* A home section on a band of colour (Google Arts & Culture's sections with a --section-background-color: Object types) */
 body.page-home main > .ccs-section.home-section.home-section--tinted:not(.ccs-section--hero) { background: var(--section-background-color); }
+
+/* Browse by category (categories/index) on the home page's sections: full-width sections whose backgrounds take turns, white and grey,
+   and those with a band of colour (CategoriesHelper::CATEGORY_LAYOUTS) on it */
+body.page-categories main.categories-page > .ccs-section.home-section { background: var(--ccs-surface-default); }
+body.page-categories main.categories-page > .ccs-section.home-section:nth-of-type(even) { background: var(--ccs-surface-subtle); }
+body.page-categories main.categories-page > .ccs-section.home-section.home-section--tinted { background: var(--section-background-color); }
+
+/* A category's page (categories/show): the four with the most records as the home page's cluster, above the mosaic of the rest */
+.categories-lead { margin-block: var(--ccs-space-6) var(--ccs-space-8); }
+.categories-lead__heading { margin: 0 0 var(--ccs-space-4); }

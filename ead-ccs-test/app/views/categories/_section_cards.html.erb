@@ -1,0 +1,14 @@
+<%# One way of grouping as a section's cards, in its layout (CategoriesHelper::CATEGORY_LAYOUTS); too few pictures for a stack, a cluster
+    or a carousel, the site's mosaic of the same values instead %>
+<%# locals: (dimension:, layout:, tiles:, all:) %>
+<% cluster = NexusCcs::ClusterComponent.new(tiles: tiles, label: dimension.title) if layout == :cluster %>
+<% if layout == :cluster && cluster.render? %>
+  <%= render cluster %>
+<% elsif layout == :carousel && tiles.size >= 3 %>
+  <%= render NexusCcs::FeatureCarouselComponent.new(tiles: tiles, label: t("nexus_ccs.categories.carousel", kind: dimension.title.downcase), kind: t("nexus_ccs.categories.era"),
+                                                    cta: t("nexus_ccs.categories.explore"), previous: t("nexus_ccs.categories.previous"), following: t("nexus_ccs.categories.next")) %>
+<% elsif %i[stack bare].include?(layout) && tiles.size >= 3 %>
+  <%= render NexusCcs::StackComponent.new(tiles: tiles, label: dimension.title, captions: layout == :stack) %>
+<% else %>
+  <%= render NexusCcs::MosaicComponent.new(tiles: all.first(8).map { |tile| category_tile(tile, dimension) }, label: dimension.title, lanes: 4) %>
+<% end %>

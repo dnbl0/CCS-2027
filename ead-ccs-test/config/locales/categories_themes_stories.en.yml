@@ -14,6 +14,12 @@ en:
       showing: "%{count} categories"
       pagination: "Pages of %{kind}"
       landing_pages: "Pages about each collection"
+      carousel: "The %{kind}, earliest first"
+      era: "Era"
+      explore: "Explore its records"
+      previous: "Previous era"
+      next: "Next era"
+      leading: "Most records"
       dimensions:
         object-types:
           title: "Object types"

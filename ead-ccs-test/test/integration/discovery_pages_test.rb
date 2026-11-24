@@ -77,6 +77,56 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     assert_select "section.categories-eras article.explore-card", count: 5 # its first cards, up to eight
   end
 
+  # rows each with a picture of its own (a different file each, so none is a repeat); eras named so their time order differs from their counts
+  def pictured(slug, count)
+    (1..count).map do |n|
+      value = slug == "eras" ? "#{count - n + 1}th century" : "#{slug} #{n}"
+      { "value" => value, "count" => 1000 - n, "image" => PICTURE.merge("id" => "#{slug}-#{n}", "path" => "https://unimelbourne.widen.net/content/x/jpeg/#{slug}-#{n}.jpeg?w=600") }
+    end
+  end
+
+  test "the categories page on the home page's layouts: stacks, clusters and the eras' carousel, two on bands of colour, no picture twice" do
+    Categories.all.each { |dimension| seed(dimension.slug, pictured(dimension.slug, 9)) }
+
+    get "/browse/categories"
+
+    assert_select "main.categories-page > section.home-section", Categories.all.size
+    assert_select "section.categories-object-types.home-section--tinted ul.stack:not(.stack--bare) li.stack__item", 5
+    assert_select "section.categories-classifications ul.cluster[data-count='4'] li", 4
+    assert_select "section.categories-materials ul.stack.stack--bare li.stack__item", 4
+    assert_select "section.categories-regions ul.stack li.stack__item", 5
+    assert_select "section.categories-collections.home-section--tinted ul.cluster[data-count='4']"
+    assert_select "section.categories-named-collections ul.stack li.stack__item", 5
+    # the eras: the eight with the most records, as slides in time order
+    eras = css_select("section.categories-eras .feature-carousel__slide h3").map { |title| title.text.strip }
+    assert_equal %w[2th 3th 4th 5th 6th 7th 8th 9th].map { |n| "#{n} century" }, eras
+    assert_select "section.categories-eras [aria-roledescription=carousel][aria-label='The eras, earliest first']"
+    pictures = css_select("main img").map { |img| img["src"][%r{[^/?]+\.jpeg}] }
+    assert_equal pictures.uniq, pictures, "no picture twice"
+  end
+
+  test "a category page: the four with the most records lead as a cluster, the rest in the mosaic after; not on later pages or A to Z" do
+    seed("regions", pictured("regions", 60))
+
+    get "/browse/categories/regions"
+    assert_select "section.categories-lead h2", "Most records"
+    assert_select "section.categories-lead ul.cluster[data-count='4'] a.cluster__link", 4
+    assert_select "section.categories-lead a.cluster__link", text: "Regions 1"
+    assert_select ".mosaic-flow h3", text: "Regions 1", count: 0 # not twice
+    assert_select ".mosaic-flow > li", 44
+
+    get "/browse/categories/regions", params: { page: 2 }
+    assert_select "section.categories-lead", 0
+
+    # values that share one picture: it is shown once, so too few for a cluster, and the page is the mosaic alone
+    seed("regions", rows(12).map { |row| row.merge("image" => PICTURE) })
+    get "/browse/categories/regions"
+    assert_select "section.categories-lead", 0
+    assert_select ".mosaic-flow > li", 12
+    get "/browse/categories/regions", params: { sort: "az" }
+    assert_select "section.categories-lead", 0
+  end
+
   test "a collection page has the placeholder introduction, its highlights, links that narrow its search, and its records in the search" do
     seed("collections", [ { "value" => "Grainger Museum Collection", "count" => 12, "image" => nil } ])
     seed_showcase([ 'collection_ssim:("Grainger Museum Collection")' ])

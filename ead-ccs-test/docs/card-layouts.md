@@ -117,3 +117,24 @@ picture tiles (`browse_entities/_facet_tiles`). Each value's picture comes from 
 then the value's records anywhere in the collections (one grouped request for all the values the page's records do not show; both kept
 for a day). A value with no picture anywhere (for example a subject whose 4,067 records have no picture that may be shown) is not a tile:
 it is listed after the mosaic under "With no picture to show", so every card in a mosaic has its picture and no value is lost.
+
+## Browse by category on the home page's layouts (24 Nov 2026)
+
+`/browse/categories` is laid out as the home page is: the Browse pages' centred head, then a full-width section for each way of grouping,
+its heading and "See all" as the home page's, the backgrounds taking turns (white, grey) and two on bands of colour. Each section's cards
+are the values with the most records, in one of the home page's layouts (`CategoriesHelper::CATEGORY_LAYOUTS`):
+
+| Section | Layout |
+|---|---|
+| Object types | fanned stack (five), on a band of colour |
+| Classifications | cluster (four) |
+| Materials | picture-only stack (four) |
+| Regions | fanned stack (five) |
+| Eras | story carousel (eight, in time order) |
+| Collections | cluster (four), on a band of colour |
+| Named collections | fanned stack (five) |
+
+No picture is shown twice on the page; a value with no picture of its own (most object types) borrows one of its records' from anywhere
+in the collections (`Browse::FacetPictures#prepare`, one grouped request a section, kept a day). Too few pictures for a layout, the
+section is the mosaic. On each category's own page (`/browse/categories/:slug`), the first page by most records opens with the four with
+the most records as a cluster ("Most records"), then the rest in the mosaic; A to Z and later pages are the mosaic alone.
