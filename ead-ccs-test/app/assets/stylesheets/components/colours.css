@@ -59,10 +59,46 @@
 /* Looks similar sits after More like this, in the same column; its cards are the record page's (object_cards.css) */
 .looks-similar .object-cards__list { margin-top: var(--ccs-space-5); }
 
-/* Explore by colour on the Explore template (colours/index; explore_pages.css .time-explorer, .time-chart): the colours' share of the
-   records as one band, each part as wide as the square root of its count beside the busiest's (white and grey would otherwise leave
-   purple a hairline). The white part has a hairline edge so it shows on the pale panel. */
-.colour-band__bar { display: flex; gap: 3px; height: 3rem; margin: 0; padding: 0; list-style: none; }
-.colour-band__part { flex: var(--w) 1 0; min-width: 6px; border-radius: var(--ccs-radius-sm); }
-.colour-band__part.colours__swatch--white { box-shadow: inset 0 0 0 1px var(--ccs-border-default); }
-.colour-band__note { margin: var(--ccs-space-3) 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-xs); max-width: 65ch; }
+/* Explore by colour (colours/index), after Google Arts & Culture's Color Explorer (measured 2026-11-24): a strip of the colours, each
+   swatch 70 by 54 pixels whatever its number of records, on a pale track the width of the page; the chosen one has a notch under it
+   pointing at its wall. Then the wall: square pictures, 4px apart, five to a row on a wide screen (Google's 236px squares at 1200px),
+   each filling its square, the record's title showing on it when pointed at or focused. */
+.colour-strip { background: var(--ccs-surface-subtle); }
+.colour-strip__list {
+  display: flex; justify-content: safe center; margin: 0; padding: 0; list-style: none;
+  overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth;
+}
+.colour-strip__list::-webkit-scrollbar { display: none; }
+.colour-strip__item { flex: 0 0 auto; }
+.colour-strip__swatch { position: relative; display: block; width: 70px; height: 54px; }
+.colour-strip__swatch.colours__swatch--white { box-shadow: inset 0 0 0 1px var(--ccs-border-default); }
+.colour-strip__swatch:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: -3px; }
+.colour-strip__swatch[aria-current="page"]::after {
+  content: ""; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+  border: 8px solid transparent; border-bottom-color: var(--ccs-surface-default); border-top-width: 0;
+}
+.colour-strip__swatch.colours__swatch--white[aria-current="page"]::after { border-bottom-color: var(--ccs-border-default); }
+.colour-strip__note { margin: var(--ccs-space-3) 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-xs); max-width: 65ch; }
+
+.colour-wall { margin-top: var(--ccs-space-6); }
+.colour-wall__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ccs-space-2) var(--ccs-space-4); margin-bottom: var(--ccs-space-4); }
+.colour-wall__heading { display: inline-flex; align-items: center; gap: var(--ccs-space-3); margin: 0; }
+.colour-wall__dot { width: 1.25rem; height: 1.25rem; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.15); }
+.colour-wall__count { margin: 0; color: var(--ccs-text-secondary); }
+.colour-wall__all { margin-inline-start: auto; min-height: 44px; align-items: center; }
+.colour-wall__grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin: 0; padding: 0; list-style: none; }
+@media (max-width: 991.98px) { .colour-wall__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 575.98px) { .colour-wall__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.colour-wall__link { position: relative; display: block; aspect-ratio: 1; overflow: hidden; background: var(--ccs-surface-subtle); }
+.colour-wall__link img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 300ms cubic-bezier(0, 0, 0.25, 1); }
+.colour-wall__title {
+  position: absolute; inset: auto 0 0; padding: var(--ccs-space-2) var(--ccs-space-3);
+  background: rgb(0 15 70 / 0.85); color: #fff; font-size: var(--ccs-font-size-sm); line-height: 1.35;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  opacity: 0; transition: opacity 200ms ease-out;
+}
+.colour-wall__link:hover .colour-wall__title, .colour-wall__link:focus-visible .colour-wall__title { opacity: 1; }
+.colour-wall__link:hover img { transform: scale(1.04); }
+.colour-wall__link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: -3px; }
+@media (hover: none) { .colour-wall__title { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .colour-wall__link img, .colour-wall__title { transition: none; } }

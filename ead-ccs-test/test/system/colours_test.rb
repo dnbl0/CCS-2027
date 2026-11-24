@@ -26,14 +26,27 @@ class ColoursSystemTest < ApplicationSystemTestCase
       visit "/explore/colours"
 
       assert_selector "h1", text: "Explore by colour"
-      assert_selector "figure.colour-band .colour-band__part", count: 12
-      assert_selector "main a[href*='colour_ssim']:not([aria-hidden])", count: 12
+      assert_selector "nav.colour-strip a.colour-strip__swatch", count: 12
+      assert_selector "main a[href*='colour=']:not([aria-hidden]):not(.colour-strip__swatch)", count: 12
       assert_text(/White\s+84 records/)
       assert_not sideways_scroll?, "no sideways scroll at #{width}px"
       assert_accessible
     end
-    click_link "Red"
-    assert_current_path(/colour_ssim/)
+    # choosing a colour swaps the wall in place (a Turbo frame) and the address follows
+    page.current_window.resize_to(1400, 900)
+    visit "/explore/colours"
+    find("a.colour-strip__swatch.colours__swatch--teal").click
+    assert_selector "h2#colour-wall-heading", text: "Teal"
+    assert_selector "a.colour-strip__swatch.colours__swatch--teal[aria-current=page]"
+    assert_current_path "/explore/colours?colour=teal"
+    # Turbo marks the frame and the page busy until the new wall is in and the visit is recorded: axe waits for both
+    assert_selector "turbo-frame#colour-explorer[complete]:not([aria-busy])", visible: :all
+    assert_no_selector "html[aria-busy]", visible: :all
+    assert_accessible
+    page.current_window.resize_to(390, 844)
+    visit "/explore/colours?colour=white"
+    assert_not sideways_scroll?
+    assert_operator page.evaluate_script("document.querySelector('.colour-strip__list').scrollLeft"), :>, 0, "the chosen colour scrolled into the strip's middle"
   end
 
   test "Looks similar loads after More like this, with the record page's cards, accessible at a phone width" do

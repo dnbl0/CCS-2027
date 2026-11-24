@@ -14,23 +14,57 @@ class ColoursTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the colour page: the colours' share as a band, then each colour by name and count, in the palette's order, opening its results" do
+  def colour_page(counts, records: [])
+    lambda do |params|
+      response = canned_response(params[:rows].to_i.zero? ? [] : records, total: counts.values.sum)
+      response["facet_counts"]["facet_fields"]["colour_ssim"] = counts.flat_map { |name, count| [ name, count ] }
+      response
+    end
+  end
+
+  test "the colour page: a strip of the colours, each named, in the palette's order; each colour's tile opens its wall" do
     with_seeded_menu_cache { with_canned_search(colour_counts("blue" => 12, "red" => 1_234, "white" => 3)) { get "/explore/colours" } }
 
     assert_response :success
     assert_select "title", /Explore by colour/
     assert_select "h1", "Explore by colour"
-    assert_select "nav li", /Browse/
-    assert_select "figure.colour-band" do
-      assert_select "figcaption", /most common is red \(1,234 records\)/
-      assert_select "ol.colour-band__bar[aria-hidden=true] > li.colour-band__part", 3
-      assert_select "li.colour-band__part.colours__swatch--red[style*='--w: 1.0']"
+    assert_select "turbo-frame#colour-explorer[data-turbo-action=advance] nav.colour-strip[aria-label=Colours]" do
+      labels = css_select("a.colour-strip__swatch").map { |swatch| swatch["aria-label"] }
+      assert_equal [ "Red: 1,234 records", "Blue: 12 records", "White: 3 records" ], labels
+      assert_select "a.colour-strip__swatch.colours__swatch--red[href=?][title=?]", "/explore/colours?colour=red", "Red: 1,234 records"
+      assert_select "a[aria-current]", 0, "no colour chosen yet"
     end
     assert_select "h2#colours-heading", "Colours"
-    # the canned Solr has no pictures: every colour is a link after the (empty) mosaic, none lost
-    links = css_select("#colours-heading ~ * a[href*='colour_ssim']")
+    # the canned Solr has no pictures: every colour is a link after the (empty) mosaic, none lost, each opening its wall
+    links = css_select("#colours-heading ~ * a[href*='colour=']")
     assert_equal [ "Red 1,234 records", "Blue 12 records", "White 3 records" ], links.map { |link| link.text.squish }
-    assert_equal "/catalog?f%5Bcolour_ssim%5D%5B%5D=red", links.first["href"]
+    assert_equal "/explore/colours?colour=red", links.first["href"]
+  end
+
+  test "a chosen colour: its swatch marked, then its records as a wall of squares, those mostly that colour first, and a way to all of them" do
+    records = [ open_record("emu-b", colour_ssim: %w[white teal]), open_record("emu-a", colour_ssim: %w[teal white]),
+                sensitive_record("emu-s", colour_ssim: %w[teal]) ]
+    with_seeded_menu_cache { with_canned_search(colour_page({ "teal" => 43, "red" => 5 }, records: records)) { get "/explore/colours?colour=teal" } }
+
+    assert_response :success
+    assert_select "title", /\ATeal — Explore by colour/
+    assert_select "a.colour-strip__swatch[aria-current=page]", 1
+    assert_select "a.colour-strip__swatch.colours__swatch--teal[aria-current=page]"
+    assert_select "section.colour-wall[aria-labelledby=colour-wall-heading]" do
+      assert_select "h2#colour-wall-heading", "Teal"
+      assert_select ".colour-wall__count", "43 records"
+      assert_select "a.colour-wall__all[data-turbo-frame=_top][href=?]", "/catalog?f%5Bcolour_ssim%5D%5B%5D=teal", text: "See all 43 in the search"
+      assert_equal %w[/catalog/emu-a /catalog/emu-b], css_select("a.colour-wall__link").map { |link| link["href"] }, "mostly teal first; no sensitive record"
+      assert_select "a.colour-wall__link[data-turbo-frame=_top] img[alt='']", 2
+      assert_select "a.colour-wall__link .colour-wall__title", "Title of emu-a"
+    end
+  end
+
+  test "a colour the index does not have is no choice: the page as it is before a colour is chosen" do
+    with_seeded_menu_cache { with_canned_search(colour_counts("red" => 5)) { get "/explore/colours?colour=mauve" } }
+    assert_response :success
+    assert_select "section.colour-wall", 0
+    assert_select "h2#colours-heading", "Colours"
   end
 
   test "with no colours yet, or Solr down, the page says so" do
