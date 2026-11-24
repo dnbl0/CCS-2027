@@ -35,7 +35,7 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
 
   # A card's title link covers the whole card (its ::after), so the card is its target, not the line of text
   def small_targets
-    page.evaluate_script("[...document.querySelectorAll('main .home-section a, main .home-section summary')].filter(e => !e.matches('.explore-card__link, .object-card__link, .simple-listing__link') && e.getAttribute('tabindex') !== '-1' && e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().height < 44).map(e => e.textContent.trim())")
+    page.evaluate_script("[...document.querySelectorAll('main .home-section a, main .home-section summary')].filter(e => !e.matches('.explore-card__link, .object-card__link, .simple-listing__link, .stack__link') && e.getAttribute('tabindex') !== '-1' && e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().height < 44).map(e => e.textContent.trim())")
   end
 
   # No picture in the home sections is cropped: each is fitted (contain) or shown at its own shape. The University's listing of its
@@ -91,8 +91,14 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     assert_equal 4, boxes.first(4).map(&:first).uniq.size, "four to a row"
     assert_equal 1, boxes.first(4).map { |box| box[1] }.uniq.size, "the first four share a row"
     assert_equal 1, boxes.map { |box| box[2] }.uniq.size, "every card the same width"
-    # every other picture section is the same tile in the same mosaic (record types, places, time, on this day)
-    %w[.explore-kinds .home-places .explore-periods .home-on-this-day].each do |section|
+    # places, time and on this day: the same tile in the same mosaic
+    # Object types: a fanned stack (the centre card in front and at full size)
+    assert_selector ".explore-kinds ul.stack > li.stack__item", minimum: 1, maximum: NexusCcs::ExploreComponent::KINDS_SHOWN
+    assert_equal "absolute", page.evaluate_script("getComputedStyle(document.querySelector('.stack__item')).position"), "a fan on a desktop"
+    first = find(".explore-kinds li.stack__item", match: :first)
+    first.hover
+    assert_selector ".explore-kinds li.stack__item.is-centre[data-away='0']", text: first.find("h3").text # pointing at a card makes it the centre
+    %w[.home-places .explore-periods .home-on-this-day].each do |section|
       next unless page.has_css?(section, wait: 0)
 
       assert_selector "#{section} ul.mosaic-flow.is-ready > li > article.explore-card--tile", minimum: 1

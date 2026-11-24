@@ -21,9 +21,10 @@
 <% end %>
 
 <% if kind_tiles.any? %>
-  <%= render NexusCcs::HomeSectionComponent.new(id: "explore-kinds", heading: t("explore.kinds.heading"), intro: t("home.kinds.intro"),
+  <%= render NexusCcs::HomeSectionComponent.new(id: "explore-kinds", heading: t("home.kinds.heading"), intro: t("home.kinds.intro"),
                                                 link: t("explore.kinds.see_all"), link_path: helpers.browse_hub_path("object-types"), extra_class: "explore-kinds") do %>
-    <%= render NexusCcs::MosaicComponent.new(tiles: kind_tiles, label: t("explore.kinds.heading"), lanes: 4) %>
+    <%# Five object types as a fanned stack of cards (after Google Arts & Culture's "SimpleStack") %>
+    <%= render NexusCcs::StackComponent.new(tiles: kind_tiles.first(NexusCcs::ExploreComponent::KINDS_SHOWN), label: t("home.kinds.heading")) %>
   <% end %>
 <% end %>
 

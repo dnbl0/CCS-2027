@@ -18,6 +18,7 @@ en:
       see_all: "Explore the collection"
       label: "Collections within the University of Melbourne Art Collection"
     kinds:
+      heading: "Object types"
       intro: "From prints and paintings to scientific instruments: browse by what a record is."
     places:
       intro: "Where the records were made, from Melbourne to the other side of the world."

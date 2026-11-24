@@ -9,6 +9,7 @@ module NexusCcs
   #   3. "Place and time": two short lists of arrow links in disclosures (closed on a phone), each with a "See all" link to its browse page.
   # Renders nothing when there is nothing to show (Solr down and nothing kept).
   class ExploreComponent < ViewComponent::Base
+    KINDS_SHOWN = 5 # object types in the home page's stack
     def initialize(overview: ExploreEntryPoints.overview)
       @overview = overview
     end
@@ -39,13 +40,13 @@ module NexusCcs
 
     def place_collages = @place_collages ||= HomeSections.place_collages(overview.place_tiles, helpers)
 
-    # Record types and Places as the same picture tiles as the collections, in the same mosaic, the first leading (two lanes wide), as the
-    # collections within the collections: one picture of each, its name, and a line on what its page holds (the kinds of record and the
-    # collections, CardDescription, worked out from its own records) where a number of records was. A place opens its own page.
+    # Object types (the first five, as the stack's cards) and Places (as mosaic tiles, the first leading): one picture of each, its name,
+    # and a line on what its page holds (the kinds of record and the collections, CardDescription, worked out from its own records) where a
+    # number of records was. A place opens its own page.
     def kind_tiles
       @kind_tiles ||= begin
         about = Array(overview.kind_tiles).to_h { |tile| [ tile.label, tile.intro ] }
-        kind_collages.each_with_index.map { |collage, index| collage_tile(collage, collage.path, about[collage.title].presence || collage.intro, index.zero?) }
+        kind_collages.first(KINDS_SHOWN).map { |collage| collage_tile(collage, collage.path, about[collage.title].presence || collage.intro, false) }
       end
     end
 

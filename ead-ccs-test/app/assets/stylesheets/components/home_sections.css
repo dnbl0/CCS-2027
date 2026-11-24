@@ -358,3 +358,51 @@ turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity
 .home-art-collection__heading { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-2xl); font-weight: 400; }
 .home-art-collection__intro { max-width: 60ch; margin: var(--ccs-space-2) 0 0; color: var(--ccs-text-secondary); }
 .home-art-collection__link { min-height: 44px; align-items: center; }
+
+/* A fanned stack of cards (NexusCcs::StackComponent, stack_controller.js; after Google Arts & Culture's "SimpleStack", 2026-11-24). From a
+   tablet up, a fan drawn by CSS alone (no shift when the page loads): each card keeps its place along the row (--i of --n, overlapping its
+   neighbours), and its steps from the centre (data-away) set its size (100%, 86%, 78%, 72%), depth and dimness; the script only moves the
+   centre. On a phone a row of the same cards that scrolls sideways, the next card peeking past the edge. A card: a tall picture filling its
+   frame, then its title and line on white; the whole card is the link. */
+.stack-frame { container-type: inline-size; }
+.stack { display: flex; gap: var(--ccs-space-4); margin: 0; padding: 0 0 var(--ccs-space-2); overflow-x: auto; scroll-snap-type: x mandatory; list-style: none; }
+.stack__item { flex: 0 0 min(78%, 18rem); scroll-snap-align: start; }
+
+.stack__card { position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--ccs-radius-md); background: var(--ccs-surface-default); box-shadow: var(--ccs-shadow-md); }
+.stack__media { aspect-ratio: 757 / 817; background: var(--ccs-surface-subtle); }
+.stack__media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.stack__body { display: flex; flex-direction: column; gap: var(--ccs-space-1); height: 7.5rem; padding: 19px var(--ccs-space-4) var(--ccs-space-4); overflow: hidden; }
+.stack__title { margin: 0; font-family: var(--ccs-font-family-sans); font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); line-height: 1.25; }
+.stack__link { color: var(--ccs-text-primary); text-decoration: none; }
+.stack__link::after { content: ""; position: absolute; inset: 0; z-index: 2; }
+.stack__item:hover .stack__link { text-decoration: underline; }
+.stack__link:focus-visible { outline: none; }
+.stack__link:focus-visible::after { outline: 3px solid var(--ccs-focus-ring); outline-offset: -3px; }
+.stack__text { margin: 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); line-height: 1.4; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.stack__shade { position: absolute; inset: 0; z-index: 1; background: var(--ccs-text-primary); opacity: 0; pointer-events: none; transition: opacity 500ms cubic-bezier(0.19, 1, 0.22, 1); }
+
+@container (min-width: 48rem) {
+  .stack {
+    --card: min(380px, calc(100cqw / (1 + (var(--n) - 1) * 0.6)));
+    --step: min(calc(var(--card) * 0.6), calc((100cqw - var(--card)) / max(var(--n) - 1, 1)));
+    --start: calc((100cqw - var(--card) - var(--step) * (var(--n) - 1)) / 2);
+    position: relative; display: block; height: calc(var(--card) * 817 / 757 + 7.5rem); overflow: visible; padding: 0;
+  }
+  .stack__item {
+    --scale: 1; --shade: 0;
+    position: absolute; top: 0; left: 0; width: var(--card); z-index: calc(10 - var(--away-z, 0));
+    /* its place along the row, pushed outward from the centre by half the width it loses in shrinking, so a slice of every card shows
+       beside the centre one (as Google Arts & Culture's: the cards left of the centre move left, those right of it move right) */
+    transform: translateX(calc(var(--start) + var(--i) * var(--step) + var(--side, 0) * (1 - var(--scale)) * var(--card) * 0.5)) scale(var(--scale));
+    transform-origin: 50% 50%;
+    transition: transform 500ms cubic-bezier(0.19, 1, 0.22, 1); /* Google Arts & Culture's: long and gentle, settling slowly */
+  }
+  .stack__item[data-side="-1"] { --side: -1; }
+  .stack__item[data-side="1"] { --side: 1; }
+  .stack__item[data-away="1"] { --scale: 0.861; --shade: 0.1; --away-z: 1; }
+  .stack__item[data-away="2"] { --scale: 0.78; --shade: 0.2; --away-z: 2; }
+  .stack__item[data-away="3"] { --scale: 0.723; --shade: 0.3; --away-z: 3; }
+  .stack__item[data-away="4"] { --scale: 0.68; --shade: 0.35; --away-z: 4; }
+  .stack__shade { opacity: var(--shade); }
+}
+@media (prefers-reduced-motion: reduce) { .stack__item, .stack__shade { transition: none; } }

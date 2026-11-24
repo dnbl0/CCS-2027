@@ -25,7 +25,7 @@ class ExploreComponentTest < ViewComponent::TestCase
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
     headings = page.all("section.home-section h2").map(&:text)
-    assert_equal [ "Explore the collections", "Record types", "Places", "Time" ], headings
+    assert_equal [ "Explore the collections", "Object types", "Places", "Time" ], headings
     assert_selector "section.explore .home-section__head a.home-section__link[href='/browse/categories/collections']", text: "See all collections"
     assert_selector "section.explore-kinds a.home-section__link[href='/browse/object-types']", text: "See all object types"
     assert_selector "section.home-places a.home-section__link[href='/browse/places']", text: "See all places"
@@ -49,15 +49,17 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_no_selector ".explore-card__cta" # no call to action on any card
   end
 
-  test "Record types, Places and Time are the same picture tiles as the collections, in the same mosaic" do
+  test "Object types as a fanned stack of cards; Places and Time as picture tiles in the mosaic" do
     render_inline NexusCcs::ExploreComponent.new(overview: overview)
 
     tile = "ul.mosaic-flow[data-controller=mosaic] li.mosaic-flow__item article.explore-card--tile"
-    assert_selector "section.explore-kinds #{tile}", count: 2
-    assert_selector "section.explore-kinds #{tile} h3 a[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings']", text: "Prints and drawings"
+    assert_selector "section.explore-kinds h2", text: "Object types"
+    assert_selector "section.explore-kinds ul.stack[data-controller=stack] li.stack__item article.stack__card", count: 2
+    assert_selector "section.explore-kinds li.stack__item.is-centre[data-away='0']", text: "Paintings" # the middle card starts at the centre
+    assert_selector "section.explore-kinds li.stack__item[data-away='1']", text: "Prints and drawings"
+    assert_selector "section.explore-kinds .stack__card h3 a.stack__link[href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=prints'][href*='f_inclusive%5Bclassification_ssim%5D%5B%5D=drawings']", text: "Prints and drawings"
     # a line on what the page holds where the number of records was (none here: the test has no index to describe them from)
     assert_no_selector "section.explore-kinds, section.home-places, section.explore-periods", text: /\d records/
-    assert_selector "section.explore-kinds li.mosaic-flow__item--lead:first-child h3", text: "Prints and drawings" # each section led by its first tile
     assert_selector "section.home-places #{tile} h3 a", text: "Australia" # its own page, or its records where it has none
     assert_selector "section.explore-periods ul.mosaic-flow[data-mosaic-ordered-value=true] li.mosaic-flow__item article.explore-card--tile h3 a[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900']", text: "1900s"
     assert_no_selector ".explore-card--collage, .place-spot" # the shelf of collages and the place tabs are gone

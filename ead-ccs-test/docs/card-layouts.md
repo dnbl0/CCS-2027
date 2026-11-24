@@ -54,7 +54,7 @@ crops pictures to fixed cells, here the cell follows the picture.
 |---|---|---|
 | Explore the collections | the University's simple listing (as museumsandcollections.unimelb.edu.au/collections): its 24 collections, four to a row, a 16:10 picture filling its frame, the title under it; the same titles and pictures | `SimpleListingComponent`, `HomeCollections` (`config/home_collections.yml`) |
 | (within Explore the collections) University of Melbourne Art Collection | under its own heading, as on the University's page: the 12 collections within it in the same listing, each opening its named collection here (Hugh Ramsay: his maker page) | `SimpleListingComponent`, `HomeCollections.art_collection` |
-| Record types (every kind) | the same tiles: one picture of each kind, its name and number | `MosaicComponent`, `ExploreComponent#kind_tiles` |
+| Object types (five) | a fanned stack of cards, after Google Arts & Culture's "SimpleStack": the centre card at full size, the others smaller (86%, 78%, 72%), further back and dimmer, pushed outward so a slice of each shows; pointing at a card or focusing it makes it the centre. Drawn by CSS (no layout shift); a sideways-scrolling row on a phone | `StackComponent`, `stack_controller.js`, `ExploreComponent#kind_tiles` |
 | Places | the same tiles, each opening the place's own page | `MosaicComponent`, `ExploreComponent#place_tiles` |
 | Time | the same tiles, in time order (ordered lanes) on the navy band | `MosaicComponent`, `ExploreComponent#period_tiles` |
 | On this day, Recently viewed | the same tiles: a record's picture, its title, its maker and date | `MosaicComponent`, `record_tile` |
