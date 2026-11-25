@@ -28,6 +28,7 @@ Commits end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`; PR b
 
 | Commit | What |
 |---|---|
+| (next) | Today's Look closer picture is set aside first, so no Time card, stack or way in repeats it (`ExploreComponent#used_pictures`) |
 | ed82eab | Home Time section: the National Gallery of Art's "Now on view" card carousel (`CardCarouselComponent`); no longer a navy band |
 | 9a239df | Home collections with no records here open their University page (`url:` in `config/home_collections.yml`) with a note |
 | 5c6ef48 | IA fixes (20 items): one Browse at `/browse`; `/browse/time`, `/browse/places`, `/browse/colours`; category pages `/browse/<name>`; 301s from every old address; one breadcrumb (`PageBreadcrumbsComponent`); one title pattern; "Saved" menu; footer columns; hyphenated addresses |
@@ -57,6 +58,5 @@ Carousels share `carousel_controller.js` (no new script needed).
 
 - Themes and stories still carry "(placeholder)" wording; they are out of the sitemap, still in the menu.
 - Blacklight's own `DELETE /search_history/clear` keeps its underscored address (engine route).
-- Look closer can occasionally show the same record as a Time card on the same day.
 - MONIAC Economics Model Machine has no University page; it opens the search.
 - When Dean asks to merge: open a PR from `design/home-bento` to `main` on `origin`, body ending with the line above, list the commits.

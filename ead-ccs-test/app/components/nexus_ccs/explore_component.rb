@@ -113,7 +113,9 @@ module NexusCcs
     # Today's "Look closer" band (HomeLookCloser), or nil
     def look_closer = defined?(@look_closer) ? @look_closer : (@look_closer = HomeLookCloser.today)
 
-    def used_pictures = @used_pictures ||= Set.new
+    # The pictures the page already shows, starting with today's Look closer record: "What do you want to explore?" picks its pictures
+    # (and so the Time cards') before the band renders, so the band's picture is set aside first, not when it is drawn
+    def used_pictures = @used_pictures ||= Set.new(look_closer ? [ picture_key(look_closer.image) ] : [])
 
     def fresh?(src) = !used_pictures.include?(picture_key(src))
 

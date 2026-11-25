@@ -72,6 +72,23 @@ class ExploreComponentTest < ViewComponent::TestCase
     assert_no_selector ".explore-card--collage, .place-spot" # the shelf of collages and the place tabs are gone
   end
 
+  test "today's Look closer picture counts as used, so no Time card, stack or way in shows it again (at any size)" do
+    component = NexusCcs::ExploreComponent.new(overview: overview)
+    pick = HomeLookCloser::Pick.new(id: "emu-9", title: "A bronze lyre", maker: nil, image: "https://dam.example/images/0000_013_1_pf.jpg?w=1600",
+                                    tint: nil, crops: [])
+    component.instance_variable_set(:@look_closer, pick)
+
+    assert_not component.fresh?("https://dam.example/images/0000_013_1_pf.jpg?w=1000")
+    assert component.fresh?("https://dam.example/images/another.jpg")
+  end
+
+  test "with no Look closer today, every picture is free" do
+    component = NexusCcs::ExploreComponent.new(overview: overview)
+    component.instance_variable_set(:@look_closer, nil)
+
+    assert component.fresh?("https://dam.example/images/0000_013_1_pf.jpg")
+  end
+
   test "with no record types, places or times, those sections are left out without leaving a heading behind" do
     render_inline NexusCcs::ExploreComponent.new(overview: empty_overview([ tile("University Art Collection", 1, 1) ]))
 
