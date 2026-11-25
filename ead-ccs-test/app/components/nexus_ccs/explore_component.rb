@@ -77,6 +77,20 @@ module NexusCcs
       end
     end
 
+    # Each period's years, the bold line of its card ("1800–1899", "Up to 1799", "2000 to today"), from its search's year range
+    def period_spans
+      overview.period_tiles.map do |tile|
+        range = tile.query.dig(:range, ExploreEntryPoints::DATE_FIELD) || tile.query.dig("range", ExploreEntryPoints::DATE_FIELD) || {}
+        first, last = range.values_at(:begin, :end).zip(range.values_at("begin", "end")).map(&:compact).map(&:first)
+        first = nil if first.to_i <= -10_000 # the earliest period's open start
+        last = nil if last.to_i >= Time.zone.today.year # the latest period runs to this year
+        if first && last then t("home.periods.span", first: first, last: last)
+        elsif last then t("home.periods.up_to", last: last)
+        elsif first then t("home.periods.from", first: first)
+        end
+      end
+    end
+
     # "What do you want to explore?": Explore by place, by time and by colour, and the stories, as Google's picture-only stack. Each takes a
     # picture no section above has used, from its own kind where it can (a place's for Places), else any record type's or place's
     def way_tiles

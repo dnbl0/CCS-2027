@@ -1,0 +1,26 @@
+<%# The cards are groups in a plain container (the ARIA carousel pattern: each a group named "2 of 4") %>
+<div class="card-carousel" role="region" aria-roledescription="carousel" aria-label="<%= label %>" data-controller="carousel">
+  <div class="card-carousel__track" data-carousel-target="track" data-action="scroll->carousel#update keydown->carousel#key">
+    <% tiles.each_with_index do |tile, index| %>
+      <div class="card-carousel__slide" role="group" aria-roledescription="slide" aria-label="<%= index + 1 %> of <%= tiles.size %>">
+        <article class="card-carousel__card">
+          <div class="card-carousel__media">
+            <% if tile.image %><img src="<%= tile.image %>" alt="" loading="lazy" decoding="async"><% end %>
+          </div>
+          <h3 class="card-carousel__title"><%= link_to tile.path, class: "card-carousel__link" do %><span class="card-carousel__title-line"><%= tile.title %></span><% end %></h3>
+          <% if meta(index).present? %><p class="card-carousel__meta"><%= meta(index) %></p><% end %>
+          <% if tile.text.present? %><p class="card-carousel__text"><%= tile.text %></p><% end %>
+        </article>
+      </div>
+    <% end %>
+  </div>
+  <div class="card-carousel__controls" data-js-only>
+    <button type="button" class="card-carousel__button" aria-label="<%= previous %>" data-carousel-target="previous" data-action="carousel#previous" aria-disabled="true">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.4 6.4 14 5l-7 7 7 7 1.4-1.4L9.8 12z" /></svg>
+    </button>
+    <p class="card-carousel__status" data-carousel-target="status" aria-live="polite">1 of <%= tiles.size %></p>
+    <button type="button" class="card-carousel__button" aria-label="<%= following %>" data-carousel-target="next" data-action="carousel#next">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.6 17.6 10 19l7-7-7-7-1.4 1.4 5.6 5.6z" /></svg>
+    </button>
+  </div>
+</div>

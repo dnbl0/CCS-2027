@@ -20,8 +20,6 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 
 .home-section__link { flex: none; min-height: 44px; align-items: center; font-weight: var(--ccs-font-weight-semibold); }
 
-.explore-periods .home-section__intro,
-.explore-periods .home-section__link { color: var(--ccs-white); }
 
 /* ---- Cover card: the picture fills it, the name sits on the navy scrim ---- */
 /* The tile variant of the site's card (result card / explore card): the picture fills the space above, the name (and for the lead,
