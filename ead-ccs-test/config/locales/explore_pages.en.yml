@@ -12,7 +12,7 @@ en:
       short: "Time"
       short_intro: "When the objects were made, century by century, and the eras they are catalogued under."
       intro: "The centuries the records come from, earliest first. Each opens its own page, with its decades and its records."
-      eras_folded: "Eras as catalogued (%{count})"
+      eras_folded: "Eras as catalogued"
       centuries: "Centuries"
       decades: "Decades of %{period}"
       all_centuries: "All centuries"
@@ -26,16 +26,9 @@ en:
       empty: "No records have a date in this period."
       earlier: "Earlier"
       strip_label: "Centuries"
-      strip_item:
-        one: "%{short} (%{period}): %{formatted} record"
-        other: "%{short} (%{period}): %{formatted} records"
-      strip_note: "Choose a century to see its records. Each bar shows how many records it has, scaled so the smaller centuries stay visible: most are from %{busiest} (%{count} records)."
-      count:
-        one: "%{formatted} record"
-        other: "%{formatted} records"
-      see_all:
-        one: "See the record"
-        other: "See all %{formatted}"
+      strip_item: "%{short} (%{period})"
+      strip_note: "Choose a century to see its records."
+      see_all: "See them all in the search"
     places:
       title: "Explore by place"
       short: "Places"

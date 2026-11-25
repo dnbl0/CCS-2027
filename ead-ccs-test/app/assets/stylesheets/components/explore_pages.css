@@ -280,9 +280,6 @@
   position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: var(--ccs-space-1);
   width: 72px; height: 104px; padding: var(--ccs-space-2) 0 var(--ccs-space-3); color: var(--ccs-text-primary); text-decoration: none;
 }
-.explore-strip__bar { width: 28px; height: calc(56px * var(--h) / 100); min-height: 3px; border-radius: 3px 3px 0 0; background: var(--ccs-text-brand); opacity: 0.35; }
-.explore-strip__period:hover .explore-strip__bar { opacity: 0.6; }
-.explore-strip__period[aria-current="page"] .explore-strip__bar { opacity: 1; }
 .explore-strip__year { font-size: var(--ccs-font-size-xs); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .explore-strip__period[aria-current="page"] .explore-strip__year { font-weight: 700; }
 .explore-strip__period:hover .explore-strip__year { text-decoration: underline; }
@@ -290,7 +287,6 @@
 .picture-wall { margin-top: var(--ccs-space-6); }
 .picture-wall__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ccs-space-2) var(--ccs-space-4); margin-bottom: var(--ccs-space-4); }
 .picture-wall__heading { display: inline-flex; align-items: center; gap: var(--ccs-space-3); margin: 0; }
-.picture-wall__count { margin: 0; color: var(--ccs-text-secondary); }
 .picture-wall__links { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2) var(--ccs-space-5); margin: 0 0 0 auto; }
 .picture-wall__links a { min-height: 44px; align-items: center; }
 .picture-wall__empty { margin: 0; color: var(--ccs-text-secondary); }
@@ -341,7 +337,6 @@
 .colour-card:hover .colour-card__link { text-decoration: underline; }
 .colour-card__link:focus-visible { outline: none; }
 .colour-card__link:focus-visible::after { outline: 3px solid var(--ccs-focus-ring); outline-offset: 4px; border-radius: var(--ccs-radius-md); }
-.colour-card__count { margin: var(--ccs-space-1) 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
 .colour-card__picture img { transition: transform 300ms cubic-bezier(0, 0, 0.25, 1), opacity 300ms ease-out; }
 .colour-card:hover .colour-card__picture img { transform: scale(1.05); }
 @media (prefers-reduced-motion: reduce) { .colour-card__picture img { transition: none; } }

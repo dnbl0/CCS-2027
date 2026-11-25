@@ -33,10 +33,10 @@
 <% @pictures.prepare(kinds.map { |value, _| [ "object_type_ssim", [ value ] ] } + periods.map(&:first) +
                      related.flat_map { |_, field, pairs| pairs.map { |related_entry, _| [ field, [ related_entry.name, *Array(related_entry.variants) ] ] } }) %>
 <%# the tiles, worked out before anything is drawn, so the strip at the head takes only pictures nothing else on the page shows %>
-<% kind_tiles = kinds.map { |value, count| facet_tile(value, count, search_catalog_path(refine(@search_query, "object_type_ssim", value)), @pictures.value("object_type_ssim", value)) } %>
-<% period_tiles = periods.map { |related_period, count| facet_tile(related_period.label, count, related_period.path, @pictures.period(related_period)) } %>
+<% kind_tiles = kinds.map { |value, _count| facet_tile(value, search_catalog_path(refine(@search_query, "object_type_ssim", value)), @pictures.value("object_type_ssim", value)) } %>
+<% period_tiles = periods.map { |related_period, _count| facet_tile(related_period.label, related_period.path, @pictures.period(related_period)) } %>
 <%# a related value's picture: a record with any of its spellings (Browse::Index::Entry#variants) %>
-<% related = related.map { |heading, field, pairs| [ heading, pairs.map { |related_entry, count| facet_tile(related_entry.name, count, related_entry.path, @pictures.value(field, related_entry.name, *Array(related_entry.variants))) } ] } %>
+<% related = related.map { |heading, field, pairs| [ heading, pairs.map { |related_entry, _count| facet_tile(related_entry.name, related_entry.path, @pictures.value(field, related_entry.name, *Array(related_entry.variants))) } ] } %>
 <%# the strip: the place's own pictures that neither "Discover" nor a tile shows (left out when there are fewer than three) %>
 <% pictured = @pictures.spare(5) %>
 <% advisory = result.cultural.positive? || name.match?(/aborigin|indigenous|torres strait|first nations|koori|palawa/i) %>
@@ -57,9 +57,8 @@
     <header class="place-page__head">
       <p class="place-page__kind"><%= kind_label %><%= " #{t('browse.place.in_region', region: region)}" if region %><% if period&.parent %>, <%= link_to period.parent.label, period.parent.path %><% end %></p>
       <h1 class="place-page__title"><%= name %></h1>
-      <p class="place-page__summary">
-        <%= t("browse.place.records", count: result.total, number: number_with_delimiter(result.total)) %><% if span %>, <%= t("browse.place.span", span: span) %><% end %><% if result.facets["collection_ssim"].any? %>, <%= t("browse.place.held_in", count: result.facets["collection_ssim"].size) %><% end %>.
-      </p>
+      <%# no number of records or of collections (the site shows no counts): when its records were made, where that is known %>
+      <% if span %><p class="place-page__summary"><%= t("browse.place.span", span: span).upcase_first %>.</p><% end %>
       <% if facts&.any? || life %>
         <dl class="place-page__facts">
           <% if life %><div><dt><%= t("browse.entity.life_dates") %></dt><dd><%= life %></dd></div><% end %>
@@ -70,7 +69,7 @@
         </dl>
       <% end %>
       <div class="place-page__actions">
-        <%= link_to t("browse.entity.see_all", count: number_with_delimiter(result.total)), search_catalog_path(@search_query), class: "btn btn-primary" %>
+        <%= link_to t("browse.entity.see_all"), search_catalog_path(@search_query), class: "btn btn-primary" %>
         <% hub = entry ? entry.kind.key : "periods" %>
         <%= link_to t("browse.place.all", hub: BrowseHubs.find(hub)&.title.to_s.downcase), BrowseHubs.find(hub).path, class: "arrow-link arrow-link--icon" %>
       </div>
@@ -85,9 +84,9 @@
 
     <% if result.facets["collection_ssim"].any? %>
       <section class="place-section" aria-labelledby="place-collections">
-        <h2 id="place-collections" class="place-section__heading"><%= t("browse.place.collections", count: result.facets["collection_ssim"].size) %></h2>
+        <h2 id="place-collections" class="place-section__heading"><%= t("browse.place.collections_heading") %></h2>
         <ul class="place-collections">
-          <% result.facets["collection_ssim"].first(8).each do |name, count| %>
+          <% result.facets["collection_ssim"].first(8).each do |name, _count| %>
             <% picture = collection_picture(name) %>
             <%# the collection's own page where it has one; otherwise its records from here in the search %>
             <% to = landing_path_for("collections", name) || search_catalog_path(refine(@search_query, "collection_ssim", name)) %>
@@ -96,7 +95,6 @@
                 <% if picture %><%= link_to to, class: "place-collection__media", tabindex: -1, "aria-hidden": true do %><%= image_tag AssetVersion.url(picture.path), alt: "", loading: "lazy", decoding: "async", width: picture.width, height: picture.height %><% end %><% end %>
                 <div class="result-card__content">
                   <h3 class="document-title-heading"><%= link_to name, to, class: "explore-card__link" %></h3>
-                  <p class="explore-card__intro"><%= t("browse.place.records", count: count, number: number_with_delimiter(count)) %></p>
                 </div>
               </article>
             </li>

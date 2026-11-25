@@ -11,12 +11,9 @@
 <% periods = @list.periods? %>
 <% noun = @hub.title.downcase %>
 <% state = { view: (@hub_view == :az ? "az" : nil), region: @list.region }.compact %>
-<% first, last, size = @list.range %>
-<% summary = if @hub_view == :all
-     t("browse.hub.summary_all", count: @wall.size, noun: noun, singular: @hub.singular.downcase, region: (@list.region ? t("browse.places.in_region", region: @list.region) : ""))
-   else
-     t("browse.hub.summary", first: number_with_delimiter(first), last: number_with_delimiter(last), count: size, total: number_with_delimiter(size), noun: noun, singular: @hub.singular.downcase)
-   end %>
+<%# what the results show, for the heading and the announcement when they change: words only (the site shows no counts) %>
+<% all_heading = @list.region ? t("browse.places.region_heading", region: @list.region) : (periods ? t("browse.hub.periods_heading") : t("browse.hub.all_heading", noun: @hub.title)) %>
+<% summary = @hub_view == :all ? all_heading : @list.heading %>
 <%# the search, in the template's toolbar (outside the results frame, so it keeps its focus while the results change) %>
 <% content_for :browse_toolbar do %>
       <% unless periods || kind == "colours" %>
@@ -46,21 +43,21 @@
         <nav class="places-regions" aria-label="<%= t("browse.places.regions") %>">
           <ul class="places-regions__list">
             <li><%= link_to t("browse.places.all_regions"), @hub.path(**state.except(:region), filter: @list.filter, letter: @list.letter), class: "places-chip", "aria-current": (@list.region ? nil : "true") %></li>
-            <% @list.regions.each do |name, count| %>
-              <li><%= link_to @hub.path(**state, region: name, filter: @list.filter, letter: @list.letter), class: "places-chip", "aria-current": (@list.region == name ? "true" : nil) do %><%= name %> <span class="places-chip__count"><%= number_with_delimiter(count) %></span><% end %></li>
+            <% @list.regions.each do |name, _count| %>
+              <li><%= link_to @hub.path(**state, region: name, filter: @list.filter, letter: @list.letter), class: "places-chip", "aria-current": (@list.region == name ? "true" : nil) do %><%= name %><% end %></li>
             <% end %>
           </ul>
         </nav>
       <% end %>
 
       <% if @hub_view == :all %>
-        <h2 class="places-page__heading"><%= @list.region ? t("browse.places.region_heading", region: @list.region) : (periods ? t("browse.hub.periods_heading") : t("browse.hub.all_heading", noun: @hub.title)) %></h2>
+        <h2 class="places-page__heading"><%= all_heading %></h2>
         <% if @wall.any? %>
           <%= render NexusCcs::MosaicComponent.new(tiles: @wall.map { |card| hub_tile(card, @list) }, label: t("browse.hub.all_heading", noun: @hub.title), lanes: (periods ? 4 : 6)) %>
         <% else %>
           <p class="browse-empty"><%= t("browse.hub.no_pictures", noun: noun) %></p>
         <% end %>
-        <p class="places-page__more"><%= link_to t(periods ? "browse.hub.every_period" : "browse.hub.every", noun: noun, singular: @hub.singular.downcase, count: number_with_delimiter(@list.region ? @list.range.last : @list.total)), @hub.path(view: "az", region: @list.region), class: "arrow-link arrow-link--icon" %></p>
+        <p class="places-page__more"><%= link_to t(periods ? "browse.hub.every_period" : "browse.hub.every", noun: noun, singular: @hub.singular.downcase), @hub.path(view: "az", region: @list.region), class: "arrow-link arrow-link--icon" %></p>
       <% else %>
         <% if @list.letters.any? %>
         <nav class="places-letters" aria-label="<%= t("browse.hub.letters", noun: noun) %>">
@@ -74,14 +71,13 @@
         <% end %>
         <div class="places-list__head">
           <h2 class="places-page__heading"><%= @list.heading %></h2>
-          <% if size.positive? && !periods %><p class="places-list__summary"><%= summary %></p><% end %>
         </div>
         <% if (@list.filter || @list.region) && @list.chosen.empty? %>
           <p class="browse-empty"><%= t("browse.hub.none", singular: @hub.singular.downcase, filter: @list.filter.presence || @list.region) %> <%= link_to t("browse.filter.clear"), @hub.path(view: "az") %></p>
         <% end %>
         <ul class="places-list">
           <% @list.entries.each do |entry| %>
-            <li><%= link_to (entry.path || search_action_path(entry.query)), class: "places-list__link", data: { turbo_frame: "_top" } do %><span class="places-list__name"><%= entry.label.to_s.upcase_first %></span> <span class="places-list__count"><%= t("home.records", count: entry.count, number: number_with_delimiter(entry.count)) %></span><% end %></li>
+            <li><%= link_to (entry.path || search_action_path(entry.query)), class: "places-list__link", data: { turbo_frame: "_top" } do %><span class="places-list__name"><%= entry.label.to_s.upcase_first %></span><% end %></li>
           <% end %>
         </ul>
         <%= render "browse_entities/pager", page: @list.page, pages: @list.pages, label: t("browse.pagination", kind: noun) if @list.paged? %>

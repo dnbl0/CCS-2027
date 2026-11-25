@@ -11,10 +11,10 @@
 <% pictures&.prepare(groups.flat_map { |field, _, pairs| pairs.map { |value, _| [ field, [ value ] ] } }) %>
 <%# each group's tiles, worked out before anything is drawn, so the strip at the head takes only pictures nothing else on the page shows %>
 <% groups = groups.map do |field, label, pairs|
-     tiles = pairs.map do |value, count|
+     tiles = pairs.map do |value, _count|
        own = named && field == "named_collection_ssim" ? landing_path_for("named-collections", value) : nil
        to = own || search_catalog_path(search_query.deep_merge(f: { field => Array(search_query.dig(:f, field)) + [ value ] }))
-       facet_tile(value, count, to, pictures&.value(field, value))
+       facet_tile(value, to, pictures&.value(field, value))
      end
      [ field, label, tiles ]
    end %>
@@ -33,10 +33,11 @@
     <header class="place-page__head">
       <p class="place-page__kind"><%= kind_label %></p>
       <h1 class="place-page__title"><%= name %></h1>
-      <p class="place-page__summary"><%= showcase.total.positive? ? t("browse.place.records", count: showcase.total, number: number_with_delimiter(showcase.total)) : t("nexus_ccs.showcase.no_records") %></p>
+      <%# no number of records (the site shows no counts); only the note when none match %>
+      <% unless showcase.total.positive? %><p class="place-page__summary"><%= t("nexus_ccs.showcase.no_records") %></p><% end %>
       <p class="place-page__intro" data-placeholder-wording><%= intro %> <span class="showcase__placeholder">[<%= t("nexus_ccs.placeholder") %>]</span></p>
       <div class="place-page__actions">
-        <% if showcase.total.positive? %><%= link_to t("nexus_ccs.showcase.see_all", count: number_with_delimiter(showcase.total)), search_catalog_path(search_query), class: "btn btn-primary" %><% end %>
+        <% if showcase.total.positive? %><%= link_to t("nexus_ccs.showcase.see_all"), search_catalog_path(search_query), class: "btn btn-primary" %><% end %>
         <%= link_to back.first, back.last, class: "arrow-link arrow-link--icon" %>
       </div>
     </header>
@@ -54,7 +55,7 @@
       <% if documents.any? %>
         <%= render NexusCcs::CardLayoutComponent.new(cards: documents, layout: :mosaic, lanes: 4, label: t("nexus_ccs.showcase.highlights"),
                                                      renderer: ->(document) { NexusCcs::RecordCardComponent.new(document: document) }) %>
-        <% if showcase.total > documents.size %><p class="places-page__more"><%= link_to t("nexus_ccs.showcase.see_all", count: number_with_delimiter(showcase.total)), search_catalog_path(search_query), class: "arrow-link arrow-link--icon" %></p><% end %>
+        <% if showcase.total > documents.size %><p class="places-page__more"><%= link_to t("nexus_ccs.showcase.see_all"), search_catalog_path(search_query), class: "arrow-link arrow-link--icon" %></p><% end %>
       <% elsif showcase.total.positive? %>
         <p class="browse-empty"><%= t("nexus_ccs.showcase.none") %></p>
       <% end %>

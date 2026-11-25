@@ -18,7 +18,7 @@
             <ul class="explore-strip__list">
               <% @colours.each do |colour| %>
                 <% name = colour_facet_label(colour.name) %>
-                <% words = t("colours.swatch", name: name, count: colour.count, formatted: number_with_delimiter(colour.count)) %>
+                <% words = name %>
                 <li class="explore-strip__item">
                   <%= link_to explore_colours_path(colour: colour.name), class: "explore-strip__swatch colours__swatch--#{colour.name}", title: words,
                               aria: { label: words, current: ("page" if colour == @colour) }, data: { explore_strip_target: ("chosen" if colour == @colour) } do %><% end %>
@@ -30,10 +30,9 @@
 
           <% if @colour %>
             <% name = colour_facet_label(@colour.name) %>
-            <% numbers = { count: @colour.count, formatted: number_with_delimiter(@colour.count) } %>
-            <%= render "explore/picture_wall", records: @records, unavailable: t("colours.unavailable"), count: t("colours.count", **numbers),
+            <%= render "explore/picture_wall", records: @records, unavailable: t("colours.unavailable"),
                        heading: safe_join([ tag.span(class: "picture-wall__dot colours__swatch--#{@colour.name}", aria: { hidden: true }), name ]),
-                       links: [ [ t("colours.see_all", **numbers), search_catalog_path(f: { field => [ @colour.name ] }) ] ], band: "colours__swatch--#{@colour.name}",
+                       links: [ [ t("colours.see_all"), search_catalog_path(f: { field => [ @colour.name ] }) ] ], band: "colours__swatch--#{@colour.name}",
                        steps: [ @previous && [ t("colours.previous", name: colour_facet_label(@previous.name)), "← #{colour_facet_label(@previous.name)}", explore_colours_path(colour: @previous.name) ],
                                 @next && [ t("colours.next", name: colour_facet_label(@next.name)), "#{colour_facet_label(@next.name)} →", explore_colours_path(colour: @next.name) ] ].compact %>
           <% else %>
@@ -51,7 +50,6 @@
                     </div>
                     <span class="colour-card__band colours__swatch--<%= colour.name %>" aria-hidden="true"></span>
                     <h3 class="colour-card__name"><%= link_to colour_facet_label(colour.name), explore_colours_path(colour: colour.name), class: "colour-card__link" %></h3>
-                    <p class="colour-card__count"><%= t("colours.count", count: colour.count, formatted: number_with_delimiter(colour.count)) %></p>
                   </li>
                 <% end %>
               </ul>

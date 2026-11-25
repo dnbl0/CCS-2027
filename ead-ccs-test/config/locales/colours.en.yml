@@ -10,15 +10,7 @@ en:
     previous: "Previous colour: %{name}"
     next: "Next colour: %{name}"
     strip_label: "Colours"
-    swatch:
-      one: "%{name}: %{formatted} record"
-      other: "%{name}: %{formatted} records"
-    see_all:
-      one: "See the record in the search"
-      other: "See all %{formatted} in the search"
-    count:
-      one: "%{formatted} record"
-      other: "%{formatted} records"
+    see_all: "See them all in the search"
     empty: "No colours are available yet."
     unavailable: "The colours cannot be shown just now. Please try again later."
     filter: "Colour"

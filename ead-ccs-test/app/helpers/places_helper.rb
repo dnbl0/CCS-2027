@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 # The Browse pages' tiles (browse/hub): each value as a tile of the home page's mosaic (NexusCcs::MosaicComponent), its picture whole with
-# its name and its number of records under it, opening its own page (a place, maker, subject or period) or else its records in the search
+# its name under it (no number of records: the site shows no counts, docs/handover-home-bento.md), opening its own page (a place, maker, subject or period) or else its records in the search
 module PlacesHelper
   def hub_tile(card, list)
     image = NexusCcs::ExploreCardComponent.image?(card, remote: true) ? card.image : nil
-    count = list.count_of(card.label) || card.count
-    HomeSections::Tile.new(title: card.label, text: t("home.records", count: count, number: number_with_delimiter(count)),
+    HomeSections::Tile.new(title: card.label, text: nil,
                            path: card.path || search_action_path(card.query), image: image && DamImage.sized(AssetVersion.url(image.path), 600),
                            lead: false, cta: nil, external: false, width: image&.width, height: image&.height)
   end
@@ -23,10 +22,9 @@ module PlacesHelper
     end
   end
 
-  # One value of an entity page's ways in (a kind of record, a period, a place, a maker, a subject) as a mosaic tile: its name, its number
-  # of records and a picture of one of them (Browse::FacetPictures; nil: listed after the mosaic, browse_entities/_facet_tiles)
-  def facet_tile(label, count, path, picture)
-    HomeSections::Tile.new(title: label.to_s.upcase_first, text: t("home.records", count: count, number: number_with_delimiter(count)), path: path,
+  # One value of an entity page's ways in (a kind of record, a period, a place, a maker, a subject) as a mosaic tile: its name and a picture of one of them (Browse::FacetPictures; nil: listed after the mosaic, browse_entities/_facet_tiles)
+  def facet_tile(label, path, picture)
+    HomeSections::Tile.new(title: label.to_s.upcase_first, text: nil, path: path,
                            image: picture && DamImage.sized(AssetVersion.url(picture.src), 600), lead: false, cta: nil, external: false, width: nil, height: nil)
   end
 
@@ -52,8 +50,7 @@ module PlacesHelper
     image = NexusCcs::ExploreCardComponent.image?(tile, remote: true) ? tile.image : nil
     image ||= collection_tile_picture(tile.value) if dimension.slug == "collections" # the home page's picture of the collection
     path = (dimension.landing? && landing_path_for(dimension.slug, tile.value)) || search_action_path(tile.query)
-    HomeSections::Tile.new(title: tile.value.to_s.upcase_first, text: t("home.records", count: tile.count, number: number_with_delimiter(tile.count)),
-                           path: path, image: image && DamImage.sized(AssetVersion.url(image.path), 600),
+    HomeSections::Tile.new(title: tile.value.to_s.upcase_first, text: nil, path: path, image: image && DamImage.sized(AssetVersion.url(image.path), 600),
                            lead: false, cta: nil, external: false, width: image&.width, height: image&.height)
   end
 
