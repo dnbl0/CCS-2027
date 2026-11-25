@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-# The pages behind the home page's Explore tiles: /browse lists the ways in, /browse/:slug lists every value of one (BrowseHubs).
+# The pages behind the home page's Explore tiles: /browse lists the ways in, and every page under it lists every value of one (BrowseHubs)
+# on the one template (browse/_template, browse/hub): object types, classifications, materials, collections, named collections, places,
+# time, makers, subjects and colours. Time's, places' and colours' third view (their explorer) is ExploreController's and ColoursController's.
 class BrowseController < ApplicationController
   layout "pages"
 
@@ -15,7 +17,7 @@ class BrowseController < ApplicationController
     @hub = BrowseHubs.find(params[:slug]) || raise(ActionController::RoutingError, "Not Found")
     @browse_meta = Browse::Meta.hub(@hub)
     @list = BrowseList.new(@hub, letter: params[:letter], filter: params[:filter], page: params[:page], region: params[:region])
-    return render(status: :service_unavailable) unless @list.available?
+    return render("browse/unavailable", status: :service_unavailable) unless @list.available?
 
     # Every Browse page, after Google Arts & Culture's Places: "All", a mosaic of the values with pictures, or "A–Z" (periods: in order),
     # the whole list by letter

@@ -1,0 +1,20 @@
+<%# The one template of every page under /browse (BrowseHubs; after Google Arts & Culture's category pages, looked at 2026-11-25): the
+    breadcrumb, the centred title and its line, then the page's own part (yielded): the hub's search, views and mosaic or list
+    (browse/hub), or an explorer drawn as the third view (the timeline, the map, the spectrum). Nothing above the views differs from
+    one page to the next, so the pages cannot drift apart.
+    locals: hub (BrowseHubs::Hub), title (the document title's first part), main (extra attributes for main, optional) %>
+<% content_for :body_class, "page-browse page-places page-browse-#{hub.slug}" %>
+<% content_for :title, "#{title} — Collections Navigator — University of Melbourne" %>
+<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ t("browse.title"), browse_path ], [ hub.title, nil ] ]) %>
+
+<%= tag.main(class: "places-page", id: "main-content", **local_assigns.fetch(:main, {})) do %>
+  <div class="places-page__inner">
+    <header class="places-page__head">
+      <h1 class="places-page__title"><%= hub.title %></h1>
+      <p class="places-page__intro"><%= hub.intro %></p>
+    </header>
+    <%# the toolbar under the head on every page: the hub's search when it has one (content_for :browse_toolbar), else just its rule %>
+    <div class="places-toolbar<%= " places-toolbar--rule" unless content_for?(:browse_toolbar) %>"><%= yield :browse_toolbar %></div>
+    <%= yield %>
+  </div>
+<% end %>

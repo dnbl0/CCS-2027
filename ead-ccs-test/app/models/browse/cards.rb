@@ -40,12 +40,12 @@ module Browse
       end
     end
 
-    def self.periods?(hub) = hub.slug == "periods"
+    def self.periods?(hub) = hub.periods?
 
     def self.path(hub, entry)
       return Browse::Periods.for_span(entry["first"], entry["last"])&.path if entry["first"]
 
-      Browse.path_for(hub.slug, entry["label"]) if Browse::Kind.find(hub.slug)
+      BrowseHubs.value_path(hub, entry["label"])
     end
 
     def self.field(hub) = CARD_FIELDS.fetch(hub.slug, hub.field)
@@ -101,17 +101,18 @@ module Browse
     # withheld one) and it is not sensitive (Sensitivity). The picture is as the Explore tiles keep it; its size is known only for a thumbnail
     # this server holds (the DAM's are on its own host).
     def self.example_image(hub, candidate, used)
-      response = Discovery.search(q: "*:*", sort: "id asc", rows: PER_VALUE, fq: THUMBNAIL_FILTERS + [ group_filter(hub, candidate) ])
-      response.documents.each do |document|
-        next if used.include?(document.id.to_s) || !AccessPolicy.view?(document) || Sensitivity.sensitive?(document)
-
-        path = document["thumbnail_path_ssi"].to_s
-        next if path.blank?
-
-        width, height = ImageDimensions.for_path(path)
-        return { id: document.id.to_s, title: Array(document["title_tsim"]).first.to_s.strip.presence || "Untitled record", path: path, width: width, height: height }
+      response = Discovery.search(q: "*:*", sort: "id asc", rows: PER_VALUE, fq: THUMBNAIL_FILTERS + [ group_filter(hub, candidate) ],
+                                  fl: (Discovery::FIELDS + [ field(hub) ]).uniq.join(","))
+      shown = response.documents.select do |document|
+        !used.include?(document.id.to_s) && AccessPolicy.view?(document) && !Sensitivity.sensitive?(document) && document["thumbnail_path_ssi"].present?
       end
-      nil
+      # a colour's picture is one whose image is mostly that colour (colour_ssim is ranked, the biggest share first), where there is one
+      document = (shown.find { |each| Array(each[field(hub)]).first == candidate["label"] } if hub.slug == "colours") || shown.first
+      return unless document
+
+      path = document["thumbnail_path_ssi"].to_s
+      width, height = ImageDimensions.for_path(path)
+      { id: document.id.to_s, title: Array(document["title_tsim"]).first.to_s.strip.presence || "Untitled record", path: path, width: width, height: height }
     end
 
     # One facet request for the card's records (CardDescription): the kinds of record (not for a kind itself) and the collections

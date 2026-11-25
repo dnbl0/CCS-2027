@@ -64,6 +64,8 @@
      the list and the map. Before the map is loaded its panel shows the places as dots from the page's own data.
    Targets are at least 44px; the active things (pressed chip, marked pin, the floating button) are ink, the site's darkest text. */
 .place-explorer-wrap { padding: var(--ccs-space-5) clamp(var(--ccs-space-4), 3vw, var(--ccs-space-7)) var(--ccs-space-8); }
+/* inside the one Browse template (browse/_template) the explorer lines up with the title and the tabs: the template gives the margins */
+.places-page__inner .place-explorer-wrap { padding-inline: 0; }
 .place-explorer { --tile-gap: var(--ccs-space-5); display: flex; flex-direction: column; gap: var(--ccs-space-5); }
 .no-js .place-explorer [data-js-only] { display: none; }
 

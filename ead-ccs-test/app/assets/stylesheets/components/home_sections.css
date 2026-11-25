@@ -163,6 +163,7 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 
 /* The toolbar stays in view while the page scrolls: the search, then (in the frame) the views, the regions and the map */
 .places-toolbar { position: sticky; top: 0; z-index: 5; margin: 0 calc(-1 * var(--ccs-space-4)) var(--ccs-space-4); padding: var(--ccs-space-3) var(--ccs-space-4); background: var(--ccs-white); box-shadow: 0 1px 0 var(--color-border-grey-91); }
+.places-toolbar--rule { position: static; padding-block: 0; }
 
 .places-search { max-width: 40rem; margin-inline: auto; }
 
@@ -425,9 +426,6 @@ body.page-categories main.categories-page > .ccs-section.home-section { backgrou
 body.page-categories main.categories-page > .ccs-section.home-section:nth-of-type(even) { background: var(--ccs-surface-subtle); }
 body.page-categories main.categories-page > .ccs-section.home-section.home-section--tinted { background: var(--section-background-color); }
 
-/* A category's page (categories/show): the four with the most records as the home page's cluster, above the mosaic of the rest */
-.categories-lead { margin-block: var(--ccs-space-6) var(--ccs-space-8); }
-.categories-lead__heading { margin: 0 0 var(--ccs-space-4); }
 
 /* The Browse page's last section, the ways in that are not lists of values (browse/index): plain cards, two to four to a row, each one a
    link with its line */

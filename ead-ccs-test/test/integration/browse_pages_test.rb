@@ -97,7 +97,7 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :service_unavailable
-    assert_select "h1", "Explore by place"
+    assert_select "h1", "Places"
     assert_select ".browse__unavailable"
   end
 

@@ -1,7 +1,8 @@
-<%# A Browse page (BrowseController#show: object types, places, periods, makers, subjects), after Google Arts & Culture's Places page
-    (looked at 2026-11-23, described in our own words). A toolbar that stays in view: the search (live as you type; not for periods), the two
-    views as tabs (All: a mosaic of the values with the most pictured records, each picture whole with its name under it; A–Z: every value by
-    letter, or the periods in order), the regions and the map (places only). The search
+<%# Every page under /browse (BrowseController#show, BrowseHubs), on the one template (browse/_template), after Google Arts & Culture's
+    category pages (looked at 2026-11-25, described in our own words). A toolbar that stays in view: the search (live as you type; not for
+    time or colours, whose lists are short), the views as tabs (browse/_views: All, a mosaic of the values with the most pictured records,
+    each picture whole with its name under it; A–Z, every value by letter, or the periods in order; and time's, places' and colours'
+    explorer), the regions (places only). The search
     stays outside the results frame so it keeps its focus while the results change; the views, regions, letters and results are one Turbo
     frame, updated without a reload and with the address kept (places_search_controller.js). Without JavaScript every link and the form
     load the page as usual. %>
@@ -9,8 +10,6 @@
 <% places = kind == "places" %>
 <% periods = @list.periods? %>
 <% noun = @hub.title.downcase %>
-<% content_for :body_class, "page-browse page-places page-browse-#{kind}" %>
-<% content_for :title, "#{@hub.title} — Collections Navigator — University of Melbourne" %>
 <% state = { view: (@hub_view == :az ? "az" : nil), region: @list.region }.compact %>
 <% first, last, size = @list.range %>
 <% summary = if @hub_view == :all
@@ -18,18 +17,10 @@
    else
      t("browse.hub.summary", first: number_with_delimiter(first), last: number_with_delimiter(last), count: size, total: number_with_delimiter(size), noun: noun, singular: @hub.singular.downcase)
    end %>
-<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", browse_path ], [ @hub.title, nil ] ]) %>
-
-<main class="places-page" id="main-content" data-controller="places-search">
-  <div class="places-page__inner">
-    <header class="places-page__head">
-      <h1 class="places-page__title"><%= @hub.title %></h1>
-      <p class="places-page__intro"><%= @hub.intro %></p>
-    </header>
-
-    <div class="places-toolbar">
-      <% unless periods %>
-      <%= form_with url: browse_hub_path(@hub.slug), method: :get, class: "places-search", data: { turbo_frame: "places-results", turbo_action: "advance", places_search_target: "form" },
+<%# the search, in the template's toolbar (outside the results frame, so it keeps its focus while the results change) %>
+<% content_for :browse_toolbar do %>
+      <% unless periods || kind == "colours" %>
+      <%= form_with url: @hub.path, method: :get, class: "places-search", data: { turbo_frame: "places-results", turbo_action: "advance", places_search_target: "form" },
                     html: { role: "search", "aria-label": t("browse.filter.label", kind: noun) } do |form| %>
         <%= form.label :filter, t("browse.hubs.#{kind}.search_label", default: t("browse.hub.search_label", singular: @hub.singular.downcase)), class: "places-search__label" %>
         <div class="places-search__row">
@@ -41,27 +32,22 @@
       <% end %>
       <% end %>
       <p class="visually-hidden" role="status" data-places-search-target="status"><%= summary %></p>
-    </div>
+<% end %>
+<%= render layout: "browse/template", locals: { hub: @hub, title: @hub.title, main: { data: { controller: "places-search" } } } do %>
 
     <turbo-frame id="places-results" data-places-search-target="frame" data-turbo-action="advance">
       <%# What the frame now shows, for the announcement and the search's region (Turbo replaces the frame's contents, not its attributes) %>
       <span hidden data-places-state data-summary="<%= summary %>" data-region="<%= @list.region %>"></span>
       <div class="places-nav">
-        <nav class="places-views" aria-label="<%= t("browse.places.views") %>">
-          <%# Places' plain address is the places page (the map and cards, ExploreController#places): its All asks for the hub by name %>
-          <%= link_to t("browse.places.all"), browse_hub_path(@hub.slug, region: @list.region, view: (@hub.slug == "places" ? "all" : nil)), class: "places-views__link", "aria-current": (@hub_view == :all ? "page" : nil) %>
-          <%= link_to (periods ? t("browse.hub.in_order") : t("browse.places.az")), browse_hub_path(@hub.slug, view: "az", region: @list.region), class: "places-views__link", "aria-current": (@hub_view == :az ? "page" : nil) %>
-        </nav>
-        <% if places %><%= link_to t("browse.places.map"), explore_places_path, class: "arrow-link arrow-link--icon places-nav__map", data: { turbo_frame: "_top" } %><% end %>
-        <% if periods %><%= link_to t("browse.hub.timeline"), explore_time_path, class: "arrow-link arrow-link--icon places-nav__map", data: { turbo_frame: "_top" } %><% end %>
+        <%= render "browse/views", hub: @hub, view: @hub_view, region: @list.region, in_frame: true %>
       </div>
 
       <% if @list.regions.any? %>
         <nav class="places-regions" aria-label="<%= t("browse.places.regions") %>">
           <ul class="places-regions__list">
-            <li><%= link_to t("browse.places.all_regions"), browse_hub_path(@hub.slug, **state.except(:region), filter: @list.filter, letter: @list.letter), class: "places-chip", "aria-current": (@list.region ? nil : "true") %></li>
+            <li><%= link_to t("browse.places.all_regions"), @hub.path(**state.except(:region), filter: @list.filter, letter: @list.letter), class: "places-chip", "aria-current": (@list.region ? nil : "true") %></li>
             <% @list.regions.each do |name, count| %>
-              <li><%= link_to browse_hub_path(@hub.slug, **state, region: name, filter: @list.filter, letter: @list.letter), class: "places-chip", "aria-current": (@list.region == name ? "true" : nil) do %><%= name %> <span class="places-chip__count"><%= number_with_delimiter(count) %></span><% end %></li>
+              <li><%= link_to @hub.path(**state, region: name, filter: @list.filter, letter: @list.letter), class: "places-chip", "aria-current": (@list.region == name ? "true" : nil) do %><%= name %> <span class="places-chip__count"><%= number_with_delimiter(count) %></span><% end %></li>
             <% end %>
           </ul>
         </nav>
@@ -74,14 +60,14 @@
         <% else %>
           <p class="browse-empty"><%= t("browse.hub.no_pictures", noun: noun) %></p>
         <% end %>
-        <p class="places-page__more"><%= link_to t(periods ? "browse.hub.every_period" : "browse.hub.every", noun: noun, singular: @hub.singular.downcase, count: number_with_delimiter(@list.region ? @list.range.last : @list.total)), browse_hub_path(@hub.slug, view: "az", region: @list.region), class: "arrow-link arrow-link--icon" %></p>
+        <p class="places-page__more"><%= link_to t(periods ? "browse.hub.every_period" : "browse.hub.every", noun: noun, singular: @hub.singular.downcase, count: number_with_delimiter(@list.region ? @list.range.last : @list.total)), @hub.path(view: "az", region: @list.region), class: "arrow-link arrow-link--icon" %></p>
       <% else %>
         <% if @list.letters.any? %>
         <nav class="places-letters" aria-label="<%= t("browse.hub.letters", noun: noun) %>">
           <ul class="places-letters__list">
-            <li><%= link_to t("browse.places.most"), browse_hub_path(@hub.slug, view: "az", region: @list.region), class: "places-letters__link", "aria-current": (@list.letter || @list.filter ? nil : "page") %></li>
+            <li><%= link_to t("browse.places.most"), @hub.path(view: "az", region: @list.region), class: "places-letters__link", "aria-current": (@list.letter || @list.filter ? nil : "page") %></li>
             <% @list.letters.each do |letter| %>
-              <li><%= link_to letter, browse_hub_path(@hub.slug, letter: letter, region: @list.region), class: "places-letters__link", "aria-current": (@list.letter == letter ? "page" : nil) %></li>
+              <li><%= link_to letter, @hub.path(letter: letter, region: @list.region), class: "places-letters__link", "aria-current": (@list.letter == letter ? "page" : nil) %></li>
             <% end %>
           </ul>
         </nav>
@@ -91,7 +77,7 @@
           <% if size.positive? && !periods %><p class="places-list__summary"><%= summary %></p><% end %>
         </div>
         <% if (@list.filter || @list.region) && @list.chosen.empty? %>
-          <p class="browse-empty"><%= t("browse.hub.none", singular: @hub.singular.downcase, filter: @list.filter.presence || @list.region) %> <%= link_to t("browse.filter.clear"), browse_hub_path(@hub.slug, view: "az") %></p>
+          <p class="browse-empty"><%= t("browse.hub.none", singular: @hub.singular.downcase, filter: @list.filter.presence || @list.region) %> <%= link_to t("browse.filter.clear"), @hub.path(view: "az") %></p>
         <% end %>
         <ul class="places-list">
           <% @list.entries.each do |entry| %>
@@ -101,5 +87,4 @@
         <%= render "browse_entities/pager", page: @list.page, pages: @list.pages, label: t("browse.pagination", kind: noun) if @list.paged? %>
       <% end %>
     </turbo-frame>
-  </div>
-</main>
+<% end %>

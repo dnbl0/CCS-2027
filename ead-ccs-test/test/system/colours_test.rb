@@ -23,9 +23,9 @@ class ColoursSystemTest < ApplicationSystemTestCase
   test "the colour page at a desktop and a phone width: every colour named and counted, accessible, no sideways scroll" do
     [ [ 1400, 900 ], [ 390, 844 ], [ 320, 700 ] ].each do |width, height|
       page.current_window.resize_to(width, height)
-      visit "/browse/colours"
+      visit "/browse/colours?view=spectrum"
 
-      assert_selector "h1", text: "Explore by colour"
+      assert_selector "h1", text: "Colours"
       assert_selector "nav.explore-strip a.explore-strip__swatch", count: 12
       assert_selector "main a[href*='colour=']:not([aria-hidden]):not(.explore-strip__swatch)", count: 12
       assert_text(/White\s+84 records/)
@@ -34,7 +34,7 @@ class ColoursSystemTest < ApplicationSystemTestCase
     end
     # choosing a colour swaps the wall in place (a Turbo frame) and the address follows
     page.current_window.resize_to(1400, 900)
-    visit "/browse/colours"
+    visit "/browse/colours?view=spectrum"
     find("a.explore-strip__swatch.colours__swatch--teal").click
     assert_selector "h2#picture-wall-heading", text: "Teal"
     assert_selector "a.explore-strip__swatch.colours__swatch--teal[aria-current=page]"
@@ -45,7 +45,7 @@ class ColoursSystemTest < ApplicationSystemTestCase
       loaded = page.evaluate_script("[...document.querySelectorAll('.picture-wall__link img.is-revealed')].map(img => getComputedStyle(img).opacity)")
       raise Capybara::ExpectationNotMet, "no picture revealed yet" if loaded.empty? || loaded.any? { |opacity| opacity.to_f < 1 }
     end
-    assert_match(/\ATeal — Explore by colour/, page.evaluate_script("document.title"), "the tab's title follows the colour")
+    assert_match(/\ATeal — Spectrum — Colours/, page.evaluate_script("document.title"), "the tab's title follows the colour")
     assert page.evaluate_script("document.activeElement.matches('.colours__swatch--teal')"), "focus stays on the chosen swatch"
     # Turbo marks the frame and the page busy until the new wall is in and the visit is recorded: axe waits for both
     assert_selector "turbo-frame#colour-explorer[complete]:not([aria-busy])", visible: :all

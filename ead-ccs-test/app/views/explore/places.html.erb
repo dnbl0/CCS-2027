@@ -1,19 +1,13 @@
-<%# Explore by place (Explore::Places, Explore::PlaceCards; after Airbnb's search with a map, 2026-11): the places as picture cards beside a
-    map whose pins carry each place's number of records (place_explorer_controller.js). Region chips and a name box narrow both; once the
+<%# Places' third view, the map (?view=map), inside the one Browse template (browse/_template; Explore::Places, Explore::PlaceCards;
+    after Airbnb's search with a map, 2026-11): the places as picture cards beside a map whose pins carry each place's number of records (place_explorer_controller.js). Region chips and a name box narrow both; once the
     map is shown the list follows it. The map is opt-in: nothing is asked of the tile server until the visitor presses Show the map (the
     choice is then remembered in their browser). Under the cards, every region, country and place as lists, which do the same job without
     the map or without JavaScript. %>
-<% content_for :body_class, "page-browse page-explore page-place-explorer" %>
-<% content_for :title, "#{t('explore_pages.places.title')} — Collections Navigator — University of Melbourne" %>
 <% content_for :head, stylesheet_link_tag("vendor/leaflet", media: "all") if @places&.map? %>
-<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", browse_path ], [ t("explore_pages.places.title"), nil ] ]) %>
-<main class="browse explore" id="main-content">
-  <% if @places.nil? || !@places.map? %>
-    <div class="places-page places-page--head"><div class="places-page__inner">
-      <%= render "browse/page_head", title: t("explore_pages.places.title"), intro: t("explore_pages.places.intro") %>
-    </div></div>
-  <% end %>
-  <div class="<%= @places&.map? ? "place-explorer-wrap" : "browse__inner" %>">
+<% hub = BrowseHubs.find("places") %>
+<%= render layout: "browse/template", locals: { hub: hub, title: "#{t('browse.hub.explorers.map')} — #{hub.title}" } do %>
+  <div class="places-nav"><%= render "browse/views", hub: hub, view: :explorer %></div>
+  <div class="place-explorer-wrap">
     <% if @places.nil? %>
       <p class="browse__unavailable"><%= t("explore_pages.unavailable_html", link: link_to(t("explore_pages.search_all"), search_action_path(any_assets: "1", search_field: "all_fields"))) %></p>
     <% elsif @places.map? %>
@@ -24,12 +18,8 @@
            data-place-explorer-tiles-value="<%= Explore::MapTiles.url %>"
            data-place-explorer-attribution-value="<%= String.new(sanitize(Explore::MapTiles.attribution, tags: %w[a], attributes: %w[href])) %>"
            data-place-explorer-words-value="<%= words.slice(:shown_one, :shown_other, :in_view, :in_region, :matching, :explore, :see_records, :group, :record_one, :record_other, :more, :show_more, :switch_map, :switch_list).to_json %>">
-        <%# The head: the title and its line, then the regions as chips and the name box (Airbnb's search bar and categories) %>
+        <%# The head (the template has the title): the regions as chips and the name box (Airbnb's search bar and categories) %>
         <div class="place-explorer__head">
-          <div class="place-explorer__title">
-            <h1 class="place-explorer__heading"><%= t("explore_pages.places.title") %></h1>
-            <p class="place-explorer__intro"><%= words[:intro] %></p>
-          </div>
           <div class="place-explorer__tools" data-js-only>
             <div class="place-explorer__chips" role="group" aria-label="<%= words[:regions] %>">
               <button type="button" class="place-explorer__chip" aria-pressed="true" data-place-explorer-target="chip" data-region="" data-action="place-explorer#choose"><%= words[:everywhere] %></button>
@@ -147,4 +137,4 @@
       </section>
     <% end %>
   </div>
-</main>
+<% end %>

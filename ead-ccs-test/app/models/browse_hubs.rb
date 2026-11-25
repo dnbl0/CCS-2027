@@ -5,8 +5,30 @@
 #
 # A list is one Solr request for all the values and their counts, kept for a day, and the last good list for a month, as
 # BrowseMenu does (CCS-147). If Solr cannot answer and nothing is kept, there is no list (nil) and the page says so.
+#
+# Every page under /browse is one of these and has the one template (browse/hub, after Google Arts & Culture's category pages, looked at
+# 2026-11-25): the title, the views as tabs (All: a mosaic of pictures; A–Z, or In order for time), and for time, places and colours a
+# third tab, their explorer (the timeline, the map, the spectrum), drawn inside the same template (browse/_template).
 module BrowseHubs
-  Hub = Data.define(:slug, :title, :singular, :field, :intro)
+  Hub = Data.define(:slug, :title, :singular, :field, :intro) do
+    # Its address: time, places and colours keep theirs (/browse/time, /browse/places, /browse/colours); the rest are /browse/<slug>
+    def path(**params)
+      routes = Rails.application.routes.url_helpers
+      params = params.compact_blank
+      case slug
+      when "periods" then routes.explore_time_path(params)
+      when "places" then routes.explore_places_path(params)
+      when "colours" then routes.explore_colours_path(params)
+      else routes.browse_hub_path(slug, params)
+      end
+    end
+
+    # The third tab, its explorer: [the view's name in the address, its label key], or nil
+    def explorer = EXPLORERS[slug]
+
+    def periods? = slug == "periods"
+  end
+  EXPLORERS = { "periods" => "timeline", "places" => "map", "colours" => "spectrum" }.freeze
   UNKNOWN_MAKER = "Unknown"
   OTHER_LETTER = "#"
   MOST_RECORDS = 100 # the list shown before a letter is chosen
@@ -16,14 +38,32 @@ module BrowseHubs
   HUBS = [
     Hub.new("object-types", "Object types", "object type", ExploreEntryPoints::OBJECT_TYPE_FIELD, "What the records are: instruments, photographs, specimens and more."),
     Hub.new("places", "Places", "place", ExploreEntryPoints::PLACE_FIELD, "Where the objects were made or found."),
-    Hub.new("periods", "Periods", "period", ExploreEntryPoints::DATE_FIELD, "When the objects were made, by century and, from 1800, by decade."),
+    Hub.new("periods", "Time", "period", ExploreEntryPoints::DATE_FIELD, "When the objects were made, by century and, from 1800, by decade."),
     Hub.new("makers", "Makers", "maker", "creator_ssim", "The people and organisations that made the objects."),
-    Hub.new("subjects", "Subjects", "subject", "subject_ssim", "What the objects are about.")
+    Hub.new("subjects", "Subjects", "subject", "subject_ssim", "What the objects are about."),
+    Hub.new("classifications", "Classifications", "classification", ExploreEntryPoints::CLASSIFICATION_FIELD,
+            "The kinds of records the collections use to group them: prints, paintings, documents and more."),
+    Hub.new("materials", "Materials", "material", "material_ssim", "What the objects are made of."),
+    Hub.new("collections", "Collections", "collection", "collection_ssim", "The University's collections whose records are in Collections Navigator."),
+    Hub.new("named-collections", "Named collections", "named collection", "named_collection_ssim", "Groups of records within a collection, often a gift or a bequest."),
+    Hub.new("colours", "Colours", "colour", CatalogConfig::Facets::COLOUR_FIELD, "The colours of the records' images. Each opens the records with a lot of it.")
   ].freeze
 
   def self.all = HUBS
 
   def self.find(slug) = HUBS.find { |hub| hub.slug == slug.to_s }
+
+  # A value's own page, or nil (it opens the search): a maker's, place's or subject's page, a collection's, or a colour's spectrum
+  def self.value_path(hub, value)
+    return if Browse.noise?(value)
+
+    routes = Rails.application.routes.url_helpers
+    case hub.slug
+    when "makers", "places", "subjects" then Browse.path_for(hub.slug, value)
+    when "collections", "named-collections" then routes.collection_landing_path(kind: hub.slug, slug: Browse::Slug.build(hub.slug, value.to_s))
+    when "colours" then routes.explore_colours_path(colour: value)
+    end
+  end
 
   # The search that opens every record with this value
   def self.query(field, value) = { any_assets: "1", f: { field => [ value ] }, search_field: "all_fields" }

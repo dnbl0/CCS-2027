@@ -32,10 +32,11 @@ class BrowseSectionsSystemTest < ApplicationSystemTestCase
     page.current_window.resize_to(1440, 900)
     visit "/browse"
 
-    assert_selector "main section.home-section", count: 5
-    assert_selector ".browse-object-types .mosaic-flow.is-ready article.explore-card", count: 8
+    # one Browse (the IA fixes): the categories' sections, makers and subjects, then the other ways in
+    assert_selector "main section.home-section", minimum: 9
+    assert_selector ".browse-makers .mosaic-flow.is-ready article.explore-card", count: 8
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
-    lefts = page.evaluate_script("[...document.querySelectorAll('.browse-object-types .mosaic-flow__item')].map(e => Math.round(e.getBoundingClientRect().left))")
+    lefts = page.evaluate_script("[...document.querySelectorAll('.browse-makers .mosaic-flow__item')].map(e => Math.round(e.getBoundingClientRect().left))")
     assert_equal 4, lefts.uniq.size, "four lanes"
     assert_equal 0, overlaps
     assert_not page.evaluate_script("document.documentElement.scrollWidth > window.innerWidth")
@@ -45,9 +46,9 @@ class BrowseSectionsSystemTest < ApplicationSystemTestCase
     page.current_window.resize_to(390, 844)
     visit "/browse"
 
-    assert_selector ".browse-places .mosaic-flow.is-ready article.explore-card", count: 8
+    assert_selector ".browse-makers .mosaic-flow.is-ready article.explore-card", count: 8
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
-    lefts = page.evaluate_script("[...document.querySelectorAll('.browse-places .mosaic-flow__item')].map(e => Math.round(e.getBoundingClientRect().left))")
+    lefts = page.evaluate_script("[...document.querySelectorAll('.browse-makers .mosaic-flow__item')].map(e => Math.round(e.getBoundingClientRect().left))")
     assert_equal 1, lefts.uniq.size, "one lane"
     assert_not page.evaluate_script("document.documentElement.scrollWidth > window.innerWidth")
   end

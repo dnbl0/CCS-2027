@@ -37,8 +37,9 @@ class DiscoveryPagesSystemTest < ApplicationSystemTestCase
     page.current_window.resize_to(320, 700)
     visit "/browse/classifications"
 
-    # the count, its own line under the name (the mosaic's cards) or on the picture (the four that lead, as a cluster)
-    assert_selector "article.explore-card .explore-card__intro, .cluster__card .cluster__text", text: /\A\d{3} records\z/, count: 12
+    # the one Browse template's mosaic: every card's count is its own visible line under the name
+    cards = all(".mosaic-flow article.explore-card", minimum: 1)
+    assert_equal cards.size, all(".mosaic-flow article.explore-card .explore-card__intro", text: /\A[\d,]+ records?\z/).size
     assert_not page.evaluate_script("document.documentElement.scrollWidth > window.innerWidth")
   end
 end

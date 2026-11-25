@@ -23,11 +23,12 @@ class ColoursTest < ActionDispatch::IntegrationTest
   end
 
   test "the colour page: a strip of the colours, each named, in the palette's order; each colour's card opens its wall" do
-    with_seeded_menu_cache { with_canned_search(colour_counts("blue" => 12, "red" => 1_234, "white" => 3)) { get "/browse/colours" } }
+    with_seeded_menu_cache { with_canned_search(colour_counts("blue" => 12, "red" => 1_234, "white" => 3)) { get "/browse/colours?view=spectrum" } }
 
     assert_response :success
-    assert_select "title", /Explore by colour/
-    assert_select "h1", "Explore by colour"
+    assert_select "title", /\ASpectrum — Colours — /
+    assert_select "h1", "Colours" # the one Browse template; the spectrum is its third view
+    assert_select "nav.places-views a.places-views__link[aria-current=page][href$='view=spectrum']", "Spectrum"
     assert_select "turbo-frame#colour-explorer[data-turbo-action=advance] nav.explore-strip[aria-label=Colours]" do
       labels = css_select("a.explore-strip__swatch").map { |swatch| swatch["aria-label"] }
       assert_equal [ "Red: 1,234 records", "Blue: 12 records", "White: 3 records" ], labels
@@ -49,7 +50,7 @@ class ColoursTest < ActionDispatch::IntegrationTest
     with_seeded_menu_cache { with_canned_search(colour_page({ "teal" => 43, "red" => 5 }, records: records)) { get "/browse/colours?colour=teal" } }
 
     assert_response :success
-    assert_select "title", /\ATeal — Explore by colour/
+    assert_select "title", /\ATeal — Spectrum — Colours — /
     assert_select "a.explore-strip__swatch[aria-current=page]", 1
     assert_select "a.explore-strip__swatch.colours__swatch--teal[aria-current=page]"
     assert_select "section.picture-wall[aria-labelledby=picture-wall-heading]" do
@@ -76,10 +77,10 @@ class ColoursTest < ActionDispatch::IntegrationTest
   end
 
   test "with no colours yet, or Solr down, the page says so" do
-    with_seeded_menu_cache { with_canned_search(colour_counts({})) { get "/browse/colours" } }
+    with_seeded_menu_cache { with_canned_search(colour_counts({})) { get "/browse/colours?view=spectrum" } }
     assert_select ".colours__empty", "No colours are available yet."
 
-    with_seeded_menu_cache { get "/browse/colours" }
+    with_seeded_menu_cache { get "/browse/colours?view=spectrum" }
     assert_response :service_unavailable
     assert_select ".colours__empty", /cannot be shown just now/
   end

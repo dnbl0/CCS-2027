@@ -19,7 +19,7 @@ module Categories
       { "object-types" => routes.browse_hub_path("object-types"), "regions" => routes.explore_places_path, "eras" => routes.explore_time_path }[slug] || routes.category_path(slug)
     end
 
-    # a category whose page is this one (CategoriesController#show), not another page
+    # a category whose page is a Browse page of its own (BrowseHubs), not another page
     def own_page? = %w[classifications materials collections named-collections].include?(slug)
     # The collection and named collection values also have a page of their own (CollectionLandingsController)
     def landing? = %w[collections named-collections].include?(slug)

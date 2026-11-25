@@ -35,7 +35,7 @@ class BrowseHubsTest < ActiveSupport::TestCase
     assert_equal "object_type_ssim", hub.field
     assert_equal "Object types", hub.title
     assert_nil BrowseHubs.find("nonsense")
-    assert_equal %w[object-types places periods makers subjects], BrowseHubs.all.map(&:slug)
+    assert_equal %w[object-types places periods makers subjects classifications materials collections named-collections colours], BrowseHubs.all.map(&:slug)
   end
 
   test "the values of a field come with their counts, the most records first, from one request that is then kept" do

@@ -9,6 +9,11 @@ en:
       placeholder: "Type a %{singular}"
       in_order: "In order"
       timeline: "See the timeline"
+      # the third view of time, places and colours (browse/_views)
+      explorers:
+        timeline: "Timeline"
+        map: "Map"
+        spectrum: "Spectrum"
       all_heading: "%{noun} with the most records"
       every: "See every %{singular}, A–Z (%{count})"
       every_period: "See every period, in order"

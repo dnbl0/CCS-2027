@@ -72,7 +72,7 @@
       <div class="place-page__actions">
         <%= link_to t("browse.entity.see_all", count: number_with_delimiter(result.total)), search_catalog_path(@search_query), class: "btn btn-primary" %>
         <% hub = entry ? entry.kind.key : "periods" %>
-        <%= link_to t("browse.place.all", hub: BrowseHubs.find(hub)&.title.to_s.downcase), browse_hub_path(hub), class: "arrow-link arrow-link--icon" %>
+        <%= link_to t("browse.place.all", hub: BrowseHubs.find(hub)&.title.to_s.downcase), BrowseHubs.find(hub).path, class: "arrow-link arrow-link--icon" %>
       </div>
     </header>
 

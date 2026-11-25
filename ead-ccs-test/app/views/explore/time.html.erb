@@ -1,5 +1,5 @@
-<%# Explore by time (Explore::Timeline), on the Explore template, after Google Arts & Culture's Color Explorer as Explore by colour is: a
-    strip of the centuries, earliest first, each the same width with a bar for its number of records (the square root of its share of the
+<%# Time's third view, the timeline (Explore::Timeline; ?view=timeline or ?century=), inside the one Browse template (browse/_template),
+    after Google Arts & Culture's Color Explorer as colours' spectrum is: a strip of the centuries, earliest first, each the same width with a bar for its number of records (the square root of its share of the
     busiest, so the small centuries stay visible; the note says so), the chosen one marked by a notch and kept in view
     (explore_strip_controller.js). Before a century is chosen, the centuries as picture tiles, each opening its own page where it has one
     (Browse::Periods, from 1000), and the eras folded after; with ?century=, its records as a wall of square pictures (explore/_picture_wall)
@@ -8,20 +8,11 @@
     plain links. The earliest period ("Earlier", before 3000 BCE) is not a century: it opens its records. %>
 <% periods = @centuries&.periods || [] %>
 <% chosen = periods.find { |period| period.first == @century } if @century %>
-<% title = "#{[ chosen&.label, t('explore_pages.time.title') ].compact.join(' — ')} — Collections Navigator — University of Melbourne" %>
-<% content_for :body_class, "page-browse page-explore page-explore-time" %>
-<% content_for :title, title %>
-<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Browse", browse_path ], [ t("explore_pages.time.title"), nil ] ]) %>
-<main class="browse explore" id="main-content">
-  <div class="place-explorer-wrap">
+<% hub = BrowseHubs.find("periods") %>
+<% title = [ chosen&.label, t("browse.hub.explorers.timeline"), hub.title ].compact.join(" — ") %>
+<%= render layout: "browse/template", locals: { hub: hub, title: title } do %>
+  <div class="places-nav"><%= render "browse/views", hub: hub, view: :explorer %></div>
     <div class="time-explorer">
-      <div class="place-explorer__head">
-        <div class="place-explorer__title">
-          <h1 class="place-explorer__heading"><%= t("explore_pages.time.title") %></h1>
-          <p class="place-explorer__intro"><%= t("explore_pages.time.intro") %></p>
-        </div>
-      </div>
-
       <% if @centuries.nil? %>
         <p class="browse__unavailable"><%= t("explore_pages.unavailable_html", link: link_to(t("explore_pages.search_all"), search_action_path(any_assets: "1", search_field: "all_fields"))) %></p>
       <% elsif periods.empty? %>
@@ -31,7 +22,7 @@
         <% busiest = periods.max_by(&:count) %>
         <%# The frame's links leave it (target _top: the tiles open the periods' own pages) unless they name it (the strip, All centuries) %>
         <turbo-frame id="time-explorer" target="_top" data-turbo-action="advance">
-          <nav class="explore-strip explore-strip--time" aria-label="<%= t("explore_pages.time.strip_label") %>" data-controller="explore-strip" data-explore-strip-title-value="<%= title %>">
+          <nav class="explore-strip explore-strip--time" aria-label="<%= t("explore_pages.time.strip_label") %>" data-controller="explore-strip" data-explore-strip-title-value="<%= "#{title} — Collections Navigator — University of Melbourne" %>">
             <ul class="explore-strip__list">
               <% periods.each do |period| %>
                 <% words = t("explore_pages.time.strip_item", short: period.short_label, period: period.label, count: period.count, formatted: number_with_delimiter(period.count)) %>
@@ -60,7 +51,7 @@
                 <%= render "browse_entities/facet_tiles", tiles: tiles, label: t("explore_pages.time.list_label"), ordered: true %>
               </section>
             <% end %>
-            <p class="time-explorer__back"><%= link_to t("explore_pages.time.all_centuries"), explore_time_path, class: "arrow-link arrow-link--icon", data: { turbo_frame: "time-explorer" } %></p>
+            <p class="time-explorer__back"><%= link_to t("explore_pages.time.all_centuries"), explore_time_path(view: "timeline"), class: "arrow-link arrow-link--icon", data: { turbo_frame: "time-explorer" } %></p>
           <% else %>
             <section class="place-section time-explorer__periods" aria-labelledby="timeline-heading">
               <h2 class="place-section__heading" id="timeline-heading"><%= t("explore_pages.time.centuries") %></h2>
@@ -84,5 +75,4 @@
         </turbo-frame>
       <% end %>
     </div>
-  </div>
-</main>
+<% end %>

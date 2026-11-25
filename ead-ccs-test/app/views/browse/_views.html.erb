@@ -1,0 +1,14 @@
+<%# The views of a Browse page, as tabs (browse/_template): All, A–Z (time: In order) and, for time, places and colours, their explorer.
+    Inside the hub's results frame (in_frame: true) All and A–Z change the frame in place and the explorer leaves it; on an explorer page
+    every tab loads its page. locals: hub, view (:all, :az or :explorer), region (places: kept by All and A–Z), in_frame %>
+<% region = local_assigns[:region] %>
+<% leave = local_assigns[:in_frame] ? { turbo_frame: "_top" } : {} %>
+<nav class="places-views" aria-label="<%= t("browse.places.views") %>">
+  <%= link_to t("browse.places.all"), hub.path(region: region), class: "places-views__link", "aria-current": (view == :all ? "page" : nil) %>
+  <%= link_to (hub.periods? ? t("browse.hub.in_order") : t("browse.places.az")), hub.path(view: "az", region: region), class: "places-views__link",
+              "aria-current": (view == :az ? "page" : nil) %>
+  <% if hub.explorer %>
+    <%= link_to t("browse.hub.explorers.#{hub.explorer}"), hub.path(view: hub.explorer), class: "places-views__link",
+                "aria-current": (view == :explorer ? "page" : nil), data: leave %>
+  <% end %>
+</nav>

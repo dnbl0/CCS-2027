@@ -106,14 +106,16 @@ Rails.application.routes.draw do
     target = { "object-types" => "/browse/object-types", "regions" => "/browse/places", "eras" => "/browse/time" }[params[:slug]] || "/browse/#{params[:slug]}"
     [ target, request.query_string.presence ].compact.join("?")
   }, constraints: { slug: /[a-z-]+/ }
-  get "browse/:slug", to: "categories#show", as: :category, constraints: { slug: /classifications|materials|collections|named-collections/ }
-  get "browse/time", to: "explore#time", as: :explore_time
-  # the places' A to Z list and its filter (the Places hub, browse/hub) answer at the same address, asked for by their options
-  get "browse/places", to: "browse#show", defaults: { slug: "places" },
-                       constraints: ->(request) { request.query_parameters.keys.intersect?(%w[view letter filter page region]) }
-  get "browse/places", to: "explore#places", as: :explore_places
-  get "browse/colours", to: "colours#index", as: :explore_colours
-  get "browse/periods", to: redirect("/browse/time", status: 301)
+  # Every page under /browse is one template (browse/hub; 25 Nov 2026): its plain address is its All view. Time, places and colours have a
+  # third view, their explorer, at the same address when asked for (?view=timeline or a ?century=, ?view=map, ?view=spectrum or a ?colour=)
+  get "browse/:slug", to: "browse#show", as: :category, constraints: { slug: /classifications|materials|collections|named-collections/ }
+  get "browse/time", to: "explore#time", constraints: ->(request) { request.query_parameters["view"] == "timeline" || request.query_parameters.key?("century") }
+  get "browse/time", to: "browse#show", defaults: { slug: "periods" }, as: :explore_time
+  get "browse/places", to: "explore#places", constraints: ->(request) { request.query_parameters["view"] == "map" }
+  get "browse/places", to: "browse#show", defaults: { slug: "places" }, as: :explore_places
+  get "browse/colours", to: "colours#index", constraints: ->(request) { request.query_parameters["view"] == "spectrum" || request.query_parameters.key?("colour") }
+  get "browse/colours", to: "browse#show", defaults: { slug: "colours" }, as: :explore_colours
+  get "browse/periods", to: redirect(status: 301) { |_params, request| [ "/browse/time", request.query_string.presence ].compact.join("?") }
   %w[time places colours].each do |page|
     get "explore/#{page}", to: redirect(status: 301) { |_params, request| [ "/browse/#{page}", request.query_string.presence ].compact.join("?") }
   end

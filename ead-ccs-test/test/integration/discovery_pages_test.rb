@@ -28,41 +28,49 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
                                                          "facets" => { "object_type_ssim" => [ [ "Work", 9 ] ], "date_era_ssim" => [ [ "20th century", 12 ] ], "named_collection_ssim" => [] } })
   end
 
-  test "a category page shows a card for each value, with its count, opening the search with that value as a filter" do
-    seed("classifications", [ { "value" => "Prints", "count" => 8638, "image" => PICTURE }, { "value" => "Paintings", "count" => 6840, "image" => nil } ])
+  def seed_hub(slug, values) = Rails.cache.write(SuppressedRecord.cache_key("browse_hubs/v1/#{slug}"), values, expires_in: 1.day)
+
+  def seed_wall(slug, entries) = Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/#{slug}/wall/v2"), entries, expires_in: 1.day)
+
+  test "a category page is on the one Browse template: its title, All and A–Z as tabs, a mosaic of its values opening the search" do
+    seed_hub("classifications", [ [ "Prints", 8638 ], [ "Paintings", 6840 ] ])
+    seed_wall("classifications", [ { "label" => "Prints", "count" => 8000, "total" => 8638, "image" => PICTURE } ])
 
     get "/browse/classifications"
 
     assert_response :success
-    assert_select "h1", "Classifications"
-    assert_select "article.explore-card", count: 2
-    assert_select "article.explore-card h3 a[href*='f%5Bclassification_ssim%5D%5B%5D=Prints'][href*='any_assets=1']", text: "Prints"
-    assert_select "article.explore-card .explore-card__intro", text: "8,638 records"
-    assert_select "article.explore-card img[src*='unimelbourne.widen.net']", count: 1
-    assert_select "nav[aria-label='Sort categories'] a[aria-current='page']", text: "Most records"
+    assert_select "h1.places-page__title", "Classifications"
+    assert_select "nav.places-views a.places-views__link", count: 2
+    assert_select "nav.places-views a.places-views__link[aria-current=page]", "All"
+    assert_select ".mosaic-flow article.explore-card h3 a[href*='f%5Bclassification_ssim%5D%5B%5D=Prints'][href*='any_assets=1']", text: "Prints"
+    assert_select ".mosaic-flow article.explore-card .explore-card__intro", text: "8,638 records"
+
+    get "/browse/classifications", params: { view: "az" }
+    assert_equal [ "Prints 8,638 records", "Paintings 6,840 records" ], css_select("a.places-list__link").map { |a| a.text.squish }
+    assert_select "nav.places-views a.places-views__link[aria-current=page]", "A–Z"
   end
 
-  test "a category page sorts A to Z and pages 48 cards at a time" do
-    seed("materials", rows(50).reverse + [ { "value" => "aardvark hide", "count" => 1, "image" => nil } ])
+  test "the collections page links each collection to its own page, from the mosaic and the A–Z list" do
+    seed_hub("collections", [ [ "Grainger Museum Collection", 12 ] ])
+    seed_wall("collections", [ { "label" => "Grainger Museum Collection", "count" => 12, "image" => PICTURE } ])
+    own = "/browse/collections/#{Browse::Slug.build('collections', 'Grainger Museum Collection')}"
 
-    get "/browse/materials", params: { sort: "az" }
-    assert_equal "Aardvark hide", css_select("article.explore-card h3").first.text.squish
-    assert_select "article.explore-card", count: Categories::PER_PAGE
-    assert_select "nav[aria-label='Sort categories'] a[aria-current='page']", text: "A to Z"
+    get "/browse/collections"
+    assert_select ".mosaic-flow article.explore-card h3 a[href='#{own}']"
 
-    get "/browse/materials", params: { page: 2 }
-    assert_select "article.explore-card", count: 3
-    assert_select "meta[name='robots'][content*='noindex']" # page 2 on is not indexed
+    get "/browse/collections", params: { view: "az" }
+    assert_select "a.places-list__link[href='#{own}']"
   end
 
-  test "an unknown category is not found, and with the index down and nothing kept the page says so" do
+  test "an unknown category is not found, and with the index down and nothing kept the page says so on the same template" do
     get "/browse/nonsense"
     assert_response :not_found
 
     Outages::SolrDown.active = true
     get "/browse/materials"
     assert_response :service_unavailable
-    assert_select "h1", "This page cannot be shown right now"
+    assert_select "h1", "Materials"
+    assert_select ".browse__unavailable a", "search all records"
   ensure
     Outages::SolrDown.active = false
   end
@@ -122,28 +130,6 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     assert_equal pictures.uniq, pictures, "no picture twice"
   end
 
-  test "a category page: the four with the most records lead as a cluster, the rest in the mosaic after; not on later pages or A to Z" do
-    seed("classifications", pictured("classifications", 60))
-
-    get "/browse/classifications"
-    assert_select "section.categories-lead h2", "Most records"
-    assert_select "section.categories-lead ul.cluster[data-count='4'] a.cluster__link", 4
-    assert_select "section.categories-lead a.cluster__link", text: "Classifications 1"
-    assert_select ".mosaic-flow h3", text: "Classifications 1", count: 0 # not twice
-    assert_select ".mosaic-flow > li", 44
-
-    get "/browse/classifications", params: { page: 2 }
-    assert_select "section.categories-lead", 0
-
-    # values that share one picture: it is shown once, so too few for a cluster, and the page is the mosaic alone
-    seed("classifications", rows(12).map { |row| row.merge("image" => PICTURE) })
-    get "/browse/classifications"
-    assert_select "section.categories-lead", 0
-    assert_select ".mosaic-flow > li", 12
-    get "/browse/classifications", params: { sort: "az" }
-    assert_select "section.categories-lead", 0
-  end
-
   test "a collection page has the placeholder introduction, its highlights, links that narrow its search, and its records in the search" do
     seed("collections", [ { "value" => "Grainger Museum Collection", "count" => 12, "image" => nil } ])
     seed_showcase([ 'collection_ssim:("Grainger Museum Collection")' ])
@@ -163,14 +149,6 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
 
     get "/browse/collections/grainger-0000000000"
     assert_response :not_found
-  end
-
-  test "the collections category page links each collection to its own page" do
-    seed("collections", [ { "value" => "Grainger Museum Collection", "count" => 12, "image" => nil } ])
-
-    get "/browse/collections"
-
-    assert_select "article.explore-card h3 a[href='/browse/collections/#{Browse::Slug.build('collections', 'Grainger Museum Collection')}']" # its tile opens its own page
   end
 
   test "themes are listed, and a theme page shows its records and opens its search" do

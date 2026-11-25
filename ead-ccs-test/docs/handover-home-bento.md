@@ -28,7 +28,8 @@ Commits end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`; PR b
 
 | Commit | What |
 |---|---|
-| (next) | Today's Look closer picture is set aside first, so no Time card, stack or way in repeats it (`ExploreComponent#used_pictures`) |
+| (next) | **One Browse template.** Every page under `/browse` is a `BrowseHubs` hub on `browse/_template` + `browse/_views` (title, toolbar, tabs All / A–Z, then the mosaic or list), after Google Arts & Culture's category pages. Classifications, materials, collections, named collections and colours became hubs (`CategoriesController` and `categories/show` deleted). Time, places and colours open on All; their explorer is the third tab at the same address (`?view=timeline` or `?century=`, `?view=map`, `?view=spectrum` or `?colour=`). New page = a `Hub.new` line, never a new template |
+| c8cddab | Today's Look closer picture is set aside first, so no Time card, stack or way in repeats it (`ExploreComponent#used_pictures`) |
 | ed82eab | Home Time section: the National Gallery of Art's "Now on view" card carousel (`CardCarouselComponent`); no longer a navy band |
 | 9a239df | Home collections with no records here open their University page (`url:` in `config/home_collections.yml`) with a note |
 | 5c6ef48 | IA fixes (20 items): one Browse at `/browse`; `/browse/time`, `/browse/places`, `/browse/colours`; category pages `/browse/<name>`; 301s from every old address; one breadcrumb (`PageBreadcrumbsComponent`); one title pattern; "Saved" menu; footer columns; hyphenated addresses |

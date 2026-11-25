@@ -18,8 +18,8 @@ class BrowseSystemTest < ApplicationSystemTestCase
         assert_selector "h1"
         assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
       end
-      visit "/browse/makers?filter=bunny"
-      first(".browse__link").click
+      visit "/browse/makers?filter=bunny&view=az"
+      first(".places-list__link").click
       assert_selector ".result-card"
       assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
       assert_no_horizontal_scroll if name == "320px"
@@ -30,10 +30,10 @@ class BrowseSystemTest < ApplicationSystemTestCase
     visit "/browse/subjects"
     find("#filter").send_keys("portr", :enter)
     assert_current_path(/filter=portr/)
-    assert_selector ".browse__link"
-    find(".browse__link", match: :first).send_keys(:enter) # a result opens with the keyboard
+    assert_selector ".places-list__link"
+    find(".places-list__link", match: :first).send_keys(:enter) # a result opens with the keyboard
     assert_selector "h1"
-    assert_selector ".browse-facts"
+    assert_selector "main.place-page h1" # the subject's own page
   end
 
   def assert_no_horizontal_scroll

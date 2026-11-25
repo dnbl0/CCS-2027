@@ -29,7 +29,7 @@ class BrowseList
 
   def available? = !@all.nil?
 
-  def periods? = hub.slug == "periods"
+  def periods? = hub.periods?
 
   def letters = @letters ||= available? && !periods? ? BrowseHubs.letters(@all) : []
 
@@ -57,7 +57,7 @@ class BrowseList
     return @all.map { |label, count, first, last| Entry.new(label, count, BrowseHubs.period_query(first, last), Browse::Periods.for_span(first, last)&.path) } if periods?
 
     shown = paged? ? chosen.slice((page - 1) * PAGE_SIZE, PAGE_SIZE) : chosen
-    shown.map { |value, count| Entry.new(value, count, BrowseHubs.query(hub.field, value), @kind && Browse.path_for(@kind.key, value)) }
+    shown.map { |value, count| Entry.new(value, count, BrowseHubs.query(hub.field, value), BrowseHubs.value_path(hub, value)) }
   end
 
   # "Most records" when no letter is chosen

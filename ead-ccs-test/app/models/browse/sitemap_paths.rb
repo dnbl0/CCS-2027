@@ -7,17 +7,18 @@ module Browse
   # building the sitemap adds no Solr walk. A period is listed when it is in the periods list with that many records, and so is the
   # century of any listed decade.
   module SitemapPaths
-    # periods and places: their hub address opens the time page (a redirect) and the places page, which are listed with the Explore pages
-    HUB_PATHS = ([ "/browse" ] + BrowseHubs.all.reject { |hub| %w[periods places].include?(hub.slug) }.map { |hub| "/browse/#{hub.slug}" }).freeze
+    # Every Browse page at its own address (time, places and colours keep theirs); DiscoverySitemap lists the same few, so they are made one
+    # (worked out when asked, not when the class loads: the routes may not be drawn yet)
+    def self.hub_paths = [ "/browse" ] + BrowseHubs.all.map(&:path)
 
     def self.paths
       entities = Kind.all.flat_map { |kind| Index.for(kind).entries.select { |entry| entry.count >= MIN_INDEXED_RECORDS }.map(&:path) }
       listed = (BrowseHubs.period_entries || []).select { |_, count, _, _| count >= MIN_INDEXED_RECORDS }
       periods = listed.filter_map { |_, _, first, last| Periods.for_span(first, last) }
       periods += periods.filter_map(&:parent).uniq
-      HUB_PATHS + entities.sort + periods.uniq.map(&:path).sort
+      hub_paths + entities.sort + periods.uniq.map(&:path).sort
     rescue Index::Unavailable
-      HUB_PATHS
+      hub_paths
     end
   end
 end

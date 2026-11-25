@@ -1,5 +1,6 @@
-<%# inert + aria-hidden while it is off screen, so keyboard and screen reader users never land in a hidden strip %>
-<div class="sticky-search position-fixed top-0 start-0 end-0" inert aria-hidden="true"
+<%# inert + aria-hidden while it is off screen, so keyboard and screen reader users never land in a hidden strip; a named region once shown,
+    so its contents sit in a landmark (axe "region") %>
+<div class="sticky-search position-fixed top-0 start-0 end-0" role="region" aria-label="Search bar" inert aria-hidden="true"
      data-controller="sticky-search" data-sticky-search-banner-value="<%= BANNERS %>">
   <div class="sticky-search__inner d-flex align-items-center py-2">
     <%= link_to "Collections Navigator", helpers.root_path, class: "site-header__title sticky-search__title" %>

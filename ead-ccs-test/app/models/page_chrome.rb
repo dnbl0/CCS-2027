@@ -18,13 +18,14 @@ PageChrome = Data.define(:breadcrumbs, :banner, :saved_bar) do
     in [ "pages", _ ] then new(breadcrumbs: [], banner: nil, saved_bar: :page)
     in [ "catalog", "index" ]
       searching ? with_trail([ [ "Search results", nil ] ], banner: :search) : new(breadcrumbs: [], banner: :search, saved_bar: :header)
-    in [ "browse", _ ] then new(breadcrumbs: [], banner: nil, saved_bar: :page) # the browse pages draw their own strip (PageBreadcrumbsComponent), which carries the saved bar
+    # every page under /browse (time's, places' and colours' explorers too) draws its own strip (PageBreadcrumbsComponent), with the saved bar
+    in [ "browse" | "explore" | "colours", _ ] then new(breadcrumbs: [], banner: nil, saved_bar: :page)
     in [ "catalog", "show" ] then with_trail([ page.record_parent, [ page.record_title, nil ] ], banner: nil)
     in [ "catalog", "advanced_search" ] then with_trail([ [ "Advanced search", nil ] ], banner: :advanced_search)
     in [ "catalog", _ ] then new(breadcrumbs: [], banner: :search, saved_bar: :header)
     in [ "bookmarks", _ ] then with_trail([ [ I18n.t("nexus_ccs.saved.list_title"), nil ] ], banner: nil)
     in [ "search_history", _ ] then with_trail([ [ I18n.t("nexus_ccs.search_history.title"), nil ] ], banner: nil)
-    in [ "browse_entities" | "categories" | "collection_landings" | "themes" | "stories", _ ] then with_trail(page.browse_trail, banner: nil)
+    in [ "browse_entities" | "collection_landings" | "themes" | "stories", _ ] then with_trail(page.browse_trail, banner: nil)
     in [ "access_requests", _ ] then with_trail([ [ "Search results", page.results_url ], [ I18n.t("nexus_ccs.access_requests.title"), nil ] ], banner: nil)
     in [ "selections", _ ] then with_trail([ [ I18n.t("nexus_ccs.selection.title"), nil ] ], banner: nil)
     in [ "saved_searches", _ ] then with_trail([ [ I18n.t("nexus_ccs.saved_searches.title"), nil ] ], banner: nil)
