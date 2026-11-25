@@ -28,6 +28,6 @@ class PlacesPageSystemTest < ApplicationSystemTestCase
     assert_selector "a.places-list__link", count: 1, text: "Carlton"
     assert_current_path(/filter=car/)
     assert_equal "filter", page.evaluate_script("document.activeElement.id"), "the search keeps its focus"
-    assert_selector "[role=status]", text: "1 place", visible: :all
+    assert_selector "[role=status]", text: "Matching “car”", visible: :all # what the list shows, in words (no count)
   end
 end

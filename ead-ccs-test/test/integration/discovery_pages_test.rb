@@ -43,10 +43,10 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     assert_select "nav.places-views a.places-views__link", count: 2
     assert_select "nav.places-views a.places-views__link[aria-current=page]", "All"
     assert_select ".mosaic-flow article.explore-card h3 a[href*='f%5Bclassification_ssim%5D%5B%5D=Prints'][href*='any_assets=1']", text: "Prints"
-    assert_select ".mosaic-flow article.explore-card .explore-card__intro", text: "8,638 records"
+    assert_select ".mosaic-flow article.explore-card .explore-card__intro", 0 # no counts
 
     get "/browse/classifications", params: { view: "az" }
-    assert_equal [ "Prints 8,638 records", "Paintings 6,840 records" ], css_select("a.places-list__link").map { |a| a.text.squish }
+    assert_equal [ "Prints", "Paintings" ], css_select("a.places-list__link").map { |a| a.text.squish }
     assert_select "nav.places-views a.places-views__link[aria-current=page]", "A–Z"
   end
 
@@ -140,7 +140,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Grainger Museum Collection"
     assert_select "[data-placeholder-wording]", text: /Lorem ipsum/
-    assert_select "a.btn[href*='f%5Bcollection_ssim%5D%5B%5D=Grainger+Museum+Collection']", text: "See all 12 records"
+    assert_select "a.btn[href*='f%5Bcollection_ssim%5D%5B%5D=Grainger+Museum+Collection']", text: "See all its records"
     assert_select ".place-section a[href*='f%5Bobject_type_ssim%5D%5B%5D=Work']", text: /\AWork/ # a tile, or a link where it has no picture
     assert_select "link[rel='canonical'][href$='/browse/collections/#{slug}']"
 

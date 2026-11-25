@@ -31,9 +31,11 @@ class BrowseSystemTest < ApplicationSystemTestCase
     find("#filter").send_keys("portr", :enter)
     assert_current_path(/filter=portr/)
     assert_selector ".places-list__link"
-    find(".places-list__link", match: :first).send_keys(:enter) # a result opens with the keyboard
+    link = find(".places-list__link", match: :first)
+    link.execute_script("this.scrollIntoView({ block: 'center' })") # off the window's bottom edge, where a key press misses it
+    link.send_keys(:enter) # a result opens with the keyboard
     assert_selector "h1"
-    assert_selector "main.place-page h1" # the subject's own page
+    assert_selector "main.place-page h1", wait: 10 # the subject's own page (cold test cache: ~2 s a request)
   end
 
   def assert_no_horizontal_scroll

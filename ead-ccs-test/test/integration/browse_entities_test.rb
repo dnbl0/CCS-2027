@@ -67,13 +67,13 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     assert_select "title", /Bunny, Rupert — Maker/
     assert_select ".place-page__facts dt", text: "Dates on records"
     assert_select ".place-page__facts dd", text: "29 September 1864 – 25-May-47"
-    assert_select ".place-page__summary", /made 1816 to 2019/
+    assert_select ".place-page__summary", "Made 1816 to 2019." # no number of records: the site shows no counts
     assert_select ".card-layout--mosaic li.mosaic-flow__item", count: 1 # the one record that may be shown
-    assert_select "a.btn[href*='f%5Bcreator_ssim%5D%5B%5D=Bunny%2C+Rupert']", text: /See all 730 records/
+    assert_select "a.btn[href*='f%5Bcreator_ssim%5D%5B%5D=Bunny%2C+Rupert']", text: "See all its records"
     # the ways in and what is related: a tile in the page's mosaic where the value has a picture, otherwise a link after it; with its count
     ways_in = ".place-section .mosaic-flow .explore-card__link, .place-section .place-facets__plain a"
     assert_select ways_in, text: /\AAustralia/ # a related place
-    assert_select ".place-section", text: /Australia\s+\d+ records?/
+    assert_select ".place-section", text: /\d+ records?/, count: 0 # no counts
     assert_select ways_in, text: /\ATiny, Tim/
     assert_select ways_in, text: /\AUnknown/, count: 0
     assert_select ".place-section a[href='/browse/periods/1900-1999']"
@@ -96,16 +96,16 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "main.place-page h1", "Australia"
-    assert_select ".place-page__summary", /730 records, made 1816 to 2019, held in 1 collection\./
+    assert_select ".place-page__summary", "Made 1816 to 2019."
     # the strip shows only pictures nothing else on the page shows: its one open record is in Discover, so there is no strip (no repeat)
     assert_select ".place-page__strip", count: 0
     assert_select ".card-layout .object-card", count: 1
-    assert_select "a.btn[href*='production_place_ssim']", /See all 730 records/
-    assert_select "section h2", /Held in 1 collection/
+    assert_select "a.btn[href*='production_place_ssim']", "See all its records"
+    assert_select "section h2", "Collections"
     link = css_select(".place-collections h3 a").first
     assert_equal "University Art Collection", link.text
     assert_match %r{\A/browse/collections/|collection_ssim}, link["href"] # the collection's own page, or its records in the search
-    assert_select ".place-section", text: /Painting\s+400 records/ # a kind of record (a tile, or a link where it has no picture)
+    assert_select ".place-section", text: /\APainting\z|Painting/ # a kind of record (a tile, or a link where it has no picture)
     assert_select "section .card-layout--mosaic ul.mosaic-flow[data-controller=mosaic] li .object-card, section .card-layout--mosaic ul.mosaic-flow li article"
     assert_select "main.browse-main", count: 0 # not the makers' and subjects' profile
   end
@@ -119,7 +119,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
 
   test "an entity page searches the records of every variant of the entity" do
     browse entity_path("subjects", "Portraits")
-    assert_select "a.btn[href*='f_inclusive']", text: /See all 730 records/
+    assert_select "a.btn[href*='f_inclusive']", text: "See all its records"
     assert_equal [ %(subject_ssim:("Portraits" OR "portraits")) ], @seen.find { |params| params[:fq] }[:fq]
   end
 
@@ -179,7 +179,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     with_env_indexing do
       browse entity_path("makers", "Bunny, Rupert")
       assert_select "link[rel=canonical][href$=?]", entity_path("makers", "Bunny, Rupert")
-      assert_select "meta[name=description][content*='730 records']"
+      assert_select "meta[name=description][content^='Records in the University']" # no count
       assert_select "meta[name=robots]", count: 1 do |tag|
         assert_no_match(/noindex/, tag.first["content"])
       end

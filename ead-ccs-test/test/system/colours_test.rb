@@ -28,7 +28,7 @@ class ColoursSystemTest < ApplicationSystemTestCase
       assert_selector "h1", text: "Colours"
       assert_selector "nav.explore-strip a.explore-strip__swatch", count: 12
       assert_selector "main a[href*='colour=']:not([aria-hidden]):not(.explore-strip__swatch)", count: 12
-      assert_text(/White\s+84 records/)
+      assert_no_text(/\d[\d,]* records?/) # names only: the site shows no counts
       assert_not sideways_scroll?, "no sideways scroll at #{width}px"
       assert_accessible
     end

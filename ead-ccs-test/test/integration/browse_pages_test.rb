@@ -57,7 +57,7 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Object types"
     links = css_select("a.places-list__link").map { |a| a.text.squish }
-    assert_equal [ "Lyre 120 records", "Harp 40 records", "Bell 3 records", "Étui 1 record", "1973 print 1 record" ], links
+    assert_equal [ "Lyre", "Harp", "Bell", "Étui", "1973 print" ], links # names only: the site shows no counts
     assert_select "a.places-list__link[href*='f%5Bobject_type_ssim%5D%5B%5D=lyre'][href*='any_assets=1']"
   end
 
@@ -118,7 +118,7 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
     get "/browse/subjects", params: { view: "az" }
 
-    assert_equal [ "Portraits 193 records", "Archaeology 20 records" ], css_select("a.places-list__link").map { |a| a.text.squish }
+    assert_equal [ "Portraits", "Archaeology" ], css_select("a.places-list__link").map { |a| a.text.squish }
     assert_select "a.places-list__link[href='#{Browse.path_for('subjects', 'Portraits')}']"
   end
 
@@ -129,7 +129,7 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
     assert_select "form[method=get][action='/browse/places'] input[type=search][name=filter][value=austr]"
     assert_select "form label[for=filter]"
-    assert_equal [ "Australia 20 records", "Austria 5 records" ], css_select("a.places-list__link").map { |a| a.text.squish } # Places has its own page
+    assert_equal [ "Australia", "Austria" ], css_select("a.places-list__link").map { |a| a.text.squish } # Places has its own page
     get "/browse/places", params: { filter: "zzz" }
     assert_select ".browse-empty", /No place matches “zzz”/
   end

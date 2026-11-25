@@ -192,14 +192,15 @@
 @container (max-width: 40rem) { .place-explorer__follow { left: var(--ccs-space-3); transform: none; max-width: calc(100% - 9rem); white-space: normal; } }
 .place-explorer__foot .explore-map__credit { margin: 0; }
 
-/* The pins: white pills with the number; ink when their card is hovered or focused, or when hovered or focused themselves */
+/* The pins: plain dots, no numbers (the site shows no counts): the brand colour with a white ring, so they stand out from the map (3:1), and
+   24px, a pointer target; ink when their card is hovered or focused, or when hovered or focused themselves */
 .place-explorer .explore-map__marker {
-  min-width: 0; height: 30px; padding: 0 10px; border: 0; border-radius: var(--ccs-radius-pill); background: var(--ccs-surface-default);
-  color: var(--ccs-text-primary); box-shadow: 0 0 0 1px rgb(0 0 0 / 8%), var(--ccs-shadow-md); font-size: var(--ccs-font-size-sm); font-variant-numeric: tabular-nums;
+  min-width: 0; width: 24px; height: 24px; padding: 0; border: 3px solid var(--ccs-surface-default); border-radius: var(--ccs-radius-circle);
+  background: var(--ccs-surface-brand); box-shadow: 0 0 0 1px rgb(0 0 0 / 12%), var(--ccs-shadow-md);
   transition: transform 150ms ease-out;
 }
-/* a group: the same pill on a second one, as a stack */
-.place-explorer .explore-map__pin--group .explore-map__marker { height: 30px; box-shadow: 0 0 0 1px rgb(0 0 0 / 8%), 3px 3px 0 0 var(--ccs-surface-default), 3px 3px 0 1px rgb(0 0 0 / 12%), var(--ccs-shadow-md); }
+/* a group: a larger dot on a second one, as a stack */
+.place-explorer .explore-map__pin--group .explore-map__marker { width: 30px; height: 30px; box-shadow: 0 0 0 1px rgb(0 0 0 / 12%), 4px 4px 0 0 var(--ccs-surface-default), 4px 4px 0 1px rgb(0 0 0 / 15%), var(--ccs-shadow-md); }
 .place-explorer .explore-map__pin:hover .explore-map__marker,
 .place-explorer .explore-map__pin.is-marked .explore-map__marker,
 .place-explorer .explore-map__pin:focus-visible .explore-map__marker { background: var(--ccs-text-primary); color: var(--ccs-text-inverse); transform: translate(-50%, -50%) scale(1.1); }

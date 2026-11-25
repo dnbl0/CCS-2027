@@ -33,7 +33,18 @@ places, colours have a third tab ?view=timeline|map|spectrum). The commit after 
    defined in ~8 locale keys. Two pagers (browse_entities/_pager vs Blacklight). Stale docs: `docs/categories-themes-stories.md`
    (CategoriesController was deleted). Hub tabs swap in a Turbo frame but the explorer tab reloads the page (note, maybe fine).
 
-## Counts removal: done in the WIP commit
+## Status (25 Nov, later)
+- **Step 1, counts: DONE.** No counts on any page outside search (checked: home, /browse, every hub view, timeline, map, spectrum, entity,
+  period, collection, themes, stories), the header Browse menu, map pins (now plain dots), page descriptions. Search results keep their
+  total and filter counts. Guard test: `test/integration/no_counts_test.rb` (extend it when you touch a page). Full suite passes.
+- **Also done (Dean's request):** quick filters removed (not a business requirement); the With Digital Asset pill reads "With digital
+  asset" / "Without digital asset" with no "> Yes" (`ConstraintsComponent::DigitalAssetPill`, `HistoryFilterPillComponent`).
+- **Flaky in a batch, pass alone:** browse_test "filter box … opens with Enter" and explore_pages_test "periods … a century opens its own
+  page": the click to an entity page is not followed when run after other system tests (the page itself works in a browser). Look at
+  Turbo prefetch between tests if it persists. Known failure still: colours "Looks similar" (local index lacks the records).
+- **Next: step 2** (one list of ways in), then 3, 4, 5 below.
+
+## Counts removal: what was changed (for reference)
 - `PlacesHelper`: hub_tile, facet_tile (signature now `facet_tile(label, path, picture)`, callers updated), category_tile: text nil.
 - browse/hub.html.erb: no list counts, region chip counts, "See every … (N)", "Showing 1–120 of N"; status/heading are words only.
 - Entity page (browse_entities/showcase): summary is the date span only; "See all its records"; collections heading "Collections",
@@ -45,7 +56,7 @@ places, colours have a third tab ?view=timeline|map|spectrum). The commit after 
   strip_item/strip_note/see_all/eras_folded), colours.en.yml (see_all), categories_themes_stories.en.yml (see_all, more_results).
 - CSS removed: explore-strip__bar, picture-wall__count, colour-card__count.
 
-## Counts removal: still to do
+## Counts removal: was still to do (now done)
 - **explore/places.html.erb**: line ~47 consent heading count, ~82 place-tile__count, ~97 "Every place … (N)", ~101/108 region/country
   counts; **explore/_entries.html.erb** browse__count.
 - **place_explorer_controller.js**: pin badges show numbers (`badge()`), group pins ("N places, N records"), popup record count,

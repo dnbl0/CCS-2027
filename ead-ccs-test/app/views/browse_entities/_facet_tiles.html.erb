@@ -8,7 +8,7 @@
     <p class="place-facets__plain-label"><%= t("browse.place.no_picture") %></p>
     <ul class="place-chips">
       <% plain.each do |tile| %>
-        <li><%= link_to tile.path, class: "places-chip" do %><%= tile.title %> <span class="places-chip__count"><%= tile.text %></span><% end %></li>
+        <li><%= link_to tile.path, class: "places-chip" do %><%= tile.title %><% end %></li>
       <% end %>
     </ul>
   </div>

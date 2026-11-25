@@ -33,13 +33,13 @@ class DiscoveryPagesSystemTest < ApplicationSystemTestCase
     end
   end
 
-  test "a category card's count stays visible on a phone" do
+  test "a category card shows no count on a phone, and the page does not scroll sideways" do
     page.current_window.resize_to(320, 700)
     visit "/browse/classifications"
 
-    # the one Browse template's mosaic: every card's count is its own visible line under the name
-    cards = all(".mosaic-flow article.explore-card", minimum: 1)
-    assert_equal cards.size, all(".mosaic-flow article.explore-card .explore-card__intro", text: /\A[\d,]+ records?\z/).size
+    # the one Browse template's mosaic: names and pictures, no count under any card (the site shows no counts)
+    assert_selector ".mosaic-flow article.explore-card", minimum: 1
+    assert_no_selector ".mosaic-flow article.explore-card .explore-card__intro"
     assert_not page.evaluate_script("document.documentElement.scrollWidth > window.innerWidth")
   end
 end

@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Explore by place (app/views/explore/places.html.erb; after Airbnb's search with a map, 2026-11): the places as picture cards beside a
-// map whose pins carry each place's number of records. The region chips and the name box narrow the cards and the pins together; once
+// map whose pins mark each place (no numbers: the site shows no counts). The region chips and the name box narrow the cards and the pins together; once
 // the map is shown, the cards are the places in view (unless "Update the list as I move the map" is turned off), and the places in view
 // with no card are listed by name under them. Hovering or focusing a card marks its pin.
 //
@@ -169,10 +169,6 @@ export default class extends Controller {
       link.href = place.href
       link.className = "place-explorer__more-link"
       link.textContent = place.label
-      const count = document.createElement("span")
-      count.className = "place-explorer__more-count"
-      count.textContent = ` ${this.records(place.count)}`
-      link.append(count)
       item.append(link)
       return item
     }))
@@ -260,8 +256,8 @@ export default class extends Controller {
 
   place(place) {
     const L = this.L
-    const name = `${place.label}: ${this.records(place.count)}`
-    const icon = L.divIcon({ className: "explore-map__pin", html: this.badge(place.count), iconSize: null })
+    const name = place.label
+    const icon = L.divIcon({ className: "explore-map__pin", html: this.badge(), iconSize: null })
     const pin = L.marker([place.lat, place.lon], { icon, keyboard: true, title: name })
     pin.bindPopup(() => this.popup(place), { className: "place-explorer__popup", minWidth: 200, maxWidth: 240 })
     // The popup's link takes the focus, and the pin gets it back when the popup closes (Escape, or its close button)
@@ -279,9 +275,8 @@ export default class extends Controller {
 
   cluster(group) {
     const L = this.L
-    const total = group.members.reduce((sum, place) => sum + place.count, 0)
-    const name = this.word("group", { count: group.members.length.toLocaleString("en-AU"), records: this.records(total) })
-    const icon = L.divIcon({ className: "explore-map__pin explore-map__pin--group", html: this.badge(total), iconSize: null })
+    const name = this.word("group")
+    const icon = L.divIcon({ className: "explore-map__pin explore-map__pin--group", html: this.badge(), iconSize: null })
     const bounds = L.latLngBounds(group.members.map((place) => [place.lat, place.lon]))
     const pin = L.marker(bounds.getCenter(), { icon, keyboard: true, title: name })
     pin.on("click", () => this.map.fitBounds(bounds.pad(0.5), { maxZoom: Math.min(this.map.getZoom() + 3, 18) }))
@@ -295,11 +290,11 @@ export default class extends Controller {
     element.setAttribute("aria-label", name)
   }
 
-  badge(count) {
+  // A pin is a plain dot (the site shows no counts); its name (the place, or "Several places here") is its aria-label
+  badge() {
     const span = document.createElement("span")
     span.className = "explore-map__marker"
     span.setAttribute("aria-hidden", "true")
-    span.textContent = count.toLocaleString("en-AU") // the same figure as in the pin's name, so the name holds the visible text
     return span.outerHTML
   }
 
@@ -326,22 +321,12 @@ export default class extends Controller {
     }
     const link = document.createElement("a")
     link.href = place.href
-    link.textContent = place.card ? this.word("explore", { place: place.label }) : this.word("see_records", { records: this.records(place.count), place: place.label })
-    if (place.card) {
-      const count = document.createElement("p")
-      count.className = "place-explorer__pop-where"
-      count.textContent = this.records(place.count)
-      box.append(count)
-    }
+    link.textContent = place.card ? this.word("explore", { place: place.label }) : this.word("see_records", { place: place.label })
     box.append(link)
     return box
   }
 
   // ---- small things
-
-  records(count) {
-    return this.word(count === 1 ? "record_one" : "record_other", { count: count.toLocaleString("en-AU") })
-  }
 
   word(key, values = {}) {
     return Object.entries(values).reduce((text, [name, value]) => text.replace(`%{${name}}`, value), this.words[key] || "")

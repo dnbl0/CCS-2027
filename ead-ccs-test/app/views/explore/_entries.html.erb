@@ -1,10 +1,9 @@
-<%# A list of filter values with their record counts, each opening the search: entries respond to label, count and search_query %>
+<%# A list of filter values, each opening the search (no counts: the site shows none): entries respond to label and search_query %>
 <ul class="browse__list">
   <% entries.each do |entry| %>
     <li class="browse__item">
       <%= link_to search_action_path(entry.search_query), class: "browse__link" do %>
         <span class="browse__label"><%= entry.label %></span>
-        <span class="browse__count"><%= t("explore_pages.count", count: entry.count, number: number_with_delimiter(entry.count)) %></span>
       <% end %>
     </li>
   <% end %>

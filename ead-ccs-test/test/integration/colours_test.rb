@@ -31,8 +31,8 @@ class ColoursTest < ActionDispatch::IntegrationTest
     assert_select "nav.places-views a.places-views__link[aria-current=page][href$='view=spectrum']", "Spectrum"
     assert_select "turbo-frame#colour-explorer[data-turbo-action=advance] nav.explore-strip[aria-label=Colours]" do
       labels = css_select("a.explore-strip__swatch").map { |swatch| swatch["aria-label"] }
-      assert_equal [ "Red: 1,234 records", "Blue: 12 records", "White: 3 records" ], labels
-      assert_select "a.explore-strip__swatch.colours__swatch--red[href=?][title=?]", "/browse/colours?colour=red", "Red: 1,234 records"
+      assert_equal %w[Red Blue White], labels # names only: the site shows no counts
+      assert_select "a.explore-strip__swatch.colours__swatch--red[href=?][title=?]", "/browse/colours?colour=red", "Red"
       assert_select "a[aria-current]", 0, "no colour chosen yet"
     end
     assert_select "h2#colours-heading", "Colours"
@@ -40,7 +40,7 @@ class ColoursTest < ActionDispatch::IntegrationTest
     # has no pictures, so the cards show the colour itself
     assert_equal %w[Red Blue White], css_select("ul.colour-cards li.colour-card h3 a.colour-card__link").map { |link| link.text.squish }
     assert_select "li.colour-card:first-child a.colour-card__link[href='/browse/colours?colour=red']"
-    assert_select "li.colour-card:first-child .colour-card__count", "1,234 records"
+    assert_select ".colour-card__count", 0
     assert_select "li.colour-card:first-child .colour-card__pictures.colours__swatch--red[aria-hidden=true]"
   end
 
@@ -60,8 +60,8 @@ class ColoursTest < ActionDispatch::IntegrationTest
       assert_select "a.picture-wall__step[aria-label^='Next']", 0 # teal is last here (the spectrum's order)
       # while a picture loads, its frame shows the picture's own main colour
       assert_select "a.picture-wall__link[href='/catalog/emu-a'][style='--tint: #0497d1']"
-      assert_select ".picture-wall__count", "43 records"
-      assert_select ".picture-wall__links a[data-turbo-frame=_top][href=?]", "/catalog?f%5Bcolour_ssim%5D%5B%5D=teal", text: "See all 43 in the search"
+      assert_select ".picture-wall__count", 0
+      assert_select ".picture-wall__links a[data-turbo-frame=_top][href=?]", "/catalog?f%5Bcolour_ssim%5D%5B%5D=teal", text: "See them all in the search"
       assert_equal %w[/catalog/emu-a /catalog/emu-b], css_select("a.picture-wall__link").map { |link| link["href"] }, "mostly teal first; no sensitive record"
       assert_select "a.picture-wall__link[data-turbo-frame=_top] img[alt='']", 2
       assert_select "a.picture-wall__link .picture-wall__title", "Title of emu-a"

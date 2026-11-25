@@ -71,8 +71,9 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
 
     century = all(".time-explorer__periods .explore-card__link[href^='/browse/periods/']").first
     assert century, "a century from 1000 has its own page"
+    century.execute_script("this.scrollIntoView({ block: 'center' })") # off the window's bottom edge a click misses it
     century.click
-    assert_selector "main.place-page h1"
+    assert_selector "main.place-page h1", wait: 10 # a period page on a cold test cache takes ~2 s
   end
 
   test "choosing a century in the strip swaps in its wall in place: the address, the title and focus follow, and the strip scrolls to it" do
@@ -104,7 +105,7 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
       click_button "Show the map"
       assert_selector ".leaflet-container"
       assert_equal "shown", page.evaluate_script("localStorage.getItem('ccs:place-map')")
-      assert_selector ".explore-map__pin[role='button'][aria-label='Melbourne: 1,391 records']"
+      assert_selector ".explore-map__pin[role='button'][aria-label='Melbourne']" # its name only: the site shows no counts
       page.execute_script("document.querySelector(\".explore-map__pin[aria-label^='Melbourne']\").focus()")
       page.driver.browser.keyboard.type(:enter)
       assert_selector ".leaflet-popup-content a", text: "Explore Melbourne"
@@ -112,7 +113,7 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
       assert_match %r{/browse/places/}, find(".leaflet-popup-content a")[:href]
       page.driver.browser.keyboard.type(:Escape)
       assert_no_selector ".leaflet-popup"
-      assert_equal "Melbourne: 1,391 records", page.evaluate_script("document.activeElement.getAttribute('aria-label')")
+      assert_equal "Melbourne", page.evaluate_script("document.activeElement.getAttribute('aria-label')")
       assert_selector ".leaflet-control-attribution a[href='https://www.openstreetmap.org/copyright']"
 
       visit "/browse/places?view=map" # remembered: the map is back without asking
@@ -135,7 +136,7 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
       assert_selector ".place-explorer__chip[aria-pressed='true']", text: "Europe"
       assert_no_selector ".place-tile"
       assert_selector ".place-explorer__empty"
-      assert_selector ".place-explorer__status", text: "0 places in Europe"
+      assert_selector ".place-explorer__status", text: "Places with pictures in Europe"
 
       click_button "Everywhere"
       fill_in "Find a place", with: "victoria"

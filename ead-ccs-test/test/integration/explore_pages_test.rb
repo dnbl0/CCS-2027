@@ -37,21 +37,21 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     assert_select "nav.places-views a.places-views__link[href='/browse/time']", "All"
     assert_select "turbo-frame#time-explorer[target=_top][data-turbo-action=advance] nav.explore-strip--time[aria-label=Centuries]" do
       items = css_select("a.explore-strip__period")
-      assert_equal [ "Earlier (Before 3000 BCE): 2 records", "1900s (1900–1999): 1,200 records" ], items.map { |item| item["aria-label"] }
+      assert_equal [ "Earlier (Before 3000 BCE)", "1900s (1900–1999)" ], items.map { |item| item["aria-label"] }
       assert_equal %w[Earlier 1900s], items.map { |item| item.text.squish }, "the name shown is the start of the name read out"
       # a century swaps in place (the link names the frame); the earliest period, not a century, opens its records
       assert_select "a.explore-strip__period[href='/browse/time?century=1900'][data-turbo-frame=time-explorer]"
       assert_select "a.explore-strip__period[href*='range%5Bdate_start_isi%5D%5Bend%5D=-3001']:not([data-turbo-frame])"
       assert_select "a[aria-current]", 0, "no century chosen yet"
-      assert_select ".explore-strip__bar[aria-hidden=true]", 2
+      assert_select ".explore-strip__bar", 0 # no bars: they showed how many records (the site shows no counts)
     end
-    assert_select ".explore-strip__note", /most are from 1900–1999 \(1,200 records\)/
+    assert_select ".explore-strip__note", "Choose a century to see its records."
     # the periods, earliest first: a century from 1000 opens its own page (its decades are there), an earlier one its records in the search
     assert_select ".time-explorer__periods a[href='/browse/periods/1900-1999']", text: /\A1900–1999/
     assert_select ".time-explorer__periods a[href*='range%5Bdate_start_isi%5D%5Bend%5D=-3001']", text: /\ABefore 3000 BCE/
     assert_select ".time-explorer__periods .mosaic-flow img[alt='']", 1 # the period with a picture is a tile; the other is a link after
-    assert_select ".time-explorer__periods", text: /1900–1999\s+1,200 records/
-    assert_select "details.time-explorer__eras summary", "Eras as catalogued (1)"
+    assert_select ".time-explorer__periods", text: /\d records?/, count: 0 # no counts
+    assert_select "details.time-explorer__eras summary", "Eras as catalogued"
     assert_select "details.time-explorer__eras a[href*='f%5Bdate_era_ssim%5D%5B%5D=20th+century']", text: /20th century/
   end
 
@@ -67,8 +67,8 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     assert_select "a.explore-strip__period[aria-current=page][data-explore-strip-target=chosen]", "1900s"
     assert_select "section.picture-wall" do
       assert_select "h2#picture-wall-heading", "1900–1999"
-      assert_select ".picture-wall__count", "1,200 records"
-      assert_select ".picture-wall__links a[href='/browse/periods/1900-1999']", "See all 1,200"
+      assert_select ".picture-wall__count", 0
+      assert_select ".picture-wall__links a[href='/browse/periods/1900-1999']", "See them all in the search"
       assert_select "a.picture-wall__link[href='/catalog/emu-1'] .picture-wall__title", "A print"
     end
     assert_select "h2", "Decades of 1900–1999"
@@ -102,16 +102,16 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     assert_select ".place-explorer__chip[aria-pressed='true']", "Everywhere"
     assert_select ".place-explorer__chip[data-region='English']", 0
     assert_select "input[type='search']#place-explorer-find"
-    # the card: its own page, where it is and the pin's number of records
+    # the card: its own page and where it is (no number of records)
     assert_select "li[data-key='0'] .place-tile" do
       assert_select "h3 a.place-tile__link[href^='/browse/places/']", "Melbourne"
       assert_select ".place-tile__where", "Victoria, Australia"
-      assert_select ".place-tile__count", "10 records"
+      assert_select ".place-tile__count", 0
       assert_select ".place-tile__media img[alt=''][src*='w=600']"
     end
     assert_select "svg.place-explorer__dots[aria-hidden='true']" # the map's preview, drawn from the page's own data
     assert_select "button.place-explorer__switch", "Show map"
-    assert_select ".place-explorer__status[role='status']", "1 place"
+    assert_select ".place-explorer__status[role='status']", "Places with pictures" # no count
     # the map: nothing asked of the tile server until the visitor presses Show the map
     assert_select ".place-explorer__consent button", "Show the map"
     assert_select ".place-explorer__stage[hidden] #place-map"
@@ -126,10 +126,10 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     assert_no_match(/tile\.openstreetmap\.org[^"]*"\s*(src|href)=/, response.body)
     assert_select "link[href*='leaflet']"
     # every region, country and place, as lists (the same job without the map)
-    assert_select "details.place-explorer__all summary", "Every place, by region and country (2)"
+    assert_select "details.place-explorer__all summary", "Every place, by region and country"
     assert_select "h3 a[href*='f%5Bplace_hierarchy_ssim%5D%5B%5D=Oceania']", "Oceania"
-    assert_select "a.browse__link[href*='Oceania%7CAustralia']", text: /Australia\s+12 records/
-    assert_select "details details summary", "Places in Australia (1)"
+    assert_select "a.browse__link[href*='Oceania%7CAustralia']", text: "Australia" # no count
+    assert_select "details details summary", "Places in Australia"
   end
 
   test "before any place is located: no map, the regions and the commonest places" do

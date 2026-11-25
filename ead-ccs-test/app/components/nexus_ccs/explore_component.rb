@@ -19,7 +19,6 @@ module NexusCcs
 
     def render? = overview.any?
 
-    def count_label(count) = t("explore.count", count: count, number: helpers.number_with_delimiter(count))
 
     # The first letters of the collection's first two words (UA, MH, GM): the typographic face of a tile with no picture (decoration, hidden from assistive technology)
     def monogram(tile)

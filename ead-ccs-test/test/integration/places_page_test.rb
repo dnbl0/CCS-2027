@@ -26,11 +26,11 @@ class PlacesPageTest < ActionDispatch::IntegrationTest
     assert_select "ul.mosaic-flow[data-controller=mosaic][data-mosaic-lanes-value='6'] li article.explore-card--tile" do
       assert_select "img[alt=''][src*='w=600']" # a smaller rendition of the DAM picture
       assert_select "h3 a[href^='/browse/places/australia-']", "Australia" # the name under the picture, opening the place's own page
-      assert_select ".explore-card__intro", "8,058 records" # every record, as the A–Z list counts them, not only the pictured ones
+      assert_select ".explore-card__intro", 0 # no number of records: the site shows no counts
     end
     assert_select "turbo-frame#places-results"
     assert_select "form[data-turbo-frame=places-results] input#filter[data-action='input->places-search#type']"
-    assert_select "a[href=?]", "/browse/places?view=az", text: /See every place, A–Z \(2\)/
+    assert_select "a[href=?]", "/browse/places?view=az", text: "See every place, A–Z"
   end
 
   test "A–Z: the letters across the top and the list of every place" do
@@ -41,7 +41,7 @@ class PlacesPageTest < ActionDispatch::IntegrationTest
     assert_select "nav.places-views a[aria-current=page]", "A–Z"
     assert_select "nav.places-letters a[aria-current=page]", "Most records"
     assert_select "nav.places-letters a[href=?]", "/browse/places?letter=A", text: "A"
-    assert_equal [ "Australia 8,058 records", "Japan 193 records" ], css_select("a.places-list__link").map { |a| a.text.squish }
+    assert_equal [ "Australia", "Japan" ], css_select("a.places-list__link").map { |a| a.text.squish }
     assert_select "ul.places-wall", count: 0
   end
 
@@ -53,9 +53,9 @@ class PlacesPageTest < ActionDispatch::IntegrationTest
 
     get "/browse/places", params: { view: "az", region: "Europe" }
 
-    assert_equal [ "All regions", "Asia 1", "Europe 1", "Oceania 1" ], css_select("nav.places-regions a").map { |a| a.text.squish }.sort
+    assert_equal [ "All regions", "Asia", "Europe", "Oceania" ], css_select("nav.places-regions a").map { |a| a.text.squish }.sort
     assert_select "nav.places-regions a[aria-current=true]", text: /Europe/
-    assert_equal [ "Paris 321 records" ], css_select("a.places-list__link").map { |a| a.text.squish }
+    assert_equal [ "Paris" ], css_select("a.places-list__link").map { |a| a.text.squish }
     assert_select "h2", "Places in Europe"
   end
 end

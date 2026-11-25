@@ -17,7 +17,7 @@
            data-place-explorer-markers-value="<%= place_explorer_markers(@places, @cards).to_json %>"
            data-place-explorer-tiles-value="<%= Explore::MapTiles.url %>"
            data-place-explorer-attribution-value="<%= String.new(sanitize(Explore::MapTiles.attribution, tags: %w[a], attributes: %w[href])) %>"
-           data-place-explorer-words-value="<%= words.slice(:shown_one, :shown_other, :in_view, :in_region, :matching, :explore, :see_records, :group, :record_one, :record_other, :more, :show_more, :switch_map, :switch_list).to_json %>">
+           data-place-explorer-words-value="<%= words.slice(:shown_one, :shown_other, :in_view, :in_region, :matching, :explore, :see_records, :group, :more, :show_more, :switch_map, :switch_list).to_json %>">
         <%# The head (the template has the title): the regions as chips and the name box (Airbnb's search bar and categories) %>
         <div class="place-explorer__head">
           <div class="place-explorer__tools" data-js-only>
@@ -44,7 +44,7 @@
               <%# A preview drawn from the site's own data (each place a dot where it is): nothing is asked of the tile server for it %>
               <svg class="place-explorer__dots" viewBox="0 10 360 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" data-place-explorer-target="dots"></svg>
               <div class="place-explorer__consent-card">
-              <p class="place-explorer__consent-heading"><%= t("explore_pages.places.explorer.consent_heading", count: number_with_delimiter(@places.markers.size)) %></p>
+              <p class="place-explorer__consent-heading"><%= t("explore_pages.places.explorer.consent_heading") %></p>
               <p class="place-explorer__consent-note"><%= words[:consent_note] %></p>
               <button type="button" class="btn btn-primary" data-place-explorer-target="showButton" data-action="place-explorer#show"><%= t("explore_pages.places.show_map") %></button>
               </div>
@@ -66,7 +66,7 @@
 
           <section class="place-explorer__list" aria-labelledby="list-heading">
             <h2 class="visually-hidden" id="list-heading"><%= words[:list] %></h2>
-            <p class="place-explorer__status" role="status" data-place-explorer-target="status"><%= t("explore_pages.places.explorer.shown", count: @cards.size) %></p>
+            <p class="place-explorer__status" role="status" data-place-explorer-target="status"><%= t("explore_pages.places.explorer.shown") %></p>
             <%# The cards, as Airbnb's: one shape for every picture (square), the picture whole on its pale mount, the name and its lines under it %>
             <ul class="place-grid" data-place-explorer-target="list" aria-labelledby="list-heading">
               <% @cards.each do |card| %>
@@ -79,7 +79,6 @@
                     </div>
                     <h3 class="place-tile__name"><%= link_to card.label, card.path, class: "place-tile__link" %></h3>
                     <% if card.where %><p class="place-tile__where"><%= card.where %></p><% end %>
-                    <p class="place-tile__count"><%= t("explore_pages.places.explorer.records_html", count: card.count, number: number_with_delimiter(card.count)) %></p>
                   </article>
                 </li>
               <% end %>
@@ -94,22 +93,20 @@
 
             <p class="place-explorer__az"><%= link_to t("explore_pages.places.all_places"), explore_places_path(view: "az"), class: "arrow-link arrow-link--icon" %></p>
             <details class="place-explorer__all">
-              <summary><%= t("explore_pages.places.explorer.all", count: number_with_delimiter(@places.markers.size)) %></summary>
+              <summary><%= t("explore_pages.places.explorer.all") %></summary>
               <% @places.regions.each do |region| %>
                 <h3 class="explore-places__region">
                   <%= link_to search_action_path(region.search_query) do %><%= region.label %><% end %>
-                  <span class="browse__count"><%= t("explore_pages.count", count: region.count, number: number_with_delimiter(region.count)) %></span>
                 </h3>
                 <ul class="explore-places__countries">
                   <% region.children.each do |country| %>
                     <li>
                       <%= link_to search_action_path(country.search_query), class: "browse__link" do %>
                         <span class="browse__label"><%= country.label %></span>
-                        <span class="browse__count"><%= t("explore_pages.count", count: country.count, number: number_with_delimiter(country.count)) %></span>
                       <% end %>
                       <% if country.children.any? %>
                         <details class="explore-places__places">
-                          <summary><%= t("explore_pages.places.places_in", country: country.label) %> (<%= country.children.size %>)</summary>
+                          <summary><%= t("explore_pages.places.places_in", country: country.label) %></summary>
                           <%= render "explore/entries", entries: country.children %>
                         </details>
                       <% end %>
