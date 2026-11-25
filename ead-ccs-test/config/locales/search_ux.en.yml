@@ -1,12 +1,7 @@
-# Wording for the results-page aids: the one-tap filters above the results (QuickFiltersComponent), the suggestions as you type
+# Wording for the results-page aids: the suggestions as you type
 # (CategorisedSuggestions) and the extra help on an empty results page (ZeroResults).
 en:
   nexus_ccs:
-    quick_filters:
-      heading: "Narrow these results"
-      results:
-        one: "result"
-        other: "results"
     suggestions:
       kinds:
         creator: "Creator"

@@ -32,28 +32,11 @@ class SearchAidsTest < ApplicationSystemTestCase
       assert_accessible tags: AXE_TAGS + WCAG22_TAGS
     end
 
-    test "results show one-tap filters that narrow the search, with no axe violations, at #{name}" do
-      page.current_window.resize_to(width, 900)
-      visit "/catalog?q=portrait&search_field=all_fields&any_assets=1"
-
-      assert_selector "nav.quick-filters h2", text: "Narrow these results"
-      count = all(".quick-filters__list a").size
-      assert_operator count, :>=, 2
-      assert_operator count, :<=, 8
-      no_sideways_scroll
-      shot("results-#{name}")
-      assert_accessible tags: AXE_TAGS + WCAG22_TAGS
-
-      first(".quick-filters__list a").click
-      assert_selector ".applied-filter", minimum: 1
-    end
-
     test "an empty page offers related categories, with no axe violations, at #{name}" do
       page.current_window.resize_to(width, 900)
       visit "/catalog?q=skull&search_field=all_fields&f%5Bhas_digital_asset%5D%5B%5D=with"
 
       assert_selector ".results-empty__related a", minimum: 1
-      assert_no_selector ".quick-filters"
       no_sideways_scroll
       shot("empty-#{name}")
       assert_accessible tags: AXE_TAGS + WCAG22_TAGS

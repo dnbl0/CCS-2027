@@ -58,6 +58,13 @@ module CatalogConfig
     # labels. A pill or a saved search's name says the filter's name too, as "With Digital Asset: Yes" (.digital_asset_choice).
     DIGITAL_ASSET_FIELD = SearchDefaults::DIGITAL_ASSET_FIELD
     DIGITAL_ASSET_VALUES = { "with" => "Yes", "without" => "No" }.freeze
+    # The applied-filter pill says the choice as one phrase, like every other pill's value alone (no "With Digital Asset ❯ Yes")
+    DIGITAL_ASSET_PILLS = { "with" => "With digital asset", "without" => "Without digital asset" }.freeze
+
+    # The pill's words for a value ("with") or its label ("Yes"); nil for anything else
+    def self.digital_asset_pill(value)
+      DIGITAL_ASSET_PILLS[value.to_s] || DIGITAL_ASSET_PILLS[DIGITAL_ASSET_VALUES.key(value.to_s)]
+    end
 
     # The Colour filter sits under Digital Asset Format Type (docs/colour-and-clean-up.md)
     DIGITAL_ASSET_FORMAT_FIELD = "digital_asset_format_ssim"

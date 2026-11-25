@@ -31,6 +31,16 @@ module NexusCcs
     # "A OR B", whose ✕ takes them all off. For a filter whose values are alternatives (InclusiveFilterField) each value is a
     # pill of its own, removed on its own: the remove link comes from InclusiveFilterField#remove, which keeps the other values.
     # Any other "any of" filter keeps Blacklight's single pill, as its filter field cannot take off one value of the group.
+    # With Digital Asset's pill: its choice as one phrase ("With digital asset"), the filter's name hidden as on every other pill
+    class DigitalAssetPill < SimpleDelegator
+      def initialize(presenter, words)
+        super(presenter)
+        @words = words
+      end
+
+      def constraint_label = @words
+    end
+
     def constraint_presenters
       return to_enum(:constraint_presenters) unless block_given?
 
@@ -39,7 +49,9 @@ module NexusCcs
         facet.each_value do |value|
           next if value.blank?
 
-          if !value.is_a?(Array)
+          if !value.is_a?(Array) && facet.key == CatalogConfig::Facets::DIGITAL_ASSET_FIELD && CatalogConfig::Facets.digital_asset_pill(value)
+            yield DigitalAssetPill.new(facet_constraint_presenter(facet_field_presenter, facet.config, value), CatalogConfig::Facets.digital_asset_pill(value))
+          elsif !value.is_a?(Array)
             yield facet_constraint_presenter(facet_field_presenter, facet.config, value)
           elsif facet.config.filter_class == InclusiveFilterField
             value.compact_blank.each { |one| yield facet_constraint_presenter(facet_field_presenter, facet.config, one) }

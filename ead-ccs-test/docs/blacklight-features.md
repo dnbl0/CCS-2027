@@ -119,7 +119,7 @@ Ideas taken from Google Arts & Culture, written our own way (no code, images or 
   results?"), and up to three related categories: the commonest collection, object type and creator of the same search without its
   filters (asked in the same request that counts it), or, when the words find nothing at all, categories whose names contain the longest
   word (one `CategorisedSuggestions` request). Did-you-mean is Blacklight's, unchanged.
-- **One-tap filters above the results.** `NexusCcs::QuickFiltersComponent`, under the results toolbar: up to eight of the commonest era,
+- **One-tap filters above the results (removed 2026-11-25: not a business requirement).** Was `NexusCcs::QuickFiltersComponent`, under the results toolbar: up to eight of the commonest era,
   object type and collection values among the results, from the facet counts the page already has (no extra request). A value every
   result has, and a field the visitor already chose from (its values are alternatives, so another would widen the results), are left out.
   A labelled list of links; hidden on an empty page and when fewer than two would help.
