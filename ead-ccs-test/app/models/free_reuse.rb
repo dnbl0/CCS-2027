@@ -45,10 +45,10 @@ module FreeReuse
     open = spellings(AccessPolicy.licences_with_tier(:open))
     return nil if open.empty?
 
-    parts = [ "#{LICENCE_FIELD}:(#{open.map { |value| quote(value) }.join(' ')})",
+    parts = [ "#{LICENCE_FIELD}:(#{open.map { |value| SolrQuery.phrase(value) }.join(' ')})",
               "-#{LICENCE_FIELD}:(#{gaps(open).join(' ')})" ]
     withheld = spellings(AccessPolicy.withheld_access_conditions)
-    parts << "-#{ACCESS_CONDITION_FIELD}:(#{withheld.map { |value| quote(value) }.join(' ')})" if withheld.any?
+    parts << "-#{ACCESS_CONDITION_FIELD}:(#{withheld.map { |value| SolrQuery.phrase(value) }.join(' ')})" if withheld.any?
     parts.join(" ")
   end
 
@@ -56,7 +56,7 @@ module FreeReuse
   def self.gaps(open)
     bounds = [ nil, *open, nil ]
     bounds.each_cons(2).map do |low, high|
-      "#{low ? "{#{quote(low)}" : '[*'} TO #{high ? "#{quote(high)}}" : '*]'}"
+      "#{low ? "{#{SolrQuery.phrase(low)}" : '[*'} TO #{high ? "#{SolrQuery.phrase(high)}}" : '*]'}"
     end
   end
 
@@ -69,7 +69,5 @@ module FreeReuse
     end.uniq.sort
   end
 
-  def self.quote(value) = %("#{value.gsub(/["\\]/) { |char| "\\#{char}" }}")
-
-  private_class_method :emu_filter_query, :gaps, :spellings, :quote
+  private_class_method :emu_filter_query, :gaps, :spellings
 end

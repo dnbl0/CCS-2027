@@ -13,7 +13,7 @@ module Browse
       def slug = Slug.build(kind_key, name)
       def path = Rails.application.routes.url_helpers.browse_entity_path(kind: kind_key, slug: slug)
       def sort_key = Index.sort_key(name)
-      def fq = Browse.field_query(kind.field, variants)
+      def fq = SolrQuery.field(kind.field, variants)
       def search_query = Browse.search_query(kind.field, variants)
     end
 

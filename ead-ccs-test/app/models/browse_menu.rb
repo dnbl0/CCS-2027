@@ -48,7 +48,7 @@ module BrowseMenu
     nil
   end
 
-  def self.facet_query(field, value) = %(#{field}:"#{value.gsub(/["\\]/) { |c| "\\#{c}" }}")
+  def self.facet_query(field, value) = "#{field}:#{SolrQuery.phrase(value)}"
 
   def self.item(label, field, value, counts) = Item.new(label, field, value, counts[[ field, value ]])
 

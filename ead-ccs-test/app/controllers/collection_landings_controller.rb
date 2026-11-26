@@ -16,7 +16,7 @@ class CollectionLandingsController < ApplicationController
     canonical = Browse::Slug.build(@dimension.slug, @value)
     return redirect_to(collection_landing_path(kind: @dimension.slug, slug: canonical), status: :moved_permanently) unless params[:slug] == canonical
 
-    @showcase = Showcase.call(fq: [ Browse.field_query(@dimension.field, @value) ]) || (return unavailable!)
+    @showcase = Showcase.call(fq: [ SolrQuery.field(@dimension.field, @value) ]) || (return unavailable!)
     @search_query = BrowseHubs.query(@dimension.field, @value)
     @intro = self.class.intro(@dimension, @value)
     use_meta @value, @intro, [ [ t("browse.title"), browse_path ], [ @dimension.title, category_path(@dimension.slug) ], [ @value, nil ] ],

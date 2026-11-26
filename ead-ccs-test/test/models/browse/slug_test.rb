@@ -46,7 +46,7 @@ class BrowseSlugTest < ActiveSupport::TestCase
 
   test "Solr syntax in a value is escaped in the filter, never run" do
     nasty = %(a" OR id:* OR "b\\)
-    filter = Browse.field_query("creator_ssim", [ nasty ])
+    filter = SolrQuery.field("creator_ssim", [ nasty ])
 
     assert_equal %(creator_ssim:("a\\" OR id:* OR \\"b\\\\")), filter
   end

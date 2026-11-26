@@ -27,7 +27,7 @@ class RecentlyViewed
     wanted = ids(except: except).first(limit)
     return [] if wanted.empty?
 
-    found = RecordSummaries.fetch({ fq: "id:(#{wanted.map { |id| RecordSummaries.phrase(id) }.join(' OR ')})", rows: wanted.size }, connection).to_a
+    found = RecordSummaries.fetch({ fq: "id:(#{wanted.map { |id| SolrQuery.phrase(id) }.join(' OR ')})", rows: wanted.size }, connection).to_a
     found.index_by { |fields| fields["id"] }.values_at(*wanted).compact.map { |fields| SolrDocument.new(fields) }
   end
 

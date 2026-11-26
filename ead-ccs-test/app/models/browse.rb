@@ -51,9 +51,4 @@ module Browse
     filters = values.one? ? { f: { field => values } } : { f_inclusive: { field => values } }
     { any_assets: "1", search_field: "all_fields" }.merge(filters)
   end
-
-  # A Solr phrase for a value taken from the index. Quotes and backslashes are escaped, so a value cannot end the phrase.
-  def self.phrase(value) = %("#{value.to_s.gsub(/["\\]/) { |c| "\\#{c}" }}")
-
-  def self.field_query(field, values) = "#{field}:(#{Array(values).map { |value| phrase(value) }.join(' OR ')})"
 end
