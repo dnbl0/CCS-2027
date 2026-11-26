@@ -121,10 +121,23 @@ Rails.application.routes.draw do
   end
   get "browse/:kind/:slug", to: "collection_landings#show", as: :collection_landing,
                             constraints: { kind: /collections|named-collections/, slug: /[a-z0-9-]+/ }
-  get "themes", to: "themes#index", as: :themes
-  get "themes/:slug", to: "themes#show", as: :theme, constraints: { slug: /[a-z0-9-]+/ }
-  get "stories", to: "stories#index", as: :stories
-  get "stories/:slug", to: "stories#show", as: :story, constraints: { slug: /[a-z0-9-]+/ }
+  # Stories, themes and Discover sit under Browse (Dean, 26 Nov 2026): one Stories page holds the stories and the themes (after the
+  # National Gallery of Art's Stories), each story and theme has its own page; the old addresses answer 301 with their query kept
+  get "browse/stories", to: "stories#index", as: :stories
+  get "browse/stories/:slug", to: "stories#show", as: :story, constraints: { slug: /[a-z0-9-]+/ }
+  get "browse/themes", to: redirect("/browse/stories#themes", status: 301), as: :themes
+  get "browse/themes/:slug", to: "themes#show", as: :theme, constraints: { slug: /[a-z0-9-]+/ }
+  get "browse/discover", to: "discover#index", as: :discover
+  get "browse/discover/frame", to: "discover#frame", as: :discover_frame
+  { "stories" => "browse/stories", "discover" => "browse/discover" }.each do |old, now|
+    get old, to: redirect(status: 301) { |_params, request| [ "/#{now}", request.query_string.presence ].compact.join("?") }, as: "legacy_#{old}"
+  end
+  get "themes", to: redirect("/browse/stories#themes", status: 301), as: :legacy_themes
+  get "stories/:slug", to: redirect(status: 301) { |params, request| [ "/browse/stories/#{params[:slug]}", request.query_string.presence ].compact.join("?") },
+                       as: :legacy_story, constraints: { slug: /[a-z0-9-]+/ }
+  get "themes/:slug", to: redirect(status: 301) { |params, request| [ "/browse/themes/#{params[:slug]}", request.query_string.presence ].compact.join("?") },
+                      as: :legacy_theme, constraints: { slug: /[a-z0-9-]+/ }
+  get "discover/frame", to: redirect("/browse/discover/frame", status: 301), as: :legacy_discover_frame
   get "browse/:slug", to: "browse#show", as: :browse_hub
   # Accessibility statement and privacy notice (CCS-148); placeholder wording until the University approves it
   get "accessibility", to: "pages#accessibility", as: :accessibility
@@ -178,8 +191,6 @@ Rails.application.routes.draw do
 
   # Discovery (docs/similar-and-trending.md): the Featured and trending page, the short version the home page loads into a lazy
   # frame, and a record's Similar records (also a lazy frame, on the record page)
-  get "discover", to: "discover#index", as: :discover
-  get "discover/frame", to: "discover#frame", as: :discover_frame
   get "catalog/:id/similar", to: "similar#show", as: :similar, constraints: { id: %r{[^/]+} }, format: false
   # Colour (docs/colour-and-clean-up.md): browse by colour, and a record's "Looks similar" (a lazy frame on the record page)
   get "catalog/:id/looks-similar", to: "looks_similar#show", as: :looks_similar, constraints: { id: %r{[^/]+} }, format: false

@@ -1,13 +1,66 @@
+<%# The Stories page, under Browse (after the National Gallery of Art's Stories, looked at 26 Nov 2026, described in our own words): a
+    hero with the newest story's picture behind the title; a "Jump to" bar that stays in view; the newest story as the large feature;
+    the other stories as cards; then the themes (records gathered around a subject) as cards. Sections with nothing in them are left out,
+    and so is their place in the bar. %>
 <% content_for :title, "#{t('nexus_ccs.stories.title')} — Collections Navigator — University of Melbourne" %>
-<% content_for :body_class, "page-browse page-places page-stories" %>
-<main class="places-page" id="main-content">
-  <div class="places-page__inner">
-    <%= render "browse/page_head", title: t("nexus_ccs.stories.title"), intro: t("nexus_ccs.stories.description") %>
-    <% if @stories.empty? %>
+<% content_for :body_class, "page-browse page-stories" %>
+<% lead, *rest = @stories %>
+<% story_tiles = discovery_tiles(@stories, text: ->(story) { story.summary }) %>
+<% theme_tiles = discovery_tiles(@themes, text: ->(theme) { theme.intro }, fallback: ->(theme) { theme_picture(theme) }) %>
+<% hero = lead && hero_pictures([ lead.hero ].compact)[lead.hero] %>
+<% sections = [ ([ "featured", t("nexus_ccs.stories.featured") ] if lead), ([ "stories", t("nexus_ccs.stories.more_stories") ] if rest.any?),
+                ([ "themes", t("nexus_ccs.stories.themes_heading") ] if @themes.any?) ].compact %>
+<main class="stories-page" id="main-content">
+  <header class="stories-hero<%= " stories-hero--picture" if hero %>">
+    <% if hero %><img class="stories-hero__image" src="<%= DamImage.sized(AssetVersion.url(hero), 1800) %>" alt="" decoding="async" fetchpriority="high"><% end %>
+    <div class="stories-hero__text">
+      <h1 class="stories-hero__title"><%= t("nexus_ccs.stories.title") %></h1>
+      <p class="stories-hero__intro"><%= t("nexus_ccs.stories.description") %></p>
+    </div>
+  </header>
+
+  <% if sections.size > 1 %>
+    <nav class="stories-jump" aria-labelledby="stories-jump-label">
+      <p class="stories-jump__label" id="stories-jump-label"><%= t("nexus_ccs.stories.jump") %></p>
+      <ul class="stories-jump__list">
+        <% sections.each do |id, label| %><li><a class="stories-jump__link" href="#<%= id %>"><%= label %></a></li><% end %>
+      </ul>
+    </nav>
+  <% end %>
+
+  <div class="stories-page__inner">
+    <% if @stories.empty? && @themes.empty? %>
       <p class="browse-empty"><%= t("nexus_ccs.stories.empty") %></p>
-    <% else %>
-      <h2 class="visually-hidden"><%= t("nexus_ccs.stories.title") %></h2>
-      <%= render NexusCcs::MosaicComponent.new(tiles: discovery_tiles(@stories, text: ->(story) { [ story.summary, t("nexus_ccs.stories.published", date: l(story.date, format: "%-d %B %Y")) ].join(" ") }), label: t("nexus_ccs.stories.title"), lanes: 3) %>
+    <% end %>
+
+    <% if lead %>
+      <section class="stories-section" id="featured" aria-labelledby="featured-heading">
+        <h2 class="stories-section__heading" id="featured-heading"><%= t("nexus_ccs.stories.featured") %></h2>
+        <%= render "stories/card", tile: story_tiles.first, kind: t("nexus_ccs.stories.kind_story"), date: lead.date, feature: true %>
+      </section>
+    <% end %>
+
+    <% if rest.any? %>
+      <section class="stories-section" id="stories" aria-labelledby="stories-heading">
+        <h2 class="stories-section__heading" id="stories-heading"><%= t("nexus_ccs.stories.more_stories") %></h2>
+        <ul class="story-grid">
+          <% rest.each_with_index do |story, index| %>
+            <li><%= render "stories/card", tile: story_tiles[index + 1], kind: t("nexus_ccs.stories.kind_story"), date: story.date %></li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+
+    <% if @themes.any? %>
+      <section class="stories-section" id="themes" aria-labelledby="themes-heading">
+        <h2 class="stories-section__heading" id="themes-heading"><%= t("nexus_ccs.stories.themes_heading") %></h2>
+        <p class="stories-section__intro"><%= t("nexus_ccs.stories.themes_intro") %></p>
+        <ul class="story-grid">
+          <% theme_tiles.each do |tile| %>
+            <li><%= render "stories/card", tile: tile, kind: t("nexus_ccs.stories.kind_theme") %></li>
+          <% end %>
+        </ul>
+      </section>
     <% end %>
   </div>
 </main>

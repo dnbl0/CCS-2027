@@ -189,7 +189,7 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
   end
 
   test "the home frame has the pick of the day, the featured records and no trending section while the data is thin" do
-    solr { get "/discover/frame" }
+    solr { get "/browse/discover/frame" }
 
     assert_response :success
     assert_select "turbo-frame#home-discover" do
@@ -202,7 +202,7 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
   end
 
   test "the home frame is not a page to index" do
-    solr { get "/discover/frame" }
+    solr { get "/browse/discover/frame" }
 
     assert_includes response.headers["X-Robots-Tag"], "noindex"
   end
@@ -210,7 +210,7 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
   test "enough views add a Trending section, most viewed first" do
     [ [ "emu-a", 9 ], [ "emu-b", 5 ], [ @featured_ids.first, 7 ] ].each { |id, views| RecordView.create!(document_id: id, day: Date.current, views: views) }
 
-    solr { get "/discover" }
+    solr { get "/browse/discover" }
 
     assert_select "h2#discover-trending-heading", text: "Trending records"
     assert_equal [ "emu-a", @featured_ids.first, "emu-b" ], css_select(".discover-section--trending article").map { |node| node["data-document-id"] }
@@ -222,7 +222,7 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
       RecordView.create!(document_id: id, day: Date.current, views: views)
     end
 
-    solr { get "/discover" }
+    solr { get "/browse/discover" }
 
     assert_select ".discover-section--trending article", count: 3
     assert_no_match(/withheld-asset|sensitive-asset|emu-withheld|emu-sensitive/, response.body)
@@ -231,36 +231,36 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
   test "TRENDING_ENABLED=off removes the Trending section, and the others stay" do
     3.times { |n| RecordView.create!(document_id: [ "emu-a", "emu-b", @featured_ids.first ][n], day: Date.current, views: 9) }
 
-    with_env("TRENDING_ENABLED" => "off") { solr { get "/discover" } }
+    with_env("TRENDING_ENABLED" => "off") { solr { get "/browse/discover" } }
 
     assert_select ".discover-section--trending", count: 0
     assert_select ".discover-section--featured"
   end
 
   test "/discover is a public page: one h1, headings in order, canonical, indexable when indexing is on, and the trail" do
-    with_env("SEO_INDEXING" => "on") { solr { get "/discover" } }
+    with_env("SEO_INDEXING" => "on") { solr { get "/browse/discover" } }
 
     assert_response :success
     assert_select "h1", text: "Discover", count: 1
     assert_select "main#main-content"
     assert_select "h2#discover-pick-heading"
     assert_select "h2#discover-featured-heading"
-    assert_select "link[rel=canonical][href$='/discover']"
+    assert_select "link[rel=canonical][href$='/browse/discover']"
     assert_select "meta[name=description][content*='Featured records']"
     assert_not_includes response.headers["X-Robots-Tag"], "noindex"
     assert_select "nav[aria-label*=readcrumb] [aria-current], .breadcrumb-bar [aria-current]", text: /Discover/
   end
 
   test "/discover lists the placeholder blurbs of the curated records" do
-    solr { get "/discover" }
+    solr { get "/browse/discover" }
 
     assert_select ".discover-cards__blurb", text: /Placeholder blurb/, minimum: 1
   end
 
   test "no section on /discover or the home frame shows a withheld or sensitive record, or either one's image" do
-    solr { get "/discover" }
+    solr { get "/browse/discover" }
     page = response.body
-    solr { get "/discover/frame" }
+    solr { get "/browse/discover/frame" }
 
     [ page, response.body ].each do |body|
       assert_no_match(/withheld-asset|sensitive-asset|emu-withheld|emu-sensitive/, body)
@@ -268,12 +268,12 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
   end
 
   test "with Solr down the home frame says there is nothing to feature, and /discover says so too, both with success" do
-    solr(->(_params) { raise Blacklight::Exceptions::ECONNREFUSED, "down" }) { get "/discover" }
+    solr(->(_params) { raise Blacklight::Exceptions::ECONNREFUSED, "down" }) { get "/browse/discover" }
     assert_response :success
     assert_select ".saved-empty__text", text: /nothing to feature/
     assert_select "a[href='/catalog']", minimum: 1
 
-    solr(->(_params) { raise Blacklight::Exceptions::ECONNREFUSED, "down" }) { get "/discover/frame" }
+    solr(->(_params) { raise Blacklight::Exceptions::ECONNREFUSED, "down" }) { get "/browse/discover/frame" }
     assert_response :success
     assert_select "turbo-frame#home-discover .discover-frame__note", text: /nothing to feature/
   end
@@ -312,8 +312,8 @@ class DiscoveryTest < ActionDispatch::IntegrationTest
 
   test "the home frame makes at most four Solr requests and two queries" do
     needs_solr
-    get "/discover/frame"
-    result = count_requests { get "/discover/frame" }
+    get "/browse/discover/frame"
+    result = count_requests { get "/browse/discover/frame" }
 
     assert_response :success
     assert_operator result.solr, :<=, 4, result.solr_requests.join("\n")

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Stories (Stories, content/stories/*.md): /stories lists them, newest first; /stories/:slug draws one, with its record and search embeds.
+# Stories (Stories, content/stories/*.md), under Browse: /browse/stories lists them, newest first, and the themes (Themes), after the
+# National Gallery of Art's Stories page; /browse/stories/:slug draws one as an article, with its record and search embeds.
 # The embeds' records come from one request for every embedded record and one search per search embed, kept for an hour.
 class StoriesController < ApplicationController
   include DiscoveryPage
@@ -10,6 +11,7 @@ class StoriesController < ApplicationController
 
   def index
     @stories = Stories.all
+    @themes = Themes.all
     use_meta t("nexus_ccs.stories.title"), t("nexus_ccs.stories.description"), [ [ t("browse.title"), browse_path ], [ t("nexus_ccs.stories.title"), nil ] ]
   end
 
@@ -17,6 +19,8 @@ class StoriesController < ApplicationController
     @story = Stories.find(params[:slug]) || not_found!
     @parts = @story.parts
     @embedded = embedded(@parts.grep(Stories::Embed), @story.hero)
+    @others = Stories.all.reject { |story| story.slug == @story.slug }.first(3) # "You may also like": other stories, then themes
+    @other_themes = Themes.all.first([ 3 - @others.size, 0 ].max)
     use_meta @story.title, @story.summary, [ [ t("browse.title"), browse_path ], [ t("nexus_ccs.stories.title"), stories_path ], [ @story.title, nil ] ]
   end
 

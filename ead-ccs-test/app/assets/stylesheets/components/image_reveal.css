@@ -6,14 +6,14 @@
    cards and close-ups (not the University's listing: its picture is its own frame). */
 :root:not(.no-js) :is(
   .picture-wall__link, .cluster__card, .feature-carousel__media, .card-carousel__media, .stack__media,
-  .look-closer__piece, .place-tile__media, .colour-card__pictures, .result-card__media, .object-card__media
+  .look-closer__piece, .place-tile__media, .colour-card__pictures, .result-card__media, .object-card__media, .story-card__media, .story__lead-mount
 ) img:not(.is-revealed) {
   opacity: 0;
   animation: image-reveal-late 300ms ease-out 6s forwards;
 }
 :root:not(.no-js) :is(
   .picture-wall__link, .cluster__card, .feature-carousel__media, .card-carousel__media, .stack__media,
-  .look-closer__piece, .place-tile__media, .colour-card__pictures, .result-card__media, .object-card__media
+  .look-closer__piece, .place-tile__media, .colour-card__pictures, .result-card__media, .object-card__media, .story-card__media, .story__lead-mount
 ) img { transition: opacity 300ms ease-out; }
 @keyframes image-reveal-late { to { opacity: 1; } }
 
@@ -22,7 +22,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   :root:not(.no-js) :is(.picture-wall__link, .cluster__card, .feature-carousel__media, .card-carousel__media, .stack__media,
-    .look-closer__piece, .place-tile__media, .colour-card__pictures, .result-card__media, .object-card__media) img { transition: none; }
+    .look-closer__piece, .place-tile__media, .colour-card__pictures, .result-card__media, .object-card__media, .story-card__media, .story__lead-mount) img { transition: none; }
 }
 
 /* A picture that failed to load (page_loader.js: is-failed): its frame in the brand's navy with the University's crest, never the

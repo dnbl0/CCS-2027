@@ -24,7 +24,7 @@ class DiscoverTest < ApplicationSystemTestCase
 
     test "/discover has no axe violations and does not scroll sideways at #{name}" do
       page.current_window.resize_to(width, 900)
-      visit "/discover"
+      visit "/browse/discover"
 
       assert_selector "h1", text: "Discover", count: 1
       assert_selector "h2", text: "Pick of the day"

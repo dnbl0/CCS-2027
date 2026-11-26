@@ -7,7 +7,7 @@ class PageTitlesTest < ActionDispatch::IntegrationTest
   PATTERN = /\A.+ — Collections Navigator — University of Melbourne\z/
 
   test "the site's own pages share the pattern" do
-    %w[/help /about /accessibility /privacy /language-in-our-records /themes /stories /lists].each do |path|
+    %w[/help /about /accessibility /privacy /language-in-our-records /browse/stories /browse/stories/example-story /lists].each do |path|
       get path
       title = css_select("title").first&.text.to_s.squish
       assert_match PATTERN, title, path

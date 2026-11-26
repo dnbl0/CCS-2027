@@ -90,7 +90,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     assert_select "section.browse-eras article.explore-card", count: 5 # too few pictures for its carousel: its first cards, up to eight
     # the other ways in, Discover among them (it had no link since the home page's Featured and trending section went)
     assert_select "section.browse-more a.browse-more__link[href='/browse/colours']", "Explore by colour"
-    assert_select "section.browse-more a.browse-more__link[href='/discover']"
+    assert_select "section.browse-more a.browse-more__link[href='/browse/discover']"
 
     { "/browse/categories" => "/browse", "/browse/categories/regions" => "/browse/places", "/browse/categories/eras" => "/browse/time",
       "/browse/categories/object-types" => "/browse/object-types", "/browse/categories/materials?sort=az" => "/browse/materials?sort=az",
@@ -151,36 +151,39 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "themes are listed, and a theme page shows its records and opens its search" do
+  test "themes are listed on the Stories page (the old /themes answers 301 to it), and a theme page shows its records and opens its search" do
     theme = Themes.find("grainger-in-the-1920s")
     seed_showcase(theme.fq)
 
     get "/themes"
+    assert_redirected_to "/browse/stories#themes"
+    get "/browse/stories"
     assert_response :success
-    Themes.all.each { |each_theme| assert_select "a[href='/themes/#{each_theme.slug}']", text: each_theme.title }
+    assert_select "section#themes h2", "Themes"
+    Themes.all.each { |each_theme| assert_select "a[href='/browse/themes/#{each_theme.slug}']", text: each_theme.title }
 
-    get "/themes/grainger-in-the-1920s"
+    get "/browse/themes/grainger-in-the-1920s"
     assert_response :success
     assert_select "h1", theme.title
     assert_select "a.btn[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1920'][href*='f%5Bcollection_ssim%5D']"
 
-    get "/themes/no-such-theme"
+    get "/browse/themes/no-such-theme"
     assert_response :not_found
   end
 
   test "stories are listed, and a story is shown with its text even when the index cannot answer" do
     Outages::SolrDown.active = true
-    get "/stories"
+    get "/browse/stories"
     assert_response :success
-    assert_select "a[href='/stories/example-story']"
+    assert_select "a[href='/browse/stories/example-story']"
 
-    get "/stories/example-story"
+    get "/browse/stories/example-story"
     assert_response :success
     assert_select "h1", "Example story (placeholder)"
     assert_select ".story__text h2", text: "Lorem ipsum"
     assert_select ".story__text script", count: 0
 
-    get "/stories/no-such-story"
+    get "/browse/stories/no-such-story"
     assert_response :not_found
   ensure
     Outages::SolrDown.active = false
@@ -199,20 +202,20 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :success
-    %w[/browse/classifications /browse/time /browse/places /browse/colours /themes /stories].each do |path|
+    %w[/browse/classifications /browse/time /browse/places /browse/colours /browse/stories].each do |path|
       assert_includes response.body, "<loc>http://www.example.com#{path}</loc>", path
     end
     assert_includes response.body, "/browse/collections/#{Browse::Slug.build('collections', 'Grainger Museum Collection')}"
     assert_not_includes response.body, Browse::Slug.build("collections", "Tiny") # fewer than 5 records
-    assert_not_includes response.body, "/themes/grainger-in-the-1920s" # placeholder wording: kept out until it is written
+    assert_not_includes response.body, "/browse/themes/grainger-in-the-1920s" # placeholder wording: kept out until it is written
     assert_not_includes response.body, "/browse/categories"
   end
 
   test "the header's Browse menu opens the browse page and every way in, in the Browse page's order; Saved explains saving and compares" do
-    get "/stories"
+    get "/browse/stories"
 
     assert_select "#site-nav-browse a[href='/browse']"
-    expected = %w[/browse/collections /browse/object-types /browse/classifications /browse/places /browse/time /browse/colours /browse/makers /browse/subjects /themes /stories]
+    expected = %w[/browse/collections /browse/object-types /browse/classifications /browse/places /browse/time /browse/colours /browse/makers /browse/subjects /browse/stories] # one Stories item holds the stories and the themes
     assert_equal expected, css_select("#site-nav-browse li a").map { |link| link["href"] }
     assert_select "#site-nav-saved a[href='/compare']", text: "Compare images"
     assert_select "#site-nav-saved a[href='/search-history']"

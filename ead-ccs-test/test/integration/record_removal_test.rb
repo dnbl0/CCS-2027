@@ -62,7 +62,7 @@ class RecordRemovalTest < ActionDispatch::IntegrationTest
     assert_filtered capture_solr { RelatedObjects.for(document) }, "RelatedObjects"
     assert_filtered capture_solr { RecordSummaries.fetch(q: "*:*") }, "RecordSummaries"
     assert_filtered capture_solr { get "/catalog/emu-other-1/similar" }, "/similar"
-    assert_filtered capture_solr { get "/discover" }, "/discover"
+    assert_filtered capture_solr { get "/browse/discover" }, "/browse/discover"
   end
 
   test "an entity page's profile asks Solr with the filter" do

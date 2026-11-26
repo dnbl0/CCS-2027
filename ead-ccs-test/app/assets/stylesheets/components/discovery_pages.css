@@ -17,12 +17,6 @@
 .discovery-index__text, .discovery-index__meta { margin: 0; max-width: 70ch; }
 .discovery-index__meta { margin-top: var(--ccs-space-1); color: var(--ccs-text-secondary); }
 
-.story { max-width: 48rem; }
-.story__meta { color: var(--ccs-text-secondary); }
-.story__text { overflow-wrap: anywhere; }
-.story__text h2 { margin-top: var(--ccs-space-6); }
-.story__embed { max-width: 28rem; margin: var(--ccs-space-5) 0; }
-.story__more { margin: var(--ccs-space-3) 0 var(--ccs-space-5); }
 
 .home-more .object-cards__list { margin-top: var(--ccs-space-4); }
 .home-more__links { display: flex; flex-wrap: wrap; gap: var(--ccs-space-3) var(--ccs-space-6); margin: var(--ccs-space-4) 0 0; padding: 0; list-style: none; }

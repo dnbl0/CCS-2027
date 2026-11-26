@@ -11,6 +11,6 @@ module DiscoverySitemap
                 .map { |row| routes.collection_landing_path(kind: dimension.slug, slug: Browse::Slug.build(dimension.slug, row["value"])) }
     end
     [ *Categories.all.select(&:own_page?).map(&:path), routes.explore_time_path, routes.explore_places_path, routes.explore_colours_path,
-      routes.themes_path, *Themes.all.reject(&:placeholder?).map(&:path), routes.stories_path, *Stories.all.reject(&:placeholder?).map(&:path), *landings.sort ]
+      *Themes.all.reject(&:placeholder?).map(&:path), routes.stories_path, *Stories.all.reject(&:placeholder?).map(&:path), *landings.sort ]
   end
 end

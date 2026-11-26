@@ -94,7 +94,7 @@ module NexusCcs
         [ I18n.t("colours.title"), helpers.explore_colours_path ],
         [ "Makers", helpers.browse_hub_path("makers") ],
         [ "Subjects", helpers.browse_hub_path("subjects") ],
-        [ I18n.t("nexus_ccs.themes.title"), helpers.themes_path ],
+        # one Stories page holds the stories and the themes (Dean, 26 Nov 2026): no separate Themes item
         [ I18n.t("nexus_ccs.stories.title"), helpers.stories_path ] ].map { |label, href| SiteNavigation::Link.new(label, href) }
     end
 

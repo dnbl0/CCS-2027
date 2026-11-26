@@ -1,0 +1,16 @@
+<%# A story or theme as a card (after the National Gallery of Art's Stories cards): its picture, its kind, its title (the link), a line
+    of summary and, for a story, its date. feature: the large one, the picture beside the words on a wide window.
+    locals: tile (HomeSections::Tile), kind ("Story" or "Theme"), date (or nil), feature (false), heading (:h3) %>
+<% feature = local_assigns.fetch(:feature, false) %>
+<% heading = local_assigns.fetch(:heading, :h3) %>
+<article class="story-card<%= " story-card--feature" if feature %>">
+  <%= link_to tile.path, class: "story-card__media", tabindex: -1, "aria-hidden": true do %>
+    <% if tile.image %><img src="<%= tile.image %>" alt="" loading="<%= feature ? "eager" : "lazy" %>" decoding="async"><% end %>
+  <% end %>
+  <div class="story-card__body">
+    <p class="story-card__kind"><%= kind %></p>
+    <%= content_tag heading, class: "story-card__title" do %><%= link_to tile.title, tile.path, class: "story-card__link" %><% end %>
+    <% if tile.text.present? %><p class="story-card__summary"><%= tile.text %></p><% end %>
+    <% if local_assigns[:date] %><p class="story-card__date"><%= l(date, format: "%-d %B %Y") %></p><% end %>
+  </div>
+</article>

@@ -1,0 +1,78 @@
+/*
+ * The Stories page and a story (stories/index, stories/show, stories/_card), after the National Gallery of Art's Stories and its articles
+ * (looked at 26 Nov 2026): a picture hero with the title over it, a "Jump to" bar that stays in view, a large feature and cards of
+ * three; an article with its title left-aligned, a ruled byline, a lead picture across the page and one reading column. Site tokens.
+ */
+
+/* ---- The hero: the newest story's picture behind the title, darkened at the foot so the white words read (7:1 on the scrim) */
+.stories-hero { position: relative; display: flex; align-items: flex-end; min-height: 18rem; background: var(--ccs-surface-brand); color: var(--ccs-text-inverse); overflow: hidden; }
+.stories-hero--picture { min-height: clamp(20rem, 46vw, 34rem); }
+.stories-hero__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.stories-hero--picture::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgb(0 15 70 / 88%) 0%, rgb(0 15 70 / 55%) 45%, rgb(0 15 70 / 0%) 80%); }
+.stories-hero__text { position: relative; z-index: 1; width: 100%; max-width: 1272px; margin: 0 auto; padding: var(--ccs-space-8) var(--space-16) var(--ccs-space-7); }
+.stories-hero__title { margin: 0; font-family: var(--ccs-font-heading); font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 600; line-height: 1; color: inherit; }
+.stories-hero__intro { max-width: 38rem; margin: var(--ccs-space-3) 0 0; font-size: var(--ccs-font-size-lg); line-height: 1.45; }
+
+/* ---- "Jump to": the sections, in a bar that stays at the top while the page scrolls */
+.stories-jump { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: var(--ccs-space-4); padding: 0 var(--space-16); background: var(--ccs-surface-default); box-shadow: 0 1px 0 var(--ccs-border-default); overflow-x: auto; }
+.stories-jump__label { flex: none; margin: 0; font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-secondary); }
+.stories-jump__list { display: flex; gap: var(--ccs-space-5); margin: 0; padding: 0; list-style: none; }
+.stories-jump__link { display: inline-flex; align-items: center; min-height: 48px; color: var(--ccs-text-primary); font-weight: var(--ccs-font-weight-semibold); text-decoration: none; white-space: nowrap; }
+.stories-jump__link:hover { text-decoration: underline; text-underline-offset: 0.25em; }
+.stories-jump__link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
+.page-stories { scroll-padding-top: 4rem; } /* a jumped-to heading lands below the bar */
+
+/* ---- Sections */
+.stories-page__inner { max-width: 1272px; margin: 0 auto; padding: 0 var(--space-16) var(--ccs-space-8); }
+.stories-section { padding-top: var(--ccs-space-8); scroll-margin-top: 4rem; }
+.stories-section + .stories-section { margin-top: var(--ccs-space-7); border-top: 1px solid var(--ccs-border-default); }
+.stories-section__heading { margin: 0 0 var(--ccs-space-5); font-family: var(--ccs-font-heading); font-size: clamp(1.875rem, 3.2vw, 2.5rem); font-weight: 600; line-height: 1.1; color: var(--ccs-text-brand); }
+.stories-section__intro { max-width: 40rem; margin: calc(-1 * var(--ccs-space-3)) 0 var(--ccs-space-5); color: var(--ccs-text-secondary); }
+
+/* ---- Cards: picture, kind, title, summary, date; three to a row, one on a phone */
+.story-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); gap: var(--ccs-space-7) var(--ccs-space-5); margin: 0; padding: 0; list-style: none; }
+.story-card { position: relative; display: flex; flex-direction: column; gap: var(--ccs-space-3); }
+.story-card__media { display: block; aspect-ratio: 3 / 2; overflow: hidden; background: var(--ccs-surface-subtle); }
+.story-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 300ms ease-out; }
+.story-card:hover .story-card__media img { transform: scale(1.03); }
+.story-card__body { display: flex; flex-direction: column; gap: var(--ccs-space-2); }
+.story-card__kind { margin: 0; font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-text-secondary); }
+.story-card__title { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-xl); font-weight: 600; line-height: 1.2; }
+.story-card__link { color: var(--ccs-text-brand); text-decoration: none; }
+.story-card__link::after { content: ""; position: absolute; inset: 0; } /* the whole card is the link's target; the picture's own link is hidden from the keyboard */
+.story-card__link:hover { text-decoration: underline; text-underline-offset: 0.15em; }
+.story-card__link:focus-visible { outline: none; }
+.story-card:has(.story-card__link:focus-visible) { outline: 3px solid var(--ccs-focus-ring); outline-offset: 4px; }
+.story-card__summary { margin: 0; color: var(--ccs-text-primary); line-height: 1.5; }
+.story-card__date { margin: 0; font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
+/* the feature: the picture beside the words on a wide window (two thirds and one third) */
+@media (min-width: 900px) {
+  .story-card--feature { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: center; gap: var(--ccs-space-7); }
+  .story-card--feature .story-card__media { aspect-ratio: 16 / 10; }
+}
+.story-card--feature .story-card__title { font-size: clamp(1.75rem, 3vw, 2.5rem); line-height: 1.1; }
+.story-card--feature .story-card__summary { font-size: var(--ccs-font-size-lg); }
+@media (prefers-reduced-motion: reduce) { .story-card__media img { transition: none; } .story-card:hover .story-card__media img { transform: none; } }
+
+/* ---- A story: the article */
+.story-page { padding-bottom: var(--ccs-space-8); }
+.story-page > * { max-width: 1272px; margin-inline: auto; padding-inline: var(--space-16); }
+.story__head { padding-top: var(--ccs-space-8); }
+.story__title { max-width: 56rem; margin: var(--ccs-space-2) 0 0; font-family: var(--ccs-font-heading); font-size: clamp(2.25rem, 5vw, 3.5rem); font-weight: 600; line-height: 1.05; color: var(--ccs-text-brand); text-wrap: balance; }
+.story__standfirst { max-width: 44rem; margin: var(--ccs-space-4) 0 0; font-size: var(--ccs-font-size-lg); line-height: 1.5; }
+.story__byline { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--ccs-space-2) var(--ccs-space-5); margin: var(--ccs-space-6) 0 0; padding-bottom: var(--ccs-space-4); border-bottom: 1px solid var(--ccs-border-default); color: var(--ccs-text-secondary); }
+.story__lead { margin: var(--ccs-space-6) 0 0; }
+.story__lead-mount { display: flex; justify-content: center; padding: var(--ccs-space-5); background: var(--ccs-surface-subtle); }
+.story__lead-mount img { max-width: 100%; max-height: 75vh; object-fit: contain; }
+.story__caption { margin-top: var(--ccs-space-3); font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
+.story__caption a { color: var(--ccs-text-link); }
+.story__body { max-width: 44rem; padding-top: var(--ccs-space-7); font-size: var(--ccs-font-size-lg); line-height: 1.65; }
+.story__body .story__records, .story__body .story__embed { max-width: none; margin-block: var(--ccs-space-7); font-size: var(--ccs-font-size-md); }
+.story__body .story__records { width: min(1240px, calc(100vw - 2 * var(--space-16))); } /* a row of records as wide as the page */
+.story__embed { max-width: 26rem !important; }
+.story__records-heading { margin: 0 0 var(--ccs-space-4); font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-xl); color: var(--ccs-text-brand); }
+.story__text { overflow-wrap: anywhere; }
+.story__text h2 { margin: var(--ccs-space-7) 0 var(--ccs-space-3); font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-2xl); color: var(--ccs-text-brand); }
+.story__text p { margin: 0 0 var(--ccs-space-4); }
+.story__more { margin: var(--ccs-space-3) 0 0; }
+.story__also { margin-top: var(--ccs-space-8); border-top: 1px solid var(--ccs-border-default); }

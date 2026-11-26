@@ -18,8 +18,9 @@
 # Every other page, a view-only, withheld or sensitive record included, shares the site's card (SHARE_CARD), so a link never
 # lands as a bare text card. A general description for a record the policy withholds or that is sensitive.
 class PageMeta
-  # The path's first segment => the key in seo.description; any other page is described as About
-  PAGE_DESCRIPTIONS = { "accessibility" => "accessibility", "privacy" => "privacy", "help" => "help", "language-in-our-records" => "language", "discover" => "discover" }.freeze
+  # The path's first segment (or its first two, for a page under Browse) => the key in seo.description; any other page is About
+  PAGE_DESCRIPTIONS = { "accessibility" => "accessibility", "privacy" => "privacy", "help" => "help", "language-in-our-records" => "language",
+                        "browse/discover" => "discover" }.freeze
 
   # The site's own share card, 1200 x 630 (public/share-card.png, drawn from public/share-card.svg)
   SHARE_CARD = "/share-card.png"
@@ -94,7 +95,9 @@ class PageMeta
 
     case @type
     when :home, :advanced then I18n.t("seo.description.#{@type}")
-    when :page then I18n.t("seo.description.#{PAGE_DESCRIPTIONS.fetch(@path.delete_prefix('/').split('/').first, 'about')}")
+    when :page
+      segments = @path.delete_prefix("/").split("/")
+      I18n.t("seo.description.#{PAGE_DESCRIPTIONS[segments.first(2).join('/')] || PAGE_DESCRIPTIONS.fetch(segments.first, 'about')}")
     when :results then results_description(params)
     when :record, :stock then @document && !RobotsPolicy.withheld?(@document) ? StructuredData::Description.of(@document) : I18n.t("seo.description.record_withheld")
     end
