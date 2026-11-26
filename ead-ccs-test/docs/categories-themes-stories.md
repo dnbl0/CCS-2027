@@ -11,8 +11,8 @@ Added 2026-11-18, with Dean's approval of new page types (recorded in `../../doc
   card opens the search with that value as a filter. Sort by most records or A to Z, 48 cards a page.
 - **Collection and named collection pages** (`/browse/collections/...`, `/browse/named-collections/...`): an introduction, highlights with
   pictures, the commonest object types, eras and named collections as links that narrow the search, and "See all N records".
-- **Themes** (`/themes`): curated searches from `config/themes.yml`, each a page like a collection page.
-- **Stories** (`/stories`): online exhibitions written as Markdown files in `content/stories/`, with record and search embeds.
+- **Themes** (`/browse/themes/<slug>`, listed on the Stories page): curated searches from `config/themes.yml`, each a page like a collection page.
+- **Stories** (`/browse/stories`, after the National Gallery of Art's Stories; one Stories page holds stories and themes): online exhibitions written as Markdown files in `content/stories/`, with record and search embeds; each story is an article.
 - **Home page**: On this day, Recently viewed and links to Stories, Themes and Browse by category, after the Explore sections.
 - **Header**: Browse is now a menu (Browse the collections, Browse by category, Themes, Stories). My saved items links to a short
   explainer of saving, lists and shared galleries on `/lists`.
@@ -37,7 +37,7 @@ team approves it.** Files: `config/themes.yml`, `config/collection_intros.yml`, 
 
 | Part | Code | Solr |
 |---|---|---|
-| Category pages | `Categories`, `CategoriesController` | One request a dimension: the facet over every record (`{!ex=img}`) and the first 1,000 records with a thumbnail for the pictures. Cached a day, last good copy a month |
+| Category pages | `Categories`, `BrowseHubs` (the Browse template; CategoriesController was removed 25 Nov 2026) | One request a dimension: the facet over every record (`{!ex=img}`) and the first 1,000 records with a thumbnail for the pictures. Cached a day, last good copy a month |
 | Collection pages | `CollectionLandingsController`, `Showcase` | One request (highlights, facets, total); cached 6 hours. The address is a `Browse::Slug` of the value; an unknown one is a 404, a stale readable part a 301 |
 | Themes | `Themes`, `ThemesController`, `Showcase` | As collection pages; a `hero` record adds one lookup. `Themes.problems` checks the file (a test runs it) |
 | Stories | `Stories`, `StoriesController` | One lookup for every embedded record, one search per search embed (the catalog's own search builder); cached an hour. With Solr down the text still shows |

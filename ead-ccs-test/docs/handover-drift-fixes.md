@@ -39,10 +39,16 @@ foot (placeholder note hidden); 69ce48f audit part A (phone map button, regions 
 dated", roles capitalised, failed pictures as a crest frame); 16c6f3b Stories/themes/Discover under /browse, one Stories page (themes
 inside, no Themes menu item) and story articles after nga.gov/stories; 634cc9f one list of ways in (menu from BrowseHubs.in_menu_order,
 /browse Places and Time sections are hubs, category names from BrowseHubs); c08af2b one time scheme (centuries; decades on century pages).
-**Next, in order:** drift fix 4 (one page head, one "can't show now" message, one breadcrumb mechanism), then audit part B (B1–B10:
-one record card, wording "record"/"A–Z"/"See all", one button set, one focus ring), then part C (dead CSS, breakpoints, unused
-CardSectionComponent and FeatureCarouselComponent now unused on /browse, stale docs). Known unrelated failures: Discover system tests
-(no "Pick of the day" in the local index), colours Looks similar.
+Then (26 Nov, later): 640885c one "cannot be shown right now" sentence (UnavailableHelper); e19d2e4 one breadcrumb mechanism
+(page_trail; the header draws every trail); 6b9d51c one Browse head partial, "record" not "item", one A–Z, one map/full-record
+wording, 3px focus ring; titles use "—" everywhere; clean-up of CardSectionComponent, FeatureCarouselComponent, explore.css and its script.
+**Still to do:** B2 one record card (ResultCardComponent for search/Discover vs RecordCardComponent elsewhere: pick one design and use
+it in both), B8 one button set (primary, secondary, arrow link; page-specific buttons such as compare-actions__button,
+results-empty__button, selection-bar__button onto those), one set of breakpoints (~20 values today), raw hex colours in
+record_classic.css and results_toolbar.css, the remaining unused CSS rules (browse-filter, browse-list, browse-facts, browse__*,
+time-chart in browse.css/explore_pages.css), and two pagers. Left as they are on purpose: filter names in Title Case ("Collection
+Title", "With Digital Asset": the project owners' workbook, config/data_model/filters.json; ask Dean before changing), the Help page's
+"collection item" wording (the University's page copy), static_shared.css (generated from the static site: its focus colours there).
 
 ## Status (25 Nov, later)
 - **Step 1, counts: DONE.** No counts on any page outside search (checked: home, /browse, every hub view, timeline, map, spectrum, entity,
