@@ -27,16 +27,9 @@ en:
         creator:
           heading: "More by this creator"
           description: "Other objects by %{values}."
-        period:
-          heading: "From the same period"
-          description: "Objects from %{values}."
-          years: "Objects made between %{from} and %{to}."
         place:
           heading: "From the same place"
           description: "Objects from %{values}."
-        type:
-          heading: "More of this type"
-          description: "Other objects described as %{values}."
     related:
       heading: "Related objects"
     recently_viewed:

@@ -141,7 +141,7 @@ The locale check is in `bin/ci`; only its missing-key half is a test, because an
 ## Backlog for the dev team (most valuable first)
 
 1. **Replace `AccessPolicy` and `Sensitivity` with the DAM's classification** when the ingest exposes it (`assets_json`). Policy-critical; the seams are ready.
-2. **Add `bin/ci` to the contributor routine and consider making `system` a required check.** Add an `auto-merge.yml` guard (or delete it): it merges `feature/*` branches without CI.
+2. **Add `bin/ci` to the contributor routine and consider making `system` a required check.** `auto-merge.yml` was deleted on 27 Nov 2026 (it merged `feature/*` branches without CI).
 3. **Retire the 2026 prototype** (`docs/decoupling-from-2026.md`): delete `public/` (except `digital-assets`), `src/`, `scripts/`, `tests/`, root `ci.yml`; give `ead-ccs-test` its own `package.json` for axe-core; remove the "Generated" headers from page styles.
 4. **Remove unused gems** (`jbuilder`, `kamal`, `thruster`, `image_processing` and Active Storage, `solid_*`) and the unused Puma/cable settings, after confirming they are not wanted for deployment.
 5. **Bring the stale documents up to date or move them to `docs/archive/`**: `handover.md`, `secrets.md`, `HANDOFF.md`, `code-quality-plan.md`, `conventions.md`.
