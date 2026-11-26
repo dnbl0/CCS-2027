@@ -5,6 +5,7 @@
 # stored for staff (bin/rails access_requests:export). No email is sent. SSO login and the approval screens come later.
 class AccessRequestsController < ApplicationController
   include Blacklight::SearchContext # the header's Search results link goes back to the visitor's last search
+  include RecordLookup
 
   layout "pages"
 
@@ -51,18 +52,9 @@ class AccessRequestsController < ApplicationController
   # The record asked about must be in the index; its title is read here, never taken from the form. A record that is
   # open, with no asset withheld, has nothing to request, so the visitor goes to it.
   def load_document
-    id = params[:document_id].to_s
-    raise ActionController::RoutingError, "Not Found" if id.blank? || id.length > 200
-
-    SuppressedRecord.guard!(id) # a record taken out of the site (CCS-112): 410 Gone
-    config = CatalogController.blacklight_config
-    service = SearchService.new(config: config, search_state: Blacklight::SearchState.new({}, config), user_params: {})
-    @document = service.fetch(id)
-    raise ActionController::RoutingError, "Not Found" unless @document
+    @document = find_record(params[:document_id]) # RecordLookup: 404 when absent, 410 when taken out of the site
     @request_type = AccessRequest.request_type_for(AccessPolicy.tier(@document), withheld: AccessPolicy.withheld_assets(@document).positive?)
     redirect_to solr_document_path(@document.id) unless @request_type
-  rescue Blacklight::Exceptions::RecordNotFound
-    raise ActionController::RoutingError, "Not Found"
   end
 
   def document_title = helpers.document_presenter(@document).heading.to_s.truncate(500)

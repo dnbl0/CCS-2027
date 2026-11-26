@@ -258,7 +258,7 @@
   }
 }
 
-/* FILM COPY: the live suggestions are exactly as wide as the search bar (the box, the field menu and the button), never wider: the
+/* The live suggestions are exactly as wide as the search bar (the box, the field menu and the button), never wider: the
    list is placed against the whole bar rather than the text box, and a long suggestion wraps instead of widening it */
 :is(.search-banner, .ccs-hero__search, .sticky-search) .input-group { position: relative; }
 :is(.search-banner, .ccs-hero__search, .sticky-search) .search-autocomplete-wrapper { position: static; }
