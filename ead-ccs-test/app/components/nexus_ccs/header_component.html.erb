@@ -55,14 +55,14 @@
                     <p class="site-nav__group-title" id="site-nav-group-<%= group.id %>"><%= group.heading %></p>
                     <ul class="site-nav__panel-list" aria-labelledby="site-nav-group-<%= group.id %>">
                       <% group.items.each do |item| %>
-                        <li><%= link_to browse_path(item) do %><span class="site-nav__item-label"><%= item.label %></span> <%= record_count(item.count) %><% end %></li>
+                        <li><%= link_to browse_path(item) do %><span class="site-nav__item-label"><%= item.label %></span><% end %></li>
                       <% end %>
                     </ul>
                   </div>
                 <% end %>
               </div>
               <ul class="site-nav__browse-more">
-                <li><%= link_to with_images_path do %>Only records with images<%= " (#{helpers.number_with_delimiter(with_images_count)})" if with_images_count %><% end %></li>
+                <li><%= link_to with_images_path do %>Only records with images<% end %></li>
                 <li><%= link_to "Advanced search", helpers.advanced_search_catalog_path %></li>
               </ul>
             </div>

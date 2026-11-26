@@ -11,7 +11,7 @@ en:
       sort:
         count: "Most records"
         az: "A to Z"
-      showing: "%{count} categories"
+      showing: "All categories"
       pagination: "Pages of %{kind}"
       landing_pages: "Pages about each collection"
       dimensions:
@@ -39,7 +39,7 @@ en:
     showcase:
       about: "About these records"
       highlights: "Highlights"
-      see_all: "See all %{count} records"
+      see_all: "See all records"
       object_types: "Object types"
       eras: "Eras"
       named_collections: "Named collections"
@@ -58,7 +58,7 @@ en:
       empty: "There are no stories yet."
       by: "By %{author}"
       published: "Published %{date}"
-      more_results: "See all %{count} results"
+      more_results: "See all results"
       search_heading: "From the collections"
       missing_record: "A record shown here is no longer available."
     creator:

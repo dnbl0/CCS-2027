@@ -29,14 +29,14 @@
           <% @places.regions.each do |region| %>
             <h3 class="explore-places__region">
               <%= link_to search_action_path(region.search_query) do %><%= region.label %><% end %>
-              <span class="browse__count"><%= t("explore_pages.count", count: region.count, number: number_with_delimiter(region.count)) %></span>
+
             </h3>
             <ul class="explore-places__countries">
               <% region.children.each do |country| %>
                 <li>
                   <%= link_to search_action_path(country.search_query), class: "browse__link" do %>
                     <span class="browse__label"><%= country.label %></span>
-                    <span class="browse__count"><%= t("explore_pages.count", count: country.count, number: number_with_delimiter(country.count)) %></span>
+
                   <% end %>
                   <% if country.children.any? %>
                     <details class="explore-places__places">

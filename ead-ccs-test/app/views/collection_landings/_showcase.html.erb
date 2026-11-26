@@ -18,7 +18,7 @@
           <div><dt><%= t("nexus_ccs.showcase.#{label}") %></dt>
             <dd><ul class="browse-facts__links">
               <% pairs.each do |value, count| %>
-                <li><%= link_to value, search_catalog_path(search_query.deep_merge(f: { field => Array(search_query.dig(:f, field)) + [ value ] })) %> <span class="browse-list__count">(<%= number_with_delimiter(count) %>)</span></li>
+                <li><%= link_to value, search_catalog_path(search_query.deep_merge(f: { field => Array(search_query.dig(:f, field)) + [ value ] })) %></li>
               <% end %>
             </ul></dd></div>
         <% end %>

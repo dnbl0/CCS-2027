@@ -6,9 +6,6 @@ en:
     description: "Find records by the colours in their images. The colours are worked out by a computer from each image, so they are a guide, not a description."
     heading: "Colours"
     intro: "Choose a colour to see the records whose images have a lot of it."
-    count:
-      one: "%{formatted} record"
-      other: "%{formatted} records"
     empty: "No colours are available yet."
     unavailable: "The colours cannot be shown just now. Please try again later."
     filter: "Colour"

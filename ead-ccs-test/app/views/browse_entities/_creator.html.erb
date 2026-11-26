@@ -20,7 +20,7 @@
     <h2 id="creator-types-title"><%= t("nexus_ccs.creator.by_type") %></h2>
     <ul class="browse-facts__links">
       <% result.facets["object_type_ssim"].each do |value, count| %>
-        <li><%= link_to value.to_s.upcase_first, search_catalog_path(refine(@search_query, "object_type_ssim", value)) %> <span class="browse-list__count">(<%= number_with_delimiter(count) %>)</span></li>
+        <li><%= link_to value.to_s.upcase_first, search_catalog_path(refine(@search_query, "object_type_ssim", value)) %></li>
       <% end %>
     </ul>
   </section>
@@ -31,7 +31,7 @@
     <p><%= t("nexus_ccs.creator.related_intro") %></p>
     <ul class="browse-list">
       <% related.each do |related_entry, count| %>
-        <li><%= link_to related_entry.name, related_entry.path, class: "browse-list__link" %> <span class="browse-list__count"><%= t("browse.records", count: count) %></span></li>
+        <li><%= link_to related_entry.name, related_entry.path, class: "browse-list__link" %></li>
       <% end %>
     </ul>
   </section>

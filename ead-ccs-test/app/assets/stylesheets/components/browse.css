@@ -54,7 +54,6 @@
 
 .browse__label { font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); overflow-wrap: anywhere; }
 
-.browse__count { flex: none; font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
 
 .browse__unavailable { margin: 0; font-size: var(--ccs-font-size-lg); }
 
