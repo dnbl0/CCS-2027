@@ -17,26 +17,26 @@ class SensitivityExportDownloadTest < ApplicationSystemTestCase
 
   def focused_text = page.evaluate_script("document.activeElement.textContent").to_s.squish
 
-  test "a sensitive record asks first: no image, two buttons, accessible; View this item shows it and focus lands on the notice" do
+  test "a sensitive record asks first: no image, two buttons, accessible; View this record shows it and focus lands on the notice" do
     sensitive do
       visit solr_document_path(OPEN)
 
-      assert_selector ".sensitivity-gate--ask", text: "This item may contain sensitive material"
+      assert_selector ".sensitivity-gate--ask", text: "This record may contain sensitive material"
       assert_no_selector ".digital-assets img"
-      assert_selector "button", text: "View this item"
+      assert_selector "button", text: "View this record"
       assert_selector "button", text: "Do not view"
       assert_accessible
 
-      click_button "View this item"
+      click_button "View this record"
       assert_selector ".digital-assets img.digital-assets__image"
       assert_selector ".sensitivity-gate--viewing"
       assert_match(/You chose to view it/, focused_text)
       assert_accessible
 
-      click_button "Hide this item"
+      click_button "Hide this record"
       assert_selector ".sensitivity-gate--declined"
       assert_no_selector ".digital-assets img"
-      assert_match(/You chose not to view this item/, focused_text)
+      assert_match(/You chose not to view this record/, focused_text)
       assert_accessible
     end
   end
@@ -48,7 +48,7 @@ class SensitivityExportDownloadTest < ApplicationSystemTestCase
 
       assert_selector ".sensitivity-gate--declined"
       assert_no_selector ".digital-assets img"
-      page.find("button", text: "View this item").execute_script("this.focus()")
+      page.find("button", text: "View this record").execute_script("this.focus()")
       page.driver.browser.keyboard.type(:Enter)
       assert_selector ".digital-assets img.digital-assets__image"
     end

@@ -78,7 +78,7 @@ en:
       most: "Most records"
       filter_placeholder: "Japan, Carlton …"
       search_label: "Find a place"
-      map: "See places on a map"
+      map: "See the places on a map"
       regions: "Places by region"
       all_regions: "All regions"
       in_region: " in %{region}"
@@ -104,13 +104,13 @@ en:
       discover: "Today's pick, the featured records and the records people are looking at."
     periods: "Periods"
     description: "Browse the University of Melbourne's cultural collections by object type, place, period, maker and subject, with no search term needed."
-    hub_description: "Every value, as pictures and A to Z."
+    hub_description: "Every value, as pictures and A–Z."
     records:
       one: "%{count} record"
       other: "%{count} records"
     cards:
       see_all: "See all %{kind}"
-      panel_title: "All %{kind}, A to Z"
+      panel_title: "All %{kind}, A–Z"
       panel_text: "Look up any one of the %{kind} by name."
     kinds:
       makers:

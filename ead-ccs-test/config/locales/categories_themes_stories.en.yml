@@ -10,7 +10,7 @@ en:
       sort_label: "Sort categories"
       sort:
         count: "Most records"
-        az: "A to Z"
+        az: "A–Z"
       showing: "%{count} categories"
       pagination: "Pages of %{kind}"
       landing_pages: "Pages about each collection"

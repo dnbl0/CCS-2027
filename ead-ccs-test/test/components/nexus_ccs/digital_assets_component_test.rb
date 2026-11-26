@@ -120,8 +120,8 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
   test "a request record withholds every asset, and its path, but keeps the notice, licence and metadata" do
     render_for(assets(3).merge("licence_type_ssim" => [ "ICIP Rights" ], "digital_media_ssim" => [ "video|video/mp4|/v.mp4|Film" ]))
 
-    assert_selector ".access-notice--request", text: "This item is available on request"
-    assert_selector ".access-notice a", text: "Request access to this item"
+    assert_selector ".access-notice--request", text: "This record is available on request"
+    assert_selector ".access-notice a", text: "Request access to this record"
     assert_no_selector "img, video, audio, figure, .digital-assets__others, [data-media-viewer-target=image]"
     assert_no_selector "button", text: "Full screen", visible: :all
     assert_selector ".digital-assets__licence", text: "ICIP Rights"
@@ -205,7 +205,7 @@ class DigitalAssetsComponentTest < ActiveSupport::TestCase
   test "a sensitive record shows the notice and none of the asset until the visitor chooses to view it" do
     render_for(assets(3).merge(SENSITIVE).merge("digital_media_ssim" => [ "video|video/mp4|/v.mp4|Film" ]))
 
-    assert_selector ".sensitivity-gate--ask button", text: "View this item"
+    assert_selector ".sensitivity-gate--ask button", text: "View this record"
     assert_selector ".sensitivity-gate--ask button", text: "Do not view"
     assert_no_selector "img"
     assert_no_selector "video"

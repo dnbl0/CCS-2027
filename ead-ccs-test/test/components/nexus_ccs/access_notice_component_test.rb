@@ -21,18 +21,18 @@ class AccessNoticeComponentTest < ActiveSupport::TestCase
   test "a view-only record says it can be viewed, not downloaded, and links to the request form" do
     render_for("Copyright - Current")
 
-    assert_selector ".access-notice--view-only", text: "You can view this item, but not download it"
+    assert_selector ".access-notice--view-only", text: "You can view this record, but not download it"
     assert_text "ask the collection team for access"
     assert_text "Your request needs approval"
-    assert_selector "a[href='/access-requests/new?document_id=emu-1']", text: "Request access to download this item"
+    assert_selector "a[href='/access-requests/new?document_id=emu-1']", text: "Request access to download this record"
   end
 
   test "a request record says the asset is not shown, and links to the request form" do
     render_for("ICIP Rights")
 
-    assert_selector ".access-notice--request", text: "This item is available on request"
+    assert_selector ".access-notice--request", text: "This record is available on request"
     assert_text "not shown here"
-    assert_selector "a[href='/access-requests/new?document_id=emu-1']", text: "Request access to this item"
+    assert_selector "a[href='/access-requests/new?document_id=emu-1']", text: "Request access to this record"
   end
 
   test "it is static text: no role, no live region, no heading to disturb the page's outline" do

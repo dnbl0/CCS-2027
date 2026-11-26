@@ -42,7 +42,7 @@
 
 .paginate-section .page-link:focus-visible,
 .paginate-section .pagination__button:focus-visible {
-  outline: 2px solid var(--ccs-focus-ring);
+  outline: 3px solid var(--ccs-focus-ring);
   outline-offset: 3px;
   box-shadow: none;
 }

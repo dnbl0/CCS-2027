@@ -9,10 +9,7 @@
 
 <%= tag.main(class: "places-page", id: "main-content", **local_assigns.fetch(:main, {})) do %>
   <div class="places-page__inner">
-    <header class="places-page__head">
-      <h1 class="places-page__title"><%= hub.title %></h1>
-      <p class="places-page__intro"><%= hub.intro %></p>
-    </header>
+    <%= render "browse/page_head", title: hub.title, intro: hub.intro %>
     <%# the toolbar under the head on every page: the hub's search when it has one (content_for :browse_toolbar), else just its rule %>
     <div class="places-toolbar<%= " places-toolbar--rule" unless content_for?(:browse_toolbar) %>"><%= yield :browse_toolbar %></div>
     <%= yield %>

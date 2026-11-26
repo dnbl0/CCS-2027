@@ -76,7 +76,7 @@
 }
 
 .collection-intro__label:focus-visible {
-  outline: 2px solid var(--ccs-focus-ring);
+  outline: 3px solid var(--ccs-focus-ring);
   outline-offset: 2px;
 }
 
@@ -106,7 +106,7 @@
 }
 
 .collection-intro__named a:focus-visible {
-  outline: 2px solid var(--ccs-focus-ring);
+  outline: 3px solid var(--ccs-focus-ring);
   outline-offset: 2px;
 }
 

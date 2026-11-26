@@ -15,11 +15,11 @@ en:
         ctc: "classification to be checked"
       gate:
         ask:
-          title: "This item is classified %{rating}"
+          title: "This record is classified %{rating}"
           body: "It is %{meaning}. It is not shown unless you choose to see it."
         declined:
-          title: "You chose not to view this item"
+          title: "You chose not to view this record"
           body: "It is %{meaning}. You can view it if you change your mind."
         viewing:
-          title: "This item is classified %{rating}. You chose to view it."
+          title: "This record is classified %{rating}. You chose to view it."
           body: "It is %{meaning}. You can hide it again at any time."

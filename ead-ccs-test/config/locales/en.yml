@@ -306,9 +306,9 @@ en:
       copy: "Copy citations"
       download: "Download citations (.txt)"
     view_full_record:
-      label: "View full record"
+      label: "View the full record"
       title: "You're leaving this site"
-      body: "The full record for this item is held on %{source}'s own system, which the University of Melbourne doesn't maintain and isn't responsible for."
+      body: "The full record is held on %{source}'s own system, which the University of Melbourne doesn't maintain and isn't responsible for."
       default_source: "another organisation"
       stay: "Stay on this page"
       continue: "Continue to site"
@@ -326,13 +326,13 @@ en:
           other: "%{count} filters applied"
     access_notice:
       view_only:
-        title: "You can view this item, but not download it"
+        title: "You can view this record, but not download it"
         body: "To download it, ask the collection team for access. Your request needs approval."
-        link: "Request access to download this item"
+        link: "Request access to download this record"
       request:
-        title: "This item is available on request"
+        title: "This record is available on request"
         body: "The image or file is not shown here. To see it, ask the collection team for access. Your request needs approval."
-        link: "Request access to this item"
+        link: "Request access to this record"
 
     # The Copyright card of a record with no licence, rights note or credit line (CCS-148). PLACEHOLDER WORDING, NOT YET APPROVED.
     rights:
@@ -464,15 +464,15 @@ en:
       nothing_heading: "Nothing to download"
       nothing: "None of the chosen records has a file that can be downloaded."
       skipped_heading:
-        one: "%{count} item left out"
-        other: "%{count} items left out"
+        one: "%{count} record left out"
+        other: "%{count} records left out"
       unknown_record: "A record"
       download: "Download zip file (%{files} files, %{size})"
       back: "Back"
       skipped:
         not_downloadable: "left out because its files can be viewed but not downloaded. You can ask the collection team for a copy."
         withheld: "left out because its files are not available to view or download. You can ask the collection team for access."
-        sensitive: "left out because it is marked sensitive and you have not chosen to view it. Open the record and choose View this item."
+        sensitive: "left out because it is marked sensitive and you have not chosen to view it. Open the record and choose View this record."
         no_assets: "left out because it has no digital assets."
         file_missing: "the file %{name} was left out because it is not available from this site."
         not_found: "left out because it is no longer in the collection."
@@ -494,17 +494,17 @@ en:
 
     # Placeholder wording (CCS-227): the University must approve it.
     sensitivity:
-      view: "View this item"
+      view: "View this record"
       do_not_view: "Do not view"
-      hide: "Hide this item"
+      hide: "Hide this record"
       ask:
-        title: "This item may contain sensitive material"
+        title: "This record may contain sensitive material"
         body: "It is not shown unless you choose to see it. You can change your mind at any time."
       declined:
-        title: "You chose not to view this item"
+        title: "You chose not to view this record"
         body: "The image or file is not shown. You can view it if you change your mind."
       viewing:
-        title: "This item may contain sensitive material. You chose to view it."
+        title: "This record may contain sensitive material. You chose to view it."
         body: "You can hide it again at any time."
 
   catalog:

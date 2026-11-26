@@ -28,7 +28,7 @@ class SensitivityChoicesTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, IMAGE
   end
 
-  test "View this item shows the image from then on, in this session, with a way to hide it again" do
+  test "View this record shows the image from then on, in this session, with a way to hide it again" do
     needs_solr
     sensitive do
       post "/catalog/#{OPEN}/sensitivity", params: { choice: "view" }
@@ -37,7 +37,7 @@ class SensitivityChoicesTest < ActionDispatch::IntegrationTest
 
       assert_select ".sensitivity-gate--viewing [data-controller=focus-on-load]"
       assert_select "img[src^='#{IMAGE}']"
-      assert_select ".sensitivity-gate--viewing button", text: "Hide this item"
+      assert_select ".sensitivity-gate--viewing button", text: "Hide this record"
 
       get "/catalog/#{OPEN}"
       assert_select "img[src^='#{IMAGE}']"
@@ -45,19 +45,19 @@ class SensitivityChoicesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "Do not view keeps the image hidden, and offers View this item" do
+  test "Do not view keeps the image hidden, and offers View this record" do
     needs_solr
     sensitive do
       post "/catalog/#{OPEN}/sensitivity", params: { choice: "hide" }
       follow_redirect!
 
-      assert_select ".sensitivity-gate--declined button", text: "View this item"
+      assert_select ".sensitivity-gate--declined button", text: "View this record"
       assert_select ".digital-assets img", count: 0
       assert_not_includes response.body, IMAGE
     end
   end
 
-  test "Hide this item takes back a choice to view" do
+  test "Hide this record takes back a choice to view" do
     needs_solr
     sensitive do
       post "/catalog/#{OPEN}/sensitivity", params: { choice: "view" }

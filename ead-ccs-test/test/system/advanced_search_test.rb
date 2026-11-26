@@ -15,10 +15,10 @@ class AdvancedSearchTest < ApplicationSystemTestCase
     assert_selector "ul.advanced-help > li", count: 8
   end
 
-  test "the match heading reads 'Find items that match all of the fields below'" do
+  test "the match heading reads 'Find records that match all of the fields below'" do
     visit "/catalog/advanced"
 
-    assert_selector "h2.query-criteria-heading", text: /Find items that match .* of the fields below/m
+    assert_selector "h2.query-criteria-heading", text: /Find records that match .* of the fields below/m
     assert_selector "h2.query-criteria-heading select#op option", count: 2, visible: :all
     assert_selector "h2.limit-criteria-heading", text: /have these attributes/
   end

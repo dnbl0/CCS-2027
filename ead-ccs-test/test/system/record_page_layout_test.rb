@@ -151,7 +151,7 @@ class RecordPageLayoutSystemTest < ApplicationSystemTestCase
   test "a record whose DAM assets are all withheld has the request notice and no image" do
     open_record(VARIANTS.fetch("DAM assets all withheld"), "desktop")
 
-    assert_selector ".digital-assets .access-notice--request", text: "This item is available on request"
+    assert_selector ".digital-assets .access-notice--request", text: "This record is available on request"
     assert_no_selector ".digital-assets img, .access-notice--partly-withheld"
   end
 

@@ -76,7 +76,7 @@
 }
 
 .save-control .toggle-bookmark-label:has(.save-control__input:focus-visible) {
-  outline: 2px solid var(--ccs-focus-ring);
+  outline: 3px solid var(--ccs-focus-ring);
   outline-offset: 2px;
 }
 

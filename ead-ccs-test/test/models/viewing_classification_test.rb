@@ -59,10 +59,10 @@ class ViewingClassificationTest < ActiveSupport::TestCase
 
   test "the gate names the rating and what it means" do
     render_inline(NexusCcs::SensitivityGateComponent.new(document: doc("MA 15+"), state: :ask))
-    assert_text "This item is classified MA 15+"
+    assert_text "This record is classified MA 15+"
     assert_text "It is restricted to 15 and over."
 
     render_inline(NexusCcs::SensitivityGateComponent.new(document: doc(restrictions_tsi: [ "Culturally sensitive images" ]), state: :ask))
-    assert_text "This item may contain sensitive material"
+    assert_text "This record may contain sensitive material"
   end
 end

@@ -22,7 +22,7 @@ class CompliancePagesTest < ApplicationSystemTestCase
     assert_selector "h1", text: "Privacy and data on Collections Navigator"
   end
 
-  test "a visitor with saved items sees them listed, confirms with the button, and ends with nothing held" do
+  test "a visitor with saved records sees them listed, confirms with the button, and ends with nothing held" do
     visit "/lists/new"
     fill_in "List name", with: "Teaching"
     click_button "Create list"

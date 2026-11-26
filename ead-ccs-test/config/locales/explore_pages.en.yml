@@ -44,7 +44,7 @@ en:
       pending: "The places have not been located on a map yet, so there is no map. The lists below open the records of each region and place."
       regions: "Regions"
       top_places: "Places with the most records"
-      all_places: "See every place, A to Z"
+      all_places: "See every place, A–Z"
       # The list and map (after Airbnb's search with a map, 2026-11; place_explorer_controller.js). Placeholder wording.
       explorer:
         intro: "Where the records were made. Choose a region, find a place, or move the map and the list follows."

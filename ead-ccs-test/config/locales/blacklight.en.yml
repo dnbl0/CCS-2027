@@ -20,7 +20,7 @@ en:
           relevance: relevance
           date-desc: date (newest)
           date-asc: date (oldest)
-          title: title (A-Z)
+          title: title (A–Z)
           title-desc: title (Z-A)
       # Record and result field labels carry no trailing colon (the static CCS design)
       show:
