@@ -8,7 +8,7 @@
 
 # System dependencies
 
-Ruby 4.0.6 (`.ruby-version`), PostgreSQL 17 and Solr 10; see [docs/running-the-app.md](docs/running-the-app.md).
+Ruby 4.0.10 (`.ruby-version`), PostgreSQL 17 and Solr 10; see [docs/running-the-app.md](docs/running-the-app.md).
 
 # Configuration
 

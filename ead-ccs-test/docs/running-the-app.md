@@ -25,12 +25,12 @@ The app has three moving parts, and all three must be running:
 
    Add `eval "$(rbenv init - zsh)"` to `~/.zshrc`, then open a new Terminal window. Java (`openjdk`) is for Solr.
 
-2. **Get the code and install Ruby 4.0.6** (the version in `.ruby-version`):
+2. **Get the code and install Ruby 4.0.10** (the version in `.ruby-version`):
 
    ```sh
    git clone https://github.com/dnbl0/CCS-2027.git
    cd CCS-2027/ead-ccs-test
-   rbenv install 4.0.6        # about 5 minutes the first time
+   rbenv install 4.0.10        # about 5 minutes the first time
    gem install bundler
    bundle install
    ```
@@ -99,7 +99,7 @@ Browser tests (`bin/rails test:system`) need Solr indexed at `SOLR_URL` and Chro
 | `PG::ConnectionBad` | PostgreSQL is not running: `brew services start postgresql@17`. |
 | `Address already in use` on 3002 | Another copy is running. Find it with `lsof -nP -iTCP:3002 -sTCP:LISTEN`, and stop that one by its process id. |
 | The page looks unstyled | Run `bin/rails dartsass:build` (or use `bin/dev`, which watches). |
-| Gems or Ruby version errors | `rbenv install 4.0.6` then `bundle install`. |
+| Gems or Ruby version errors | `rbenv install 4.0.10` then `bundle install`. |
 
 ## 6. On Azure
 

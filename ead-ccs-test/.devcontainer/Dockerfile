@@ -1,5 +1,5 @@
 # .devcontainer/Dockerfile
-FROM ruby:4.0.6-trixie AS base
+FROM ruby:4.0.10-trixie AS base
 
 # Avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
