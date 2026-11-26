@@ -33,6 +33,17 @@ places, colours have a third tab ?view=timeline|map|spectrum). The commit after 
    defined in ~8 locale keys. Two pagers (browse_entities/_pager vs Blacklight). Stale docs: `docs/categories-themes-stories.md`
    (CategoriesController was deleted). Hub tabs swap in a Turbo frame but the explorer tab reloads the page (note, maybe fine).
 
+## Status (26 Nov): Dean said "fix everything in the suggested order" (docs/ux-drift-audit.md)
+Done and pushed (newest last): b98e066 quick filters out + pill; 84e10fb no counts; 873db07 audit; slim cookie bar at the window's
+foot (placeholder note hidden); 69ce48f audit part A (phone map button, regions wrap, short hints, phone breadcrumb trail, "Records
+dated", roles capitalised, failed pictures as a crest frame); 16c6f3b Stories/themes/Discover under /browse, one Stories page (themes
+inside, no Themes menu item) and story articles after nga.gov/stories; 634cc9f one list of ways in (menu from BrowseHubs.in_menu_order,
+/browse Places and Time sections are hubs, category names from BrowseHubs); c08af2b one time scheme (centuries; decades on century pages).
+**Next, in order:** drift fix 4 (one page head, one "can't show now" message, one breadcrumb mechanism), then audit part B (B1–B10:
+one record card, wording "record"/"A–Z"/"See all", one button set, one focus ring), then part C (dead CSS, breakpoints, unused
+CardSectionComponent and FeatureCarouselComponent now unused on /browse, stale docs). Known unrelated failures: Discover system tests
+(no "Pick of the day" in the local index), colours Looks similar.
+
 ## Status (25 Nov, later)
 - **Step 1, counts: DONE.** No counts on any page outside search (checked: home, /browse, every hub view, timeline, map, spectrum, entity,
   period, collection, themes, stories), the header Browse menu, map pins (now plain dots), page descriptions. Search results keep their
