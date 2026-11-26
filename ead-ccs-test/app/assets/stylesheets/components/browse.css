@@ -3,11 +3,6 @@
    the ways in (/browse) are one section for each, two rows of four result cards as on the home page, and the value lists are the Explore rows. Targets are at least 44px tall. */
 .browse { background: var(--ccs-surface-default); }
 
-.browse__inner {
-  display: flex; flex-direction: column; gap: var(--ccs-space-5);
-  max-width: var(--layout-container); margin-inline: auto; padding: var(--ccs-space-6) var(--space-32) var(--ccs-space-8);
-}
-
 .browse__list, .browse__letter-list { margin: 0; padding: 0; list-style: none; }
 
 .browse__letter, .browse__link { color: var(--ccs-text-link); }
@@ -16,30 +11,13 @@
 
 .browse__letter:focus-visible, .browse__link:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px; }
 
-/* A to Z: the Help page's "On this page" (a title ruled underneath, then plain links); letters are 44px targets in a grid */
-.browse__letters-title {
-  margin: 0 0 var(--ccs-space-4); padding-bottom: var(--ccs-space-2); border-bottom: 1px solid var(--ccs-border-default);
-  font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); line-height: var(--ccs-line-height-tight); color: var(--ccs-text-brand);
-}
-
-.browse__letter-list { display: flex; flex-wrap: wrap; gap: var(--ccs-space-1); }
-
-.browse__letter {
-  display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding-inline: var(--ccs-space-2);
-  font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); text-decoration: underline;
-}
-
-.browse__letter[aria-current="page"] { background: var(--ccs-sage-200); color: var(--ccs-navy-1100); text-decoration: none; }
-
 .browse__heading { margin: 0; font-size: var(--ccs-heading-section-size); color: var(--ccs-text-brand); }
-
-.browse__content { display: flex; flex-direction: column; gap: var(--ccs-space-5); min-width: 0; }
 
 /* Desktop: the letters sit in a sticky left column, ruled from the content as on the Help page */
 @media (min-width: 901px) {
   .browse__inner--with-letters { display: grid; grid-template-columns: 18rem minmax(0, 1fr); gap: var(--ccs-space-6); align-items: start; }
-  .browse__letters { align-self: stretch; padding-right: var(--ccs-space-4); border-right: 1px solid var(--ccs-border-default); }
-  .browse__letters .browse__letter-list { position: sticky; top: calc(4.5rem + var(--ccs-space-4)); }
+  
+  
 }
 
 /* The values: ruled rows with the count at the right in the muted style (the Explore and entity lists the same) */
@@ -54,15 +32,9 @@
 
 .browse__label { font-size: var(--ccs-font-size-lg); font-weight: var(--ccs-font-weight-semibold); overflow-wrap: anywhere; }
 
-.browse__count { flex: none; font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
-
 /* the one "cannot be shown right now" sentence (UnavailableHelper) */
 .unavailable-note { margin: 0; font-size: var(--ccs-font-size-lg); color: var(--ccs-text-primary); }
 .unavailable-note a { color: var(--ccs-text-link); }
-
-@media (max-width: 767px) {
-  .browse__inner { padding-inline: var(--space-16); }
-}
 
 /* /browse: each way in is its own section after the banner, alternating white and light grey as the home page's do */
 body.page-browse main.browse--hubs { background: none; }

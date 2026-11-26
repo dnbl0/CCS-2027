@@ -28,6 +28,6 @@
 /* A picture that failed to load (page_loader.js: is-failed): its frame in the brand's navy with the University's crest, never the
    browser's broken-picture box. The image's own pixels are hidden; its box keeps its size, so nothing moves. */
 img.is-failed {
-  object-position: -99999px 0; /* hides the broken-image glyph while keeping the box */
+  content: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"); /* a clear pixel in place of the broken-image glyph */
   background: var(--ccs-surface-brand) url("../site/uom-logo-vert-ondark.svg") center / auto 45% no-repeat;
 }

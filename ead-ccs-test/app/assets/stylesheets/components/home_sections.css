@@ -20,7 +20,6 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 
 .home-section__link { flex: none; min-height: 44px; align-items: center; font-weight: var(--ccs-font-weight-semibold); }
 
-
 /* ---- Cover card: the picture fills it, the name sits on the navy scrim ---- */
 /* The tile variant of the site's card (result card / explore card): the picture fills the space above, the name (and for the lead,
    its line and call to action) below on white; the whole card is the link (the title's link covers it) */
@@ -145,9 +144,6 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 
 @media (max-width: 599px) { .card-layout--shelf .result-card__media img { height: 14rem; } .card-layout--shelf .card-rail__button { top: 7rem; } }
 
-/* ---- Recently viewed: as many columns as fit ---- */
-.home-recent__list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 17.5rem), 1fr)); }
-
 /* ---- The Places page (browse/places; after Google Arts & Culture's Places, looked at 2026-11-23) ----
    The places as the home page's mosaic (each picture whole, the name and count under it); a sticky toolbar with the live search; the
    views, regions and A–Z list. */
@@ -175,8 +171,6 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 
 .places-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ccs-space-3); margin-block: var(--ccs-space-4); }
 
-.places-nav__map { min-height: 44px; align-items: center; font-weight: var(--ccs-font-weight-semibold); }
-
 .places-views { display: flex; gap: var(--ccs-space-2); }
 
 .places-views__link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--ccs-space-5); border: 1px solid var(--color-border-grey-91); border-radius: 999px; color: var(--ccs-text-heading, var(--ccs-navy-1100)); font-weight: var(--ccs-font-weight-semibold); text-decoration: none; }
@@ -196,13 +190,9 @@ body.page-home .home-section__heading { margin: 0; text-align: start; }
 
 .places-chip[aria-current="true"] { background: var(--ccs-text-heading, var(--ccs-navy-1100)); color: var(--ccs-white); }
 
-.places-chip__count { font-weight: 400; opacity: 0.8; }
-
 .places-list__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--ccs-space-2) var(--ccs-space-4); margin-block-end: var(--ccs-space-4); }
 
 .places-list__head .places-page__heading { margin: 0; }
-
-.places-list__summary { margin: 0; color: var(--ccs-text-secondary); }
 
 turbo-frame#places-results { display: block; }
 
@@ -230,8 +220,6 @@ turbo-frame#places-results[aria-busy="true"] { opacity: 0.6; transition: opacity
 .places-list__link:hover .places-list__name { text-decoration: underline; }
 
 .places-list__name { font-weight: var(--ccs-font-weight-semibold); }
-
-.places-list__count { flex: none; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
 
 @media (prefers-reduced-motion: reduce) { turbo-frame#places-results[aria-busy="true"] { transition: none; } }
 
@@ -418,7 +406,6 @@ body.page-home main > .ccs-section.home-section.home-section--tinted:not(.ccs-se
 body.page-categories main.categories-page > .ccs-section.home-section { background: var(--ccs-surface-default); }
 body.page-categories main.categories-page > .ccs-section.home-section:nth-of-type(even) { background: var(--ccs-surface-subtle); }
 body.page-categories main.categories-page > .ccs-section.home-section.home-section--tinted { background: var(--section-background-color); }
-
 
 /* The Browse page's last section, the ways in that are not lists of values (browse/index): plain cards, two to four to a row, each one a
    link with its line */

@@ -45,8 +45,9 @@ wording, 3px focus ring; titles use "—" everywhere; clean-up of CardSectionCom
 **Still to do:** B2 one record card (ResultCardComponent for search/Discover vs RecordCardComponent elsewhere: pick one design and use
 it in both), B8 one button set (primary, secondary, arrow link; page-specific buttons such as compare-actions__button,
 results-empty__button, selection-bar__button onto those), one set of breakpoints (~20 values today), raw hex colours in
-record_classic.css and results_toolbar.css, the remaining unused CSS rules (browse-filter, browse-list, browse-facts, browse__*,
-time-chart in browse.css/explore_pages.css), and two pagers. Left as they are on purpose: filter names in Title Case ("Collection
+record_classic.css and results_toolbar.css, and two pagers. (48 dead CSS rules in browse, explore_pages, home_sections and
+discovery_pages were removed 26 Nov; other files not yet checked: the finder script idea is "a rule is dead when every selector names
+a class nothing in app/, config/locales, vendor/javascript or public uses; leaflet-* classes are the map library's own".) Left as they are on purpose: filter names in Title Case ("Collection
 Title", "With Digital Asset": the project owners' workbook, config/data_model/filters.json; ask Dean before changing), the Help page's
 "collection item" wording (the University's page copy), static_shared.css (generated from the static site: its focus colours there).
 

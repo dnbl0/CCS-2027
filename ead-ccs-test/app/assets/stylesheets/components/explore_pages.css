@@ -2,30 +2,18 @@
    lists (Explore by time and by place themselves are on the Explore template, below). Targets are at least 44px; focus rings as the browse pages; no horizontal page scroll at 320px. */
 .explore__section { display: flex; flex-direction: column; gap: var(--ccs-space-4); min-width: 0; }
 .explore__hint, .explore__back { margin: 0; color: var(--ccs-text-secondary); }
-.explore__back a { color: var(--ccs-text-link); }
 
 .explore-chips__chip:focus-visible, .explore-map__toggle:focus-visible, .explore-places summary:focus-visible, .explore-places__region a:focus-visible {
   outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px;
 }
 
-/* Era chips */
-.explore-chips { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2); margin: 0; padding: 0; list-style: none; }
-.explore-chips__chip {
-  display: inline-flex; align-items: center; gap: var(--ccs-space-1); min-height: 44px; padding: var(--ccs-space-2) var(--ccs-space-4);
-  border: 1px solid var(--ccs-border-strong); border-radius: var(--ccs-radius-circle); color: var(--ccs-text-link); text-decoration: none;
-}
-.explore-chips__chip:hover { text-decoration: underline; }
-.explore-chips__count { color: var(--ccs-text-secondary); }
-
 /* The map beside its lists on wide screens, the lists under it on narrow ones */
 .explore-places { display: grid; gap: var(--ccs-space-6); }
 @media (min-width: 992px) { .explore-places { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: start; } }
-.explore-places__map, .explore-places__lists { display: flex; flex-direction: column; gap: var(--ccs-space-4); min-width: 0; }
-.explore-places__map p { margin: 0; }
-.explore-map__toggle { align-self: flex-start; min-height: 44px; }
+
 .explore-map { height: min(70vh, 36rem); border: 1px solid var(--ccs-border-default); }
 .explore-map[hidden] { display: none; }
-.no-js .explore-map__toggle { display: none; }
+
 .explore-map__credit { font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
 .explore-map__credit a { color: var(--ccs-text-link); }
 
@@ -71,8 +59,7 @@
 
 /* ---- The head */
 .place-explorer__head { display: flex; flex-direction: column; gap: var(--ccs-space-4); }
-.place-explorer__heading { margin: 0; font-family: var(--ccs-font-heading); font-size: var(--ccs-font-size-2xl); font-weight: 400; line-height: 1.15; text-wrap: balance; }
-.place-explorer__intro { max-width: 60ch; margin: var(--ccs-space-1) 0 0; color: var(--ccs-text-secondary); text-wrap: pretty; }
+
 .place-explorer__tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-3) var(--ccs-space-5); }
 
 /* The regions: one row of pills; on a narrow screen it scrolls sideways and the next pill peeks past the edge */
@@ -148,8 +135,6 @@ body:has(.cookie-notice) .place-explorer__switch { bottom: calc(6rem + env(safe-
 .place-tile__link:focus-visible { outline: none; }
 .place-tile__link:focus-visible::after { outline: 3px solid var(--ccs-focus-ring); outline-offset: 4px; }
 .place-tile__where { margin: 2px 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
-.place-tile__count { margin: 2px 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); font-variant-numeric: tabular-nums; }
-.place-tile__count strong { color: var(--ccs-text-primary); font-weight: var(--ccs-font-weight-semibold); }
 
 .place-explorer__show-more {
   align-self: center; min-height: 48px; padding: 0 var(--ccs-space-5); border: 1px solid var(--ccs-text-primary); border-radius: var(--ccs-radius-lg);
@@ -230,7 +215,6 @@ body:has(.cookie-notice) .place-explorer__switch { bottom: calc(6rem + env(safe-
   border-radius: var(--ccs-radius-pill); color: var(--ccs-text-primary); text-decoration: none;
 }
 .place-explorer__more-link:hover { border-color: var(--ccs-text-primary); }
-.place-explorer__more-count { color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
 
 .place-explorer__all { margin-top: var(--ccs-space-5); padding-top: var(--ccs-space-4); border-top: 1px solid var(--ccs-border-subtle); }
 .place-explorer__all > summary { display: flex; align-items: center; min-height: 44px; font-weight: var(--ccs-font-weight-semibold); cursor: pointer; }
@@ -241,12 +225,6 @@ body:has(.cookie-notice) .place-explorer__switch { bottom: calc(6rem + env(safe-
 .time-explorer { display: flex; flex-direction: column; gap: var(--ccs-space-6); }
 .time-explorer .place-explorer__head { flex-direction: row; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; }
 .time-explorer__back { margin: 0; }
-
-.time-chart { margin: 0; padding: var(--ccs-space-5); border-radius: var(--ccs-radius-lg); background: var(--ccs-surface-subtle); }
-.time-chart__caption { margin: 0 0 var(--ccs-space-4); color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }
-.time-chart__bars { display: flex; align-items: flex-end; gap: 3px; height: 8rem; margin: 0; padding: 0; list-style: none; }
-.time-chart__bar { flex: 1 1 0; min-width: 2px; height: var(--h); border-radius: 3px 3px 0 0; background: var(--ccs-text-brand); opacity: 0.85; }
-.time-chart__ends { display: flex; justify-content: space-between; margin: var(--ccs-space-2) 0 0; color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-xs); font-variant-numeric: tabular-nums; }
 
 .time-explorer__periods { margin-top: 0; padding-top: 0; border-top: 0; }
 .time-explorer__eras-intro { margin: var(--ccs-space-2) 0 var(--ccs-space-3); color: var(--ccs-text-secondary); font-size: var(--ccs-font-size-sm); }

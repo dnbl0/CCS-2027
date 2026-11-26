@@ -1,26 +1,8 @@
-/* The category, collection, theme and story pages, the home page's On this day / Recently viewed / More ways in, and the lists
-   page's explainer (docs/categories-themes-stories.md). The cards are the site's own (card_layout.css, explore_card.css,
-   object_cards.css); this file only spaces the parts around them. Every link is at least 24px tall (WCAG 2.5.8). */
 
-.category-sort__list { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2) var(--ccs-space-5); margin: 0 0 var(--ccs-space-5); padding: 0; list-style: none; }
-.category-sort__link { display: inline-flex; align-items: center; min-height: 1.5rem; font-weight: var(--ccs-font-weight-semibold); }
-.category-sort__link[aria-current] { color: var(--ccs-text-brand); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.25em; }
-.category-landings__title { margin: var(--ccs-space-6) 0 var(--ccs-space-3); font-size: var(--ccs-font-size-lg); }
 
-.showcase__intro { margin: 0; padding: var(--ccs-space-5) var(--ccs-space-5) 0; max-width: 70ch; }
 .showcase__placeholder { color: var(--ccs-text-secondary); font-style: italic; }
 
-.discovery-index { display: grid; gap: var(--ccs-space-5); margin: 0; padding: 0; list-style: none; }
-.discovery-index__item { padding-bottom: var(--ccs-space-5); border-bottom: 1px solid var(--ccs-border-subtle); }
-.discovery-index__title { margin: 0 0 var(--ccs-space-2); font-size: var(--ccs-font-size-2xl); }
-.discovery-index__title a { display: inline-block; min-height: 1.5rem; overflow-wrap: anywhere; }
-.discovery-index__text, .discovery-index__meta { margin: 0; max-width: 70ch; }
-.discovery-index__meta { margin-top: var(--ccs-space-1); color: var(--ccs-text-secondary); }
-
-
 .home-more .object-cards__list { margin-top: var(--ccs-space-4); }
-.home-more__links { display: flex; flex-wrap: wrap; gap: var(--ccs-space-3) var(--ccs-space-6); margin: var(--ccs-space-4) 0 0; padding: 0; list-style: none; }
-.home-more__links a { min-height: 1.5rem; }
 
 .lists-help { margin: var(--ccs-space-5) 0; padding: var(--ccs-space-4) var(--ccs-space-5); border: 1px solid var(--ccs-border-default); }
 .lists-help__title { margin: 0 0 var(--ccs-space-2); font-size: var(--ccs-font-size-lg); }
