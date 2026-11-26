@@ -37,9 +37,4 @@ places:
   limit: 12
   skip: [Oceania, "Melbourne, Victoria, Australia", Western Europe, Great Britain]
 
-# periods: [label, first year, last year]; the last year of the last one is the current year
-periods:
-  - [Before 1800, -10000, 1799]
-  - [1800s, 1800, 1899]
-  - [1900s, 1900, 1999]
-  - [2000 onwards, 2000, null]
+# periods: none here: the home page uses the one time scheme (BrowseHubs.periods)

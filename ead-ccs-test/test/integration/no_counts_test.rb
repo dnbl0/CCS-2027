@@ -12,7 +12,7 @@ class NoCountsTest < ActionDispatch::IntegrationTest
     @cache = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
     Rails.cache.write(SuppressedRecord.cache_key("browse_hubs/v1/object-types"), [ [ "Lyre", 120 ], [ "Harp", 40 ] ], expires_in: 1.day)
-    Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/object-types/wall/v2"),
+    Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v4/object-types/wall/v2"),
                       [ { "label" => "Lyre", "count" => 100, "total" => 120, "image" => { "id" => "r1", "title" => "A lyre", "path" => "https://unimelbourne.widen.net/content/x/jpeg/a.jpeg", "width" => nil, "height" => nil } } ],
                       expires_in: 1.day)
   end

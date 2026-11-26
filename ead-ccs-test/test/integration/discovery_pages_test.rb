@@ -30,7 +30,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
 
   def seed_hub(slug, values) = Rails.cache.write(SuppressedRecord.cache_key("browse_hubs/v1/#{slug}"), values, expires_in: 1.day)
 
-  def seed_wall(slug, entries) = Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/#{slug}/wall/v2"), entries, expires_in: 1.day)
+  def seed_wall(slug, entries) = Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v4/#{slug}/wall/v2"), entries, expires_in: 1.day)
 
   test "a category page is on the one Browse template: its title, All and A–Z as tabs, a mosaic of its values opening the search" do
     seed_hub("classifications", [ [ "Prints", 8638 ], [ "Paintings", 6840 ] ])
@@ -80,7 +80,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     picture = { "id" => "r1", "title" => "A print", "path" => "/digital-assets/thumbs/0000_013_1_pf.jpg", "width" => 400, "height" => 300 }
     { "places" => %w[Australia Japan], "periods" => %w[1900–1999] }.each do |slug, labels|
       cards = labels.map { |label| { "label" => label, "count" => 5, "image" => picture, "first" => (1900 if slug == "periods"), "last" => (1999 if slug == "periods") }.compact }
-      Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/#{slug}"), cards, expires_in: 1.day)
+      Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v4/#{slug}"), cards, expires_in: 1.day)
     end
 
     get "/browse"

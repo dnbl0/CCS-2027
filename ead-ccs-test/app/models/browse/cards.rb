@@ -13,8 +13,8 @@ module Browse
   # placeholder: the collections team has not approved it. The cards are kept for a day, and the last good copy for a month, as BrowseHubs.
   module Cards
     CARDS = 8
-    CACHE_KEY = "browse_cards/v3"
-    LAST_GOOD_KEY = "browse_cards/last_good/v3"
+    CACHE_KEY = "browse_cards/v4" # v4: one time scheme (centuries)
+    LAST_GOOD_KEY = "browse_cards/last_good/v4"
     # The values looked at, most records with a thumbnail first
     CANDIDATES = 40
     PER_VALUE = 20 # records looked at for one value's picture

@@ -13,7 +13,7 @@ class PlacesPageTest < ActionDispatch::IntegrationTest
 
   test "All is the default: tabs for All and A–Z, the filter, a wall of places with pictures and their full counts, and the way to every place" do
     wall = [ { "label" => "Australia", "count" => 532, "image" => { "id" => "emu-1", "title" => "A tree", "path" => "https://unimelbourne.widen.net/content/a/jpeg/a.jpeg?w=1000&u=x", "width" => nil, "height" => nil } } ]
-    Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/places/wall/v2"), wall, expires_in: 1.day)
+    Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v4/places/wall/v2"), wall, expires_in: 1.day)
     seed_places([ [ "Australia", 8058 ], [ "Japan", 193 ] ])
 
     get "/browse/places", params: { view: "all" } # the plain address is the places page with the map (ExplorePagesTest)

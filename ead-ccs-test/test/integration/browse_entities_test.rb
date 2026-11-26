@@ -42,7 +42,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
   # The value lists are BrowseHubs' (its cache holds them for a day), so the entity pages need no request for them
   def seed_lists
     HUB_VALUES.each { |slug, values| Rails.cache.write("browse_hubs/v1/#{slug}", values.to_a, expires_in: 1.day) }
-    Rails.cache.write("browse_hubs/v1/periods", [ [ "Before 1000", 15, -10_000, 999 ], [ "1900–1909", 130, 1900, 1909 ], [ "1890–1899", 600, 1890, 1899 ] ], expires_in: 1.day)
+    Rails.cache.write("browse_hubs/v1/periods/v2", [ [ "Before 1000", 15, -10_000, 999 ], [ "1800–1899", 600, 1800, 1899 ], [ "1900–1999", 130, 1900, 1999 ] ], expires_in: 1.day)
   end
 
   def browse(path, **options)
@@ -105,7 +105,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     link = css_select(".place-collections h3 a").first
     assert_equal "University Art Collection", link.text
     assert_match %r{\A/browse/collections/|collection_ssim}, link["href"] # the collection's own page, or its records in the search
-    assert_select ".place-section", text: /\APainting\z|Painting/ # a kind of record (a tile, or a link where it has no picture)
+    assert_select ".place-section", text: /Painting/ # a kind of record (a tile, or a link where it has no picture)
     assert_select "section .card-layout--mosaic ul.mosaic-flow[data-controller=mosaic] li .object-card, section .card-layout--mosaic ul.mosaic-flow li article"
     assert_select "main.browse-main", count: 0 # not the makers' and subjects' profile
   end
@@ -200,8 +200,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     assert_includes paths, "/browse"
     assert_not_includes paths, "/browse/periods" # it redirects to the time page, listed with the Explore pages (DiscoverySitemap)
     assert_includes paths, entity_path("makers", "Bunny, Rupert")
-    assert_includes paths, "/browse/periods/1900-1909"
-    assert_includes paths, "/browse/periods/1900-1999" # the century of a listed decade
+    assert_includes paths, "/browse/periods/1900-1999" # the one time scheme lists centuries; their decades are on their pages
     assert_not_includes paths, entity_path("makers", "Tiny, Tim")
     assert_equal paths.uniq, paths
   end

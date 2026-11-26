@@ -92,7 +92,7 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     cards = [ { "label" => "Melbourne", "count" => 8, "total" => 9, "image" => { "id" => "r1", "title" => "A tram", "path" => "https://unimelbourne.widen.net/content/a/jpeg/a.jpeg?w=1000&u=x", "width" => 800, "height" => 600 } } ]
     visit("/browse/places?view=map") do
       seed("places", result)
-      Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/places/map/v1"), cards, expires_in: 1.day)
+      Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v4/places/map/v1"), cards, expires_in: 1.day)
     end
 
     assert_response :success

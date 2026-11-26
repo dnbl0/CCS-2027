@@ -64,7 +64,7 @@ class ExploreComponentTest < ViewComponent::TestCase
     # Time: a slide for each period, in time order, named "1 of 2"; the buttons move it, the first starts marked disabled
     carousel = "section.explore-periods [role=region][aria-roledescription=carousel][data-controller=carousel]"
     assert_selector "#{carousel}.card-carousel div.card-carousel__slide[role=group][aria-roledescription=slide][aria-label='1 of #{overview.period_tiles.size}']"
-    assert_selector "#{carousel} .card-carousel__card h3 a.card-carousel__link[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900']", text: "1900s"
+    assert_selector "#{carousel} .card-carousel__card h3 a.card-carousel__link[href='/browse/periods/1900-1999']", text: "1900s" # its own page
     assert_selector "#{carousel} .card-carousel__card .card-carousel__meta", text: "1900–1999" # its years, the card's bold line
     assert_selector "#{carousel} .card-carousel__status[aria-live=polite]", text: "1 of #{overview.period_tiles.size}"
     assert_selector "#{carousel} button[aria-label='Previous period'][aria-disabled=true]"

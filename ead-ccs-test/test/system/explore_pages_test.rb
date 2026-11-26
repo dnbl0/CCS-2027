@@ -21,7 +21,7 @@ class ExplorePagesSystemTest < ApplicationSystemTestCase
     Rails.cache.write(SuppressedRecord.cache_key("explore/v1/places"),
                       Explore::Places::Result.new(markers: [ melbourne, paris ], regions: regions, plain_regions: [], top_places: []), expires_in: 1.hour)
     # Melbourne has a card (its own page and picture); Paris is only a pin, listed by name under the cards
-    Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/places/map/v1"),
+    Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v4/places/map/v1"),
                       [ { "label" => "Melbourne", "count" => 1391, "image" => { "id" => "r1", "title" => "A tram", "path" => "/favicon.ico", "width" => 800, "height" => 600 } } ], expires_in: 1.hour)
     page.execute_script("try { localStorage.clear() } catch (e) {}") rescue nil
   end

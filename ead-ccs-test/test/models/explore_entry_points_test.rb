@@ -75,7 +75,7 @@ class ExploreEntryPointsTest < ActiveSupport::TestCase
     counts = { "periods" => { ExploreEntryPoints.period_key(-10_000, 1799) => 0, ExploreEntryPoints.period_key(1800, 1899) => 7, ExploreEntryPoints.period_key(1900, 1999) => 9 } }
     links = ExploreEntryPoints.overview(counts.merge("collections" => [ [ "x", 1 ] ])).periods
 
-    assert_equal [ "1800s", "1900s" ], links.map(&:label)
+    assert_equal [ "1800–1899", "1900–1999" ], links.map(&:label) # the one time scheme (BrowseHubs.periods)
     assert_equal "1800", links.first.query.dig(:range, "date_start_isi", :begin).to_s
   end
 

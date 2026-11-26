@@ -13,7 +13,7 @@ class BrowseSectionsSystemTest < ApplicationSystemTestCase
     BrowseHubs.all.each do |hub|
       picture = { id: "r1", title: "A print", path: "/digital-assets/thumbs/0000_013_1_pf.jpg", width: 400, height: 300 }
       entries = (1..9).map { |number| { "label" => "#{hub.singular} #{number}", "count" => 5, "intro" => "Includes prints. Held in University Art Collection.", "image" => (picture if number <= 5) } }
-      Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/#{hub.slug}"), entries.first(8), expires_in: 1.day)
+      Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v4/#{hub.slug}"), entries.first(8), expires_in: 1.day)
     end
   end
 

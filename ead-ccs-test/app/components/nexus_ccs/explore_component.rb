@@ -71,16 +71,24 @@ module NexusCcs
         image = ExploreCardComponent.image?(tile, remote: true) ? DamImage.sized(AssetVersion.url(tile.image.path), 1000) : nil # a carousel slide: large
         image = nil if image && !fresh?(image)
         used_pictures << picture_key(image) if image
-        HomeSections::Tile.new(title: tile.label, text: tile.intro.presence, path: helpers.search_action_path(tile.query),
+        first, last = period_years(tile)
+        # its own page, as the Time page's tiles open (Browse::Periods), else its records in the search
+        path = Browse::Periods.for_span(first, last)&.path || helpers.search_action_path(tile.query)
+        HomeSections::Tile.new(title: tile.label, text: tile.intro.presence, path: path,
                                image: image, lead: index.zero?, cta: nil, external: false, width: (tile.image.width if image), height: (tile.image.height if image))
       end
     end
 
     # Each period's years, the bold line of its card ("1800–1899", "Up to 1799", "2000 to today"), from its search's year range
+    # A period tile's first and last years, from its search's year range
+    def period_years(tile)
+      range = tile.query.dig(:range, ExploreEntryPoints::DATE_FIELD) || tile.query.dig("range", ExploreEntryPoints::DATE_FIELD) || {}
+      range.values_at(:begin, :end).zip(range.values_at("begin", "end")).map(&:compact).map(&:first).map { |year| year&.to_i }
+    end
+
     def period_spans
       overview.period_tiles.map do |tile|
-        range = tile.query.dig(:range, ExploreEntryPoints::DATE_FIELD) || tile.query.dig("range", ExploreEntryPoints::DATE_FIELD) || {}
-        first, last = range.values_at(:begin, :end).zip(range.values_at("begin", "end")).map(&:compact).map(&:first)
+        first, last = period_years(tile)
         first = nil if first.to_i <= -10_000 # the earliest period's open start
         last = nil if last.to_i >= Time.zone.today.year # the latest period runs to this year
         if first && last then t("home.periods.span", first: first, last: last)

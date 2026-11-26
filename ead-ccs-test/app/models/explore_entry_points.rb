@@ -41,7 +41,7 @@ module ExploreEntryPoints
   PLACE_FIELD = "production_place_ssim"
   DATE_FIELD = "date_start_isi"
   CONFIG_PATH = Rails.root.join("config/explore_kinds.yml")
-  CACHE_KEY = "explore_entry_points/v6"
+  CACHE_KEY = "explore_entry_points/v7"
   LAST_GOOD_KEY = "explore_entry_points/last_good/v6"
   # The tints of the collection tiles (--ccs-explore-tint-1 to -6 in tokens/semantic.css)
   TINTS = 6
@@ -55,9 +55,8 @@ module ExploreEntryPoints
   def self.config = (@config ||= YAML.safe_load_file(CONFIG_PATH).freeze)
 
   # [label, first year, last year]
-  def self.periods(this_year = Time.zone.today.year)
-    config["periods"].map { |label, first, last| [ label, first, last || this_year ] }
-  end
+  # The home page's Time carousel: the one time scheme (BrowseHubs.periods), so it divides time as the Time page does
+  def self.periods(this_year = Time.zone.today.year) = BrowseHubs.periods(this_year)
 
   def self.period_key(first, last) = "#{first}-#{last}"
 

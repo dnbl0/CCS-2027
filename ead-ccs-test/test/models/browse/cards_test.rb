@@ -76,8 +76,8 @@ class Browse::CardsTest < ActiveSupport::TestCase
   end
 
   test "the periods are cards in order of time that open the period's range" do
-    first = ExploreEntryPoints.period_query(1950, 1959)
-    last = ExploreEntryPoints.period_query(1960, 1969)
+    first = ExploreEntryPoints.period_query(1800, 1899)
+    last = ExploreEntryPoints.period_query(1900, 1999)
     records = { first => [ open_record("a") ], last => [ open_record("b") ] }
     answer = lambda do |params|
       params = params.to_h.with_indifferent_access
@@ -92,8 +92,8 @@ class Browse::CardsTest < ActiveSupport::TestCase
 
     cards = with_canned_search(answer) { |_seen| Browse::Cards.for(hub("periods")) }
 
-    assert_equal [ "1950–1959", "1960–1969" ], cards.map(&:label)
-    assert_equal BrowseHubs.period_query(1950, 1959), cards.first.query
+    assert_equal [ "1800–1899", "1900–1999" ], cards.map(&:label)
+    assert_equal BrowseHubs.period_query(1800, 1899), cards.first.query
   end
 
   test "when the index cannot answer there are no cards" do

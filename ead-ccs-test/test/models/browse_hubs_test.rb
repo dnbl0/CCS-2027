@@ -73,16 +73,18 @@ class BrowseHubsTest < ActiveSupport::TestCase
     assert_equal [], BrowseHubs.for_letter(values, "Z")
   end
 
-  test "the periods are chronological and leave out the empty ones" do
-    first = BrowseHubs.periods(2030).first
-    queries = BrowseHubs.periods(2030).to_h { |_label, from, to| [ ExploreEntryPoints.period_query(from, to), 0 ] }
-    one = BrowseHubs.periods(2030).find { |label, *| label == "1950–1959" }
+  test "the periods are one scheme of centuries, chronological, the current one to today, leaving out the empty ones" do
+    periods = BrowseHubs.periods(2030)
+    queries = periods.to_h { |_label, from, to| [ ExploreEntryPoints.period_query(from, to), 0 ] }
+    one = periods.find { |label, *| label == "1900–1999" }
     queries[ExploreEntryPoints.period_query(one[1], one[2])] = 12
 
     result = BrowseHubs.period_values(FakeConnection.new(queries: queries), 2030)
 
-    assert_equal "Before 1000", first.first
-    assert_equal [ [ "1950–1959", 12, 1950, 1959 ] ], result
+    assert_equal "Before 1000", periods.first.first
+    assert_equal [ "1000–1099", 1000, 1099 ], periods[1]
+    assert_equal [ "2000 to today", 2000, 2099 ], periods.last # no decades here: they are on a century's own page
+    assert_equal [ [ "1900–1999", 12, 1900, 1999 ] ], result
   end
 
   test "the search a value opens finds all its records, not only those with images" do

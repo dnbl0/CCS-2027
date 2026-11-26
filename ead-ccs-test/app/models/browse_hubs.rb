@@ -86,14 +86,17 @@ module BrowseHubs
 
   # [[label, count, first year, last year], ...] in order of time, leaving out the empty ones; nil as for .values
   def self.period_entries(connection = nil, this_year = Time.zone.today.year)
-    cached("periods") { period_values(connection, this_year) }
+    cached("periods/v2") { period_values(connection, this_year) }
   end
 
   # [label, first year, last year]: before 1000, then by century to 1800, then by decade
+  # The one time scheme (26 Nov 2026; the Time page, its Browse section and the home page's Time carousel): before 1000, then each
+  # century, the current one "2000 to today"; a century's decades are on its own page (Browse::Periods), the timeline goes back further
   def self.periods(this_year = Time.zone.today.year)
-    centuries = (FIRST_CENTURY...FIRST_DECADE).step(100).map { |year| [ "#{year}–#{year + 99}", year, year + 99 ] }
-    decades = (FIRST_DECADE..this_year).step(10).map { |year| [ "#{year}–#{year + 9}", year, year + 9 ] }
-    [ [ "Before 1000", ExploreEntryPoints::EARLIEST_YEAR, FIRST_CENTURY - 1 ], *centuries, *decades ]
+    centuries = (FIRST_CENTURY..this_year).step(100).map do |year|
+      [ year + 99 >= this_year ? "#{year} to today" : "#{year}–#{year + 99}", year, year + 99 ]
+    end
+    [ [ "Before 1000", ExploreEntryPoints::EARLIEST_YEAR, FIRST_CENTURY - 1 ], *centuries ]
   end
 
   def self.period_values(connection, this_year = Time.zone.today.year)
