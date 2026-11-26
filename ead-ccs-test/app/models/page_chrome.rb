@@ -15,11 +15,11 @@ PageChrome = Data.define(:breadcrumbs, :banner, :saved_bar) do
   def self.for(controller:, action:, searching: false, page: nil)
     case [ controller, action ]
     in [ "pages", "home" ] then new(breadcrumbs: [], banner: nil, saved_bar: :hero)
-    in [ "pages", _ ] then new(breadcrumbs: [], banner: nil, saved_bar: :page)
+    in [ "pages", _ ] then trail_or_header(page.browse_trail)
     in [ "catalog", "index" ]
       searching ? with_trail([ [ "Search results", nil ] ], banner: :search) : new(breadcrumbs: [], banner: :search, saved_bar: :header)
     # every page under /browse (time's, places' and colours' explorers too) draws its own strip (PageBreadcrumbsComponent), with the saved bar
-    in [ "browse" | "explore" | "colours", _ ] then new(breadcrumbs: [], banner: nil, saved_bar: :page)
+    in [ "browse" | "explore" | "colours", _ ] then trail_or_header(page.browse_trail)
     in [ "catalog", "show" ] then with_trail([ page.record_parent, [ page.record_title, nil ] ], banner: nil)
     in [ "catalog", "advanced_search" ] then with_trail([ [ "Advanced search", nil ] ], banner: :advanced_search)
     in [ "catalog", _ ] then new(breadcrumbs: [], banner: :search, saved_bar: :header)
@@ -46,7 +46,11 @@ PageChrome = Data.define(:breadcrumbs, :banner, :saved_bar) do
 
   def self.with_trail(breadcrumbs, banner:) = new(breadcrumbs: breadcrumbs, banner: banner, saved_bar: :breadcrumb)
 
-  private_class_method :record_trail, :with_trail
+  # A page that names its trail (ApplicationHelper#page_trail) has it drawn here, the one way every breadcrumb is drawn; a page with none
+  # has the saved bar in the header's top strip
+  def self.trail_or_header(trail) = trail.present? ? with_trail(trail, banner: nil) : new(breadcrumbs: [], banner: nil, saved_bar: :header)
+
+  private_class_method :record_trail, :with_trail, :trail_or_header
 
   # Phones hide the header's top strip, and the home page has no breadcrumb strip, so the phone menu carries the
   # saved-records link on those pages.

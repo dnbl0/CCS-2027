@@ -2,7 +2,7 @@ require "test_helper"
 
 class PageChromeTest < ActiveSupport::TestCase
   # Stands in for the header: the record's title and the way back to the results, asked for on a record page only
-  Record = Struct.new(:record_title, :results_url) do
+  Record = Struct.new(:record_title, :results_url, :browse_trail) do
     def record_parent = [ "Search results", results_url ] # HeaderComponent#record_parent: the results, unless the visitor came from Browse
   end
   RECORD = Record.new("Bust of Percy Grainger", "/catalog?q=grainger")
@@ -20,13 +20,16 @@ class PageChromeTest < ActiveSupport::TestCase
     assert home.saved_link_in_phone_menu?
   end
 
-  test "a content page draws its own breadcrumb strip, so the header has no trail and no saved bar" do
-    about = chrome("pages", "about")
+  test "a content page's trail (page_trail) is drawn by the header, the one way every breadcrumb is drawn, with the saved bar in it" do
+    about = chrome("pages", "about", page: Record.new(nil, nil, [ [ "About", nil ] ]))
 
-    assert_equal [], about.breadcrumbs
+    assert_equal [ [ "About", nil ] ], about.breadcrumbs
     assert_nil about.banner
-    assert_equal :page, about.saved_bar
+    assert_equal :breadcrumb, about.saved_bar
     assert_not about.saved_link_in_phone_menu?
+
+    bare = chrome("pages", "about", page: Record.new(nil, nil, [])) # no trail: the saved bar in the header's top strip
+    assert_equal :header, bare.saved_bar
   end
 
   test "the bare search page: the search banner, the saved bar in the header's top strip" do
@@ -55,11 +58,13 @@ class PageChromeTest < ActiveSupport::TestCase
     assert_equal :breadcrumb, record.saved_bar
   end
 
-  test "a browse page draws its own breadcrumb strip, so the saved bar is not also in the header" do
-    browse = chrome("browse", "index")
+  test "a browse page, an explorer and the colours page: their trail is drawn by the header, with the saved bar in it" do
+    %w[browse explore colours].each do |controller|
+      page = chrome(controller, "index", page: Record.new(nil, nil, [ [ "Browse", "/browse" ], [ "Time", nil ] ]))
 
-    assert_equal [], browse.breadcrumbs
-    assert_equal :page, browse.saved_bar
+      assert_equal [ [ "Browse", "/browse" ], [ "Time", nil ] ], page.breadcrumbs
+      assert_equal :breadcrumb, page.saved_bar
+    end
   end
 
   test "advanced search: its own trail and page banner, not the search banner" do

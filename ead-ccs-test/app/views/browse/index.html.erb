@@ -5,7 +5,7 @@
     two on bands of colour; no picture twice. Last, the other ways in: colour, themes, stories and the pick of the day. %>
 <% content_for :body_class, "page-browse page-places page-categories" %>
 <% content_for :title, "#{t('browse.footer_link')} — Collections Navigator — University of Melbourne" %>
-<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ t("browse.title"), nil ] ]) %>
+<% page_trail([ [ t("browse.title"), nil ] ]) %>
 <main class="categories-page" id="main-content">
   <div class="places-page places-page--head"><div class="places-page__inner">
     <%= render "browse/page_head", title: t("browse.footer_link"), intro: t("browse.index_intro") %>

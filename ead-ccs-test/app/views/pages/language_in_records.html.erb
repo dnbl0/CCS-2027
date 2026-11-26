@@ -1,7 +1,7 @@
 <%# About the language in our records: what the de-bias notice on a record page is. PLACEHOLDER WORDING until the collections team and the University's Indigenous advisers approve it: the marked notice stays on the page until then. %>
 <% content_for :body_class, "page-help" %>
 <% content_for :title, "#{t('nexus_ccs.debias.page.title')} — Collections Navigator — University of Melbourne" %>
-<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ t("nexus_ccs.debias.page.crumb"), nil ] ]) %>
+<% page_trail([ [ t("nexus_ccs.debias.page.crumb"), nil ] ]) %>
 <%= render NexusCcs::PageBannerComponent.new(title: t("nexus_ccs.debias.page.title"), description: t("nexus_ccs.debias.page.description")) %>
 <main class="help-main-content help-main-content--topic" id="main-content">
 <div class="help-layout">

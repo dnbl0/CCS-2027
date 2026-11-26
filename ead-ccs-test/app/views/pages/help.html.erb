@@ -1,6 +1,6 @@
 <% content_for :body_class, "page-help" %>
 <% content_for :title, "Help and support — Collections Navigator — University of Melbourne" %>
-<%= render NexusCcs::PageBreadcrumbsComponent.new(trail: [ [ "Help and support", nil ] ]) %>
+<% page_trail([ [ "Help and support", nil ] ]) %>
 <%= render NexusCcs::PageBannerComponent.new(title: "Help and support", description: "Guidance on searching, using and requesting items from the University's cultural collections.") %>
 <main class="help-main-content help-main-content--topic" id="main-content">
 <div class="help-layout">
