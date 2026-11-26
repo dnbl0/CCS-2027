@@ -165,12 +165,24 @@
   flex: 1;
 }
 
+/* A grid card's picture sits in a fixed 3:2 frame (the story pictures have no known size), shown whole, so nothing shifts as
+   it loads */
+.collection-story--card .result-card__media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 2;
+}
+
+.collection-story--card .result-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 /* The summary sits between the title and the lines, in the lines' body text */
 .result-card__content > .collection-story__summary {
   padding-top: var(--ccs-space-3);
   font-size: var(--ccs-font-size-md);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .collection-story__link { transition: none; }
-}

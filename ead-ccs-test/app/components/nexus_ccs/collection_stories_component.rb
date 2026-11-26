@@ -42,11 +42,9 @@ module NexusCcs
       record_image_url if pictures? && story.image_url.present?
     end
 
-    def story_classes(story, variant)
-      picture = image_url(story)
-      card = variant == "card"
-      [ ("result-card" if card), ("result-card--media" if card && picture), "collection-story", "collection-story--#{variant}",
-        ("collection-story--text" unless picture) ].compact.join(" ")
+    # One story, drawn by CollectionStoryComponent with the picture this component chose for it
+    def story_component(story)
+      CollectionStoryComponent.new(story: story, layout: feature? ? :feature : :card, picture: image_url(story), fallback: fallback_url(story))
     end
 
     private

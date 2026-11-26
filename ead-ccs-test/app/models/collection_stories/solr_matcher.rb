@@ -7,12 +7,10 @@ class CollectionStories
     module_function
 
     def call(collection, accession)
-      params = { q: "accession_number_ssim:#{quote(accession)}", fq: "collection_ssim:#{quote(collection)}", fl: "id", rows: 2,
-                 defType: "lucene" }
+      # Each value is a parameter of a {!term} query, never in the query text (the repo's convention, similar_rows.rb)
+      params = { q: "{!term f=accession_number_ssim v=$story_accession}", fq: "{!term f=collection_ssim v=$story_collection}",
+                 story_accession: accession.to_s, story_collection: collection.to_s, fl: "id", rows: 2, defType: "lucene" }
       Blacklight.default_index.connection.get("select", params: params).dig("response", "docs").map { |doc| doc["id"] }
     end
-
-    # A phrase query: the value in double quotes, its quotes and backslashes escaped
-    def quote(value) = %("#{value.to_s.gsub(/["\\]/) { |char| "\\#{char}" }}")
   end
 end
