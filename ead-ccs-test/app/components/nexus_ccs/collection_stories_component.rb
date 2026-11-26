@@ -43,7 +43,10 @@ module NexusCcs
     end
 
     def story_classes(story, variant)
-      [ "collection-story", "collection-story--#{variant}", ("collection-story--text" unless image_url(story)) ].compact.join(" ")
+      picture = image_url(story)
+      card = variant == "card"
+      [ ("result-card" if card), ("result-card--media" if card && picture), "collection-story", "collection-story--#{variant}",
+        ("collection-story--text" unless picture) ].compact.join(" ")
     end
 
     private

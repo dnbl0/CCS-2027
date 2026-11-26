@@ -9,9 +9,9 @@
   color: var(--ccs-text-secondary);
 }
 
-/* --- One story --- */
+/* --- One story: the wide row (a grid card is the search results' card, result_card.css) --- */
 
-.collection-story {
+.collection-story--feature {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -30,7 +30,7 @@
   min-width: 0;
 }
 
-/* The small uppercase label above the headline ("Article", and on a card the site it is from) */
+/* The small uppercase label above the headline ("Article") */
 .collection-story__kicker,
 .collection-story__source {
   margin: 0;
@@ -143,7 +143,7 @@
 .collection-story-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--ccs-space-7) var(--ccs-space-6);
+  gap: var(--ccs-space-5);
   margin: var(--ccs-space-6) 0 0;
   padding: 0;
   list-style: none;
@@ -165,8 +165,10 @@
   flex: 1;
 }
 
-.collection-story--card .collection-story__kicker-source {
-  color: var(--ccs-text-secondary);
+/* The summary sits between the title and the lines, in the lines' body text */
+.result-card__content > .collection-story__summary {
+  padding-top: var(--ccs-space-3);
+  font-size: var(--ccs-font-size-md);
 }
 
 @media (prefers-reduced-motion: reduce) {

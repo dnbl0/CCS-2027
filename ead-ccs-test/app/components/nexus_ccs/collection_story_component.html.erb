@@ -1,17 +1,40 @@
-<%# One story: the headline first in the reading order, then the summary; the source and the picture are placed by
-    collection_stories.css (the source to the left of a wide row, the picture to its right or above a card). %>
-<%= tag.article class: classes, data: { controller: "story-image", story_image_fallback_value: fallback_url }.compact do %>
-  <div class="collection-story__body">
-    <p class="collection-story__kicker"><%= t("nexus_ccs.collection_stories.kicker") %><% if !feature? && story.site.present? %><span class="collection-story__kicker-source"> · <%= story.site %></span><% end %></p>
-    <h3 class="collection-story__title"><%= link_to story.title, story.url, class: "collection-story__link" %></h3>
-    <% if story.summary.present? %><p class="collection-story__summary"><%= story.summary %></p><% end %>
-  </div>
-  <% if feature? && story.site.present? %><p class="collection-story__source"><%= story.site %></p><% end %>
-  <% if image_url %>
-    <div class="collection-story__media" data-story-image-target="media">
-      <%# The headline names the story, so the picture adds nothing for a screen reader %>
-      <%= image_tag image_url, alt: "", class: "collection-story__image", loading: "lazy", decoding: "async",
-                               data: { story_image_target: "image", action: "error->story-image#fail" } %>
+<%# One story. A grid card is the search results' card (ResultCardComponent, result_card.css): the picture as a link (out of the tab
+    order, hidden from screen readers: the title is the link), then the h3 title, the summary, and "Article" and the site as its lines.
+    The wide row (one story) is the National Gallery of Art's listing row: headline first in the reading order; the source and the
+    picture are placed by collection_stories.css. %>
+<% if feature? %>
+  <%= tag.article class: classes, data: { controller: "story-image", story_image_fallback_value: fallback_url }.compact do %>
+    <div class="collection-story__body">
+      <p class="collection-story__kicker"><%= t("nexus_ccs.collection_stories.kicker") %></p>
+      <h3 class="collection-story__title"><%= link_to story.title, story.url, class: "collection-story__link" %></h3>
+      <% if story.summary.present? %><p class="collection-story__summary"><%= story.summary %></p><% end %>
+    </div>
+    <% if story.site.present? %><p class="collection-story__source"><%= story.site %></p><% end %>
+    <% if image_url %>
+      <div class="collection-story__media" data-story-image-target="media">
+        <%# The headline names the story, so the picture adds nothing for a screen reader %>
+        <%= image_tag image_url, alt: "", class: "collection-story__image", loading: "lazy", decoding: "async",
+                                 data: { story_image_target: "image", action: "error->story-image#fail" } %>
+      </div>
+    <% end %>
+  <% end %>
+<% else %>
+  <%= tag.article class: classes, data: { controller: "story-image", story_image_fallback_value: fallback_url }.compact do %>
+    <% if image_url %>
+      <%= link_to story.url, class: "result-card__media", tabindex: -1, "aria-hidden": true, data: { story_image_target: "media" } do %>
+        <%= image_tag image_url, alt: "", loading: "lazy", decoding: "async",
+                                 data: { story_image_target: "image", action: "error->story-image#fail" } %>
+      <% end %>
+    <% end %>
+    <div class="result-card__content">
+      <header class="documentHeader">
+        <h3 class="document-title-heading h5"><%= link_to story.title, story.url %></h3>
+      </header>
+      <% if story.summary.present? %><p class="collection-story__summary"><%= story.summary %></p><% end %>
+      <ul class="result-card__lines">
+        <li><%= t("nexus_ccs.collection_stories.kicker") %></li>
+        <% if story.site.present? %><li><%= story.site %></li><% end %>
+      </ul>
     </div>
   <% end %>
 <% end %>

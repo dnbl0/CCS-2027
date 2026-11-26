@@ -24,5 +24,6 @@ export default class extends Controller {
 
     if (this.hasMediaTarget) this.mediaTarget.remove()
     this.element.classList.add("collection-story--text")
+    this.element.classList.remove("result-card--media")
   }
 }
