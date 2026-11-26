@@ -11,10 +11,11 @@ class NoCountsTest < ActionDispatch::IntegrationTest
   PAGES = %w[/ /browse /browse/categories /browse/collections /browse/creators /browse/places /browse/periods /explore/time
              /explore/places /explore/colours /stories /discover].freeze
 
-  # The visible text of the page, without the parts that may count: the visitor's own saved bar and selections
+  # The visible text of the page, without the parts that may count (the visitor's own saved bar and selections) and without
+  # record cards, whose titles are the records' own ("Unused certificates (3)")
   def visible_text
     page = Nokogiri::HTML(response.body)
-    page.css("script, style, template, .saved-bar, .selection-stepper, [hidden]").each(&:remove)
+    page.css("script, style, template, .saved-bar, .selection-stepper, [hidden], [data-document-id], .object-card").each(&:remove)
     page.at("body")&.text.to_s.squish
   end
 

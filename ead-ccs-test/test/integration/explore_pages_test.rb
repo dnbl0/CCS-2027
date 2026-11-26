@@ -63,7 +63,7 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     assert_select ".explore-map__credit a[href='https://www.openstreetmap.org/copyright']"
     assert_select "h3 a[href*='f%5Bplace_hierarchy_ssim%5D%5B%5D=Oceania']", "Oceania"
     assert_select "a.browse__link[href*='Oceania%7CAustralia']", text: "Australia"
-    assert_select "details summary", "Places in Australia (1)"
+    assert_select "details summary", "Places in Australia" # no count
     assert_select "details a[href*='Oceania%7CAustralia%7CVictoria%7CMelbourne']", text: /Melbourne/
     assert_no_match(/tile\.openstreetmap\.org[^"]*"\s*(src|href)=/, response.body)
     assert_select "link[href*='leaflet']"

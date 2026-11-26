@@ -40,7 +40,7 @@
                   <% end %>
                   <% if country.children.any? %>
                     <details class="explore-places__places">
-                      <summary><%= t("explore_pages.places.places_in", country: country.label) %> (<%= country.children.size %>)</summary>
+                      <summary><%= t("explore_pages.places.places_in", country: country.label) %></summary>
                       <%= render "explore/entries", entries: country.children %>
                     </details>
                   <% end %>
