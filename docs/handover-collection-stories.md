@@ -63,11 +63,34 @@ The site owner (Dean) is not technical: give plain-language results, pick the re
 Melbourne", "University of Melbourne, Faculty of Engineering"), plus 17 parent/child parts that are not themselves about the
 University (flagged `fetchedAsPartOf`).
 
-**The catch:** these are Museums Victoria's objects, not records in Collections Navigator, so there is no accession number to
+**The catch (resolved, see "Museums Victoria records" below):** these are Museums Victoria's objects, not records in Collections Navigator, so there is no accession number to
 match them to our record pages the way Grainger stories are matched. Options to put to Dean: (a) a separate "From Museums
 Victoria" list on the relevant collection or Discover page, (b) match by named object where the University holds a related
 record (for example CSIRAC or MUDPAC material, if any is in our index), or (c) keep the data for curators only. Check the
 Museums Victoria API terms and each article's `licence` before showing their text or images.
+
+## Museums Victoria records (26 Nov, Copilot session)
+
+PR #93 (`design/museums-victoria-records`, base `design/collection-stories`; retarget to `main` once #91 merges).
+
+- **Decision (Dean):** blend the records into the site, no separate section; licences cleared with Museums Victoria; all 20
+  parent/child parts (the handover said 17; the data has 20); filed under "Engineering and Information Technology Collection".
+  13 of the 20 parts (Immigration Museum "Love" exhibition, Sigalas family, John Gould) are not CSIRAC/Engineering; Dean knows.
+- **What was added:** 46 rows in `ead-ccs-test/data/harvested.csv` (source "Museums Victoria Collections"): 19 objects linked to
+  the 7 CSIRAC/Engineering stories (1338, 1340, 1348, 1663, 2408, 2511, 3145), and 27 stories (those 7 + the 20 parts). The
+  existing `HarvestedSource` indexes them (ids `harvested-items_N`, `harvested-articles_N`), so no Ruby changed.
+- **How:** `python3 scripts/museums-victoria/build_harvested_rows.py --stories <unimelb_related_stories.json> [--items-cache f.json]`.
+  Story text comes from the fetcher's JSON (copy on Dean's Desktop, `CCS stories screenshots/Museums Victoria stories/`; not
+  committed). Only the objects hit the API (batched). Re-running replaces these rows by id. The CSV uses CRLF; keep it, or the
+  diff shows every row changed.
+- **Rate limit:** a second full fetcher run the same day got Cloudflare 429 (error 1015, Retry-After about 3500 s). The script
+  stops on 429. Do not retry around it or run the full fetcher again; reuse the JSON.
+- **Not done:** the rows are **not indexed**. Solr was down locally. Run `bin/rails collections:index_harvested` against a
+  running core (`docs/solr-dev.md`), then check the records on `/catalog`. Only `bin/rails test test/indexers` ran (63 passed);
+  `bin/ci` was not run. No new test (existing `HarvestedSourceTest` covers the mapping).
+- **Cloud run:** Dean asked for `/delegate`. That is a CLI command only he can type; not started. Suggested:
+  `/delegate --base design/collection-stories ensure bin/rails collections:index_harvested runs against Solr for PR #93`.
+  The cloud agent must not use Azure or secrets, so it needs its own Solr.
 
 ## Rules that bit during this work
 
