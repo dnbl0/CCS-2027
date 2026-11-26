@@ -33,11 +33,12 @@ class DiscoveryPagesSystemTest < ApplicationSystemTestCase
     end
   end
 
-  test "a category card's count stays visible on a phone" do
+  test "a category card's name stays visible on a phone, with no count" do
     page.current_window.resize_to(320, 700)
     visit "/browse/categories/regions"
 
-    assert_selector "article.explore-card h3", text: /\(\d{3}\)\z/, count: 12
+    assert_selector "article.explore-card h3", text: /\ARegions example/, count: 12
+    assert_no_selector "article.explore-card h3", text: /\(\d/
     assert_not page.evaluate_script("document.documentElement.scrollWidth > window.innerWidth")
   end
 end
