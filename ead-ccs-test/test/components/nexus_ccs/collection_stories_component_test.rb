@@ -2,8 +2,9 @@
 
 require "test_helper"
 
-# "Stories from the collection" on a record page: the record cards' look (object-cards), one card per story, each a link to the
-# story on the collection's own site. Drawn only when the record has a story; never a count.
+# "Stories from the collection" on a record page, after the National Gallery of Art's article listings: one story is a wide row
+# (source, kicker, headline, summary, picture); two or more are a card grid (picture, kicker, headline, summary). Each story is a
+# link to the article on the collection's own site. Drawn only when the record has a story; never a count.
 class CollectionStoriesComponentTest < ViewComponent::TestCase
   def story(title: "Hardanger fiddle", image_url: "https://museum.example/i.jpg")
     CollectionStories::Story.new(title: title, url: "https://museum.example/#{title.parameterize}", image_url: image_url,
@@ -11,64 +12,82 @@ class CollectionStoriesComponentTest < ViewComponent::TestCase
                                  accession_numbers: [ "00.0099" ])
   end
 
-  test "a section named by its h2, with each story an h3 card in a list" do
+  def record(**fields) = SolrDocument.new({ "id" => "emu-1", "thumbnail_path_ssi" => "/media/emu-1.jpg" }.merge(fields))
+
+  test "a section named by its h2; each story an h3 headline that links to the article, in the same tab" do
     render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story, story(title: "Pin") ])
 
-    assert_selector "section#collection-stories.object-cards[aria-labelledby=collection-stories-heading]"
+    assert_selector "section#collection-stories[aria-labelledby=collection-stories-heading]"
     assert_selector "h2#collection-stories-heading", exact_text: "Stories from the collection"
-    assert_selector "ul.object-cards__list > li > article.object-card", count: 2
-    assert_selector "article h3.object-card__title a.object-card__link[href='https://museum.example/hardanger-fiddle']",
-                    exact_text: "Hardanger fiddle"
+    assert_selector "article.story h3.story__title a.story__link[href='https://museum.example/hardanger-fiddle']", exact_text: "Hardanger fiddle"
     assert_no_selector "a[target]"
   end
 
-  # The picture repeats what the title beside it already says (and many story titles are "From the Collection June 2017"), so it
-  # is decorative to a screen reader, as on the record cards: alt="" rather than the title read twice
-  test "the card: the image whole and lazy, with empty alt (the title beside it names it); a short summary; the site it is from" do
+  test "one story is a wide row: the source, the Article kicker, the headline, the summary and the picture" do
     render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ])
 
-    assert_selector ".object-card__media img.object-card__image[src='https://museum.example/i.jpg'][alt=''][loading=lazy][decoding=async]"
-    assert_selector "p.object-card__summary", exact_text: "A Norwegian folk fiddle."
-    assert_selector "p.object-card__meta", exact_text: "Grainger Museum"
+    assert_selector "article.story.story--feature", count: 1
+    assert_no_selector "ul"
+    assert_selector ".story--feature .story__source", exact_text: "Grainger Museum"
+    assert_selector ".story--feature .story__kicker", exact_text: "Article"
+    assert_selector ".story--feature p.story__summary", exact_text: "A Norwegian folk fiddle."
+    assert_selector ".story--feature .story__media img.story__image[src='https://museum.example/i.jpg']"
   end
 
-  test "the title comes first in the reading order, before the image" do
+  test "two stories are a two-column grid, three or more a three-column grid: a list of cards" do
+    render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story, story(title: "Pin") ])
+    assert_selector "ul.story-grid.story-grid--2 > li > article.story.story--card", count: 2
+
+    render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story, story(title: "Pin"), story(title: "Baton"), story(title: "Card") ])
+    assert_selector "ul.story-grid.story-grid--3 > li > article.story.story--card", count: 4
+    assert_selector ".story--card .story__kicker", text: "Article"
+    assert_selector ".story--card p.story__summary", count: 4
+  end
+
+  # The headline beside it names the story, so the picture is decorative to a screen reader: alt="" rather than the title read twice
+  test "the picture is whole, lazy and decorative, and the headline comes before it in the reading order" do
     render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ])
 
-    assert_operator page.native.to_html.index("object-card__title"), :<, page.native.to_html.index("object-card__image")
+    assert_selector "img.story__image[alt=''][loading=lazy][decoding=async]"
+    html = page.native.to_html
+    assert_operator html.index("story__title"), :<, html.index("story__image")
   end
 
-  test "a story with no image is a text card" do
+  test "a story without its own picture shows the record's picture of the object" do
+    render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story(image_url: nil) ], document: record)
+
+    assert_selector "img.story__image[src$='/media/emu-1.jpg']"
+  end
+
+  test "when the story's picture will not load, the record's picture is tried, then the card becomes text (no broken image)" do
+    render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ], document: record)
+
+    assert_selector "article.story[data-controller='story-image'][data-story-image-fallback-value$='/media/emu-1.jpg']"
+    assert_selector "[data-story-image-target='media'] img[data-story-image-target='image'][data-action='error->story-image#fail']"
+  end
+
+  test "no picture at all is a text story" do
     render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story(image_url: nil) ])
 
-    assert_selector "article.object-card.object-card--text"
+    assert_selector "article.story.story--text"
     assert_no_selector "img"
   end
 
-  test "a record the visitor may not view, or a sensitive one, gets text cards: no picture of the object" do
-    withheld = SolrDocument.new("id" => "emu-1", "access_condition_ssi" => "Community Restricted")
-    render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ], document: withheld)
-    assert_selector "article.object-card--text"
-    assert_no_selector "img"
-
-    sensitive = SolrDocument.new("id" => "emu-2", "restrictions_tsi" => "Culturally sensitive images")
-    render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ], document: sensitive)
-    assert_selector "article.object-card--text"
-    assert_no_selector "img"
-  end
-
-  test "a picture the collection's site will not serve turns the card into a text card, not a broken image" do
-    render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ])
-
-    assert_selector "article.object-card[data-controller='story-image']"
-    assert_selector "[data-story-image-target='media'] img[data-story-image-target='image'][data-action='error->story-image#fail']"
+  test "a record the visitor may not view, or a sensitive one, gets text stories: no picture of the object at all" do
+    [ record("access_condition_ssi" => "Community Restricted"), record("restrictions_tsi" => "Culturally sensitive images") ].each do |hidden|
+      render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ], document: hidden)
+      assert_selector "article.story--text"
+      assert_no_selector "img"
+      assert_no_selector "[data-story-image-fallback-value]"
+    end
   end
 
   test "the wording comes from the locale file" do
     render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ])
 
     assert_selector "h2", exact_text: I18n.t("nexus_ccs.collection_stories.heading")
-    assert_selector "p.object-cards__description", exact_text: I18n.t("nexus_ccs.collection_stories.description")
+    assert_selector "p.collection-stories__description", exact_text: I18n.t("nexus_ccs.collection_stories.description")
+    assert_selector ".story__kicker", exact_text: I18n.t("nexus_ccs.collection_stories.kicker")
   end
 
   test "no stories, no section; and no count anywhere" do

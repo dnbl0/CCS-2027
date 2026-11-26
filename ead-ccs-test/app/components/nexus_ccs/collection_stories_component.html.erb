@@ -1,31 +1,19 @@
-<%# "Stories from the collection": the record page's own section look (more-like-this) with the record cards (object-cards).
-    In each card the title comes first in the reading order; the picture is drawn above it (collection_stories.css). %>
+<%# "Stories from the collection", after the National Gallery of Art's article listings: one story is a wide row, two or more a card
+    grid. In each story the headline comes first in the reading order; the picture is placed by collection_stories.css. %>
 <div class="more-like-this collection-stories">
   <div class="more-like-this__inner">
-    <section id="collection-stories" class="object-cards" aria-labelledby="collection-stories-heading">
+    <section id="collection-stories" aria-labelledby="collection-stories-heading">
       <h2 id="collection-stories-heading" class="more-like-this__heading"><%= t("nexus_ccs.collection_stories.heading") %></h2>
-      <p class="object-cards__description"><%= t("nexus_ccs.collection_stories.description") %></p>
-      <ul class="object-cards__list">
-        <% stories.each do |story| %>
-          <li class="object-cards__item">
-            <article class="<%= card_classes(story) %>" data-controller="story-image">
-              <div class="object-card__body">
-                <h3 class="object-card__title"><%= link_to story.title, story.url, class: "object-card__link" %></h3>
-                <% if story.summary.present? %><p class="object-card__summary"><%= story.summary %></p><% end %>
-                <% if story.site.present? %><p class="object-card__meta"><%= story.site %></p><% end %>
-              </div>
-              <% if (src = image_url(story)) %>
-                <div class="object-card__media" data-story-image-target="media">
-                  <%# The title beside it names the story, so the picture adds nothing for a screen reader. A picture the
-                      collection's site will not serve turns the card into a text card (story_image_controller.js). %>
-                  <%= image_tag src, alt: "", class: "object-card__image", loading: "lazy", decoding: "async",
-                                     data: { story_image_target: "image", action: "error->story-image#fail" } %>
-                </div>
-              <% end %>
-            </article>
-          </li>
-        <% end %>
-      </ul>
+      <p class="collection-stories__description"><%= t("nexus_ccs.collection_stories.description") %></p>
+      <% if feature? %>
+        <%= render NexusCcs::CollectionStoryComponent.new(story: stories.first, variant: "feature", stories: self) %>
+      <% else %>
+        <ul class="story-grid story-grid--<%= columns %>">
+          <% stories.each do |story| %>
+            <li class="story-grid__item"><%= render NexusCcs::CollectionStoryComponent.new(story: story, variant: "card", stories: self) %></li>
+          <% end %>
+        </ul>
+      <% end %>
     </section>
   </div>
 </div>

@@ -19,9 +19,9 @@ class RecordCollectionStoriesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "section#collection-stories[aria-labelledby=collection-stories-heading]" do
       assert_select "h2#collection-stories-heading", text: I18n.t("nexus_ccs.collection_stories.heading")
-      assert_select "h3.object-card__title a.object-card__link[href^='https://grainger.unimelb.edu.au/']", text: "Bridgeport Presentation Baton"
-      assert_select ".object-card__meta", text: "Grainger Museum"
-      assert_select "img.object-card__image[loading=lazy]"
+      assert_select "article.story--feature h3.story__title a.story__link[href^='https://grainger.unimelb.edu.au/']", text: "Bridgeport Presentation Baton"
+      assert_select ".story__source", text: "Grainger Museum"
+      assert_select "img.story__image[loading=lazy]"
     end
     section = css_select("#collection-stories").first.text
     assert_no_match(/\d/, section, "no number of stories or records in the section")

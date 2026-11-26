@@ -6,3 +6,5 @@ en:
       heading: "Stories from the collection"
       # PLACEHOLDER WORDING, NOT YET APPROVED
       description: "Articles about this object from the University's collection websites."
+      # The small label above each headline, as "Article" on the National Gallery of Art's listings
+      kicker: "Article"

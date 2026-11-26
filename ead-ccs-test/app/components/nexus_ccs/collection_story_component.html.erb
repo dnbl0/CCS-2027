@@ -1,0 +1,17 @@
+<%# One story: the headline first in the reading order, then the summary; the source and the picture are placed by
+    collection_stories.css (the source to the left of a wide row, the picture to its right or above a card). %>
+<%= tag.article class: classes, data: { controller: "story-image", story_image_fallback_value: fallback_url }.compact do %>
+  <div class="story__body">
+    <p class="story__kicker"><%= t("nexus_ccs.collection_stories.kicker") %><% if !feature? && story.site.present? %><span class="story__kicker-source"> · <%= story.site %></span><% end %></p>
+    <h3 class="story__title"><%= link_to story.title, story.url, class: "story__link" %></h3>
+    <% if story.summary.present? %><p class="story__summary"><%= story.summary %></p><% end %>
+  </div>
+  <% if feature? && story.site.present? %><p class="story__source"><%= story.site %></p><% end %>
+  <% if image_url %>
+    <div class="story__media" data-story-image-target="media">
+      <%# The headline names the story, so the picture adds nothing for a screen reader %>
+      <%= image_tag image_url, alt: "", class: "story__image", loading: "lazy", decoding: "async",
+                               data: { story_image_target: "image", action: "error->story-image#fail" } %>
+    </div>
+  <% end %>
+<% end %>

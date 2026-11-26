@@ -1,27 +1,174 @@
-/* "Stories from the collection" on the record page (NexusCcs::CollectionStoriesComponent): the record cards (object_cards.css) in
-   the record page's section (more-like-this). Only what differs from a record card is here. */
+/* "Stories from the collection" on the record page (NexusCcs::CollectionStoriesComponent, CollectionStoryComponent), after the
+   National Gallery of Art's article listings (nga.gov/stories/articles): one story is a wide row between two rules, two or more a
+   card grid. Each story is one link (the headline's, stretched over it). Pictures are shown whole, never cropped. */
 
-/* The title comes first in the markup, so a screen reader meets the story's name before anything else; the picture is drawn above it,
-   as on every other card. The picture is not a link or a control, so focus order and reading order still agree. */
-.collection-stories .object-card__media {
-  order: -1;
-}
-
-.collection-stories .object-cards__list {
-  margin-top: var(--ccs-space-5);
-}
-
-/* A short summary in body text, between the title and the site's name */
-.object-card__summary {
-  margin: 0;
+.collection-stories__description {
+  margin: var(--ccs-space-2) 0 0;
   font-size: var(--ccs-font-size-md);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-secondary);
+}
+
+/* --- One story --- */
+
+.story {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-4);
+}
+
+.story:has(.story__link:focus-visible) {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 4px;
+}
+
+.story__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-3);
+  min-width: 0;
+}
+
+/* The small uppercase label above the headline ("Article", and on a card the site it is from) */
+.story__kicker,
+.story__source {
+  margin: 0;
+  font-size: var(--ccs-font-size-sm);
+  font-weight: var(--ccs-font-weight-bold);
+  line-height: var(--ccs-line-height-normal);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ccs-text-primary);
+}
+
+.story__title {
+  margin: 0;
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-2xl);
+  font-weight: var(--ccs-font-weight-regular);
+  line-height: var(--ccs-line-height-tight);
+  overflow-wrap: anywhere;
+}
+
+.story__link {
+  color: var(--ccs-text-brand);
+  text-decoration: none;
+}
+
+/* The headline's box covers the story, so there is one target and no nested link */
+.story__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.story:hover .story__link,
+.story__link:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.story__link:focus-visible {
+  outline: none; /* the story draws the focus ring */
+}
+
+.story__summary {
+  margin: 0;
+  font-size: var(--ccs-font-size-lg);
   line-height: var(--ccs-line-height-normal);
   color: var(--ccs-text-primary);
   overflow-wrap: anywhere;
 }
 
-/* The site's name sits at the foot of the card, however long the summary above it */
-.collection-stories .object-card__meta {
-  margin-top: auto;
-  padding-top: var(--ccs-space-2);
+/* The picture: a 3:2 frame on a quiet ground, the picture whole inside it. Drawn above the text, though it follows it in the markup
+   (the headline is read first). */
+.story__media {
+  order: -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: var(--ccs-surface-subtle);
+}
+
+.story__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* --- One story: the wide row --- */
+
+.story--feature {
+  margin-top: var(--ccs-space-6);
+  padding-block: var(--ccs-space-6);
+  border-block: 1px solid var(--ccs-border-default);
+}
+
+.story--feature .story__title {
+  font-size: var(--ccs-font-size-3xl);
+}
+
+.story--feature .story__source {
+  order: -2; /* above the picture and the text on a phone */
+}
+
+/* Source | kicker, headline, summary | picture, as the National Gallery's listing row */
+@media (min-width: 768px) {
+  .story--feature {
+    display: grid;
+    grid-template-columns: minmax(8rem, 1fr) 3fr 2fr;
+    grid-template-areas: "source body media";
+    gap: var(--ccs-space-6);
+    align-items: start;
+  }
+
+  .story--feature .story__source { grid-area: source; }
+  .story--feature .story__body { grid-area: body; }
+  .story--feature .story__media { grid-area: media; }
+
+  /* With no picture, the text takes its place */
+  .story--feature.story--text {
+    grid-template-columns: minmax(8rem, 1fr) 5fr;
+    grid-template-areas: "source body";
+  }
+}
+
+/* --- Two or more stories: the card grid --- */
+
+.story-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ccs-space-7) var(--ccs-space-6);
+  margin: var(--ccs-space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 600px) {
+  .story-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .story-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.story-grid__item {
+  display: flex;
+}
+
+.story--card {
+  flex: 1;
+}
+
+.story--card .story__kicker-source {
+  color: var(--ccs-text-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story__link { transition: none; }
 }
