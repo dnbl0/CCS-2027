@@ -1,8 +1,8 @@
 name: Push images to Azure Container Registry
 
 # Builds the Rails and Solr images and pushes them to the registry (tagged with the commit SHA and :latest) using
-# the ACR_USERNAME and ACR_PASSWORD repository secrets (no Azure sign-in needed). Runs automatically on every
-# push to main that touches ead-ccs-test, and can also be run manually from the Actions tab.
+# the ACR_USERNAME and ACR_PASSWORD repository secrets (no Azure sign-in needed). Runs only when started by
+# hand from the Actions tab: hosting is undecided, and running it on every merge failed and cost Actions minutes.
 #
 # It only pushes images -- it does not roll them out. Azure Container Apps keeps running whatever image it was
 # last told to use, even after a newer one lands in the registry (and :latest alone does not trigger a new
@@ -12,9 +12,6 @@ name: Push images to Azure Container Registry
 # (only needed for ccs-solr if solr/ or the Solr half of the Dockerfile changed). The commit's SHA is the tag this
 # workflow just pushed, shown in its own log and in the Actions run's URL.
 on:
-  push:
-    branches: [main]
-    paths: ["ead-ccs-test/**"]
   workflow_dispatch:
     inputs:
       registry:

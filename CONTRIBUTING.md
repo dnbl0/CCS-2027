@@ -13,13 +13,10 @@ the usual changes. Running the app on your computer is in [ead-ccs-test/docs/run
 - Keep a pull request small enough to review in one sitting. Move code or reformat in its own commit, apart from a behaviour change.
 - No secrets in files, messages or pull requests. Production values are Azure secrets.
 
-### The auto-merge trap
+### No automatic merges
 
-`.github/workflows/auto-merge.yml` runs on a push to any branch named `feature/**`, `bugfix/**` or `enhance/**` that changes a
-`.md`, `.css`, `.js` or `.html` file outside `ead-ccs-test/`, and then, for 3 or more commits or 2 or more changed files, **opens a
-pull request and squash-merges it into `main` straight away, without waiting for the Rails checks.** A documentation change that
-rides along with a Rails change on such a branch is enough. To avoid it, use another prefix (`fix/`, `docs/`, `nfr/`, `chore/`)
-unless you want that behaviour. Check the branch name before the first push; a merge cannot be taken back by renaming the branch.
+No workflow merges a pull request: `auto-merge.yml`, which used to squash-merge `feature/**`, `bugfix/**` and `enhance/**`
+branches without the Rails checks, was removed on 27 Nov 2026. Every change goes through a pull request and its checks.
 
 ## Before you push
 

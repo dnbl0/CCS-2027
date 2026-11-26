@@ -5,7 +5,7 @@ The product is the Rails/Blacklight app in `ead-ccs-test/`, searching the Univer
 1. [ead-ccs-test/docs/running-the-app.md](ead-ccs-test/docs/running-the-app.md): run it on your computer (Ruby, PostgreSQL, Solr).
 2. [docs/architecture.md](docs/architecture.md): how it fits together, and [CONTEXT.md](CONTEXT.md) for the words it uses.
 3. [docs/how-to-change.md](docs/how-to-change.md): the usual changes, step by step.
-4. [CONTRIBUTING.md](CONTRIBUTING.md): branches, tests, `bin/ci`, and the auto-merge trap.
+4. [CONTRIBUTING.md](CONTRIBUTING.md): branches, tests and `bin/ci`.
 5. [docs/configuration.md](docs/configuration.md) (every environment variable), [docs/adr](docs/adr/) (decisions) and [docs/maintainability.md](docs/maintainability.md) (the state of the code, and the backlog).
 
 The rest of this file describes the static front-end prototype kept in `public/`, a static prototype for searching and browsing the University of Melbourne's cultural collections (Grainger Museum, Medical History Museum, University Art Collection, Harry Brookes Allen Museum, Henry Forman Atkinson Dental Museum, and a few smaller collections).
@@ -82,7 +82,7 @@ src/scss/custom-bootstrap.scss   Bootstrap 5.3.3 theme source (see Styling)
 tests/                      Plain-Node test scripts (see Develop, test and deploy)
 config/redirects.json      Documentation-only list of legacy redirects (nothing reads it at runtime; config/hosting.json and .htaccess are authoritative)
 assets/                     Source material for content: spreadsheets, CSVs, help/landing-page copy (.docx), original images. Not deployed (scripts/build-pages.js copies public/ only)
-.github/workflows/          ci.yml, rails-ci.yml, auto-merge.yml, pages.yml (deploy to GitHub Pages), azure-deploy.yml, acr-push.yml
+.github/workflows/          ci.yml, rails-ci.yml, pages.yml (deploy to GitHub Pages), azure-deploy.yml, acr-push.yml
 .agents/rules/              PR workflow rule for coding agents
 verify-bootstrap.sh         Checks Bootstrap references in pages (run by npm test)
 config/hosting.json          Clean URLs + legacy redirects; read by scripts/dev-server.js and scripts/build-pages.js
@@ -253,7 +253,6 @@ Clean URLs (`/search/search-results`, `/collections/record`) only resolve on a h
 ### CI and merge workflow
 
 - `.github/workflows/ci.yml`: the checks for the static prototype in `public/` (Node 20, `npm ci` or `npm install`, Chromium for the browser tests, then `npm test`). It runs only when the prototype's own files change.
-- `.github/workflows/auto-merge.yml`: pushes to `feature/**`, `bugfix/**` or `enhance/**` that change html/css/js/md files and have 3+ commits or 2+ changed files open (or reuse) a PR against `main`, run basic documentation/structure checks, approve it, and squash-merge it. It does not run `npm test` itself. Auto-approval only works if the repository setting **Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests"** is enabled; otherwise the approve step logs a warning and the job continues to the merge step. See `github.md` and `.agents/rules/pr-workflow.md`.
 - `.github/workflows/rails-ci.yml`: Rails tests, system tests and rubocop. `rails` and `system` must pass before a pull request is merged.
 
 ### Hosting
