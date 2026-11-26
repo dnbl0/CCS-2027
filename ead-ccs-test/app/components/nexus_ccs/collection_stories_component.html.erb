@@ -1,0 +1,29 @@
+<%# "Stories from the collection": the record page's own section look (more-like-this) with the record cards (object-cards).
+    In each card the title comes first in the reading order; the picture is drawn above it (collection_stories.css). %>
+<div class="more-like-this collection-stories">
+  <div class="more-like-this__inner">
+    <section id="collection-stories" class="object-cards" aria-labelledby="collection-stories-heading">
+      <h2 id="collection-stories-heading" class="more-like-this__heading"><%= t("nexus_ccs.collection_stories.heading") %></h2>
+      <p class="object-cards__description"><%= t("nexus_ccs.collection_stories.description") %></p>
+      <ul class="object-cards__list">
+        <% stories.each do |story| %>
+          <li class="object-cards__item">
+            <article class="<%= card_classes(story) %>">
+              <div class="object-card__body">
+                <h3 class="object-card__title"><%= link_to story.title, story.url, class: "object-card__link" %></h3>
+                <% if story.summary.present? %><p class="object-card__summary"><%= story.summary %></p><% end %>
+                <% if story.site.present? %><p class="object-card__meta"><%= story.site %></p><% end %>
+              </div>
+              <% if (src = image_url(story)) %>
+                <div class="object-card__media">
+                  <%# The title beside it names the story, so the picture adds nothing for a screen reader %>
+                  <%= image_tag src, alt: "", class: "object-card__image", loading: "lazy", decoding: "async" %>
+                </div>
+              <% end %>
+            </article>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  </div>
+</div>

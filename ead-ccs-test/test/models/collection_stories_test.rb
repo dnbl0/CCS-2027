@@ -47,11 +47,27 @@ class CollectionStoriesTest < ActiveSupport::TestCase
     assert_equal 1, stories(two).for(doc("00.0100")).size
   end
 
-  test "the committed data file links the Hardanger fiddle story to its record" do
-    found = CollectionStories.default.for(doc("00.0099", "Grainger Museum Collection"))
+  test "the committed data file links the Bridgeport baton story to both of its batons, and only in their collection" do
+    %w[00.0039 00.0021].each do |accession|
+      found = CollectionStories.default.for(doc(accession, "Grainger Museum Collection"))
 
-    assert_equal [ "Hardanger fiddle" ], found.map(&:title)
-    assert_equal "Grainger Museum", found.first.site
+      assert_equal [ "Bridgeport Presentation Baton" ], found.map(&:title), accession
+      assert_equal "Grainger Museum", found.first.site
+    end
+    assert_empty CollectionStories.default.for(doc("00.0039", "University Art Collection"))
+  end
+
+  test "the committed data file: nothing on the curator list or held by a reviewer is in the stories the site reads" do
+    data = YAML.safe_load_file(CollectionStories::PATH)
+    shown = Array(data["stories"]).map { |story| story["url"] }
+    held = CollectionStories::Source.load.flat_map { |source| source.hold.keys }
+
+    assert_empty shown & Array(data["unmatched"]).map { |story| story["url"] }
+    assert_empty shown & held
+    Array(data["stories"]).each do |story|
+      assert CollectionStories::Story.from(story), "#{story['title']} is not a usable story (https address, title, collection)"
+      assert_predicate story["accession_numbers"], :present?, story["title"]
+    end
   end
 
   test "an unreadable file gives no stories and never breaks a page" do

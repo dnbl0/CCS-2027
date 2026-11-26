@@ -92,6 +92,7 @@ A switch is **on** only for the word `on` (any case); anything else, or unset, t
 | `FORCE` | unset | same | `FORCE=1 bin/rails collections:index` reindexes a core that already has records |
 | `CSV` | none (required) | `lib/tasks/debias.rake` | `bin/rails debias:import CSV=terms.csv` checks the collections team's term spreadsheet and writes the de-bias term list |
 | `OUT` | `config/debias_terms.yml` | same | Where `debias:import` writes the list, to try an import without replacing the real list |
+| `OUT` | `config/collection_stories.yml` | `lib/tasks/collection_stories.rake` | Where `stories:harvest` writes the harvested stories, to compare a harvest before replacing the reviewed file ([collection-stories.md](../ead-ccs-test/docs/collection-stories.md)) |
 | `SOURCE_DIR` | `../public/assets/images/collections` | `lib/tasks/digital_assets.rake` | Where `digital_assets:*` reads source images |
 | `CI` | unset | `config/environments/test.rb` | When set, tests eager-load the app, as GitHub CI does. `bin/ci` sets it |
 | `PARALLEL_WORKERS` | CPU count | Rails test runner | `1` runs tests in one process; always use it for system tests |

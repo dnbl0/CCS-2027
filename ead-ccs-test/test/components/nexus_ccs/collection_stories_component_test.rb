@@ -22,10 +22,12 @@ class CollectionStoriesComponentTest < ViewComponent::TestCase
     assert_no_selector "a[target]"
   end
 
-  test "the card: the image whole and lazy, its alt the story title; a short summary; the site it is from" do
+  # The picture repeats what the title beside it already says (and many story titles are "From the Collection June 2017"), so it
+  # is decorative to a screen reader, as on the record cards: alt="" rather than the title read twice
+  test "the card: the image whole and lazy, with empty alt (the title beside it names it); a short summary; the site it is from" do
     render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ])
 
-    assert_selector "img.object-card__image[src='https://museum.example/i.jpg'][alt='Hardanger fiddle'][loading=lazy][decoding=async]"
+    assert_selector ".object-card__media img.object-card__image[src='https://museum.example/i.jpg'][alt=''][loading=lazy][decoding=async]"
     assert_selector "p.object-card__summary", exact_text: "A Norwegian folk fiddle."
     assert_selector "p.object-card__meta", exact_text: "Grainger Museum"
   end
@@ -43,11 +45,30 @@ class CollectionStoriesComponentTest < ViewComponent::TestCase
     assert_no_selector "img"
   end
 
+  test "a record the visitor may not view, or a sensitive one, gets text cards: no picture of the object" do
+    withheld = SolrDocument.new("id" => "emu-1", "access_condition_ssi" => "Community Restricted")
+    render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ], document: withheld)
+    assert_selector "article.object-card--text"
+    assert_no_selector "img"
+
+    sensitive = SolrDocument.new("id" => "emu-2", "restrictions_tsi" => "Culturally sensitive images")
+    render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ], document: sensitive)
+    assert_selector "article.object-card--text"
+    assert_no_selector "img"
+  end
+
+  test "the wording comes from the locale file" do
+    render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ])
+
+    assert_selector "h2", exact_text: I18n.t("nexus_ccs.collection_stories.heading")
+    assert_selector "p.object-cards__description", exact_text: I18n.t("nexus_ccs.collection_stories.description")
+  end
+
   test "no stories, no section; and no count anywhere" do
     render_inline NexusCcs::CollectionStoriesComponent.new(stories: [])
     assert_no_selector "section"
 
     render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story, story(title: "Pin") ])
-    assert_no_text(/\d+ stor/i)
+    assert_no_text(/\d/) # nothing in the section is a number: no "2 stories", no record count
   end
 end

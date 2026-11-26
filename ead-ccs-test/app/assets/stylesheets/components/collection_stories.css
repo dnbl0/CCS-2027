@@ -1,0 +1,27 @@
+/* "Stories from the collection" on the record page (NexusCcs::CollectionStoriesComponent): the record cards (object_cards.css) in
+   the record page's section (more-like-this). Only what differs from a record card is here. */
+
+/* The title comes first in the markup, so a screen reader meets the story's name before anything else; the picture is drawn above it,
+   as on every other card. The picture is not a link or a control, so focus order and reading order still agree. */
+.collection-stories .object-card__media {
+  order: -1;
+}
+
+.collection-stories .object-cards__list {
+  margin-top: var(--ccs-space-5);
+}
+
+/* A short summary in body text, between the title and the site's name */
+.object-card__summary {
+  margin: 0;
+  font-size: var(--ccs-font-size-md);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* The site's name sits at the foot of the card, however long the summary above it */
+.collection-stories .object-card__meta {
+  margin-top: auto;
+  padding-top: var(--ccs-space-2);
+}

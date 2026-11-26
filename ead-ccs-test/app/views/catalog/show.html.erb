@@ -14,6 +14,10 @@
   <% end %>
 <% end %>
 
+<%# Stories from the collection (docs/collection-stories.md): read from the reviewed data file only, drawn only when a story's accession
+    number and collection match this record's %>
+<%= render NexusCcs::CollectionStoriesComponent.new(stories: CollectionStories.default.for(@document), document: @document) %>
+
 <%# FILM COPY: one section, "Similar objects", in place of More like this; it fills a lazy frame and is not drawn when nothing is found %>
 <%= render NexusCcs::SimilarRecordsComponent.new(document: @document) %>
 <%= render "catalog/looks_similar", document: @document %>
