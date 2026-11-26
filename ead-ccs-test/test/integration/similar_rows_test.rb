@@ -36,9 +36,14 @@ class SimilarRowsIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test "each row has its label" do
-    { "period" => "From the same period", "place" => "From the same place", "type" => "More of this type" }.each do |row, heading|
+    solr { get "/catalog/emu-source/similar", params: { row: "place" } }
+    assert_select "h2#similar-place-heading", text: "From the same place"
+  end
+
+  test "the removed rows (From the same period, More of this type) are not found" do
+    %w[period type].each do |row|
       solr { get "/catalog/emu-source/similar", params: { row: row } }
-      assert_select "h2#similar-#{row}-heading", text: heading
+      assert_response :not_found
     end
   end
 
@@ -55,7 +60,7 @@ class SimilarRowsIntegrationTest < ActionDispatch::IntegrationTest
 
   test "Solr failing leaves the row out" do
     with_seeded_menu_cache do
-      with_canned_search(->(_params) { raise Blacklight::Exceptions::ECONNREFUSED, "down" }) { get "/catalog/emu-source/similar", params: { row: "type" } }
+      with_canned_search(->(_params) { raise Blacklight::Exceptions::ECONNREFUSED, "down" }) { get "/catalog/emu-source/similar", params: { row: "place" } }
     end
     assert_response :no_content
   end
@@ -77,7 +82,7 @@ class SimilarRowsIntegrationTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     frames = css_select("turbo-frame.similar-frame").map { |frame| frame["id"] }
-    assert_equal %w[similar-records similar-creator similar-period similar-type], frames
+    assert_equal %w[similar-records similar-creator], frames # no place values here; no period or type rows at all
     assert_select "turbo-frame#similar-creator[loading=lazy][src='/catalog/emu-source/similar?row=creator']"
     assert_select "turbo-frame#similar-creator *", count: 0
   end

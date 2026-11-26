@@ -4,8 +4,8 @@ module NexusCcs
   # The record page's "Similar records": an empty lazy Turbo frame that fetches /catalog/:id/similar when it nears the screen
   # (SimilarController). Nothing at all for a record that may not have recommendations beside it (its asset is withheld, or it is
   # sensitive): the section is hidden, and the request is never made. The frame stays empty when the answer is "no content".
-  # After it, one lazy frame per labelled row the record can have (SimilarRows: More by this creator, From the same period, From the
-  # same place, More of this type), each loaded and hidden on its own.
+  # After it, one lazy frame per labelled row the record can have (SimilarRows: More by this creator, From the same place), each
+  # loaded and hidden on its own.
   class SimilarRecordsComponent < ViewComponent::Base
     def initialize(document:, exclude: [])
       @document = document
