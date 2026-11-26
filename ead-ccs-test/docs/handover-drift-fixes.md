@@ -42,7 +42,7 @@ places, colours have a third tab ?view=timeline|map|spectrum). The commit after 
 - **Flaky in a batch, pass alone:** browse_test "filter box … opens with Enter" and explore_pages_test "periods … a century opens its own
   page": the click to an entity page is not followed when run after other system tests (the page itself works in a browser). Look at
   Turbo prefetch between tests if it persists. Known failure still: colours "Looks similar" (local index lacks the records).
-- **Next: step 2** (one list of ways in), then 3, 4, 5 below.
+- **Next:** the full UX and drift audit is `docs/ux-drift-audit.md` (26 Nov): do its part A, then step 2 here (one list of ways in), then 3, 4, 5.
 
 ## Counts removal: what was changed (for reference)
 - `PlacesHelper`: hub_tile, facet_tile (signature now `facet_tile(label, path, picture)`, callers updated), category_tile: text nil.
