@@ -12,7 +12,7 @@
   "503" => { title: "The service is busy or unavailable", lead: "We can't reach part of the service just now. Nothing you did caused this. Please try again in a few minutes. Pages that don't need a search, such as Help and About, may still work." },
   "406" => { title: "We can't show it that way", lead: "This page isn't available in the form that was asked for. Go to the page itself, or start a new search." }
 }.fetch(@code) %>
-<% content_for :title, "#{copy[:title]} - Collections Navigator - University of Melbourne" %>
+<% content_for :title, "#{copy[:title]} — Collections Navigator — University of Melbourne" %>
 <% content_for :body_class, "page-error" %>
 
 <%= render NexusCcs::PageBannerComponent.new(title: copy[:title]) %>
