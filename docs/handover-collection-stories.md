@@ -37,7 +37,11 @@ The site owner (Dean) is not technical: give plain-language results, pick the re
 3. **Curator review**: three matches may be broader than one object (Hirschfield Mack, Ian Bonighton Archive, Melba);
    four stories are unmatched (Christmas Card, Harp Guitar, Dr Kent's Electronic Music Box; Chinese material is held).
 4. **Museums Victoria stories (new direction, 26 Nov):** Dean asked to pull stories from the Museums Victoria Collections API
-   instead. See below. **Not yet decided:** how (or whether) these stories attach to Collections Navigator records.
+   instead. See below. **Decided (26 Nov, Dean):** the CSIRAC and Engineering objects, their stories and all 20 parent/child
+   parts (the run found 20, not 17) become ordinary records in the Engineering and Information Technology Collection, not a
+   separate section; Dean has cleared the licences with Museums Victoria. Done by `scripts/museums-victoria/build_harvested_rows.py`
+   (adds rows to `ead-ccs-test/data/harvested.csv`, then `bin/rails collections:index_harvested`). The API rate-limits (Cloudflare
+   429, about an hour): the script stops rather than retrying; do not work around it.
 
 ## Museums Victoria fetcher
 
