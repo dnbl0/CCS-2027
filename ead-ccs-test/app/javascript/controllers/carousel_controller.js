@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-// A carousel of slides in a row that scrolls sideways (FeatureCarouselComponent, CardCarouselComponent): the previous and next buttons
+// A carousel of slides in a row that scrolls sideways (CardCarouselComponent): the previous and next buttons
 // move it one slide, and are marked disabled at its ends (aria-disabled, so a button the focus is on keeps it); where there is a status
 // ("1 of 4", the card carousel's), it names the slide at the row's start; the left and right arrow keys move it from inside the row.
 // Nothing moves on its own; the row also scrolls by touch, trackpad or moving the focus along it.

@@ -35,7 +35,7 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
 
   # A card's title link covers the whole card (its ::after), so the card is its target, not the line of text
   def small_targets
-    page.evaluate_script("[...document.querySelectorAll('main .home-section a, main .home-section summary')].filter(e => !e.matches('.explore-card__link, .object-card__link, .simple-listing__link, .stack__link, .cluster__link, .feature-carousel__link, .card-carousel__link') && e.getAttribute('tabindex') !== '-1' && e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().height < 44).map(e => e.textContent.trim())")
+    page.evaluate_script("[...document.querySelectorAll('main .home-section a, main .home-section summary')].filter(e => !e.matches('.explore-card__link, .object-card__link, .simple-listing__link, .stack__link, .cluster__link, .card-carousel__link') && e.getAttribute('tabindex') !== '-1' && e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().height < 44).map(e => e.textContent.trim())")
   end
 
   # No picture in the home sections is cropped: each is fitted (contain) or shown at its own shape. The University's listing of its
@@ -43,7 +43,7 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
   # Google Arts & Culture's cluster (On this day) and story carousel (Time), whose cards are filled as Google's are.
   def cropped_pictures
     page.evaluate_script(<<~JS)
-      [...document.querySelectorAll('main .home-section img:not(.simple-listing__img, .cluster__image, .feature-carousel__media img, .card-carousel__media img)')].filter(img => {
+      [...document.querySelectorAll('main .home-section img:not(.simple-listing__img, .cluster__image, .card-carousel__media img)')].filter(img => {
         if (!img.naturalWidth || !img.getBoundingClientRect().width) return false
         if (getComputedStyle(img).objectFit !== 'cover') return false
         const r = img.getBoundingClientRect()

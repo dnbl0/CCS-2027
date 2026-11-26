@@ -23,7 +23,6 @@
 @import url("components/media_viewer.css");
 @import url("components/results_layout.css");
 @import url("components/result_card.css");
-@import url("components/explore.css");
 @import url("components/explore_card.css");
 @import url("components/card_layout.css");
 @import url("components/browse.css");
@@ -77,7 +76,6 @@
 @import url("components/home_sections.css");
 @import url("components/look_closer.css");
 @import url("components/cluster.css");
-@import url("components/feature_carousel.css");
 @import url("components/card_carousel.css");
 @import url("components/image_reveal.css");
 @import url("components/stories.css");

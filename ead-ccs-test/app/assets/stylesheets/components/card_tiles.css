@@ -9,7 +9,7 @@
  * - A tile with no picture keeps its tint and dark text.
  * - The whole tile is the target (the title link's area is stretched over it); focus shows as a ring around the tile.
  *
- * Section headings are centred, with "See all" under the cards (NexusCcs::CardSectionComponent, NexusCcs::ExploreComponent).
+ * Section headings are centred, with "See all" under the cards (NexusCcs::ExploreComponent).
  */
 :root {
   --ccs-tile-scrim: rgb(0 15 70 / 0.85);

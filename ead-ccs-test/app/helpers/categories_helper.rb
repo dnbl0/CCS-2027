@@ -9,8 +9,6 @@ module CategoriesHelper
     "object-types" => [ :stack, 5, "var(--ccs-explore-tint-3)" ],
     "classifications" => [ :cluster, 4, nil ],
     "materials" => [ :bare, 4, nil ],
-    "regions" => [ :stack, 5, nil ],
-    "eras" => [ :carousel, 8, nil ],
     "collections" => [ :cluster, 4, "var(--ccs-explore-tint-2)" ],
     "named-collections" => [ :stack, 5, nil ]
   }.freeze
