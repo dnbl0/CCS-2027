@@ -106,7 +106,7 @@ module Dam
     private
 
     def find(accessions)
-      terms = accessions.map { |accession| %("#{accession.gsub(/["\\]/) { |c| "\\#{c}" }}") }.join(" OR ")
+      terms = accessions.map { |accession| SolrQuery.phrase(accession) }.join(" OR ")
       response = @solr.get("select", params: { q: "accession_number_ssim:(#{terms})", fl: "id,accession_number_ssim,collection_ssim,dam_digest_ssi,#{POLICY_FIELDS.join(',')}",
                                                rows: accessions.size * 5, wt: "json" })
       response.dig("response", "docs") || []

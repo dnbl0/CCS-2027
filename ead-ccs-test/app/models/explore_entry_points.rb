@@ -86,7 +86,7 @@ module ExploreEntryPoints
       connection.get("select", params: {
         q: "*:*", rows: 0, wt: "json", facet: true, "facet.mincount": 1, "facet.limit": FACET_LIMIT, "facet.sort": "count",
         "facet.field": [ COLLECTION_FIELD, CLASSIFICATION_FIELD, PLACE_FIELD ],
-        "facet.query": kinds.map { |_label, values| Browse.field_query(CLASSIFICATION_FIELD, values) } +
+        "facet.query": kinds.map { |_label, values| SolrQuery.field(CLASSIFICATION_FIELD, values) } +
                        periods.map { |_label, first, last| period_query(first, last) }
       })
     end
@@ -108,7 +108,7 @@ module ExploreEntryPoints
     {
       "collections" => collection_pairs(facets[COLLECTION_FIELD]),
       "kinds" => kinds.filter_map do |label, values|
-        count = queries[Browse.field_query(CLASSIFICATION_FIELD, values)].to_i
+        count = queries[SolrQuery.field(CLASSIFICATION_FIELD, values)].to_i
         [ label, count, values.select { |value| present.include?(value) } ] if count.positive?
       end,
       "places" => facets[PLACE_FIELD].to_a.each_slice(2).to_a.reject { |value, _count| config.dig("places", "skip").include?(value) }.first(config.dig("places", "limit")),
@@ -129,7 +129,7 @@ module ExploreEntryPoints
     collection_pairs.to_a.filter_map do |name, _count|
       next if text_only?(name)
 
-      image = example_image("#{COLLECTION_FIELD}:#{Browse.phrase(name)}")
+      image = example_image("#{COLLECTION_FIELD}:#{SolrQuery.phrase(name)}")
       [ name, image ] if image
     end.to_h
   rescue StandardError => e
@@ -139,8 +139,8 @@ module ExploreEntryPoints
 
   # FILM COPY: one example picture for each record type, place and period (the same rule as the collection tiles' pictures)
   def self.fetch_link_images(fetched)
-    kinds = fetched["kinds"].to_a.to_h { |label, _count, values| [ label, values.any? ? Browse.field_query(CLASSIFICATION_FIELD, values) : nil ] }
-    places = fetched["places"].to_a.to_h { |value, _count| [ value, "#{PLACE_FIELD}:#{Browse.phrase(value)}" ] }
+    kinds = fetched["kinds"].to_a.to_h { |label, _count, values| [ label, values.any? ? SolrQuery.field(CLASSIFICATION_FIELD, values) : nil ] }
+    places = fetched["places"].to_a.to_h { |value, _count| [ value, "#{PLACE_FIELD}:#{SolrQuery.phrase(value)}" ] }
     periods = periods().to_h { |label, first, last| [ label, period_query(first, last) ] }
     used = fetched.fetch("images", {}).values.map { |image| image[:id].to_s } # no picture is shown twice on the page
     { "kind_images" => kinds, "place_images" => places, "period_images" => periods }.transform_values do |filters|
@@ -160,8 +160,8 @@ module ExploreEntryPoints
   # The description of each record type, place and period (CardDescription): { "kind_intros" => { label => text }, ... }. A failure costs the
   # descriptions only.
   def self.fetch_link_intros(fetched)
-    kinds = fetched["kinds"].to_a.filter_map { |label, _count, values| [ label, { filter: Browse.field_query(CLASSIFICATION_FIELD, values), kinds: false } ] if values.any? }
-    places = fetched["places"].to_a.map { |value, _count| [ value, { filter: "#{PLACE_FIELD}:#{Browse.phrase(value)}" } ] }
+    kinds = fetched["kinds"].to_a.filter_map { |label, _count, values| [ label, { filter: SolrQuery.field(CLASSIFICATION_FIELD, values), kinds: false } ] if values.any? }
+    places = fetched["places"].to_a.map { |value, _count| [ value, { filter: "#{PLACE_FIELD}:#{SolrQuery.phrase(value)}" } ] }
     periods = periods().map { |label, first, last| [ label, { filter: period_query(first, last), earliest: first == EARLIEST_YEAR } ] }
     { "kind_intros" => kinds, "place_intros" => places, "period_intros" => periods }.transform_values do |described|
       described.to_h { |label, options| [ label, CardDescription.for(**options) ] }

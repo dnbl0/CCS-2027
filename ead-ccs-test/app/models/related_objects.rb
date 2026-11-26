@@ -26,11 +26,11 @@ module RelatedObjects
   end
 
   def self.params(document, clauses, limit)
-    required = clauses.map { |field, value, _boost| "#{field}:#{RecordSummaries.phrase(value)}" }
-    scored = clauses.map { |field, value, boost| "#{field}:#{RecordSummaries.phrase(value)}^#{boost}" }
-    scored += values(document, "collection_ssim").map { |value| "collection_ssim:#{RecordSummaries.phrase(value)}^#{NUDGE['collection_ssim']}" }
+    required = clauses.map { |field, value, _boost| "#{field}:#{SolrQuery.phrase(value)}" }
+    scored = clauses.map { |field, value, boost| "#{field}:#{SolrQuery.phrase(value)}^#{boost}" }
+    scored += values(document, "collection_ssim").map { |value| "collection_ssim:#{SolrQuery.phrase(value)}^#{NUDGE['collection_ssim']}" }
     scored << "has_digital_asset_bsi:true^#{NUDGE['has_digital_asset_bsi']}"
-    { q: scored.join(" OR "), fq: [ "-id:#{RecordSummaries.phrase(document.id)}", required.join(" OR ") ], rows: limit, sort: "score desc, id asc" }
+    { q: scored.join(" OR "), fq: [ "-id:#{SolrQuery.phrase(document.id)}", required.join(" OR ") ], rows: limit, sort: "score desc, id asc" }
   end
 
   private_class_method :values, :params
