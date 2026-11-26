@@ -15,18 +15,18 @@ class CookieNoticeComponentTest < ActiveSupport::TestCase
 
     assert_selector "section[aria-labelledby=cookie-notice-title] h2#cookie-notice-title", text: "Cookies on this site"
     assert_text "only the cookies it needs"
-    assert_text "no advertising or analytics cookies"
+    assert_text "no advertising or analytics"
     assert_selector "form[action='/cookie_notice'][method=post] button[name=choice][value=acknowledged]", count: 1
     assert_selector "button", count: 1
     assert_no_text "Decline"
     assert_selector "a[href='/privacy#cookies']"
   end
 
-  test "it is marked as placeholder wording, in the markup and in words" do
+  test "it is marked as placeholder wording in the markup, but the note is not shown to visitors (a slim bar, Dean 26 Nov 2026)" do
     render_inline(NexusCcs::CookieNoticeComponent.new)
 
     assert_selector "section[data-placeholder-wording]"
-    assert_text "Placeholder"
+    assert_no_text "Placeholder"
   end
 
   test "it is not a dialog: no role dialog, no modal, nothing focused for the visitor" do

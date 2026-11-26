@@ -9,6 +9,10 @@ en:
       essential_always: "The cookies the site needs to work are always set. They keep your search history, saved items and choices, and remember what you have read here."
       more_html: "See <a href=\"%{privacy}\">what each cookie does and how long it lasts</a>."
       placeholder: "[Placeholder wording: the University to approve this notice.]"
+      # the bar at the foot of the window (one sentence; the full wording is on /privacy#cookies)
+      bar: "This site sets only the cookies it needs to work, such as your search history and saved records: no advertising or analytics."
+      bar_with_choice: "This site sets the cookies it needs to work, and would like to set these optional ones, only if you accept:"
+      bar_link: "What each cookie does"
       ok: "OK"
       accept: "Accept optional cookies"
       decline: "Decline optional cookies"

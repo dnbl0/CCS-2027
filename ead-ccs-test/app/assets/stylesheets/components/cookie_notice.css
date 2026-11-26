@@ -1,60 +1,48 @@
 /*
- * The cookie notice (NexusCcs::CookieNoticeComponent, CCS-471): a band at the top of the page, in the page's flow (so nothing
- * moves when it loads, and it never covers a focused control), white with a rule under it. The text and the buttons sit side
- * by side on a wide window and stack on a phone. The buttons are ordinary .btn-primary buttons, all of one kind.
+ * The cookie notice (NexusCcs::CookieNoticeComponent, CCS-471): a slim bar fixed to the foot of the window (26 Nov 2026), navy with
+ * white text, one sentence and the answer side by side (stacked on a narrow phone). It takes no room in the page's flow, so nothing
+ * moves when it loads; the page keeps room for it at its foot, and anything focused scrolls clear of it (scroll-padding), so the bar
+ * never hides a focused control (WCAG 2.4.11). Not a dialog: nothing is trapped.
  */
 .cookie-notice {
-  background: var(--ccs-surface-default);
-  border-bottom: 1px solid var(--ccs-border-strong);
-  color: var(--ccs-text-primary);
-  /* The site's body face. It is preloaded (layouts/_font_preload) so the notice does not re-wrap when it arrives, which would
-     move the page below it (test/system/cookie_notice_test.rb keeps the layout shift within the allowance). */
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 1040; /* over the page, under Bootstrap's modals */
+  background: var(--ccs-surface-brand);
+  color: var(--ccs-text-inverse);
   font-family: var(--ccs-font-body);
+  box-shadow: 0 -2px 12px rgb(0 0 0 / 18%);
 }
 
 .cookie-notice__inner {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--ccs-space-4);
-  max-width: 1272px; /* the page's 1240px content column plus the 16px side padding */
+  gap: var(--ccs-space-2) var(--ccs-space-4);
+  max-width: 1272px;
   margin: 0 auto;
-  padding: var(--ccs-space-4) var(--space-16);
+  padding: var(--ccs-space-2) var(--space-16);
 }
 
 .cookie-notice__text {
-  flex: 1 1 32rem;
-  max-width: 70ch;
-  font-size: var(--ccs-font-size-md);
-  line-height: 1.5;
-}
-
-.cookie-notice__text p,
-.cookie-notice__list {
-  margin: 0 0 var(--ccs-space-2);
-}
-
-.cookie-notice__title {
-  margin: 0 0 var(--ccs-space-2);
-  font-family: inherit;
-  font-size: var(--ccs-font-size-xl);
-  font-weight: var(--ccs-font-weight-semibold);
-  line-height: 1.2;
-  color: var(--ccs-text-brand);
-}
-
-.cookie-notice__placeholder {
-  font-size: var(--ccs-font-size-sm);
-  color: var(--ccs-text-secondary);
-}
-
-.cookie-notice__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ccs-space-3);
-}
-
-.cookie-notice__form {
+  flex: 1 1 28rem;
   margin: 0;
+  font-size: var(--ccs-font-size-sm);
+  line-height: 1.4;
 }
+
+.cookie-notice .cookie-notice__link,
+.cookie-notice .cookie-notice__link:visited { color: var(--ccs-text-inverse); text-decoration: underline; text-underline-offset: 0.15em; }
+.cookie-notice .cookie-notice__link:hover { text-decoration-thickness: 2px; }
+.cookie-notice .cookie-notice__link:focus-visible { outline: 3px solid var(--ccs-text-inverse); outline-offset: 2px; }
+
+.cookie-notice__actions { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2); }
+.cookie-notice__actions .btn { min-height: 36px; min-width: 64px; }
+.cookie-notice__form { margin: 0; }
+
+/* Room for the bar at the page's foot, and focus kept clear of it */
+body:has(.cookie-notice) { padding-bottom: 5.5rem; }
+html:has(.cookie-notice) { scroll-padding-bottom: 6rem; }
+body:has(.cookie-notice) .back-to-top { bottom: 6rem; }

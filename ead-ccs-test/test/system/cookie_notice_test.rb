@@ -72,11 +72,14 @@ class CookieNoticeSystemTest < ApplicationSystemTestCase
     assert_no_selector NOTICE
   end
 
-  test "the Escape key does nothing to it and it never covers the page: it is above the header in the flow" do
+  test "the Escape key does nothing to it; it is a slim bar at the window's foot and the page keeps room for it" do
     visit "/help"
     page.driver.browser.keyboard.type(:escape)
     assert_selector NOTICE
-    assert_equal "static", page.evaluate_script("getComputedStyle(document.querySelector('#{NOTICE}')).position")
+    assert_equal "fixed", page.evaluate_script("getComputedStyle(document.querySelector('#{NOTICE}')).position")
+    assert page.evaluate_script("document.querySelector('#{NOTICE}').getBoundingClientRect().bottom === window.innerHeight"), "at the foot of the window"
+    assert page.evaluate_script("document.querySelector('#{NOTICE}').getBoundingClientRect().height < 120"), "slim"
+    assert page.evaluate_script("parseFloat(getComputedStyle(document.body).paddingBottom) >= document.querySelector('#{NOTICE}').getBoundingClientRect().height"), "room at the page's foot"
   end
 
   test "it reads at 320 CSS pixels wide with no sideways scrolling" do
