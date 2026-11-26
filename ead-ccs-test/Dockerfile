@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # 1. Blacklight Rails Server
-FROM ruby:4.0.6-trixie AS ead-ccs
+FROM ruby:4.0.10-trixie AS ead-ccs
 
 ## System dependencies
 RUN apt-get update -qq && \
