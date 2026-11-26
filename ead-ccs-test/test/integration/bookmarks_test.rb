@@ -5,12 +5,6 @@ require "test_helper"
 class BookmarksTest < ActionDispatch::IntegrationTest
   # These tests read records from the Solr core at SOLR_URL. The "rails" CI job has no Solr (the system tests, which
   # do, cover the same flow in a browser), so they skip themselves when it cannot be reached.
-  def needs_solr
-    Blacklight.default_index.connection.get("select", params: { q: "*:*", rows: 0 })
-  rescue StandardError
-    skip "needs the Solr core at SOLR_URL"
-  end
-
   # Two records from the Solr core at SOLR_URL
   def record_ids
     @record_ids ||= begin
