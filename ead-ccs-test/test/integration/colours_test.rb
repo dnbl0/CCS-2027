@@ -33,7 +33,8 @@ class ColoursTest < ActionDispatch::IntegrationTest
     with_seeded_menu_cache { with_canned_search(colour_counts({})) { get "/explore/colours" } }
     assert_select ".colours__empty", "No colours are available yet."
 
-    with_seeded_menu_cache { get "/explore/colours" }
+    # Solr down, whether or not a core is running (CI's system job has one)
+    with_seeded_menu_cache { with_canned_search(->(_params) { raise Blacklight::Exceptions::ECONNREFUSED, "down" }) { get "/explore/colours" } }
     assert_response :service_unavailable
     assert_select ".colours__empty", /cannot be shown just now/
   end
