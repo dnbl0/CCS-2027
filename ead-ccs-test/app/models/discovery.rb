@@ -43,7 +43,18 @@ module Discovery
     Blacklight.default_index.search(params: base.merge(params))
   end
 
+  # An optional part of a page could not be built, so the page goes on without it. An outage (SolrGuard::FAILURES, the database
+  # gone) is only logged; anything else is a bug, so it is also reported to Rails.error (ErrorLogSubscriber and any error service)
+  # rather than hidden behind an empty section.
   def self.log_failure(what, error)
     Rails.logger.warn("#{what} unavailable: #{error.class}: #{error.message}")
+    return if outage?(error)
+
+    Rails.error.report(error, handled: true, severity: :warning, context: { section: what })
+  end
+
+  def self.outage?(error)
+    SolrGuard::FAILURES.any? { |kind| error.is_a?(kind) } || error.is_a?(SolrGuard::Unavailable) ||
+      error.is_a?(ActiveRecord::ConnectionNotEstablished) || error.is_a?(ActiveRecord::DatabaseConnectionError)
   end
 end

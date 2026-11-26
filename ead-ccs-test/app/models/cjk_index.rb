@@ -42,7 +42,7 @@ module CjkIndex
       response = Blacklight.default_index.connection.get("admin/luke", params: { show: "schema", wt: "json" })
       response.dig("schema", "fields")&.key?(FIELD) || false
     rescue StandardError => e
-      Rails.logger.warn("CJK search check unavailable: #{e.class}")
+      Discovery.log_failure("CJK search check", e)
       false
     end
   end

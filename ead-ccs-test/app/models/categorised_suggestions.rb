@@ -28,7 +28,7 @@ module CategorisedSuggestions
     FIELDS.flat_map { |field, kind| values(response, field).map { |value| Suggestion.new(value: value, kind: label(kind), query: query(field, value)) } }
           .first(MAX)
   rescue StandardError => error
-    Rails.logger.warn("Suggestions unavailable: #{error.class}: #{error.message}")
+    Discovery.log_failure("Suggestions", error)
     []
   end
 

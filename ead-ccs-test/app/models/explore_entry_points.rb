@@ -95,7 +95,7 @@ module ExploreEntryPoints
     fetched = fetched.merge(fetch_link_images(fetched))
     fetched.merge(fetch_link_intros(fetched))
   rescue RSolr::Error::Http, RSolr::Error::ConnectionRefused, RSolr::Error::Timeout, Faraday::Error, SystemCallError, Timeout::Error => e
-    Rails.logger.warn("Explore entry points unavailable: #{e.class}")
+    Discovery.log_failure("Explore entry points", e)
     nil
   end
 
@@ -133,7 +133,7 @@ module ExploreEntryPoints
       [ name, image ] if image
     end.to_h
   rescue StandardError => e
-    Rails.logger.warn("Explore example images unavailable: #{e.class}")
+    Discovery.log_failure("Explore example images", e)
     {}
   end
 
@@ -153,7 +153,7 @@ module ExploreEntryPoints
       end.to_h
     end
   rescue StandardError => e
-    Rails.logger.warn("Explore link images unavailable: #{e.class}")
+    Discovery.log_failure("Explore link images", e)
     {}
   end
 
@@ -167,7 +167,7 @@ module ExploreEntryPoints
       described.to_h { |label, options| [ label, CardDescription.for(**options) ] }
     end
   rescue StandardError => e
-    Rails.logger.warn("Explore descriptions unavailable: #{e.class}")
+    Discovery.log_failure("Explore descriptions", e)
     {}
   end
 
