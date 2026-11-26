@@ -31,7 +31,7 @@ The words used for the product are in [CONTEXT.md](../CONTEXT.md); decisions tha
 
 | Change | Edit | Then |
 |---|---|---|
-| Styles or images shared by the pages | `public/styles`, `public/images` | `npm run sync:rails` (no longer enforced; see `docs/decoupling-from-2026.md`) |
+| Styles or images shared by the pages | `public/styles`, `public/images` | none: edit the Rails copies in `ead-ccs-test/app/assets`; **do not run `npm run sync:rails`** (it overwrites them; `docs/decoupling-from-2026.md`) |
 | Header, search overlay, footer, Browse collections cards (static) | `src/partials/` | `npm run sync:partials` |
 | Header and Browse collections cards (Rails) | `NexusCcs::HeaderComponent`, `app/views/pages/_browse_collections.html.erb` | the Rails app owns it (the static partials are a 2026 prototype) |
 | Page copy | the static page and the Rails view / `config/pages.yml` | none |
