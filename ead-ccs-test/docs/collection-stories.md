@@ -20,17 +20,26 @@ are articles on another University site, linked from the record they are about.
 
 ## What the visitor sees
 
-Under the record's details, before the similar objects: an h2 "Stories from the collection", one line of description, then a card
-per story in the record cards' look (`object_cards.css`, `collection_stories.css`):
+Under the record's details, before the similar objects: an h2 "Stories from the collection" and one line of description, then the
+stories, after the National Gallery of Art's article listings (nga.gov/stories/articles). The layout depends on how many there are:
 
-- the story's picture, shown whole (never cropped) in the 16:9 frame, lazy-loaded from the collection's site. Its `alt` is empty: the
-  title beside it names the story, so a screen reader would otherwise hear it twice. A record the visitor may not view, or a sensitive
-  one, gets text cards with no picture (the record cards' rule: `AccessPolicy.view?` and not `Sensitivity.sensitive?`);
-- the title, an h3, which is the link of the whole card (same tab, like every link on the site); it comes first in the reading order;
-- a short summary (at most about 200 characters);
-- the site's name ("Grainger Museum").
+- **One story** is a wide row between two rules: the site's name on the left, then an "Article" kicker, the headline and the summary,
+  with the picture on the right. On a phone it stacks: the site's name, the picture, then the text.
+- **Two or more** are a card grid (two columns for two stories, three for more; one column on a phone). Each card has the picture,
+  the kicker ("Article · Grainger Museum"), the headline and the summary.
 
-The wording is in `config/locales/collection_stories.en.yml` (the description is placeholder wording).
+In every story:
+
+- the headline is an h3 and the link of the whole story (same tab, like every link on the site); it comes first in the reading order;
+- the picture is shown whole (never cropped) in a 3:2 frame and lazy-loaded. Its `alt` is empty: the headline names the story.
+- **Which picture:** the story's own, from the collection's site. That site may refuse it (a Cloudflare check), so
+  `story_image_controller.js` then shows the record's own picture of the object, and if there is none, the story becomes text only.
+  A story with no picture of its own starts with the record's picture. A record the visitor may not view, or a sensitive one, gets
+  text stories and no picture at all (`AccessPolicy.view?`, `Sensitivity.sensitive?`).
+- No number of stories or records is shown.
+
+Components: `CollectionStoriesComponent` (the section and the layout) and `CollectionStoryComponent` (one story); styles in
+`collection_stories.css`. The wording is in `config/locales/collection_stories.en.yml` (the description is placeholder wording).
 
 ## Files
 
