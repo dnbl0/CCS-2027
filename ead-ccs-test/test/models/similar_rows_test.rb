@@ -1,9 +1,9 @@
 require "test_helper"
 require_relative "../support/discovery_records"
 
-# The labelled rows under a record (More by this creator, From the same period, From the same place, More of this type):
+# The labelled rows under a record (More by this creator, From the same place; the period and type rows were removed 26 Nov 2026):
 # docs/similar-and-trending.md. Solr is stood in for (DiscoveryRecords), with stubbed records that carry the fields a local core
-# may lack (date_era_ssim, region_ssim).
+# may lack (region_ssim).
 class SimilarRowsTest < ActiveSupport::TestCase
   include DiscoveryRecords
 
@@ -22,14 +22,15 @@ class SimilarRowsTest < ActiveSupport::TestCase
   end
 
   test "a row is offered only for what the record has; noise such as Unknown is not a creator" do
-    assert_equal %w[creator period place type], SimilarRows.keys_for(source)
-    assert_equal %w[period place type], SimilarRows.keys_for(source(creator_ssim: [ "Unknown" ]))
+    assert_equal %w[creator place], SimilarRows.keys_for(source)
+    assert_equal %w[place], SimilarRows.keys_for(source(creator_ssim: [ "Unknown" ]))
     assert_equal [], SimilarRows.keys_for(SolrDocument.new("id" => "bare"))
   end
 
-  test "the period row reads the era or, without one, the start year" do
-    assert_includes SimilarRows.keys_for(source(date_era_ssim: nil)), "period"
-    assert_not_includes SimilarRows.keys_for(source(date_era_ssim: nil, date_start_isi: nil)), "period"
+  test "there is no From the same period or More of this type row, whatever the record has" do
+    assert_empty SimilarRows.keys_for(source) & %w[period type]
+    assert_equal [], SimilarRows.for(source, "period")
+    assert_equal [], SimilarRows.for(source, "type")
   end
 
   test "the query takes every value as a parameter, never in its text, and asks only for listable records with images" do
@@ -43,24 +44,15 @@ class SimilarRowsTest < ActiveSupport::TestCase
     SimilarRecords::ASSET_FILTERS.each { |filter| assert_includes params[:fq], filter }
   end
 
-  test "each row matches on the first field the record has: era, else 25 years either side; region, else place; object type, else classification" do
-    period = SimilarRows.new(source, "period").params
-    assert_equal "{!term f=date_era_ssim v=$sim_v0}", period[:sim_r0]
-    assert_nil period[:sim_r1]
-    assert_equal "date_start_isi:[1885 TO 1935]", SimilarRows.new(source(date_era_ssim: nil), "period").params[:sim_r0]
-
+  test "the place row matches on the first field the record has: region, else place of production" do
     assert_equal "{!term f=region_ssim v=$sim_v0}", SimilarRows.new(source, "place").params[:sim_r0]
     assert_equal "{!term f=production_place_ssim v=$sim_v0}", SimilarRows.new(source(region_ssim: nil), "place").params[:sim_r0]
-
-    assert_equal "{!term f=object_type_ssim v=$sim_v0}", SimilarRows.new(source, "type").params[:sim_r0]
-    assert_nil SimilarRows.new(source, "type").params[:sim_r1]
-    assert_equal "{!term f=classification_ssim v=$sim_v0}", SimilarRows.new(source(object_type_ssim: nil), "type").params[:sim_r0]
   end
 
   test "up to eight records, without the record itself, withheld, sensitive or imageless ones" do
     found = [ open_record("emu-source"), withheld_record("emu-w"), sensitive_record("emu-s"), open_record("emu-noimage", thumbnail_path_ssi: nil) ] +
             (1..10).map { |n| open_record("emu-#{n}", creator_ssim: [ "C#{n}" ]) }
-    documents, = row_for(source, "type", found: found)
+    documents, = row_for(source, "place", found: found)
 
     assert_equal (1..8).map { |n| "emu-#{n}" }, documents.map(&:id)
   end
@@ -94,10 +86,9 @@ class SimilarRowsTest < ActiveSupport::TestCase
     with_canned_search(->(_params) { raise Faraday::ConnectionFailed, "down" }) { assert_equal [], SimilarRows.for(source, "creator") }
   end
 
-  test "See all is the filtered search for a single value, and nothing when the row matches several or a span of years" do
+  test "See all is the filtered search for a single value, and nothing when the row matches several" do
     assert_equal({ "f" => { "creator_ssim" => [ "Lees, Derwent" ] } }, SimilarRows.new(source, "creator").see_all_query)
     assert_equal({ "f" => { "region_ssim" => [ "Oceania" ] } }, SimilarRows.new(source, "place").see_all_query)
     assert_nil SimilarRows.new(source(region_ssim: %w[Oceania Europe]), "place").see_all_query
-    assert_nil SimilarRows.new(source(date_era_ssim: nil), "period").see_all_query
   end
 end

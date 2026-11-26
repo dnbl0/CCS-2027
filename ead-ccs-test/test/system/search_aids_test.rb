@@ -21,10 +21,11 @@ class SearchAidsTest < ApplicationSystemTestCase
     test "a record page's labelled rows load under Similar objects, with no axe violations, at #{name}" do
       page.current_window.resize_to(width, 900)
       visit "/catalog/emu-10247"
-      page.execute_script("document.getElementById('similar-type').scrollIntoView()")
+      page.execute_script("document.querySelector('.similar-frame[id^=similar-]').scrollIntoView()")
 
-      assert_selector "#similar-type h2", text: "More of this type"
-      assert_selector "#similar-type li.discover-cards__item h3 a[href^='/catalog/']", minimum: 1
+      assert_selector ".similar-row h2", minimum: 1
+      assert_selector ".similar-row li.discover-cards__item h3 a[href^='/catalog/']", minimum: 1
+      assert_no_selector "#similar-type, #similar-period"
       assert_selector ".record-details__list a[href*='object_type_ssim']"
       no_sideways_scroll
       shot("record-#{name}")

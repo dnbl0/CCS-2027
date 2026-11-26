@@ -6,11 +6,7 @@
     <div class="more-like-this__inner">
       <section id="similar-<%= key %>-section" aria-labelledby="similar-<%= key %>-heading">
         <h2 id="similar-<%= key %>-heading" class="more-like-this__heading"><%= t("nexus_ccs.similar.rows.#{key}.heading") %></h2>
-        <% if @row.described.any? %>
-          <p class="object-cards__description"><%= t("nexus_ccs.similar.rows.#{key}.description", values: @row.described.to_sentence(two_words_connector: t("nexus_ccs.similar.rows.or"), last_word_connector: t("nexus_ccs.similar.rows.or"))) %></p>
-        <% else %>
-          <p class="object-cards__description"><%= t("nexus_ccs.similar.rows.period.years", from: @row.year - SimilarRows::DATE_WINDOW, to: @row.year + SimilarRows::DATE_WINDOW) %></p>
-        <% end %>
+        <p class="object-cards__description"><%= t("nexus_ccs.similar.rows.#{key}.description", values: @row.described.to_sentence(two_words_connector: t("nexus_ccs.similar.rows.or"), last_word_connector: t("nexus_ccs.similar.rows.or"))) %></p>
         <div class="ccs-mosaic ccs-mosaic--4"><%= render "discover/cards", entries: @entries, title_tag: :h3 %></div>
         <% if (query = @row.see_all_query) %>
           <p class="similar-row__more"><%= link_to t("nexus_ccs.similar.rows.see_all", values: @row.described.first), search_action_path(query), class: "similar-row__all" %></p>
