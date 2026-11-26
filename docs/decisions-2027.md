@@ -51,6 +51,14 @@ each can be changed. **Plain-language summary first.**
 - **Subjects with `--` are not split into a tree.** The index values are shown as catalogued; a tree needs a data decision from the
   collections team. Places now have one (decision 13): the catalogued place text is unchanged, and the tree comes from geocoding it.
 
+## Standing rules from the product owner
+
+These are not open questions: the product owner has set them, and every page must keep them. A test guards each one.
+
+| Rule | What it means | Guarded by |
+|---|---|---|
+| Pictures of cultural objects are never cropped | Every picture of an object is shown whole (`object-fit: contain`, on a quiet ground if the frame is a fixed shape). Only site photographs, such as the home page banner, may fill a frame. | `ead-ccs-test/test/lint/no_cropped_images_test.rb` |
+
 ## Earlier decisions
 
 The access tiers (licence-based), the sensitivity placeholder rule, Community Restricted as request-only, the zip limits, the citation
