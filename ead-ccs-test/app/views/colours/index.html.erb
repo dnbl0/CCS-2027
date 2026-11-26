@@ -10,7 +10,7 @@
   <div class="places-nav"><%= render "browse/views", hub: hub, view: :explorer %></div>
     <div class="time-explorer colour-explorer">
       <% if @colours.blank? %>
-        <p class="colours__empty"><%= @colours.nil? ? t("colours.unavailable") : t("colours.empty") %></p>
+        <%= @colours.nil? ? unavailable_note(t("colours.the_colours")) : tag.p(t("colours.empty"), class: "colours__empty") %>
       <% else %>
         <% field = CatalogConfig::Facets::COLOUR_FIELD %>
         <turbo-frame id="colour-explorer" data-turbo-action="advance">
@@ -30,7 +30,7 @@
 
           <% if @colour %>
             <% name = colour_facet_label(@colour.name) %>
-            <%= render "explore/picture_wall", records: @records, unavailable: t("colours.unavailable"),
+            <%= render "explore/picture_wall", records: @records, unavailable: unavailable_sentence(t("colours.its_records", name: colour_facet_label(@colour.name))),
                        heading: safe_join([ tag.span(class: "picture-wall__dot colours__swatch--#{@colour.name}", aria: { hidden: true }), name ]),
                        links: [ [ t("colours.see_all"), search_catalog_path(f: { field => [ @colour.name ] }) ] ], band: "colours__swatch--#{@colour.name}",
                        steps: [ @previous && [ t("colours.previous", name: colour_facet_label(@previous.name)), "← #{colour_facet_label(@previous.name)}", explore_colours_path(colour: @previous.name) ],

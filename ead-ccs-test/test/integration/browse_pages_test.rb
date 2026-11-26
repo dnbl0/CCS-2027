@@ -98,7 +98,7 @@ class BrowsePagesTest < ActionDispatch::IntegrationTest
 
     assert_response :service_unavailable
     assert_select "h1", "Places"
-    assert_select ".browse__unavailable"
+    assert_select ".unavailable-note", /cannot be shown right now\. Please try again in a few minutes/ # the one sentence
   end
 
   test "the home page's Explore groups link to their full lists" do

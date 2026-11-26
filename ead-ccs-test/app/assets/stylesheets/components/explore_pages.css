@@ -294,7 +294,6 @@ body:has(.cookie-notice) .place-explorer__switch { bottom: calc(6rem + env(safe-
 .picture-wall__heading { display: inline-flex; align-items: center; gap: var(--ccs-space-3); margin: 0; }
 .picture-wall__links { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2) var(--ccs-space-5); margin: 0 0 0 auto; }
 .picture-wall__links a { min-height: 44px; align-items: center; }
-.picture-wall__empty { margin: 0; color: var(--ccs-text-secondary); }
 .picture-wall__grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin: 0; padding: 0; list-style: none; }
 @media (max-width: 991.98px) { .picture-wall__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 575.98px) { .picture-wall__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

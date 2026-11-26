@@ -82,7 +82,7 @@ class ColoursTest < ActionDispatch::IntegrationTest
 
     with_seeded_menu_cache { get "/browse/colours?view=spectrum" }
     assert_response :service_unavailable
-    assert_select ".colours__empty", /cannot be shown just now/
+    assert_select ".unavailable-note", "The colours cannot be shown right now. Please try again in a few minutes." # the one sentence
   end
 
   test "the Colour filter sits under Digital Asset Format Type, names its values, and is not on the Advanced search form" do

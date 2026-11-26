@@ -70,7 +70,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     get "/browse/materials"
     assert_response :service_unavailable
     assert_select "h1", "Materials"
-    assert_select ".browse__unavailable a", "search all records"
+    assert_select ".unavailable-note a", "search all records"
   ensure
     Outages::SolrDown.active = false
   end

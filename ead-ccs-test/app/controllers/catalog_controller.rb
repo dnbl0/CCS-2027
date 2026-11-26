@@ -216,7 +216,7 @@ class CatalogController < ApplicationController
     response.headers["Retry-After"] = ErrorsController::RETRY_AFTER.fetch("503").to_s
     respond_to do |format|
       format.html { render "catalog/unavailable", status: :service_unavailable }
-      format.json { render json: { error: "Search is unavailable. Please try again shortly." }, status: :service_unavailable }
+      format.json { render json: { error: "Search cannot be shown right now. Please try again in a few minutes." }, status: :service_unavailable }
       format.any { head :service_unavailable }
     end
   end

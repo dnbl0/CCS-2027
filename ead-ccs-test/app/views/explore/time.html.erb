@@ -14,7 +14,7 @@
   <div class="places-nav"><%= render "browse/views", hub: hub, view: :explorer %></div>
     <div class="time-explorer">
       <% if @centuries.nil? %>
-        <p class="browse__unavailable"><%= t("explore_pages.unavailable_html", link: link_to(t("explore_pages.search_all"), search_action_path(any_assets: "1", search_field: "all_fields"))) %></p>
+        <%= unavailable_note(search: search_action_path(any_assets: "1", search_field: "all_fields")) %>
       <% elsif periods.empty? %>
         <p><%= t("explore_pages.time.empty") %></p>
       <% else %>
@@ -38,7 +38,7 @@
 
           <% if chosen %>
             <%= render "explore/picture_wall", records: @records, heading: chosen.label,
-                       unavailable: t("explore_pages.unavailable_html", link: link_to(t("explore_pages.search_all"), search_action_path(chosen.search_query))),
+                       unavailable: unavailable_sentence(t("explore_pages.time.records_of", period: chosen.label), search: search_action_path(chosen.search_query)),
                        links: [ [ t("explore_pages.time.see_all"), timeline_period_path(chosen) || search_action_path(chosen.search_query) ] ] %>
             <% if @timeline&.periods.present? %>
               <section class="place-section time-explorer__periods" aria-labelledby="timeline-heading">

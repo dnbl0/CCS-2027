@@ -83,7 +83,7 @@ en:
       removed_title: "This record has been removed" # placeholder wording until the University approves it (CCS-112)
       removed_body: "This record is no longer part of the Collections Navigator."
       unavailable_title: "Temporarily unavailable"
-      unavailable_body: "The collection could not be reached. Try again in a few minutes."
+      unavailable_body: "This gallery cannot be shown right now. Please try again in a few minutes."
     my_data:
       held:
         shared_lists:

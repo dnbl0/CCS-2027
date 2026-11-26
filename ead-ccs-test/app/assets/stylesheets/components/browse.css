@@ -56,7 +56,9 @@
 
 .browse__count { flex: none; font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
 
-.browse__unavailable { margin: 0; font-size: var(--ccs-font-size-lg); }
+/* the one "cannot be shown right now" sentence (UnavailableHelper) */
+.unavailable-note { margin: 0; font-size: var(--ccs-font-size-lg); color: var(--ccs-text-primary); }
+.unavailable-note a { color: var(--ccs-text-link); }
 
 @media (max-width: 767px) {
   .browse__inner { padding-inline: var(--space-16); }

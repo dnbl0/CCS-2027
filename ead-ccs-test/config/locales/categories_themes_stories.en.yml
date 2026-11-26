@@ -38,7 +38,7 @@ en:
       no_records: "No records match these filters in this copy of the index."
       none: "None of these records has a picture that can be shown here. The search lists them all."
       unavailable_title: "This page cannot be shown right now"
-      unavailable: "The collections index is not answering. Please try again in a few minutes."
+      unavailable: "This page cannot be shown right now. Please try again in a few minutes."
       search_all: "Search all records"
     themes:
       title: "Themes"

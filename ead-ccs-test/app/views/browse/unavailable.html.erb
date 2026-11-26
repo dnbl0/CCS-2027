@@ -1,4 +1,4 @@
 <%# A Browse page whose list Solr cannot give and nothing is kept (503): the same template, with a way to the search %>
 <%= render layout: "browse/template", locals: { hub: @hub, title: @hub.title } do %>
-  <p class="browse__unavailable">The list of <%= @hub.title.downcase %> cannot be shown right now. Please try again in a few minutes, or <%= link_to "search all records", search_action_path(any_assets: "1", search_field: "all_fields") %>.</p>
+  <%= unavailable_note("The list of #{@hub.title.downcase}", search: search_action_path(any_assets: "1", search_field: "all_fields")) %>
 <% end %>

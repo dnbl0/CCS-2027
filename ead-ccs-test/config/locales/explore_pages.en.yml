@@ -4,8 +4,6 @@ en:
     count:
       one: "%{number} record"
       other: "%{number} records"
-    unavailable_html: "This page cannot be shown right now. Please try again in a few minutes, or %{link}."
-    search_all: "search all records"
     links_label: "Explore by time or place"
     time:
       title: "Explore by time"
@@ -15,6 +13,7 @@ en:
       eras_folded: "Eras as catalogued"
       centuries: "Centuries"
       decades: "Decades of %{period}"
+      records_of: "The records of %{period}"
       all_centuries: "All centuries"
       keys: "On a period, the left and right arrow keys move to the one before or after it."
       list_label: "Periods, earliest first"

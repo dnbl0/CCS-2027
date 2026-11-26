@@ -9,7 +9,7 @@
   <div class="places-nav"><%= render "browse/views", hub: hub, view: :explorer %></div>
   <div class="place-explorer-wrap">
     <% if @places.nil? %>
-      <p class="browse__unavailable"><%= t("explore_pages.unavailable_html", link: link_to(t("explore_pages.search_all"), search_action_path(any_assets: "1", search_field: "all_fields"))) %></p>
+      <%= unavailable_note(search: search_action_path(any_assets: "1", search_field: "all_fields")) %>
     <% elsif @places.map? %>
       <% words = t("explore_pages.places.explorer") %>
       <% continents = Geo::Hierarchy::CONTINENTS.values.uniq %>

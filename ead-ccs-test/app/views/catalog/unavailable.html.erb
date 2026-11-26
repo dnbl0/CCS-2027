@@ -1,5 +1,6 @@
-<div class="col-12 text-center py-5" role="alert">
-  <h1 class="h3">Search is unavailable</h1>
-  <p class="lead">We could not search the collections just now. Please try again in a few minutes.</p>
-  <p><%= link_to "Back to the home page", root_path %> or <%= link_to "contact the collections team", help_path(anchor: "contact-us") %>.</p>
+<%# Search cannot answer (CatalogController#search_unavailable, 503): the same page banner and the one sentence as every other page that
+    cannot be shown (UnavailableHelper), then the ways on %>
+<%= render NexusCcs::PageBannerComponent.new(title: "Search is unavailable", description: unavailable_sentence("Search")) %>
+<div class="browse-main__inner" role="alert">
+  <p class="browse-empty"><%= link_to "Back to the home page", root_path %> or <%= link_to "contact the collections team", help_path(anchor: "contact-us") %>.</p>
 </div>

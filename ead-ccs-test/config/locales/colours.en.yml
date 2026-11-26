@@ -12,7 +12,8 @@ en:
     strip_label: "Colours"
     see_all: "See them all in the search"
     empty: "No colours are available yet."
-    unavailable: "The colours cannot be shown just now. Please try again later."
+    the_colours: "The colours"
+    its_records: "The %{name} records"
     filter: "Colour"
     names:
       red: "Red"

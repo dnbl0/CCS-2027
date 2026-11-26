@@ -20,7 +20,7 @@
   </div>
   <% if band %><span class="picture-wall__band <%= band %>" aria-hidden="true"></span><% end %>
   <% if records.nil? %>
-    <p class="picture-wall__empty"><%= unavailable %></p>
+    <p class="unavailable-note"><%= unavailable %></p>
   <% elsif records.any? %>
     <ul class="picture-wall__grid">
       <% records.each do |record| %>

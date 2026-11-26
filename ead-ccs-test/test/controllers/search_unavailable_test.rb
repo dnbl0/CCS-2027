@@ -22,7 +22,7 @@ class SearchUnavailableTest < ActionDispatch::IntegrationTest
     with_solr_down { get "/catalog.json", params: { q: "skull" } }
 
     assert_response :service_unavailable
-    assert_equal "Search is unavailable. Please try again shortly.", response.parsed_body["error"]
+    assert_equal "Search cannot be shown right now. Please try again in a few minutes.", response.parsed_body["error"]
   end
 
   test "pages that do not search keep working while Solr is down" do
