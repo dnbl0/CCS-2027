@@ -116,9 +116,10 @@
               <% end %>
             </details>
           </section>
+          <%# On a phone: the list or the map, swapped by a floating button (Airbnb's "Map" button), inside the split so it floats over
+              the list only, never over the regions and the name box above it %>
+          <button type="button" class="place-explorer__switch" data-js-only data-place-explorer-target="switch" data-action="place-explorer#switch"><%= words[:switch_map] %></button>
         </div>
-        <%# On a phone: the list or the map, swapped by a floating button (Airbnb's "Map" button) %>
-        <button type="button" class="place-explorer__switch" data-js-only data-place-explorer-target="switch" data-action="place-explorer#switch"><%= words[:switch_map] %></button>
       </div>
     <% else %>
       <p class="explore__hint"><%= t("explore_pages.places.pending") %></p>

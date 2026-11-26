@@ -76,7 +76,7 @@
 .place-explorer__tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ccs-space-3) var(--ccs-space-5); }
 
 /* The regions: one row of pills; on a narrow screen it scrolls sideways and the next pill peeks past the edge */
-.place-explorer__chips { display: flex; gap: var(--ccs-space-2); flex: 1 1 24rem; min-width: 0; margin: 0; padding: 2px; overflow-x: auto; scrollbar-width: none; }
+.place-explorer__chips { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2); flex: 1 1 24rem; min-width: 0; margin: 0; padding: 2px; } /* six regions: they wrap, so none hides off the edge on a phone */
 .place-explorer__chips::-webkit-scrollbar { display: none; }
 .place-explorer__chip {
   flex: none; min-height: 44px; padding: 0 var(--ccs-space-4); border: 1px solid var(--ccs-border-default); border-radius: var(--ccs-radius-pill);
@@ -121,13 +121,17 @@
   .place-explorer.is-map-view .place-explorer__map { height: calc(100dvh - 9rem); min-height: 24rem; }
   .place-explorer.is-map-view .place-explorer__consent, .place-explorer.is-map-view .place-explorer__stage { flex: 1 1 auto; min-height: 0; }
 }
+/* It sticks to the window's foot while the list is in view (it is the split's last child), so it never sits over the regions or the
+   name box; with the map open it stays fixed at the foot. Above the cookie bar while that is shown. */
 .place-explorer__switch {
-  position: fixed; bottom: calc(var(--ccs-space-5) + env(safe-area-inset-bottom)); left: 50%; z-index: 1100; transform: translateX(-50%);
+  position: sticky; bottom: calc(var(--ccs-space-5) + env(safe-area-inset-bottom)); z-index: 1100; display: block; width: fit-content; margin: var(--ccs-space-4) auto 0;
   min-height: 48px; padding: 0 var(--ccs-space-5); border: 0; border-radius: var(--ccs-radius-pill);
   background: var(--ccs-text-primary); color: var(--ccs-text-inverse); box-shadow: var(--ccs-shadow-lg);
   font-weight: var(--ccs-font-weight-semibold); white-space: nowrap;
 }
 .place-explorer__switch:focus-visible { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
+.place-explorer.is-map-view .place-explorer__switch { position: fixed; left: 50%; margin: 0; transform: translateX(-50%); }
+body:has(.cookie-notice) .place-explorer__switch { bottom: calc(6rem + env(safe-area-inset-bottom)); }
 
 /* ---- The cards: even rows of one shape */
 .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: var(--ccs-space-7) var(--tile-gap); margin: 0; padding: 0; list-style: none; }

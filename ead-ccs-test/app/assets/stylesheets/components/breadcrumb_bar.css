@@ -22,3 +22,10 @@
 
 /* The breadcrumb itself is NexusCcs::PageBreadcrumbsComponent (.page-breadcrumbs) on every page; the Gen 3 bar that collapsed to one
    back link on a phone is gone (docs/ia-audit-handover.md: one breadcrumb) */
+
+/* Phones: the whole trail, as at every width (docs/ia-audit-handover.md). The static site's shared sheet (pages/static_shared.css, generated:
+   not edited here) hides the trail at 768px and under and expects a separate .bc-mobile list this site does not draw, which left phones
+   with no way up a level (docs/ux-drift-audit.md A5). This keeps the trail; it wraps onto a second line when it is long. */
+@media (max-width: 768px) {
+  .breadcrumb-strip nav.page-breadcrumbs[aria-label="Breadcrumb"] > ol.page-local-history { display: flex !important; }
+}

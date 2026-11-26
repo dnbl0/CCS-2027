@@ -24,3 +24,10 @@
   :root:not(.no-js) :is(.picture-wall__link, .cluster__card, .feature-carousel__media, .card-carousel__media, .stack__media,
     .look-closer__piece, .place-tile__media, .colour-card__pictures, .result-card__media, .object-card__media) img { transition: none; }
 }
+
+/* A picture that failed to load (page_loader.js: is-failed): its frame in the brand's navy with the University's crest, never the
+   browser's broken-picture box. The image's own pixels are hidden; its box keeps its size, so nothing moves. */
+img.is-failed {
+  object-position: -99999px 0; /* hides the broken-image glyph while keeping the box */
+  background: var(--ccs-surface-brand) url("../site/uom-logo-vert-ondark.svg") center / auto 45% no-repeat;
+}

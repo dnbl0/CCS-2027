@@ -14,8 +14,18 @@ if (document.readyState === "complete") {
 // hears every picture's, including those added later (a Turbo frame's wall, a lazy picture scrolled to); pictures already complete when
 // this runs, or brought back from Turbo's cache, are marked straight away.
 const reveal = (img) => img.classList.add("is-revealed")
-const revealComplete = () => document.querySelectorAll("img:not(.is-revealed)").forEach((img) => { if (img.complete) reveal(img) })
-const onPicture = (event) => { if (event.target instanceof HTMLImageElement) reveal(event.target) }
+const revealComplete = () => document.querySelectorAll("img:not(.is-revealed)").forEach((img) => {
+  if (!img.complete) return
+  if (img.naturalWidth === 0 && img.getAttribute("src")) img.classList.add("is-failed") // failed before this script ran
+  reveal(img)
+})
+// A picture that fails (a University site refusing it, a moved file) is marked is-failed too, so the stylesheet can show a tidy frame
+// in its place instead of the browser's broken-picture box (docs/ux-drift-audit.md A8)
+const onPicture = (event) => {
+  if (!(event.target instanceof HTMLImageElement)) return
+  if (event.type === "error") event.target.classList.add("is-failed")
+  reveal(event.target)
+}
 
 document.addEventListener("load", onPicture, true)
 document.addEventListener("error", onPicture, true)

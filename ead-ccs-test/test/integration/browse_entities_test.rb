@@ -67,7 +67,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     assert_select "title", /Bunny, Rupert — Maker/
     assert_select ".place-page__facts dt", text: "Dates on records"
     assert_select ".place-page__facts dd", text: "29 September 1864 – 25-May-47"
-    assert_select ".place-page__summary", "Made 1816 to 2019." # no number of records: the site shows no counts
+    assert_select ".place-page__summary", "Records dated 1816 to 2019." # no number of records: the site shows no counts
     assert_select ".card-layout--mosaic li.mosaic-flow__item", count: 1 # the one record that may be shown
     assert_select "a.btn[href*='f%5Bcreator_ssim%5D%5B%5D=Bunny%2C+Rupert']", text: "See all its records"
     # the ways in and what is related: a tile in the page's mosaic where the value has a picture, otherwise a link after it; with its count
@@ -96,7 +96,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "main.place-page h1", "Australia"
-    assert_select ".place-page__summary", "Made 1816 to 2019."
+    assert_select ".place-page__summary", "Records dated 1816 to 2019."
     # the strip shows only pictures nothing else on the page shows: its one open record is in Discover, so there is no strip (no repeat)
     assert_select ".place-page__strip", count: 0
     assert_select ".card-layout .object-card", count: 1

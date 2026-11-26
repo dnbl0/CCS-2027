@@ -58,14 +58,16 @@
       <p class="place-page__kind"><%= kind_label %><%= " #{t('browse.place.in_region', region: region)}" if region %><% if period&.parent %>, <%= link_to period.parent.label, period.parent.path %><% end %></p>
       <h1 class="place-page__title"><%= name %></h1>
       <%# no number of records or of collections (the site shows no counts): when its records were made, where that is known %>
-      <% if span %><p class="place-page__summary"><%= t("browse.place.span", span: span).upcase_first %>.</p><% end %>
+      <%# the span of its records' dates, said as that (beside a maker's own life dates "Made 1816 to 2019" read as theirs); not on a
+          period's page, whose title is its span already %>
+      <% if span && entry %><p class="place-page__summary"><%= t("browse.place.records_dated", span: span) %></p><% end %>
       <% if facts&.any? || life %>
         <dl class="place-page__facts">
           <% if life %><div><dt><%= t("browse.entity.life_dates") %></dt><dd><%= life %></dd></div><% end %>
           <% if facts&.born %><div><dt><%= t("nexus_ccs.creator.born") %></dt><dd><%= facts.born %></dd></div><% end %>
           <% if facts&.died %><div><dt><%= t("nexus_ccs.creator.died") %></dt><dd><%= facts.died %></dd></div><% end %>
           <% if facts&.nationality %><div><dt><%= t("nexus_ccs.creator.nationality") %></dt><dd><%= facts.nationality %></dd></div><% end %>
-          <% if facts&.roles.present? %><div><dt><%= t("nexus_ccs.creator.roles") %></dt><dd><%= Array(facts.roles).join(", ") %></dd></div><% end %>
+          <% if facts&.roles.present? %><div><dt><%= t("nexus_ccs.creator.roles") %></dt><dd><%= Array(facts.roles).map(&:upcase_first).join(", ") %></dd></div><% end %>
         </dl>
       <% end %>
       <div class="place-page__actions">

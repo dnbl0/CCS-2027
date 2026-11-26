@@ -6,7 +6,7 @@ en:
     # Every Browse page (browse/hub; after Google Arts & Culture's Places)
     hub:
       search_label: "Find a %{singular}"
-      placeholder: "Type a %{singular}"
+      placeholder: "Type a name"
       in_order: "In order"
       timeline: "See the timeline"
       # the third view of time, places and colours (browse/_views)
@@ -31,16 +31,16 @@ en:
     hubs:
       places:
         search_label: "Find a place"
-        placeholder: "Type a place, such as Japan or Carlton"
+        placeholder: "Japan, Carlton …"
       object-types:
         search_label: "Find an object type"
-        placeholder: "Type an object type, such as photograph or medal"
+        placeholder: "Photograph, medal …"
       makers:
         search_label: "Find a maker"
-        placeholder: "Type a maker, such as Grainger or Kodak"
+        placeholder: "Grainger, Kodak …"
       subjects:
         search_label: "Find a subject"
-        placeholder: "Type a subject, such as portraits or anatomy"
+        placeholder: "Portraits, anatomy …"
     # A place's own page (browse_entities/place; after Google Arts & Culture's place pages)
     place:
       no_picture: "With no picture to show"
@@ -50,6 +50,7 @@ en:
         one: "1 record"
         other: "%{number} records"
       span: "made %{span}"
+      records_dated: "Records dated %{span}."
       held_in:
         one: "held in 1 collection"
         other: "held in %{count} collections"
@@ -75,7 +76,7 @@ en:
       every: "See every place, A–Z"
       letters: "Places by letter"
       most: "Most records"
-      filter_placeholder: "Type a place, such as Japan or Carlton"
+      filter_placeholder: "Japan, Carlton …"
       search_label: "Find a place"
       map: "See places on a map"
       regions: "Places by region"
