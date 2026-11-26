@@ -45,16 +45,16 @@ mentioned in the brief was therefore not needed: the shared one was only read.
 
 ### Labelled rows under a record (added 2026-11-18)
 
-After Similar objects, up to four more rows, each with its own heading: **More by this creator**, **From the same period**, **From the
-same place** and **More of this type**. Each is a lazy Turbo frame from the same route, `GET /catalog/:id/similar?row=creator|period|place|type`
+After Similar objects, up to two more rows, each with its own heading: **More by this creator** and **From the same place**. (**From the
+same period** and **More of this type** were removed at the site owner's request on 26 Nov 2026.) Each is a lazy Turbo frame from the
+same route, `GET /catalog/:id/similar?row=creator|place`
 (`SimilarRows`, `app/views/similar/row.html.erb`), so the record page still makes its one Solr request and each row one more (two in
 all: the record, then the row) when it nears the screen. A row holds up to eight of the same result cards as Similar objects, with a
 line saying what the records share and, when that is one value of one filter, a "See all records for ..." link to the filtered search.
 
-- **What each row matches on** (the first field the record has a value in; any of up to three values): creator `creator_ssim`; period
-  `date_era_ssim`, else `date_start_isi` 25 years either side; place `region_ssim`, else `production_place_ssim`; type `object_type_ssim`,
-  else `classification_ssim`. Values such as "Unknown" or "Anonymous" are not matched on. A row the record has nothing for is not drawn
-  and never requested, so a core without `date_era_ssim` or `region_ssim` (a local one) simply uses the fallback.
+- **What each row matches on** (the first field the record has a value in; any of up to three values): creator `creator_ssim`; place
+  `region_ssim`, else `production_place_ssim`. Values such as "Unknown" or "Anonymous" are not matched on. A row the record has nothing for is not drawn
+  and never requested, so a core without `region_ssim` (a local one) simply uses the fallback.
 - **Who is listed:** the Similar objects rules (`SimilarRecords::ASSET_FILTERS` and `SimilarRecords.shows_image?`): records with an
   image this visitor may see, never withheld or sensitive ones, never the record itself; a withheld or sensitive record has no rows. The
   rows other than the creator's show at most three records of one creator. An empty row answers 204 and stays hidden; an unknown row is a 404.

@@ -1,28 +1,24 @@
 # frozen_string_literal: true
 
-# The labelled rows under a record, after "Similar objects" (docs/similar-and-trending.md): More by this creator, From the same
-# period, From the same place, More of this type. Each row is one Solr request for records that share a value of the record's
+# The labelled rows under a record, after "Similar objects" (docs/similar-and-trending.md): More by this creator and From the same
+# place. (From the same period and More of this type were removed at the site owner's request, 26 Nov 2026.) Each row is one Solr request for records that share a value of the record's
 # own (any of them), loaded in its own lazy Turbo frame (SimilarController, ?row=), so the record page itself still makes one
 # request. The same rules as Similar objects: only records Discovery lists, with an image this visitor may see
 # (SimilarRecords::ASSET_FILTERS and SimilarRecords.shows_image?), never the record itself; a withheld or sensitive record has
 # no rows at all. A row with nothing in it is not drawn.
 #
-# Fields a core may not have yet (date_era_ssim, region_ssim) are read when they are there: a record without them falls back to
-# its start year (period) or its place of production (place), and a row with nothing to match on is not offered.
+# A field a core may not have yet (region_ssim) is read when it is there: a record without it falls back to its place of production,
+# and a row with nothing to match on is not offered.
 class SimilarRows
   # The row => the fields it matches on, in order of preference: the first the record has a value in is used (region before place of
-  # production, object type before classification); the period row falls back to the start year
+  # production)
   FIELDS = {
     "creator" => %w[creator_ssim],
-    "period" => %w[date_era_ssim],
-    "place" => %w[region_ssim production_place_ssim],
-    "type" => %w[object_type_ssim classification_ssim]
+    "place" => %w[region_ssim production_place_ssim]
   }.freeze
   KEYS = FIELDS.keys.freeze
-  YEAR_FIELD = "date_start_isi"
-  DATE_WINDOW = SimilarRecords::DATE_WINDOW # years either side, as Similar objects' nudge
   # What the source record must be fetched with, beyond Discovery::FIELDS
-  SOURCE_FIELDS = (Discovery::FIELDS + FIELDS.values.flatten + [ YEAR_FIELD ]).uniq.freeze
+  SOURCE_FIELDS = (Discovery::FIELDS + FIELDS.values.flatten).uniq.freeze
   SHOWN = 8
   CANDIDATES = 24           # asked for, so that dropping unlistable ones still leaves enough
   MAX_VALUES = 3            # a record with many values does not make a vague row
@@ -60,13 +56,7 @@ class SimilarRows
     @values ||= FIELDS.fetch(key).lazy.map { |field| [ field, clean(@document[field]) ] }.find { |_field, list| list.any? }.then { |pair| pair ? [ pair ].to_h : {} }
   end
 
-  # The start year, for a period row with no era: records made within DATE_WINDOW years of it
-  def year
-    value = Array(@document[YEAR_FIELD]).first
-    value.to_i if key == "period" && values.empty? && value.to_s.match?(/\A-?\d+\z/)
-  end
-
-  def matchable? = values.any? || !year.nil?
+  def matchable? = values.any?
 
   # The search behind "See all": only when the row matches one value of one field (it is then exactly that filter)
   def see_all_query
@@ -83,8 +73,7 @@ class SimilarRows
     varied(kept).first(SHOWN)
   end
 
-  # One request: q is a Boolean "any of" of term queries, each value passed as a parameter (never in the query text); the year range
-  # is built from an integer. similar_row names the row (it also lets a test tell the request apart).
+  # One request: q is a Boolean "any of" of term queries, each value passed as a parameter (never in the query text). similar_row names the row (it also lets a test tell the request apart).
   def params
     clauses = {}
     values.each do |field, list|
@@ -94,7 +83,6 @@ class SimilarRows
         clauses[:"sim_v#{index}"] = value
       end
     end
-    clauses[:"sim_r#{clauses.size / 2}"] = "#{YEAR_FIELD}:[#{year - DATE_WINDOW} TO #{year + DATE_WINDOW}]" if year
     shoulds = clauses.keys.grep(/\Asim_r/).map { |name| "should=$#{name}" }.join(" ")
     { q: "{!bool #{shoulds}}", fq: [ "-{!term f=id v=$src}", *SimilarRecords::ASSET_FILTERS ], rows: CANDIDATES, src: @document.id.to_s,
       similar_row: key, fl: Discovery::FIELDS.join(","), **clauses }
