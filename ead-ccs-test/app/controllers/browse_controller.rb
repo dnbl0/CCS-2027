@@ -9,7 +9,7 @@ class BrowseController < ApplicationController
   # One Browse (docs/ia-audit-handover.md): Browse by category merged in; the sections are CategoriesHelper::BROWSE_SECTIONS. Makers and
   # subjects are the hubs' own cards; the rest are the categories' values
   def index
-    @hub_cards = BrowseHubs.all.select { |hub| %w[makers subjects].include?(hub.slug) }.to_h { |hub| [ hub.slug, [ hub, Browse::Cards.for(hub) ] ] }
+    @hub_cards = CategoriesHelper::BROWSE_SECTIONS.filter_map { |section| section[:hub] }.to_h { |slug| hub = BrowseHubs.find(slug); [ slug, [ hub, Browse::Cards.for(hub) ] ] }
     @browse_meta = Browse::Meta.index
   end
 

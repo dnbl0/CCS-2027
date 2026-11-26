@@ -19,8 +19,8 @@ module CategoriesHelper
   # subjects). heading and intro, where given, name the section by the page its "See all" opens (regions are Places, eras Time).
   BROWSE_SECTIONS = [
     { dimension: "collections" }, { dimension: "object-types" }, { dimension: "classifications" }, { dimension: "materials" },
-    { dimension: "regions", heading: "explore_pages.places.short", intro: "explore_pages.places.short_intro", link: "explore_pages.places.title" },
-    { dimension: "eras", heading: "explore_pages.time.short", intro: "explore_pages.time.short_intro", link: "explore_pages.time.title" },
+    # Places and Time show what their pages show (places; centuries and decades), not world regions and catalogue eras (26 Nov 2026)
+    { hub: "places" }, { hub: "periods" },
     { hub: "makers" }, { hub: "subjects" }, { dimension: "named-collections" }
   ].freeze
 

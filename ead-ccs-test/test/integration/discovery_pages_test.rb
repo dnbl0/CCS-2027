@@ -77,19 +77,25 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
 
   test "the Browse page has a section for each way in, each linking to its one page; the old addresses answer 301" do
     Categories.all.each { |dimension| seed(dimension.slug, rows(5)) }
+    picture = { "id" => "r1", "title" => "A print", "path" => "/digital-assets/thumbs/0000_013_1_pf.jpg", "width" => 400, "height" => 300 }
+    { "places" => %w[Australia Japan], "periods" => %w[1900–1999] }.each do |slug, labels|
+      cards = labels.map { |label| { "label" => label, "count" => 5, "image" => picture, "first" => (1900 if slug == "periods"), "last" => (1999 if slug == "periods") }.compact }
+      Rails.cache.write(SuppressedRecord.cache_key("browse_cards/v3/#{slug}"), cards, expires_in: 1.day)
+    end
 
     get "/browse"
 
     assert_response :success
     { "collections" => "/browse/collections", "object-types" => "/browse/object-types", "classifications" => "/browse/classifications",
-      "materials" => "/browse/materials", "regions" => "/browse/places", "eras" => "/browse/time", "named-collections" => "/browse/named-collections" }.each do |slug, path|
+      "materials" => "/browse/materials", "places" => "/browse/places", "periods" => "/browse/time", "named-collections" => "/browse/named-collections" }.each do |slug, path|
       assert_select "section.browse-#{slug} a.home-section__link[href='#{path}']"
     end
-    assert_select "section.browse-regions h2", "Places"
-    assert_select "section.browse-eras h2", "Time"
-    assert_select "section.browse-eras article.explore-card", count: 5 # too few pictures for its carousel: its first cards, up to eight
-    # the other ways in, Discover among them (it had no link since the home page's Featured and trending section went)
-    assert_select "section.browse-more a.browse-more__link[href='/browse/colours']", "Explore by colour"
+    # Places and Time show what their pages show (places; centuries and decades), named as their pages are
+    assert_select "section.browse-places h2", "Places"
+    assert_select "section.browse-places article.explore-card h3", text: "Australia"
+    assert_select "section.browse-periods h2", "Time"
+    # the other ways in, Discover among them, each by its page's own name
+    assert_select "section.browse-more a.browse-more__link[href='/browse/colours']", "Colours"
     assert_select "section.browse-more a.browse-more__link[href='/browse/discover']"
 
     { "/browse/categories" => "/browse", "/browse/categories/regions" => "/browse/places", "/browse/categories/eras" => "/browse/time",
@@ -110,22 +116,18 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the Browse page on the home page's layouts: stacks, clusters and the eras' carousel, two on bands of colour, no picture twice" do
+  test "the Browse page on the home page's layouts: stacks and clusters, two on bands of colour, no picture twice" do
     Categories.all.each { |dimension| seed(dimension.slug, pictured(dimension.slug, 9)) }
 
     get "/browse"
 
-    assert_select "main.categories-page > section.home-section.browse-section", Categories.all.size + 1 # and More ways in
+    # the five categories with a section of their own (Places and Time are hubs, with no cards here), and More ways in
+    assert_select "main.categories-page > section.home-section.browse-section", 6
     assert_select "section.browse-object-types.home-section--tinted ul.stack:not(.stack--bare) li.stack__item", 5
     assert_select "section.browse-classifications ul.cluster[data-count='4'] li", 4
     assert_select "section.browse-materials ul.stack.stack--bare li.stack__item", 4
-    assert_select "section.browse-regions ul.stack li.stack__item", 5
     assert_select "section.browse-collections.home-section--tinted ul.cluster[data-count='4']"
     assert_select "section.browse-named-collections ul.stack li.stack__item", 5
-    # the eras: the eight with the most records, as slides in time order
-    eras = css_select("section.browse-eras .feature-carousel__slide h3").map { |title| title.text.strip }
-    assert_equal %w[2th 3th 4th 5th 6th 7th 8th 9th].map { |n| "#{n} century" }, eras
-    assert_select "section.browse-eras [aria-roledescription=carousel][aria-label='The eras, earliest first']"
     pictures = css_select("main img").map { |img| img["src"][%r{[^/?]+\.jpeg}] }
     assert_equal pictures.uniq, pictures, "no picture twice"
   end
@@ -215,7 +217,9 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     get "/browse/stories"
 
     assert_select "#site-nav-browse a[href='/browse']"
-    expected = %w[/browse/collections /browse/object-types /browse/classifications /browse/places /browse/time /browse/colours /browse/makers /browse/subjects /browse/stories] # one Stories item holds the stories and the themes
+    # every Browse page from the one list, in the Browse page's order, then Stories (with the themes) and Discover
+    expected = %w[/browse/collections /browse/object-types /browse/classifications /browse/materials /browse/places /browse/time /browse/makers
+                  /browse/subjects /browse/named-collections /browse/colours /browse/stories /browse/discover]
     assert_equal expected, css_select("#site-nav-browse li a").map { |link| link["href"] }
     assert_select "#site-nav-saved a[href='/compare']", text: "Compare images"
     assert_select "#site-nav-saved a[href='/search-history']"

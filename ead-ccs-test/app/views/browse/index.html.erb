@@ -15,7 +15,7 @@
       <% hub, cards = @hub_cards[section[:hub]] %>
       <% next unless cards&.any? %>
       <%= render NexusCcs::HomeSectionComponent.new(id: "browse-#{hub.slug}", heading: hub.title, intro: hub.intro,
-                                                    link: t("browse.cards.see_all", kind: hub.title.downcase), link_path: browse_hub_path(hub.slug), extra_class: "browse-section browse-#{hub.slug}") do %>
+                                                    link: t("browse.cards.see_all", kind: hub.title.downcase), link_path: hub.path, extra_class: "browse-section browse-#{hub.slug}") do %>
         <%= render NexusCcs::CardLayoutComponent.new(cards: cards, layout: :mosaic, lanes: 4, label: hub.title) %>
       <% end %>
     <% else %>
@@ -35,7 +35,7 @@
   <%# The ways in that are not a list of values %>
   <%= render NexusCcs::HomeSectionComponent.new(id: "browse-more", heading: t("browse.more.heading"), intro: t("browse.more.intro"), extra_class: "browse-section browse-more") do %>
     <ul class="browse-more__list">
-      <% [ [ t("colours.title"), t("browse.more.colours"), explore_colours_path ],
+      <% [ [ BrowseHubs.find("colours").title, t("browse.more.colours"), explore_colours_path ],
            [ t("nexus_ccs.stories.title"), t("browse.more.stories"), stories_path ], [ t("nexus_ccs.discover.title"), t("browse.more.discover"), discover_path ] ].each do |title, text, path| %>
         <li class="browse-more__item">
           <h3 class="browse-more__title"><%= link_to title, path, class: "browse-more__link" %></h3>

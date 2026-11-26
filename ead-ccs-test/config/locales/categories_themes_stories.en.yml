@@ -20,28 +20,14 @@ en:
       previous: "Previous era"
       next: "Next era"
       leading: "Most records"
+      # regions and eras only: every other category is named by its Browse page (BrowseHubs)
       dimensions:
-        object-types:
-          title: "Object types"
-          intro: "What the records are: works, objects, archives, instruments and more."
-        classifications:
-          title: "Classifications"
-          intro: "The kinds of records the collections use to group them: prints, paintings, documents and more."
-        materials:
-          title: "Materials"
-          intro: "What the objects are made of."
         regions:
           title: "Regions"
           intro: "The parts of the world the objects come from."
         eras:
           title: "Eras"
           intro: "The centuries the objects were made in."
-        collections:
-          title: "Collections"
-          intro: "The University's collections whose records are in Collections Navigator."
-        named-collections:
-          title: "Named collections"
-          intro: "Groups of records within a collection, often a gift or a bequest."
     showcase:
       about: "About these records"
       highlights: "Highlights"

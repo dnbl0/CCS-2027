@@ -155,7 +155,7 @@ en:
       advisory_link: "Read about Indigenous cultural data and access"
       pagination: "Pages of records"
     period:
-      title: "%{period} — Periods — Collections Navigator — University of Melbourne"
+      title: "%{period} — Time — Collections Navigator — University of Melbourne"
       description: "Records in the University of Melbourne's cultural collections from %{span}."
       within: "Within this period"
       parent: "Century"

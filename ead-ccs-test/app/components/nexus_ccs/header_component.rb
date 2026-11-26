@@ -86,16 +86,11 @@ module NexusCcs
 
     # The Browse menu: every way in, in the order of the Browse page's sections (docs/ia-audit-handover.md), then themes and stories
     def browse_more_links
-      [ [ I18n.t("nexus_ccs.categories.dimensions.collections.title"), helpers.category_path("collections") ],
-        [ "Object types", helpers.browse_hub_path("object-types") ],
-        [ I18n.t("nexus_ccs.categories.dimensions.classifications.title"), helpers.category_path("classifications") ],
-        [ I18n.t("explore_pages.places.title"), helpers.explore_places_path ],
-        [ I18n.t("explore_pages.time.title"), helpers.explore_time_path ],
-        [ I18n.t("colours.title"), helpers.explore_colours_path ],
-        [ "Makers", helpers.browse_hub_path("makers") ],
-        [ "Subjects", helpers.browse_hub_path("subjects") ],
-        # one Stories page holds the stories and the themes (Dean, 26 Nov 2026): no separate Themes item
-        [ I18n.t("nexus_ccs.stories.title"), helpers.stories_path ] ].map { |label, href| SiteNavigation::Link.new(label, href) }
+      # every Browse page from the one list (BrowseHubs), in the Browse page's order and by its own title, then Stories (which holds the
+      # themes) and Discover: the menu cannot drift from the pages
+      links = BrowseHubs.in_menu_order.map { |hub| [ hub.title, hub.path ] } +
+              [ [ I18n.t("nexus_ccs.stories.title"), helpers.stories_path ], [ I18n.t("nexus_ccs.discover.title"), helpers.discover_path ] ]
+      links.map { |label, href| SiteNavigation::Link.new(label, href) }
     end
 
     def about = SiteNavigation::Link.new(SiteNavigation::ABOUT_LABEL, helpers.about_path)

@@ -11,8 +11,10 @@
 # record has a picture for is a card with no picture (the card's designed face).
 module Categories
   Dimension = Data.define(:slug, :field) do
-    def title = I18n.t("nexus_ccs.categories.dimensions.#{slug}.title")
-    def intro = I18n.t("nexus_ccs.categories.dimensions.#{slug}.intro")
+    # its Browse page's own title and intro (BrowseHubs: the one list), so a category is named the same everywhere; regions and eras,
+    # which have no Browse page of their own, keep theirs
+    def title = BrowseHubs.find(slug)&.title || I18n.t("nexus_ccs.categories.dimensions.#{slug}.title")
+    def intro = BrowseHubs.find(slug)&.intro || I18n.t("nexus_ccs.categories.dimensions.#{slug}.intro")
     # its one page (docs/ia-audit-handover.md): object types, regions and eras have a page of their own already
     def path
       routes = Rails.application.routes.url_helpers

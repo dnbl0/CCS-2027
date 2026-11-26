@@ -44,7 +44,7 @@ class BrowseEntitiesController < CatalogController
     @pictures = Browse::FacetPictures.for(@period.fq, avoid: @result.documents.map(&:id))
 
     @search_query = @period.search_query
-    trail = [ [ t("browse.title"), browse_path ], [ t("explore_pages.time.title"), explore_time_path ] ]
+    trail = [ [ t("browse.title"), browse_path ], [ BrowseHubs.find("periods").title, explore_time_path ] ] # the Time page, by its own name
     trail << [ @period.parent.label, browse_period_path(slug: @period.parent.slug) ] if @period.parent
     use_meta Browse::Meta.period(@period, @result.total), trail + [ [ @period.label, nil ] ]
     render "browse_entities/showcase"

@@ -51,6 +51,10 @@ module BrowseHubs
 
   def self.all = HUBS
 
+  # The order the Browse page's sections and the header's Browse menu follow (CategoriesHelper::BROWSE_SECTIONS), colours last
+  MENU_ORDER = %w[collections object-types classifications materials places periods makers subjects named-collections colours].freeze
+  def self.in_menu_order = MENU_ORDER.map { |slug| find(slug) }
+
   def self.find(slug) = HUBS.find { |hub| hub.slug == slug.to_s }
 
   # A value's own page, or nil (it opens the search): a maker's, place's or subject's page, a collection's, or a colour's spectrum
