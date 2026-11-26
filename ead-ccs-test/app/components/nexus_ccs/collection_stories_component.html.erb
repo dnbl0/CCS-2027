@@ -8,16 +8,18 @@
       <ul class="object-cards__list">
         <% stories.each do |story| %>
           <li class="object-cards__item">
-            <article class="<%= card_classes(story) %>">
+            <article class="<%= card_classes(story) %>" data-controller="story-image">
               <div class="object-card__body">
                 <h3 class="object-card__title"><%= link_to story.title, story.url, class: "object-card__link" %></h3>
                 <% if story.summary.present? %><p class="object-card__summary"><%= story.summary %></p><% end %>
                 <% if story.site.present? %><p class="object-card__meta"><%= story.site %></p><% end %>
               </div>
               <% if (src = image_url(story)) %>
-                <div class="object-card__media">
-                  <%# The title beside it names the story, so the picture adds nothing for a screen reader %>
-                  <%= image_tag src, alt: "", class: "object-card__image", loading: "lazy", decoding: "async" %>
+                <div class="object-card__media" data-story-image-target="media">
+                  <%# The title beside it names the story, so the picture adds nothing for a screen reader. A picture the
+                      collection's site will not serve turns the card into a text card (story_image_controller.js). %>
+                  <%= image_tag src, alt: "", class: "object-card__image", loading: "lazy", decoding: "async",
+                                     data: { story_image_target: "image", action: "error->story-image#fail" } %>
                 </div>
               <% end %>
             </article>

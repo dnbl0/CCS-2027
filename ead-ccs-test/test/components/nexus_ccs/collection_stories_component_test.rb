@@ -57,6 +57,13 @@ class CollectionStoriesComponentTest < ViewComponent::TestCase
     assert_no_selector "img"
   end
 
+  test "a picture the collection's site will not serve turns the card into a text card, not a broken image" do
+    render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ])
+
+    assert_selector "article.object-card[data-controller='story-image']"
+    assert_selector "[data-story-image-target='media'] img[data-story-image-target='image'][data-action='error->story-image#fail']"
+  end
+
   test "the wording comes from the locale file" do
     render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ])
 
