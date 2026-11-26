@@ -8,9 +8,9 @@
       <% if feature? %>
         <%= render NexusCcs::CollectionStoryComponent.new(story: stories.first, variant: "feature", stories: self) %>
       <% else %>
-        <ul class="story-grid story-grid--<%= columns %>">
+        <ul class="collection-story-grid collection-story-grid--<%= columns %>">
           <% stories.each do |story| %>
-            <li class="story-grid__item"><%= render NexusCcs::CollectionStoryComponent.new(story: story, variant: "card", stories: self) %></li>
+            <li class="collection-story-grid__item"><%= render NexusCcs::CollectionStoryComponent.new(story: story, variant: "card", stories: self) %></li>
           <% end %>
         </ul>
       <% end %>

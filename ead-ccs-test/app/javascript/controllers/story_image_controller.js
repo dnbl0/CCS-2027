@@ -23,6 +23,6 @@ export default class extends Controller {
     }
 
     if (this.hasMediaTarget) this.mediaTarget.remove()
-    this.element.classList.add("story--text")
+    this.element.classList.add("collection-story--text")
   }
 }

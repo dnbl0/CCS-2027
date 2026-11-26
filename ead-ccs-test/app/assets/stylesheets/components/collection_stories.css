@@ -11,19 +11,19 @@
 
 /* --- One story --- */
 
-.story {
+.collection-story {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--ccs-space-4);
 }
 
-.story:has(.story__link:focus-visible) {
+.collection-story:has(.collection-story__link:focus-visible) {
   outline: 3px solid var(--ccs-focus-ring);
   outline-offset: 4px;
 }
 
-.story__body {
+.collection-story__body {
   display: flex;
   flex-direction: column;
   gap: var(--ccs-space-3);
@@ -31,8 +31,8 @@
 }
 
 /* The small uppercase label above the headline ("Article", and on a card the site it is from) */
-.story__kicker,
-.story__source {
+.collection-story__kicker,
+.collection-story__source {
   margin: 0;
   font-size: var(--ccs-font-size-sm);
   font-weight: var(--ccs-font-weight-bold);
@@ -42,7 +42,7 @@
   color: var(--ccs-text-primary);
 }
 
-.story__title {
+.collection-story__title {
   margin: 0;
   font-family: var(--ccs-font-heading);
   font-size: var(--ccs-font-size-2xl);
@@ -51,30 +51,30 @@
   overflow-wrap: anywhere;
 }
 
-.story__link {
+.collection-story__link {
   color: var(--ccs-text-brand);
   text-decoration: none;
 }
 
 /* The headline's box covers the story, so there is one target and no nested link */
-.story__link::after {
+.collection-story__link::after {
   content: "";
   position: absolute;
   inset: 0;
 }
 
-.story:hover .story__link,
-.story__link:focus-visible {
+.collection-story:hover .collection-story__link,
+.collection-story__link:focus-visible {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
 }
 
-.story__link:focus-visible {
+.collection-story__link:focus-visible {
   outline: none; /* the story draws the focus ring */
 }
 
-.story__summary {
+.collection-story__summary {
   margin: 0;
   font-size: var(--ccs-font-size-lg);
   line-height: var(--ccs-line-height-normal);
@@ -84,7 +84,7 @@
 
 /* The picture: a 3:2 frame on a quiet ground, the picture whole inside it. Drawn above the text, though it follows it in the markup
    (the headline is read first). */
-.story__media {
+.collection-story__media {
   order: -1;
   display: flex;
   align-items: center;
@@ -94,7 +94,7 @@
   background: var(--ccs-surface-subtle);
 }
 
-.story__image {
+.collection-story__image {
   display: block;
   width: 100%;
   height: 100%;
@@ -103,23 +103,23 @@
 
 /* --- One story: the wide row --- */
 
-.story--feature {
+.collection-story--feature {
   margin-top: var(--ccs-space-6);
   padding-block: var(--ccs-space-6);
   border-block: 1px solid var(--ccs-border-default);
 }
 
-.story--feature .story__title {
+.collection-story--feature .collection-story__title {
   font-size: var(--ccs-font-size-3xl);
 }
 
-.story--feature .story__source {
+.collection-story--feature .collection-story__source {
   order: -2; /* above the picture and the text on a phone */
 }
 
 /* Source | kicker, headline, summary | picture, as the National Gallery's listing row */
 @media (min-width: 768px) {
-  .story--feature {
+  .collection-story--feature {
     display: grid;
     grid-template-columns: minmax(10rem, 1fr) 3fr 2fr;
     grid-template-areas: "source body media";
@@ -127,12 +127,12 @@
     align-items: start;
   }
 
-  .story--feature .story__source { grid-area: source; }
-  .story--feature .story__body { grid-area: body; }
-  .story--feature .story__media { grid-area: media; }
+  .collection-story--feature .collection-story__source { grid-area: source; }
+  .collection-story--feature .collection-story__body { grid-area: body; }
+  .collection-story--feature .collection-story__media { grid-area: media; }
 
   /* With no picture, the text takes its place */
-  .story--feature.story--text {
+  .collection-story--feature.collection-story--text {
     grid-template-columns: minmax(10rem, 1fr) 5fr;
     grid-template-areas: "source body";
   }
@@ -140,7 +140,7 @@
 
 /* --- Two or more stories: the card grid --- */
 
-.story-grid {
+.collection-story-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--ccs-space-7) var(--ccs-space-6);
@@ -150,25 +150,25 @@
 }
 
 @media (min-width: 600px) {
-  .story-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .collection-story-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (min-width: 1024px) {
-  .story-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .collection-story-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-.story-grid__item {
+.collection-story-grid__item {
   display: flex;
 }
 
-.story--card {
+.collection-story--card {
   flex: 1;
 }
 
-.story--card .story__kicker-source {
+.collection-story--card .collection-story__kicker-source {
   color: var(--ccs-text-secondary);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .story__link { transition: none; }
+  .collection-story__link { transition: none; }
 }
