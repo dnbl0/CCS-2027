@@ -170,12 +170,6 @@ class ListsTest < ActionDispatch::IntegrationTest
   end
 
   # The pages below read the Solr core at SOLR_URL; the "rails" CI job has none, so they skip themselves
-  def needs_solr
-    Blacklight.default_index.connection.get("select", params: { q: "*:*", rows: 0 })
-  rescue StandardError
-    skip "needs the Solr core at SOLR_URL"
-  end
-
   def first_ids(count)
     get "/catalog", params: { q: "skull", any_assets: "1", format: :json }
     JSON.parse(response.body)["data"].first(count).map { |doc| doc["id"] }

@@ -12,12 +12,6 @@ class SavedRecordsHiddenTest < ActionDispatch::IntegrationTest
 
   # The results and record pages read the Solr core at SOLR_URL. The "rails" CI job has no Solr, so these tests skip themselves
   # when it cannot be reached.
-  def needs_solr
-    Blacklight.default_index.connection.get("select", params: { q: "*:*", rows: 0 })
-  rescue StandardError
-    skip "needs the Solr core at SOLR_URL"
-  end
-
   def assert_no_saving
     assert_response :success
     assert_select ".site-nav__saved", count: 0
