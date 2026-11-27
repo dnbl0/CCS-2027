@@ -50,7 +50,7 @@
                       <% row.values.each_with_index do |value, index| %>
                         <div class="record-details__truncate" data-controller="truncate">
                           <span class="record-details__value" data-truncate-target="text"><%= flagged(row, value, index) %></span>
-                          <button type="button" class="record-details__truncate-toggle" data-truncate-target="toggle" data-action="truncate#toggle" hidden>Show more</button>
+                          <button type="button" class="record-details__truncate-toggle" data-truncate-target="toggle" data-action="truncate#toggle" hidden><%= t("nexus_ccs.show_more") %></button>
                         </div>
                       <% end %>
                     <% else %>

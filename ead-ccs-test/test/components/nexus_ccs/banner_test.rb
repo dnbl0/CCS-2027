@@ -6,8 +6,8 @@ class BannerTest < ActiveSupport::TestCase
   SCOPE = /:is\(\.search-banner, \.ccs-hero__search, \.sticky-search\)/
 
   test "the banner copy is the default description until there is a search" do
-    assert_match(/Explore artworks, objects, manuscripts/, NexusCcs::SearchBannerComponent::DESCRIPTION)
-    assert_equal "Search the collections", NexusCcs::SearchBannerComponent::TITLE
+    assert_match(/Explore artworks, objects, manuscripts/, I18n.t("nexus_ccs.search_banner.description"))
+    assert_equal "Search the collections", I18n.t("nexus_ccs.search_banner.title")
   end
 
   test "the banner styles follow the static page: 48px bar, 720px, visible Advanced search link" do
