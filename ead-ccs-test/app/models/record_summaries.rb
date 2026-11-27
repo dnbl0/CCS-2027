@@ -9,9 +9,6 @@ module RecordSummaries
     licence_type_ssim digital_asset_metadata_ssm access_condition_ssi restrictions_tsi digital_asset_advisory_classification_ssim
   ].freeze
 
-  # A Solr phrase: the value in quotes, with any quote or backslash escaped so it cannot change the query
-  def self.phrase(value) = %("#{value.to_s.gsub(/["\\]/) { |char| "\\#{char}" }}")
-
   # An array of hashes (what Solr returned), or nil when Solr could not answer
   def self.fetch(params, connection = nil)
     response = SolrGuard.run do

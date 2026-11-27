@@ -30,7 +30,7 @@ module ExploreEntryPoints
   Overview = Data.define(:collections, :kinds, :places, :periods, :kind_tiles, :place_tiles, :period_tiles) do
     def any? = [ collections, kinds, places, periods ].any?(&:present?)
   end
-  # FILM COPY: Record types, Places and Time are each a row of this many tiles
+  # Record types, Places and Time are each a row of this many tiles
   ROW = 4
   # The Places section is a row that scrolls sideways, so it holds more than a row of tiles
   PLACES_SHOWN = 8
@@ -86,7 +86,7 @@ module ExploreEntryPoints
       connection.get("select", params: {
         q: "*:*", rows: 0, wt: "json", facet: true, "facet.mincount": 1, "facet.limit": FACET_LIMIT, "facet.sort": "count",
         "facet.field": [ COLLECTION_FIELD, CLASSIFICATION_FIELD, PLACE_FIELD ],
-        "facet.query": kinds.map { |_label, values| Browse.field_query(CLASSIFICATION_FIELD, values) } +
+        "facet.query": kinds.map { |_label, values| SolrQuery.field(CLASSIFICATION_FIELD, values) } +
                        periods.map { |_label, first, last| period_query(first, last) }
       })
     end
@@ -95,7 +95,7 @@ module ExploreEntryPoints
     fetched = fetched.merge(fetch_link_images(fetched))
     fetched.merge(fetch_link_intros(fetched))
   rescue RSolr::Error::Http, RSolr::Error::ConnectionRefused, RSolr::Error::Timeout, Faraday::Error, SystemCallError, Timeout::Error => e
-    Rails.logger.warn("Explore entry points unavailable: #{e.class}")
+    Discovery.log_failure("Explore entry points", e)
     nil
   end
 
@@ -108,7 +108,7 @@ module ExploreEntryPoints
     {
       "collections" => collection_pairs(facets[COLLECTION_FIELD]),
       "kinds" => kinds.filter_map do |label, values|
-        count = queries[Browse.field_query(CLASSIFICATION_FIELD, values)].to_i
+        count = queries[SolrQuery.field(CLASSIFICATION_FIELD, values)].to_i
         [ label, count, values.select { |value| present.include?(value) } ] if count.positive?
       end,
       "places" => facets[PLACE_FIELD].to_a.each_slice(2).to_a.reject { |value, _count| config.dig("places", "skip").include?(value) }.first(config.dig("places", "limit")),
@@ -129,18 +129,18 @@ module ExploreEntryPoints
     collection_pairs.to_a.filter_map do |name, _count|
       next if text_only?(name)
 
-      image = example_image("#{COLLECTION_FIELD}:#{Browse.phrase(name)}")
+      image = example_image("#{COLLECTION_FIELD}:#{SolrQuery.phrase(name)}")
       [ name, image ] if image
     end.to_h
   rescue StandardError => e
-    Rails.logger.warn("Explore example images unavailable: #{e.class}")
+    Discovery.log_failure("Explore example images", e)
     {}
   end
 
-  # FILM COPY: one example picture for each record type, place and period (the same rule as the collection tiles' pictures)
+  # One example picture for each record type, place and period (the same rule as the collection tiles' pictures)
   def self.fetch_link_images(fetched)
-    kinds = fetched["kinds"].to_a.to_h { |label, _count, values| [ label, values.any? ? Browse.field_query(CLASSIFICATION_FIELD, values) : nil ] }
-    places = fetched["places"].to_a.to_h { |value, _count| [ value, "#{PLACE_FIELD}:#{Browse.phrase(value)}" ] }
+    kinds = fetched["kinds"].to_a.to_h { |label, _count, values| [ label, values.any? ? SolrQuery.field(CLASSIFICATION_FIELD, values) : nil ] }
+    places = fetched["places"].to_a.to_h { |value, _count| [ value, "#{PLACE_FIELD}:#{SolrQuery.phrase(value)}" ] }
     periods = periods().to_h { |label, first, last| [ label, period_query(first, last) ] }
     used = fetched.fetch("images", {}).values.map { |image| image[:id].to_s } # no picture is shown twice on the page
     { "kind_images" => kinds, "place_images" => places, "period_images" => periods }.transform_values do |filters|
@@ -153,21 +153,21 @@ module ExploreEntryPoints
       end.to_h
     end
   rescue StandardError => e
-    Rails.logger.warn("Explore link images unavailable: #{e.class}")
+    Discovery.log_failure("Explore link images", e)
     {}
   end
 
   # The description of each record type, place and period (CardDescription): { "kind_intros" => { label => text }, ... }. A failure costs the
   # descriptions only.
   def self.fetch_link_intros(fetched)
-    kinds = fetched["kinds"].to_a.filter_map { |label, _count, values| [ label, { filter: Browse.field_query(CLASSIFICATION_FIELD, values), kinds: false } ] if values.any? }
-    places = fetched["places"].to_a.map { |value, _count| [ value, { filter: "#{PLACE_FIELD}:#{Browse.phrase(value)}" } ] }
+    kinds = fetched["kinds"].to_a.filter_map { |label, _count, values| [ label, { filter: SolrQuery.field(CLASSIFICATION_FIELD, values), kinds: false } ] if values.any? }
+    places = fetched["places"].to_a.map { |value, _count| [ value, { filter: "#{PLACE_FIELD}:#{SolrQuery.phrase(value)}" } ] }
     periods = periods().map { |label, first, last| [ label, { filter: period_query(first, last), earliest: first == EARLIEST_YEAR } ] }
     { "kind_intros" => kinds, "place_intros" => places, "period_intros" => periods }.transform_values do |described|
       described.to_h { |label, options| [ label, CardDescription.for(**options) ] }
     end
   rescue StandardError => e
-    Rails.logger.warn("Explore descriptions unavailable: #{e.class}")
+    Discovery.log_failure("Explore descriptions", e)
     {}
   end
 
@@ -206,7 +206,7 @@ module ExploreEntryPoints
 
   def self.period_query(first, last) = "#{DATE_FIELD}:[#{first} TO #{last}]"
 
-  # FILM ONLY (private copy for the 2027 showcase clip; never pushed): every University collection as a tile, with the collection
+  # Used only when FILM_ALL_COLLECTIONS is set (made for the 2027 showcase film): every University collection as a tile, with the collection
   # thumbnails supplied for the film. No record counts are shown, as most of these collections have no records in this index yet.
   FILM_COLLECTIONS = [
     [ "University Art Collection", "/film-thumbs/00-university-art-collection.jpg", 1200, 600 ],

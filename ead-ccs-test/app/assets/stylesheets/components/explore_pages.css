@@ -21,7 +21,7 @@
 }
 .timeline__label { font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); }
 .timeline__images { display: flex; gap: var(--ccs-space-1); }
-.timeline__images img { width: 4rem; height: 4rem; object-fit: cover; background: var(--ccs-surface-subtle); }
+.timeline__images img { width: 4rem; height: 4rem; object-fit: contain; background: var(--ccs-surface-subtle); }
 .timeline__zoom { display: inline-flex; align-items: center; min-height: 44px; color: var(--ccs-text-link); text-decoration: underline; }
 
 @media (max-width: 576px) {

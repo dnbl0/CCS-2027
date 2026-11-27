@@ -70,7 +70,7 @@ class HomeExploreTest < ActionDispatch::IntegrationTest
     assert_equal in_solr, count
     assert_not_includes counts["collections"].map(&:first), "[other]"
     label, kind_count, values = counts["kinds"].first
-    in_kind = connection.get("select", params: { q: Browse.field_query("classification_ssim", ExploreEntryPoints.kinds.to_h.fetch(label)), rows: 0 }).dig("response", "numFound")
+    in_kind = connection.get("select", params: { q: SolrQuery.field("classification_ssim", ExploreEntryPoints.kinds.to_h.fetch(label)), rows: 0 }).dig("response", "numFound")
     assert_equal in_kind, kind_count
     assert_not_empty values
   end

@@ -21,7 +21,7 @@ For the next Claude agent (any account) continuing Dean's work. Dean is non-tech
 - `tests/bookmarks.test.js` "Save button is at least 44px tall" failed on about half of CI runs until #226 made it poll until the layout settles.
 
 ## How to work here
-- Per task: `git worktree add -B <branch> /tmp/<dir> origin/main`; never switch branches in /Users/nobled/CCS-Static (shared, stay on main).
+- Per task: `git worktree add -B <branch> /tmp/<dir> origin/main`; never switch branches in ~/CCS-Static (shared, stay on main).
 - Checks (all four must pass before merge): parity, rails, system, test. Merge: `gh pr merge N --squash` (allowed in `.claude/settings.local.json`). Look at the CI conclusion before merging; rerun a flaky failed job with `gh run rerun <run> --failed`.
 - Static: `npm install --no-package-lock` (or symlink root node_modules into the worktree, remove before committing), `npm run sync:partials` after editing `src/partials/*`, `npm run sync:rails` after static CSS, `npm test`. `package.json`'s test script is one long line, so two PRs adding a test collide there: rebase after the first merges. Rails: `SOLR_URL=http://127.0.0.1:8984/solr/blacklight-core bin/rails test` and `test:system`, `bin/rubocop`, `bin/erb_lint --lint-all`, `bin/rails dartsass:build` once per worktree (system tests are unstyled without it). The axe system test needs the root node_modules symlinked. Solr 8984 is ours; 8983 is another project's: never pkill by pattern.
 - Shipping: branch off `org/main` in a worktree, push to `org`, `gh pr create -R Enterprise-Services-Group/CCS-2026-MVP`, wait for four checks, merge, confirm "Deploy to GitHub Pages" success, remove the temp worktree/branch. No dnbl0 sync step (see Repos).

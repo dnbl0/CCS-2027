@@ -85,7 +85,7 @@ module Browse
     end
 
     def self.group_filter(hub, candidate)
-      candidate["first"] ? ExploreEntryPoints.period_query(candidate["first"], candidate["last"]) : "#{field(hub)}:#{Browse.phrase(candidate["label"])}"
+      candidate["first"] ? ExploreEntryPoints.period_query(candidate["first"], candidate["last"]) : "#{field(hub)}:#{SolrQuery.phrase(candidate["label"])}"
     end
 
     # The first record, in id order, that a result card would show a picture for: its asset may be seen (AccessPolicy.view?, so not a

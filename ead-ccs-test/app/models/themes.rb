@@ -18,9 +18,9 @@ module Themes
       range ? query.merge(range: { DATE_FIELD => { begin: range["begin"], end: range["end"] } }) : query
     end
 
-    # The same records as Solr filters; values are from the file and quoted (Browse.phrase)
+    # The same records as Solr filters; values are from the file and quoted (SolrQuery.phrase)
     def fq
-      list = filters.map { |field, values| Browse.field_query(field, values) }
+      list = filters.map { |field, values| SolrQuery.field(field, values) }
       range ? list << "#{DATE_FIELD}:[#{range['begin'].to_i} TO #{range['end'].to_i}]" : list
     end
   end

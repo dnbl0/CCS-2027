@@ -13,7 +13,7 @@ module ColourCounts
     counts = Array(response.dig("facet_counts", "facet_fields", CatalogConfig::Facets::COLOUR_FIELD)).each_slice(2).to_h
     Colour::Palette::NAMES.filter_map { |name| Entry.new(name: name, count: counts[name].to_i) if counts[name].to_i.positive? }
   rescue StandardError => e
-    Rails.logger.warn("Colour counts unavailable: #{e.class}")
+    Discovery.log_failure("Colour counts", e)
     nil
   end
 end
