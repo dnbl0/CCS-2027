@@ -20,14 +20,14 @@ class ColoursSystemTest < ApplicationSystemTestCase
 
   def sideways_scroll? = page.evaluate_script("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
-  test "the colour page at a desktop and a phone width: every colour named and counted, accessible, no sideways scroll" do
+  test "the colour page at a desktop and a phone width: every colour named (no counts), accessible, no sideways scroll" do
     [ [ 1400, 900 ], [ 390, 844 ], [ 320, 700 ] ].each do |width, height|
       page.current_window.resize_to(width, height)
       visit "/explore/colours"
 
       assert_selector "h1", text: "Explore by colour"
       assert_selector "a.colours__link", count: 12
-      assert_selector "a.colours__link", text: /White\s+84 records/
+      assert_selector "a.colours__link", exact_text: "White" # the name only: no count
       assert_not sideways_scroll?, "no sideways scroll at #{width}px"
       assert_accessible
     end

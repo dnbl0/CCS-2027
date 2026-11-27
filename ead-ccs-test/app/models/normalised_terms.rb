@@ -31,7 +31,7 @@ module NormalisedTerms
       response = Blacklight.default_index.connection.get("select", params: { q: "*:*", fq: "#{field}:[* TO *]", rows: 0, wt: "json" })
       response.dig("response", "numFound").to_i.positive?
     rescue StandardError => e
-      Rails.logger.warn("Normalised #{field} check unavailable: #{e.class}")
+      Discovery.log_failure("Normalised #{field} check", e)
       false
     end
   end

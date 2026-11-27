@@ -7,8 +7,12 @@ on:
       - 'ead-ccs-test/**'
       - 'package.json' # the system job installs axe-core from the root package.json
       - '.github/workflows/rails-ci.yml'
-  # No run on push to main: the pull request already ran these checks, and a private repo's minutes are limited
+  # No run on push to main: the pull request already ran these checks, and the Actions budget is $0 (public repo)
   workflow_dispatch:
+
+# Read-only token: these jobs only check out and test the code
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -148,6 +152,10 @@ jobs:
         run: |
           bin/rails db:create db:schema:load
           bin/rails collections:index
+
+      # The rails job has no Solr, so every test that calls needs_solr skips there; run them here, against the indexed core
+      - name: Run the tests that need Solr (models, integration, components)
+        run: bin/rails test
 
       - name: Run system tests (journeys and accessibility)
         run: bin/rails test:system

@@ -68,9 +68,9 @@ module Categories
   end
 
   def self.tile(dimension, row)
-    count = ActiveSupport::NumberHelper.number_to_delimited(row["count"])
     image = ExploreEntryPoints.build_image(row["image"]) unless ExploreEntryPoints.text_only?(row["value"])
-    Tile.new(label: "#{row['value'].to_s.upcase_first} (#{count})", value: row["value"], count: row["count"],
+    # The name only: no count of records on the tile (the owner's no-counts rule, docs/decisions-2027.md)
+    Tile.new(label: row["value"].to_s.upcase_first, value: row["value"], count: row["count"],
              query: BrowseHubs.query(dimension.field, row["value"]), image: image, intro: nil)
   end
 

@@ -28,7 +28,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
                                                          "facets" => { "object_type_ssim" => [ [ "Work", 9 ] ], "date_era_ssim" => [ [ "20th century", 12 ] ], "named_collection_ssim" => [] } })
   end
 
-  test "a category page shows a card for each value, with its count, opening the search with that value as a filter" do
+  test "a category page shows a card for each value, with no count, opening the search with that value as a filter" do
     seed("regions", [ { "value" => "Oceania", "count" => 8638, "image" => PICTURE }, { "value" => "Europe", "count" => 6840, "image" => nil } ])
 
     get "/browse/categories/regions"
@@ -36,7 +36,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Regions"
     assert_select "article.explore-card", count: 2
-    assert_select "article.explore-card h3 a[href*='f%5Bregion_ssim%5D%5B%5D=Oceania'][href*='any_assets=1']", text: "Oceania (8,638)"
+    assert_select "article.explore-card h3 a[href*='f%5Bregion_ssim%5D%5B%5D=Oceania'][href*='any_assets=1']", text: "Oceania" # the name only, no count
     assert_select "article.explore-card img[src*='unimelbourne.widen.net']", count: 1
     assert_select "nav[aria-label='Sort categories'] a[aria-current='page']", text: "Most records"
   end
@@ -45,7 +45,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     seed("materials", rows(50).reverse + [ { "value" => "aardvark hide", "count" => 1, "image" => nil } ])
 
     get "/browse/categories/materials", params: { sort: "az" }
-    assert_equal "Aardvark hide (1)", css_select("article.explore-card h3").first.text.squish
+    assert_equal "Aardvark hide", css_select("article.explore-card h3").first.text.squish
     assert_select "article.explore-card", count: Categories::PER_PAGE
     assert_select "nav[aria-label='Sort categories'] a[aria-current='page']", text: "A to Z"
 
@@ -86,7 +86,7 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Grainger Museum Collection"
     assert_select "[data-placeholder-wording]", text: /Lorem ipsum/
-    assert_select "a.btn[href*='f%5Bcollection_ssim%5D%5B%5D=Grainger+Museum+Collection']", text: "See all 12 records"
+    assert_select "a.btn[href*='f%5Bcollection_ssim%5D%5B%5D=Grainger+Museum+Collection']", text: "See all records"
     assert_select ".browse-facts__links a[href*='f%5Bobject_type_ssim%5D%5B%5D=Work']", text: "Work"
     assert_select "link[rel='canonical'][href$='/browse/collections/#{slug}']"
 
@@ -131,8 +131,8 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     get "/stories/example-story"
     assert_response :success
     assert_select "h1", "Example story (placeholder)"
-    assert_select ".story__text h2", text: "Lorem ipsum"
-    assert_select ".story__text script", count: 0
+    assert_select ".story-page__text h2", text: "Lorem ipsum"
+    assert_select ".story-page__text script", count: 0
 
     get "/stories/no-such-story"
     assert_response :not_found

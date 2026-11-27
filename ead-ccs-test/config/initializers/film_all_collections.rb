@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# FILM COPY ONLY (FILM_ALL_COLLECTIONS, private copy for the 2027 showcase film; never pushed): the Collection Title facet lists every
+# Off unless FILM_ALL_COLLECTIONS is set (made for the 2027 showcase film): the Collection Title facet lists every
 # University collection, as the home page's tiles do (ExploreEntryPoints::FILM_COLLECTIONS). A collection with no records in this index
 # has no count beside it (none is invented). The list is the facet's own: the sidebar shows its first values and Blacklight's
 # "More Collection Title" link opens the rest in its facet modal; Advanced search lists them all as checkboxes.

@@ -182,7 +182,7 @@ class CatalogController < ApplicationController
   def blacklight_suggestions
     suggestions_service.suggestions
   rescue StandardError => error
-    Rails.logger.warn("Suggestions unavailable: #{error.class}: #{error.message}")
+    Discovery.log_failure("Suggestions", error)
     []
   end
 

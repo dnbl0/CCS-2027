@@ -2,12 +2,6 @@ require "test_helper"
 
 # CCS-137: citations for the records of a list and of the saved records. Reads records from the Solr core at SOLR_URL.
 class CitationsTest < ActionDispatch::IntegrationTest
-  def needs_solr
-    Blacklight.default_index.connection.get("select", params: { q: "*:*", rows: 0 })
-  rescue StandardError
-    skip "needs the Solr core at SOLR_URL"
-  end
-
   def record_ids
     @record_ids ||= begin
       get "/catalog", params: { q: "skull", any_assets: "1", format: :json }

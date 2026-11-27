@@ -38,7 +38,6 @@
 }
 
 .colours__name { font-weight: var(--ccs-heading-weight-strong); color: var(--ccs-text-link); text-decoration: underline; overflow-wrap: anywhere; }
-.colours__count { color: var(--ccs-text-secondary); font-size: 0.9375rem; }
 
 /* One fixed sample per colour name (Colour::Palette::NAMES) */
 .colours__swatch--red { background: #c8102e; }

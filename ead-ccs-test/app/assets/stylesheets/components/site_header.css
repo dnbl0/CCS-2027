@@ -157,7 +157,6 @@ a.site-header__title:hover { color: var(--ccs-cyan-400); text-decoration: underl
 /* Search collections menu (BrowseMenu): the collections with their record counts, then the links under them */
 .site-nav__group-title { margin: 0 0 var(--ccs-space-2); font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-semibold); letter-spacing: 0.02em; color: var(--ccs-cyan-250); }
 .site-nav__panel--browse .site-nav__panel-list a { align-items: baseline; justify-content: space-between; }
-.site-nav__count { flex: none; font-size: var(--ccs-font-size-sm); font-weight: var(--ccs-font-weight-regular); color: var(--ccs-neutral-300); font-variant-numeric: tabular-nums; }
 .site-nav__browse-more { display: flex; flex-wrap: wrap; gap: var(--ccs-space-2) var(--ccs-space-6); margin: var(--ccs-space-5) 0 0; padding: var(--ccs-space-4) 0 0; border-top: 1px solid var(--ccs-navy-750); list-style: none; }
 .site-nav__browse-more a { font-weight: var(--ccs-font-weight-semibold); color: var(--ccs-white); text-decoration: none; }
 .site-nav__browse-more a:hover { text-decoration: underline; color: var(--ccs-cyan-400); }

@@ -71,9 +71,9 @@
 
 .explore__tile-link:hover .explore__tile-title { color: var(--ccs-text-link-hover); text-decoration: underline; }
 
-/* FILM ONLY: every collection, five per row, the collection picture filling its face */
+/* Every collection, five per row, the collection picture shown whole on its face (never cropped) */
 .explore__tiles--all { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--ccs-space-4); }
-.explore__tiles--all .explore__image { object-fit: cover; }
+.explore__tiles--all .explore__image { object-fit: contain; }
 .explore__tiles--all .explore__tile-body { padding: var(--ccs-space-3) var(--ccs-space-7) var(--ccs-space-3) var(--ccs-space-3); }
 .explore__tiles--all .explore__tile-title { font-size: var(--ccs-font-size-md); }
 .explore__tiles--all .explore__tile-body::after { right: var(--ccs-space-3); bottom: var(--ccs-space-3); width: 1.25rem; height: 1.25rem; }

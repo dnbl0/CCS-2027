@@ -2,7 +2,7 @@
 // (Rails) are extracted from "CCS Field labels and filters.xlsx"; if someone edits the workbook (or a JSON file by hand) without
 // re-running the extractors, this fails. It compares the sequence number, name and source system (CMS or DAM) of every field and
 // the number, name and type of every filter, read straight from the workbook (tests/workbook-names.py, standard library only),
-// and checks the two JSON copies are the same. The DAM-only fields are the media metadata: they must be exactly the sheet's.
+// The DAM-only fields are the media metadata: they must be exactly the sheet's.
 const { ROOT, fail, ok, finish, fs, path } = require('./lib');
 const { execFileSync } = require('child_process');
 
@@ -26,8 +26,6 @@ else fail(`the DAM-only fields differ from the workbook: ${JSON.stringify(dam(sh
 if (same(filters, sheet.filters)) ok(`${filters.length} filters and their types match the workbook`);
 else fail(`data-model/filters.json differs from the workbook; re-run scripts/extract-data-model.py\n  workbook: ${JSON.stringify(sheet.filters)}\n  json:     ${JSON.stringify(filters)}`);
 
-for (const [a, b] of [['field-labels.json', 'field_labels.json'], ['filters.json', 'filters.json']]) {
-  if (same(J('data-model', a), J('ead-ccs-test', 'config', 'data_model', b))) ok(`the Rails copy of ${a} is the static site's`);
-  else fail(`ead-ccs-test/config/data_model/${b} differs from data-model/${a}; re-run both extractors`);
-}
+// The Rails app owns its copy (ead-ccs-test/config/data_model/) and may add to it (for example the With Digital Asset filter):
+// the 2026 and 2027 data models are kept separate (docs/decoupling-from-2026.md), so the two copies are no longer compared.
 finish('workbook-drift');

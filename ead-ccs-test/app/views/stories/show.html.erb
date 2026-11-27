@@ -3,16 +3,16 @@
 <% content_for :body_class, "page-browse page-story" %>
 <%= render NexusCcs::PageBannerComponent.new(title: @story.title, description: @story.summary) %>
 <main class="browse-main" id="main-content">
-  <article class="browse-main__inner story" aria-labelledby="story-title">
+  <article class="browse-main__inner story-page" aria-labelledby="story-title">
     <h2 id="story-title" class="visually-hidden"><%= @story.title %></h2>
-    <p class="story__meta"><%= [ (t("nexus_ccs.stories.by", author: @story.author) if @story.author), t("nexus_ccs.stories.published", date: l(@story.date, format: "%-d %B %Y")) ].compact.join(" · ") %></p>
+    <p class="story-page__meta"><%= [ (t("nexus_ccs.stories.by", author: @story.author) if @story.author), t("nexus_ccs.stories.published", date: l(@story.date, format: "%-d %B %Y")) ].compact.join(" · ") %></p>
     <% hero = @embedded[:records][@story.hero] %>
-    <% if hero %><div class="story__embed story__embed--hero"><%= render NexusCcs::RecordCardComponent.new(document: hero) %></div><% end %>
+    <% if hero %><div class="story-page__embed story-page__embed--hero"><%= render NexusCcs::RecordCardComponent.new(document: hero) %></div><% end %>
     <% @parts.each_with_index do |part, index| %>
       <% if part.is_a?(Stories::Embed) && part.kind == :record %>
         <% document = @embedded[:records][part.value] %>
         <% if document %>
-          <div class="story__embed"><%= render NexusCcs::RecordCardComponent.new(document: document) %></div>
+          <div class="story-page__embed"><%= render NexusCcs::RecordCardComponent.new(document: document) %></div>
         <% else %>
           <p class="browse-note"><%= t("nexus_ccs.stories.missing_record") %></p>
         <% end %>
@@ -20,10 +20,10 @@
         <% found = @embedded[:searches][@parts.grep(Stories::Embed).index(part)] %>
         <% if found && found[:documents].any? %>
           <%= render NexusCcs::RecordCardsComponent.new(id: "story-search-#{index}", heading: part.heading || t("nexus_ccs.stories.search_heading"), documents: found[:documents]) %>
-          <p class="story__more"><%= link_to t("nexus_ccs.stories.more_results", count: number_with_delimiter(found[:total])), search_catalog_path(part.value), class: "arrow-link" %></p>
+          <p class="story-page__more"><%= link_to t("nexus_ccs.stories.more_results", count: number_with_delimiter(found[:total])), search_catalog_path(part.value), class: "arrow-link" %></p>
         <% end %>
       <% else %>
-        <div class="story__text"><%= part %></div>
+        <div class="story-page__text"><%= part %></div>
       <% end %>
     <% end %>
   </article>

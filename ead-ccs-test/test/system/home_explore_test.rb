@@ -82,14 +82,14 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     assert_selector ".explore-places article.result-card h3 a", text: "Australia"
   end
 
-  test "with example images the section has no axe violations, the picture fills its tile and the Indigenous Collections tile is still text only" do
+  test "with example images the section has no axe violations, the picture is shown whole on its tile and the Indigenous Collections tile is still text only" do
     keep(counts(with_image: true))
     visit "/"
 
     assert_selector "section.explore img.explore__image", count: 1
     assert_selector "li.explore__tile:nth-child(1) img"
     assert_no_selector "li.explore__tile:nth-child(5) img"
-    assert_equal "cover", page.evaluate_script("getComputedStyle(document.querySelector('.explore__image')).objectFit")
+    assert_equal "contain", page.evaluate_script("getComputedStyle(document.querySelector('.explore__image')).objectFit") # shown whole, never cropped
     assert_accessible(tags: AXE_TAGS + WCAG22_TAGS)
   end
 

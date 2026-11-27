@@ -5,7 +5,7 @@ require "test_helper"
 # The curated groups of the home page's Explore section (config/explore_kinds.yml): what is kept from Solr, and what is drawn from it
 class ExploreEntryPointsTest < ActiveSupport::TestCase
   def kind_query(label)
-    ExploreEntryPoints.kinds.find { |name, _values| name == label }.then { |_name, values| Browse.field_query("classification_ssim", values) }
+    ExploreEntryPoints.kinds.find { |name, _values| name == label }.then { |_name, values| SolrQuery.field("classification_ssim", values) }
   end
 
   def response(collections: [], classification: [], places: [], queries: {})

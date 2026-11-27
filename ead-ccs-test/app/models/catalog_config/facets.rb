@@ -31,7 +31,7 @@ module CatalogConfig
         when :checkbox then options.merge!(limit: nil, **MULTI_SELECT.call(solr))
         else options.merge!(limit: 20, index_range: "A".."Z", **MULTI_SELECT.call(solr))   # browse, with "search within this filter" in the modal
         end
-        # FILM COPY: every collection title is listed (config/initializers/film_all_collections.rb); the sidebar shows the first ten and
+        # With FILM_ALL_COLLECTIONS set, every collection title is listed (config/initializers/film_all_collections.rb); the sidebar shows the first ten and
         # Blacklight's own "More Collection Title" modal the rest, on one page
         options.merge!(limit: 10, more_limit: 40) if filter.solr == "collection_ssim" && ENV["FILM_ALL_COLLECTIONS"].present?
         options[:helper_method] = VALUE_HELPERS[filter.solr] if VALUE_HELPERS.key?(filter.solr)
@@ -73,7 +73,7 @@ module CatalogConfig
     # Filters whose stored values are codes, shown through a helper (FacetValuesHelper)
     VALUE_HELPERS = { "dam_access_tier_ssi" => :access_tier_facet_label }.freeze
 
-    # FILM COPY (as CCS-2026 #221): multi-select. The values are alternatives (InclusiveFilterField), the filter query is tagged
+    # Multi-select. The values are alternatives (InclusiveFilterField), the filter query is tagged
     # with the field, and Solr leaves that tag out when it counts the facet's own values, so a chosen collection keeps the others listed.
     MULTI_SELECT = ->(field) { { filter_class: InclusiveFilterField, tag: field, ex: field } }
 
