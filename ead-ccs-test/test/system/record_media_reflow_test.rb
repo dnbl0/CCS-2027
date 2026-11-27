@@ -31,7 +31,7 @@ class RecordMediaReflowTest < ApplicationSystemTestCase
 
     click_button "Close media information"
     assert_no_selector ".digital-assets__panel.is-open", visible: :all
-    sleep 0.4 # let the slide-out transition finish
+    wait_for_animations # the slide-out transition
     assert_no_sideways_scroll("closed again")
   end
 end

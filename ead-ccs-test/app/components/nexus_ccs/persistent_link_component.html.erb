@@ -5,11 +5,11 @@
         <h3 id="persistent-link-heading" class="persistent-link__heading"><%= t("nexus_ccs.record_page.about.persistent_link") %></h3>
         <%= render NexusCcs::HelpTipComponent.new(topic: :persistent_link) %>
       </div>
-      <input type="text" class="persistent-link__url" value="<%= url %>" readonly autocomplete="off" aria-label="Persistent link" data-clipboard-target="source">
+      <input type="text" class="persistent-link__url" value="<%= url %>" readonly autocomplete="off" aria-label="<%= t("nexus_ccs.persistent_link.field") %>" data-clipboard-target="source">
     </div>
     <button type="button" class="persistent-link__copy" data-action="clipboard#copy" data-clipboard-target="button">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="1" /><path d="M5 15V5a1 1 0 0 1 1-1h10" /></svg>
-      <span data-clipboard-target="label">Copy link</span>
+      <span data-clipboard-target="label"><%= t("nexus_ccs.persistent_link.copy") %></span>
     </button>
   </div>
   <div class="persistent-link__footer">

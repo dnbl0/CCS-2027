@@ -49,18 +49,7 @@ class MediaViewerTest < ApplicationSystemTestCase
 
   def pane_zoom(index) = page.evaluate_script("Number(document.querySelectorAll('.compare-pane')[#{index}].dataset.zoom || 0)")
 
-  def wait_for_zoom_to_settle
-    previous = nil
-    Timeout.timeout(5) do
-      loop do
-        now = [ pane_zoom(0), pane_zoom(1) ]
-        break if now == previous
-
-        previous = now
-        sleep 0.3
-      end
-    end
-  end
+  def wait_for_zoom_to_settle = wait_until_stable("both panes' zoom") { [ pane_zoom(0), pane_zoom(1) ] }
 
   test "Compare images: two panes with synchronised zoom, a selector each, and the link can be switched off" do
     visit "/catalog/#{MULTI}"
@@ -93,10 +82,10 @@ class MediaViewerTest < ApplicationSystemTestCase
     assert_operator pane_zoom(0), :>, 0
     start = pane_zoom(0)
     page.driver.browser.keyboard.type("=")
-    sleep 1.2
+    wait_until("the equals key to zoom in") { pane_zoom(0) > start }
     assert_operator pane_zoom(0), :>, start, "the equals key zooms in"
     page.driver.browser.keyboard.type("0")
-    sleep 1.2
+    wait_until("0 to reset the zoom") { (pane_zoom(0) - start).abs < 0.01 }
     assert_in_delta start, pane_zoom(0), 0.01, "0 resets"
 
     unnamed = page.evaluate_script("Array.from(document.querySelectorAll('.compare-pane button, .compare-pane select, .compare-pane .openseadragon-canvas')).filter(function (e) { return !(e.getAttribute('aria-label') || e.textContent.trim() || (e.labels && e.labels.length)) }).length")

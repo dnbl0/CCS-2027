@@ -1,8 +1,8 @@
 <section class="search-banner" aria-label="<%= t("blacklight.search.header") %>">
   <div class="search-banner__inner">
     <%# Not a heading: every Blacklight page already renders its own h1 %>
-    <p class="search-banner__title"><%= TITLE %></p>
-    <p class="search-banner__desc"><%= summary || DESCRIPTION %></p>
+    <p class="search-banner__title"><%= t("nexus_ccs.search_banner.title") %></p>
+    <p class="search-banner__desc"><%= summary || t("nexus_ccs.search_banner.description") %></p>
     <div class="search-banner__search" <%= tag.attributes(data: controllers) %>>
       <%= search_bar %>
     </div>
