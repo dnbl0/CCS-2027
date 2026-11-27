@@ -14,7 +14,7 @@ class ColoursTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the colour page lists each colour by name with its count, linking to the results filtered by it" do
+  test "the colour page lists each colour by name, with no count, linking to the results filtered by it" do
     with_seeded_menu_cache { with_canned_search(colour_counts("blue" => 12, "red" => 1_234, "white" => 3)) { get "/explore/colours" } }
 
     assert_response :success
@@ -24,7 +24,7 @@ class ColoursTest < ActionDispatch::IntegrationTest
     assert_select "ul.colours__list li:first-child a.colours__link[href=?]", "/catalog?f%5Bcolour_ssim%5D%5B%5D=red" do
       assert_select ".colours__swatch.colours__swatch--red[aria-hidden=true]"
       assert_select ".colours__name", "Red"
-      assert_select ".colours__count", "1,234 records"
+      assert_select ".colours__count", count: 0 # the colour's name only, no count
     end
     assert_equal %w[Red Blue White], css_select(".colours__name").map { |name| name.text.strip }
   end

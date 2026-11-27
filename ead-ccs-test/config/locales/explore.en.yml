@@ -6,9 +6,6 @@ en:
     intro: "No search term needed. Start from a collection, a record type, a place or a time."
     collections:
       label: "Browse by collection"
-    count:
-      one: "%{number} record"
-      other: "%{number} records"
     kinds:
       heading: "Record types"
       see_all: "See all object types"

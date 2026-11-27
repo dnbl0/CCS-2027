@@ -1,5 +1,8 @@
 # Handoff for agents continuing CCS 2027 work
 
+> **Newer handover:** read `docs/handover-2026-11-27.md` first; it replaces this file where they differ.
+
+
 Written 2026-11-10 so any agent can carry on when a session reaches its limit. Read `CLAUDE.md` and `CONTRIBUTING.md` first, then `docs/audit-2026-11-27.md` (the latest audit and its order of work). This is a snapshot: check `gh pr list` and `git log origin/main` for what has changed since.
 
 ## If you are an agent resuming after the session limit
