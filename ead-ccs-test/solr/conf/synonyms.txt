@@ -1,5 +1,5 @@
 # Query-time synonyms for the CCS search, ported from the static prototype's curated vocabulary
-# (public/search/smart-search.js). The text field type applies them at query time only, so changing
+# (the 2026 prototype's smart-search.js, since removed). The text field type applies them at query time only, so changing
 # this file needs a core reload (not a reindex). Single words only.
 #
 # Interchangeable words: searching any of them also finds the others.

@@ -5,7 +5,7 @@ on:
   pull_request:
     paths:
       - 'ead-ccs-test/**'
-      - 'package.json' # the system job installs axe-core from the root package.json
+      - 'package.json' # the system job installs axe-core and stylelint from the root package.json
       - '.github/workflows/rails-ci.yml'
   # No run on push to main: the pull request already ran these checks, and the Actions budget is $0 (public repo)
   workflow_dispatch:
@@ -120,9 +120,13 @@ jobs:
           cache: npm
           cache-dependency-path: package.json
 
-      - name: Install axe-core
+      - name: Install axe-core and stylelint
         working-directory: .
         run: npm install
+
+      - name: Lint the stylesheets
+        working-directory: .
+        run: npm run lint:rails-css
 
       - name: Cache Solr
         id: solr-cache

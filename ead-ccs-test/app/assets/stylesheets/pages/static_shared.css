@@ -1,4 +1,4 @@
-/* Generated from public/styles/components/ccs.css by scripts/sync-rails-assets.js. Edit the static file, not this copy. */
+/* First copied from the 2026 prototype (public/styles/components/ccs.css); now this app\'s own file. */
 /* ==========================================================================
    Cultural Collections homepage — reusable components (Figma YfHNpNSYnl3T3by65Sikv3)
 
@@ -161,7 +161,7 @@ body.page-home .ccs-nav__list-item--saved { display: block; }
 /* Card/help/footer headings use the body face (global h2/h3 rules default to Fraunces) */
 .ccs-card__title, .ccs-help__title, .ccs-foot__label { font-family: "Source Sans 3", sans-serif; letter-spacing: 0; }
 /* Header/footer are used on every page, not just the homepage */
-/* Generated from public/styles/components/breadcrumbs.css by scripts/sync-rails-assets.js. Edit the static file, not this copy. */
+/* First copied from the 2026 prototype (public/styles/components/breadcrumbs.css); now this app\'s own file. */
 /* Page Breadcrumbs / Local History (Gen 3 Design System) */
 .page-breadcrumbs {
   tab-size: 4;
@@ -251,7 +251,7 @@ body.page-home .ccs-nav__list-item--saved { display: block; }
   white-space: normal;
   overflow-wrap: anywhere;
 }
-/* Generated from public/styles/components/page-banner.css by scripts/sync-rails-assets.js. Edit the static file, not this copy. */
+/* First copied from the 2026 prototype (public/styles/components/page-banner.css); now this app\'s own file. */
 /* Page banner — shared title banner (matches the Help page banner) */
 .page-banner {
   width: 100%;
@@ -291,7 +291,7 @@ body.page-home .ccs-nav__list-item--saved { display: block; }
   text-wrap: pretty;
 }
 .page-banner--compact .page-banner__desc { margin-top: var(--space-12); font-size: var(--font-size-17); }
-/* Generated from public/styles/components/content-templates.css by scripts/sync-rails-assets.js. Edit the static file, not this copy. */
+/* First copied from the 2026 prototype (public/styles/components/content-templates.css); now this app\'s own file. */
 /* Content templates shared by the collections, help and Indigenous data pages. Modelled on the Matrix "Page Listing" (image list, text list) and "Pathfinder" (alt) content templates from unimelb.edu.au/web/matrix-cms/content-templates. */
 .ct-listing {
   background: var(--white-100);
@@ -1174,7 +1174,7 @@ body.page-home .ccs-nav__list-item--saved { display: block; }
     padding-inline: var(--space-16);
   }
 }
-/* Generated from public/styles/components/campaign-banner.css by scripts/sync-rails-assets.js. Edit the static file, not this copy. */
+/* First copied from the 2026 prototype (public/styles/components/campaign-banner.css); now this app\'s own file. */
 /* Collection landing hero — UoM Gen 3 campaign banner (split, dark), as used on unimelb.edu.au/giving */
 .campaign-banner-split {
   box-sizing: border-box;
@@ -1208,7 +1208,7 @@ body.page-home .ccs-nav__list-item--saved { display: block; }
 .campaign-banner-split__inner { padding: var(--space-40) var(--space-32) var(--space-48); }
 .campaign-banner-split h1 { font-size: var(--font-size-title-2); }
 }
-/* Generated from public/styles/components/collection.css by scripts/sync-rails-assets.js. Edit the static file, not this copy. */
+/* First copied from the 2026 prototype (public/styles/components/collection.css); now this app\'s own file. */
 /* ==========================================================================
    Collection landing page components
    Modelled on documented University of Melbourne Matrix CMS content

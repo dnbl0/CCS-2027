@@ -31,7 +31,7 @@ class ModalScrollLockTest < ApplicationSystemTestCase
 
   def assert_locked_and_unmoved(start_y)
     assert_equal "hidden", root_overflow, "the root does not scroll while the modal is open"
-    # (the page does not shift when the scrollbar goes: the gutter stays reserved; checked with real scrollbars in tests/modal-scroll-lock.test.js,
+    # (the page does not shift when the scrollbar goes: the gutter stays reserved; checked with real scrollbars in the 2026 prototype's tests, since removed,
     # as the headless browser here hides its scrollbars)
     assert_equal "stable", root_gutter, "the scrollbar's gutter stays reserved"
     push_the_page

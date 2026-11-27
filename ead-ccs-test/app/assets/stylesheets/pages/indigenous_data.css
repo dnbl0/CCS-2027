@@ -1,4 +1,4 @@
-/* Generated from public/styles/pages/indigenous-data.css by scripts/sync-rails-assets.js. Edit the static file, not this copy. */
+/* First copied from the 2026 prototype (public/styles/pages/indigenous-data.css); now this app\'s own file. */
 /* indigenous-data: styles moved out of inline style="" attributes. Class names are semantic (block__element) and scoped by the page class on <body> (page-indigenous-data), which gives them the precedence the inline styles had over shared component CSS. Do not reintroduce inline styles. */
 body.page-indigenous-data .indigenous-data-page__group {
   min-height: 100vh;

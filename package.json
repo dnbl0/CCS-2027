@@ -1,46 +1,18 @@
 {
   "name": "ccs-2027",
   "version": "1.0.0",
-  "description": "A comprehensive web platform for discovering and searching the University of Melbourne's cultural collections spanning visual arts, cartography, medical history, zoology, archives, and more.",
-  "directories": {
-    "doc": "docs",
-    "test": "tests"
-  },
+  "private": true,
+  "description": "Tools the Rails app (ead-ccs-test/) uses from Node: axe-core for the accessibility checks in the system tests, and stylelint for its stylesheets.",
   "scripts": {
-    "dev": "node scripts/dev-server.js",
-    "build:css": "sass --quiet-deps --silence-deprecation=import --load-path=node_modules src/scss/custom-bootstrap.scss:public/styles/vendor/bootstrap-uom.min.css --style=compressed --no-source-map && node scripts/purge-css.js public/styles/vendor/bootstrap-uom.min.css",
-    "build:css:dev": "sass --quiet-deps --silence-deprecation=import --load-path=node_modules src/scss/custom-bootstrap.scss:public/styles/vendor/bootstrap-uom.css",
-    "watch:css": "sass --quiet-deps --silence-deprecation=import --load-path=node_modules --watch src/scss/custom-bootstrap.scss:public/styles/vendor/bootstrap-uom.css",
-    "verify:bootstrap": "bash verify-bootstrap.sh",
-    "build:pages": "node scripts/build-pages.js",
-    "lint": "eslint . && stylelint \"public/styles/**/*.css\" && npm run lint:rails-css",
-    "lint:rails-css": "stylelint --config ead-ccs-test/.stylelintrc.json --config-basedir . \"ead-ccs-test/app/assets/stylesheets/**/*.css\"",
-    "sync:partials": "node scripts/sync-partials.js",
-    "sync:rails": "node scripts/sync-rails-assets.js",
-    "style:snapshot": "node scripts/style-snapshot.js",
-    "style:diff": "node scripts/style-diff.js",
-    "test": "node scripts/run-tests.js"
+    "lint:rails-css": "stylelint --config ead-ccs-test/.stylelintrc.json --config-basedir . \"ead-ccs-test/app/assets/stylesheets/**/*.css\""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dnbl0/CCS-2027.git"
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/dnbl0/CCS-2027/issues"
-  },
-  "homepage": "https://github.com/dnbl0/CCS-2027#readme",
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
     "axe-core": "^4.13.0",
-    "bootstrap": "^5.3.3",
-    "eslint": "^10.12.0",
-    "globals": "^17.13.0",
-    "playwright-core": "^1.63.0",
-    "sass": "^1.105.1",
     "stylelint": "^17.16.0",
     "stylelint-config-recommended": "^18.0.0"
   }

@@ -1,9 +1,0 @@
-<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="control">
-<mask id="path-1-inside-1_0_312" fill="white">
-<path d="M0 0H20V20H0V0Z"/>
-</mask>
-<path d="M0 0H20V20H0V0Z" fill="white"/>
-<path d="M0 0V-2H-2V0H0ZM20 0H22V-2H20V0ZM20 20V22H22V20H20ZM0 20H-2V22H0V20ZM0 0V2H20V0V-2H0V0ZM20 0H18V20H20H22V0H20ZM20 20V18H0V20V22H20V20ZM0 20H2V0H0H-2V20H0Z" fill="#000F46" mask="url(#path-1-inside-1_0_312)"/>
-</g>
-</svg>
