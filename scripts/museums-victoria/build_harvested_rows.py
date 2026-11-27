@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Add the Museums Victoria CSIRAC and Engineering objects, and their stories, to ead-ccs-test/data/harvested.csv.
+"""Add the Museums Victoria stories about University of Melbourne objects, and those objects, to ead-ccs-test/data/harvested.csv.
 
 Input: unimelb_related_stories.json, written by fetch_unimelb_stories.py (full story text, so stories are not fetched again).
 Only the objects need the API: they are fetched in one or two batched requests (GET /api/search?id=items/1,items/2,...).
 
 Rows added (all filed under the Engineering and Information Technology Collection, as agreed with the site owner):
-  * the objects linked to the CSIRAC and Engineering stories, and
-  * the stories themselves: those stories plus all 17 parent/child parts the fetcher collected.
+  * every story the fetcher linked to a University object (19 in the 26 Nov run), and all its parent/child parts, and
+  * the objects those stories are linked to.
+
+It also writes ead-ccs-test/config/collection_stories_museums_victoria.yml: each story with the registration numbers of the objects
+it is about, so their record pages show it under "Stories from the collection" (CollectionStories, docs/collection-stories.md).
 
 Re-running replaces these rows (matched on id) and leaves every other row alone. Then: bin/rails collections:index_harvested.
 If the API answers 429 the script stops and says when to try again; it never retries around a rate limit.
@@ -33,7 +36,6 @@ COLLECTION = "Engineering and Information Technology Collection"
 SOURCE = "Museums Victoria Collections"
 PAUSE = 1.0
 BATCH = 40
-DIRECT_STORIES = ["articles/1338", "articles/1340", "articles/1348", "articles/1663", "articles/2408", "articles/2511", "articles/3145"]
 COLUMNS = ["collection", "source", "id", "title", "description", "keywords", "registration_number", "date", "maker_or_collector",
            "place", "classification", "sub_collection", "image_url", "image_alt", "record_url", "file_name", "file_format"]
 
@@ -90,6 +92,27 @@ def story_row(story):
     }
 
 
+def stories_yaml(direct, items):
+    """The record pages' data file. JSON strings are valid YAML scalars, so json.dumps quotes every value safely."""
+    lines = ["# Museums Victoria stories about University of Melbourne objects (CollectionStories, docs/collection-stories.md).",
+             "# Written by scripts/museums-victoria/build_harvested_rows.py; review the diff before committing, do not edit by hand.",
+             "# A story shows on a record whose accession number (the object's registration number) AND collection match.",
+             "stories:"]
+    for story in direct:
+        numbers = sorted({items[o["id"]].get("registrationNumber") for o in story["linkedUniversityObjects"]} - {None, ""})
+        if not numbers:
+            continue
+        uri, _alt = image(story)
+        entry = {"title": text(story["displayTitle"]), "url": f"{SITE}/{story['id']}", "image_url": uri,
+                 "summary": first_sentences(story.get("contentSummary") or story.get("content"), 200),
+                 "site": "Museums Victoria", "collection": COLLECTION}
+        lines.append(f"- title: {json.dumps(entry['title'], ensure_ascii=False)}")
+        lines += [f"  {key}: {json.dumps(value, ensure_ascii=False)}" for key, value in entry.items() if key != "title"]
+        lines.append("  accession_numbers:")
+        lines += [f"  - {json.dumps(number, ensure_ascii=False)}" for number in numbers]
+    return "\n".join(lines) + "\n"
+
+
 def names(values, key="name"):
     return [v[key] if isinstance(v, dict) else v for v in values or [] if v]
 
@@ -112,12 +135,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--stories", required=True, help="unimelb_related_stories.json from fetch_unimelb_stories.py")
     parser.add_argument("--harvested", default=str(Path(__file__).resolve().parents[2] / "ead-ccs-test/data/harvested.csv"))
+    parser.add_argument("--stories-file", default=str(Path(__file__).resolve().parents[2] / "ead-ccs-test/config/collection_stories_museums_victoria.yml"))
     parser.add_argument("--items-cache", help="read/write the fetched items here so a re-run does not call the API")
     args = parser.parse_args()
 
     stories = {s["id"]: s for s in json.load(open(args.stories))["stories"]}
-    chosen = [s for s in stories.values() if s["id"] in DIRECT_STORIES or s["fetchedAsPartOf"]]
-    object_ids = sorted({o["id"] for s in stories.values() if s["id"] in DIRECT_STORIES for o in s["linkedUniversityObjects"]})
+    direct = [s for s in stories.values() if s["linkedUniversityObjects"]]
+    chosen = direct + [s for s in stories.values() if s["fetchedAsPartOf"]]
+    object_ids = sorted({o["id"] for s in direct for o in s["linkedUniversityObjects"]})
 
     cache = Path(args.items_cache) if args.items_cache else None
     if cache and cache.exists():
@@ -140,6 +165,7 @@ def main():
         writer.writeheader()
         writer.writerows(kept)
         writer.writerows({c: row.get(c, "") for c in COLUMNS} for row in new_rows)
+    Path(args.stories_file).write_text(stories_yaml(sorted(direct, key=lambda s: text(s["displayTitle"])), items), encoding="utf-8")
     print(f"{len(chosen)} stories and {len(object_ids)} objects written to {args.harvested}")
 
 
