@@ -5,10 +5,12 @@ require "yaml"
 # "Stories from the collection" on a record page: short articles a University collection's own website has published about an
 # object (the Grainger Museum's "From the collection" first). The stories are harvested offline (bin/rails stories:harvest,
 # CollectionStories::Harvester) into a reviewed data file, config/collection_stories.yml; the record page reads only that file and
-# never fetches another site. A story belongs on a record only when the record's accession number AND collection both match the
+# never fetches another site. Museums Victoria's stories about University objects (scripts/museums-victoria/) have their own file,
+# config/collection_stories_museums_victoria.yml, so a Grainger harvest never overwrites them; both are read together. A story belongs on a record only when the record's accession number AND collection both match the
 # story's, exactly. The file's "unmatched" list is for a curator and is never shown. docs/collection-stories.md explains it.
 class CollectionStories
   PATH = Rails.root.join("config/collection_stories.yml")
+  MUSEUMS_VICTORIA_PATH = Rails.root.join("config/collection_stories_museums_victoria.yml")
   SOURCES_PATH = Rails.root.join("config/collection_story_sources.yml")
 
   class FetchError < StandardError; end
@@ -31,15 +33,22 @@ class CollectionStories
     end
   end
 
-  def self.default = @default ||= load(PATH)
+  def self.default = @default ||= load(PATH, MUSEUMS_VICTORIA_PATH)
 
-  # An unreadable or malformed file is logged and gives no stories: it never breaks a record page
-  def self.load(path)
-    new(YAML.safe_load_file(path) || {})
+  # The stories of every file, in order. An unreadable, missing or malformed file is logged and adds no stories: it never breaks a
+  # record page
+  def self.load(*paths)
+    new("stories" => paths.flat_map { |path| Array(read(path)["stories"]) })
+  end
+
+  def self.read(path)
+    data = YAML.safe_load_file(path)
+    data.is_a?(Hash) ? data : {}
   rescue StandardError => e
     Rails.logger.warn("CollectionStories: #{path} not read (#{e.class}: #{e.message})")
-    new({})
+    {}
   end
+  private_class_method :read
 
   def initialize(data)
     @index = Hash.new { |hash, key| hash[key] = [] }
