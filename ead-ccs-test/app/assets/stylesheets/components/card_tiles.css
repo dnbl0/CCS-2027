@@ -2,7 +2,7 @@
  * Card tiles (2026-11-18, Dean: the cards in the sections should read like a picture-led collections site). Loaded after
  * components/card_layout.css and components/explore.css, it changes how a card looks in every layout, not where it sits:
  *
- * - The picture fills the tile (object-fit: cover, centred). The record page always shows the whole picture.
+ * - The picture is shown whole on the tile's brand ground (object-fit: contain): cultural objects are never cropped.
  * - The name sits over a navy scrim at the foot of the tile. The scrim is at least 85% navy wherever there is text, so white
  *   text has more than 4.5:1 contrast whatever the picture (WCAG 1.4.3): the worst case, white under 85% navy, is about 12:1.
  * - No border and no shadow; the corners are rounded on picture tiles only.
@@ -40,7 +40,7 @@
 
 .card-layout .explore-card:not(.explore-card--text) .result-card__media { position: absolute; inset: 0; z-index: -1; flex: none; height: auto; aspect-ratio: auto; background: var(--ccs-surface-brand); }
 
-.card-layout .explore-card:not(.explore-card--text) .result-card__media img { object-fit: cover; object-position: center; }
+.card-layout .explore-card:not(.explore-card--text) .result-card__media img { object-fit: contain; object-position: center; }
 
 .card-layout .explore-card:not(.explore-card--text) .result-card__content {
   margin-block-start: auto;
@@ -105,7 +105,7 @@ body.page-home main > .ccs-section.explore-periods:not(.ccs-section--hero) { bac
 
 .explore__tiles .explore__face--image { display: block; aspect-ratio: auto; background: var(--ccs-surface-brand); }
 
-.explore__tiles .explore__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.explore__tiles .explore__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; }
 
 /* The name sits at the foot (explore.css lets the body grow to fill the tile) */
 .explore__tiles .explore__tile-body { position: relative; flex: none; height: auto; min-height: 0; margin-block-start: auto; padding: var(--ccs-tile-scrim-fade) var(--ccs-space-4) var(--ccs-space-4); }
