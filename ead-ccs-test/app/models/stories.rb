@@ -3,7 +3,9 @@
 require "kramdown"
 
 # Stories (online exhibitions, docs/categories-themes-stories.md): Markdown files in content/stories/*.md with a YAML front matter
-# (title, summary, hero, author, date), drawn at /stories/<file name>. Two embeds, each alone on its line:
+# (title, summary, hero, author, date; optional category, and draft: true to keep a story off the list), drawn at
+# /stories/<file name>. The stories about collection objects (CollectionStories: the Grainger Museum's and Museums Victoria's) are
+# stories of the site too, at /stories/<their slug>, so a visitor reads them here (Stories.from_collection). Two embeds, each alone on its line:
 #
 #   {{record emu_mc-20882}}                       the record as the site's record card (its picture only when it may be shown)
 #   {{search "violin"}}                           four results of that search and a link to all of them
@@ -21,23 +23,48 @@ module Stories
   ATTRIBUTES = %w[href].freeze
   SEARCH_KEYS = %w[q f range search_field].freeze
 
-  Story = Data.define(:slug, :title, :summary, :hero, :author, :date, :body) do
+  # category: the line over the title (a collection story's source site); image: a picture of the story's own (Image); source:
+  # where a collection story was first published (Source); records: the ids of the records it is about; html: the body is HTML
+  # (a collection story's), not Markdown; draft: not listed on /stories, though its address works.
+  Story = Data.define(:slug, :title, :summary, :hero, :author, :date, :body, :category, :image, :source, :records, :html, :draft) do
     def path = Rails.application.routes.url_helpers.story_path(slug)
-    def parts = Stories.parts(body)
+    def parts = Stories.parts(body, html: html)
   end
+
+  Image = Data.define(:url, :alt, :caption, :credit)
+
+  # full_text: the page has the whole story (else its summary and a link to the source for the rest)
+  Source = Data.define(:name, :url, :licence, :licence_url, :full_text)
 
   # An embed: kind :record (value: the id) or :search (value: the search parameters, heading: the strip's heading or nil)
   Embed = Data.define(:kind, :value, :heading)
 
-  def self.all(directory = DIRECTORY)
-    Dir[File.join(directory, "*.md")].filter_map { |file| load(file) }.sort_by { |story| [ -story.date.to_time.to_i, story.slug ] }
+  # Every story, newest first; stories with no date (Museums Victoria gives none) after them, by title
+  def self.all(directory = DIRECTORY, collection: CollectionStories.default)
+    written = Dir[File.join(directory, "*.md")].filter_map { |file| load(file) }
+    taken = written.map(&:slug)
+    stories = written + collection.stories.reject { |story| taken.include?(story.slug) }.map { |story| from_collection(story) }
+    stories.sort_by { |story| [ story.date ? 0 : 1, -(story.date&.jd || 0), story.title.downcase ] }
   end
 
-  def self.find(slug, directory = DIRECTORY)
+  def self.find(slug, directory = DIRECTORY, collection: CollectionStories.default)
     return unless slug.to_s.match?(SLUG)
 
     file = File.join(directory, "#{slug}.md")
-    load(file) if File.file?(file)
+    return load(file) if File.file?(file)
+
+    story = collection.stories.find { |item| item.slug == slug }
+    from_collection(story) if story
+  end
+
+  # A collection story as a story of the site: its own text when the data file has it, else no text (the page shows the summary
+  # and links to the source for the rest)
+  def self.from_collection(story)
+    image = Image.new(url: story.image_url, alt: story.image_alt, caption: story.image_caption, credit: story.image_credit) if story.image_url
+    Story.new(slug: story.slug, title: story.title, summary: story.summary, hero: nil, author: story.author, date: story.date,
+              body: story.body.to_s, category: story.site.presence, image: image,
+              source: Source.new(name: story.site, url: story.url, licence: story.licence, licence_url: story.licence_url, full_text: story.body.present?),
+              records: story.record_ids, html: true, draft: false)
   end
 
   def self.load(file)
@@ -50,14 +77,18 @@ module Stories
 
     meta = YAML.safe_load(match[1], permitted_classes: [ Date ]) || {}
     Story.new(slug: slug, title: meta.fetch("title").to_s, summary: meta["summary"].to_s, hero: meta["hero"]&.to_s.presence,
-              author: meta["author"].to_s.presence, date: (meta["date"].is_a?(Date) ? meta["date"] : Date.parse(meta["date"].to_s)), body: match[2])
+              author: meta["author"].to_s.presence, date: (meta["date"].is_a?(Date) ? meta["date"] : Date.parse(meta["date"].to_s)), body: match[2],
+              category: meta["category"].to_s.presence, image: nil, source: nil, records: [], html: false, draft: meta["draft"] == true)
   rescue KeyError, Date::Error, Psych::Exception => e
     Rails.logger.warn("Story #{file} skipped: #{e.class}")
     nil
   end
 
   # The body as [html, embed, html, embed, ...]: sanitised HTML (html_safe) and the embeds in their places
-  def self.parts(markdown)
+  # A collection story's HTML is only sanitised (it has no embeds)
+  def self.parts(markdown, html: false)
+    return markdown.present? ? [ sanitize(markdown).html_safe ] : [] if html # rubocop:disable Rails/OutputSafety -- sanitised
+
     embeds = []
     marked = markdown.gsub(EMBED) do
       embed = parse_embed(Regexp.last_match(1), Regexp.last_match(2))

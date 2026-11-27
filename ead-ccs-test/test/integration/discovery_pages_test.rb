@@ -122,11 +122,12 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "stories are listed, and a story is shown with its text even when the index cannot answer" do
+  test "stories are listed (drafts left out), and a story is shown with its text even when the index cannot answer" do
     Outages::SolrDown.active = true
     get "/stories"
     assert_response :success
-    assert_select "a[href='/stories/example-story']"
+    assert_select "a[href='/stories/csirac-collection']"
+    assert_select "a[href='/stories/example-story']", count: 0 # a draft is not listed; its address still works
 
     get "/stories/example-story"
     assert_response :success

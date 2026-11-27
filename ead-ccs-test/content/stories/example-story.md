@@ -5,6 +5,7 @@ summary: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Placeholder s
 hero: emu_mc-10044
 author: "Placeholder author"
 date: 2026-11-18
+draft: true
 ---
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.

@@ -92,24 +92,61 @@ def story_row(story):
     }
 
 
-def stories_yaml(direct, items):
-    """The record pages' data file. JSON strings are valid YAML scalars, so json.dumps quotes every value safely."""
+def slug(title):
+    """The story's address on the site: /stories/<slug> (lower-case words joined by hyphens, as Stories::SLUG requires)."""
+    return re.sub(r"[^a-z0-9]+", "-", text(title).lower().replace("&", " and ")).strip("-")
+
+
+def record_id(api_id):
+    """The site's id of a harvested Museums Victoria record (Collections::Source#document_id for the source "harvested")."""
+    return "harvested-" + re.sub(r"[^A-Za-z0-9_.-]+", "_", api_id)
+
+
+def site_links(html_text, slugs, hosted):
+    """Links to a Museums Victoria story or object the site holds point to the site's own page; any other link stays as it is."""
+    def swap(match):
+        href = match.group(1)
+        found = re.match(r"^https?://collections\.museumsvictoria\.com\.au/((?:articles|items|specimens)/\d+)/?$", href)
+        if found and found.group(1) in slugs:
+            href = f"/stories/{slugs[found.group(1)]}"
+        elif found and found.group(1) in hosted:
+            href = f"/catalog/{record_id(found.group(1))}"
+        return f'href="{html.escape(href, quote=True)}"'
+    return re.sub(r'href="([^"]+)"', swap, html_text or "")
+
+
+def stories_yaml(direct, items, hosted):
+    """The stories data file: what the record pages show (title, summary, picture, accession numbers) and, for the story's own
+    page on the site (/stories/<slug>), its text, author, picture caption and licence. JSON strings are valid YAML scalars, so
+    json.dumps quotes every value safely."""
     lines = ["# Museums Victoria stories about University of Melbourne objects (CollectionStories, docs/collection-stories.md).",
              "# Written by scripts/museums-victoria/build_harvested_rows.py; review the diff before committing, do not edit by hand.",
-             "# A story shows on a record whose accession number (the object's registration number) AND collection match.",
+             "# A story shows on a record whose accession number (the object's registration number) AND collection match, and has",
+             "# its own page at /stories/<slug> with the text below (CC BY 4.0: Museums Victoria is credited on the page).",
              "stories:"]
+    slugs = {story["id"]: slug(story["displayTitle"]) for story in direct}
     for story in direct:
-        numbers = sorted({items[o["id"]].get("registrationNumber") for o in story["linkedUniversityObjects"]} - {None, ""})
+        objects = [items[o["id"]] for o in story["linkedUniversityObjects"]]
+        numbers = sorted({o.get("registrationNumber") for o in objects} - {None, ""})
         if not numbers:
             continue
-        uri, _alt = image(story)
-        entry = {"title": text(story["displayTitle"]), "url": f"{SITE}/{story['id']}", "image_url": uri,
+        uri, alt = image(story)
+        media = next((m for m in story.get("media") or [] if m.get("type") == "image"), {})
+        licence = story.get("licence") or {}
+        entry = {"title": text(story["displayTitle"]), "slug": slugs[story["id"]], "url": f"{SITE}/{story['id']}", "image_url": uri,
+                 "image_alt": alt, "image_caption": text(media.get("caption")),
+                 "image_credit": "; ".join(media.get("creators") or []) or text(media.get("credit")),
                  "summary": first_sentences(story.get("contentSummary") or story.get("content"), 200),
-                 "site": "Museums Victoria", "collection": COLLECTION}
+                 "site": "Museums Victoria", "collection": COLLECTION,
+                 "author": "; ".join(a["fullName"] for a in story.get("authors") or [] if a.get("fullName")),
+                 "licence": licence.get("shortName", ""), "licence_url": licence.get("uri", ""),
+                 "body": site_links(story.get("content"), slugs, hosted).strip()}
         lines.append(f"- title: {json.dumps(entry['title'], ensure_ascii=False)}")
-        lines += [f"  {key}: {json.dumps(value, ensure_ascii=False)}" for key, value in entry.items() if key != "title"]
+        lines += [f"  {key}: {json.dumps(value, ensure_ascii=False)}" for key, value in entry.items() if key != "title" and value]
         lines.append("  accession_numbers:")
         lines += [f"  - {json.dumps(number, ensure_ascii=False)}" for number in numbers]
+        lines.append("  record_ids:")
+        lines += [f"  - {json.dumps(record_id(o['id']), ensure_ascii=False)}" for o in sorted(objects, key=lambda o: o["id"])]
     return "\n".join(lines) + "\n"
 
 
@@ -165,7 +202,7 @@ def main():
         writer.writeheader()
         writer.writerows(kept)
         writer.writerows({c: row.get(c, "") for c in COLUMNS} for row in new_rows)
-    Path(args.stories_file).write_text(stories_yaml(sorted(direct, key=lambda s: text(s["displayTitle"])), items), encoding="utf-8")
+    Path(args.stories_file).write_text(stories_yaml(sorted(direct, key=lambda s: text(s["displayTitle"])), items, {r["id"] for r in new_rows}), encoding="utf-8")
     print(f"{len(chosen)} stories and {len(object_ids)} objects written to {args.harvested}")
 
 

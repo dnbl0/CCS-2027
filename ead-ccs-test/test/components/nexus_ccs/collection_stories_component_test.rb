@@ -7,9 +7,9 @@ require "test_helper"
 # link to the article on the collection's own site. Drawn only when the record has a story; never a count.
 class CollectionStoriesComponentTest < ViewComponent::TestCase
   def story(title: "Hardanger fiddle", image_url: "https://museum.example/i.jpg")
-    CollectionStories::Story.new(title: title, url: "https://museum.example/#{title.parameterize}", image_url: image_url,
-                                 summary: "A Norwegian folk fiddle.", site: "Grainger Museum", collection: "Grainger Museum Collection",
-                                 accession_numbers: [ "00.0099" ])
+    CollectionStories::Story.from("title" => title, "url" => "https://museum.example/#{title.parameterize}", "image_url" => image_url,
+                                  "summary" => "A Norwegian folk fiddle.", "site" => "Grainger Museum", "collection" => "Grainger Museum Collection",
+                                  "accession_numbers" => [ "00.0099" ])
   end
 
   def record(**fields) = SolrDocument.new({ "id" => "emu-1", "thumbnail_path_ssi" => "/media/emu-1.jpg" }.merge(fields))
@@ -18,11 +18,11 @@ class CollectionStoriesComponentTest < ViewComponent::TestCase
     render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story ])
     assert_selector "section#collection-stories[aria-labelledby=collection-stories-heading]"
     assert_selector "h2#collection-stories-heading", exact_text: "Stories from the collection"
-    assert_selector "article.collection-story h3 a[href='https://museum.example/hardanger-fiddle']", exact_text: "Hardanger fiddle"
+    assert_selector "article.collection-story h3 a[href='/stories/hardanger-fiddle']", exact_text: "Hardanger fiddle"
     assert_no_selector "a[target]"
 
     render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story, story(title: "Pin") ])
-    assert_selector "article.collection-story h3 a[href='https://museum.example/hardanger-fiddle']", exact_text: "Hardanger fiddle"
+    assert_selector "article.collection-story h3 a[href='/stories/hardanger-fiddle']", exact_text: "Hardanger fiddle"
     assert_no_selector "a[target]"
   end
 
@@ -51,8 +51,8 @@ class CollectionStoriesComponentTest < ViewComponent::TestCase
     render_inline NexusCcs::CollectionStoriesComponent.new(stories: [ story, story(title: "Pin") ])
 
     card = "article.result-card.result-card--media.collection-story--card"
-    assert_selector "#{card} > a.result-card__media[href=\"https://museum.example/hardanger-fiddle\"][tabindex=\"-1\"][aria-hidden=true] img[alt=\"\"]"
-    assert_selector "#{card} .result-card__content h3.document-title-heading a[href=\"https://museum.example/hardanger-fiddle\"]", exact_text: "Hardanger fiddle"
+    assert_selector "#{card} > a.result-card__media[href=\"/stories/hardanger-fiddle\"][tabindex=\"-1\"][aria-hidden=true] img[alt=\"\"]"
+    assert_selector "#{card} .result-card__content h3.document-title-heading a[href=\"/stories/hardanger-fiddle\"]", exact_text: "Hardanger fiddle"
     assert_selector "#{card} .result-card__content ul.result-card__lines li", exact_text: "Article"
     assert_selector "#{card} .result-card__content ul.result-card__lines li", exact_text: "Grainger Museum"
   end

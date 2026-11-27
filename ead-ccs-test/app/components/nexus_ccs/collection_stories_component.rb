@@ -8,8 +8,8 @@ module NexusCcs
   #   with the picture beside them;
   # - two or more are a card grid (two columns for two, three for more): the picture, the kicker, the headline and the summary.
   #
-  # The headline is the link of the whole story (stretched, so there is no nested link), to the article on that site, in the same tab
-  # as every link on the site. Drawn only when the record has a story; no count is shown.
+  # The headline is the link of the whole story (stretched, so there is no nested link), to the story's page on this site
+  # (/stories/<slug>), which credits and links the site that first published it. Drawn only when the record has a story; no count is shown.
   #
   # The picture is the story's own, loaded by the visitor's browser from the collection's site; else the record's own picture of the
   # object. The collection's site may refuse its picture (a Cloudflare check), so story_image_controller.js then tries the record's

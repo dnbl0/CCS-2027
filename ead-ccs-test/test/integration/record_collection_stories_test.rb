@@ -19,7 +19,7 @@ class RecordCollectionStoriesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "section#collection-stories[aria-labelledby=collection-stories-heading]" do
       assert_select "h2#collection-stories-heading", text: I18n.t("nexus_ccs.collection_stories.heading")
-      assert_select "article.collection-story--feature h3.collection-story__title a.collection-story__link[href^='https://grainger.unimelb.edu.au/']", text: "Bridgeport Presentation Baton"
+      assert_select "article.collection-story--feature h3.collection-story__title a.collection-story__link[href='/stories/bridgeport-presentation-baton']", text: "Bridgeport Presentation Baton"
       assert_select ".collection-story__source", text: "Grainger Museum"
       assert_select "img.collection-story__image[loading=lazy]"
     end

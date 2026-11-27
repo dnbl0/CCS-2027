@@ -61,6 +61,14 @@ en:
       more_results: "See all results"
       search_heading: "From the collections"
       missing_record: "A record shown here is no longer available."
+      read_more: "Read more"
+      full_text: "Read the full story on the %{site} website"
+      objects: "Objects in this story"
+      # Where a story about collection objects was first published (Stories.from_collection)
+      source:
+        heading: "About this story"
+        published_html: "This story was first published by %{site}."
+        licence_html: "Its text is shared under %{licence}."
     creator:
       about: "About this maker"
       born: "Born"
