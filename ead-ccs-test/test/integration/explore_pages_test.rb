@@ -32,7 +32,7 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Explore by time"
     assert_select "ol.timeline li", 2
-    assert_select "a.timeline__link[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999']", text: /1900–1999\s+1,200 records/
+    assert_select "a.timeline__link[href*='range%5Bdate_start_isi%5D%5Bbegin%5D=1900'][href*='range%5Bdate_start_isi%5D%5Bend%5D=1999']", text: "1900–1999" # a name, no count
     assert_select "a.timeline__link[href*='range%5Bdate_start_isi%5D%5Bend%5D=-3001']", text: /Before 3000 BCE/
     assert_select "a.timeline__link img[alt='']", 1
     assert_select "a.timeline__zoom[href='/explore/time?century=1900']", text: /Decades of 1900–1999/
@@ -62,8 +62,8 @@ class ExplorePagesTest < ActionDispatch::IntegrationTest
     assert_select "[data-place-map-tiles-value='https://tile.openstreetmap.org/{z}/{x}/{y}.png']"
     assert_select ".explore-map__credit a[href='https://www.openstreetmap.org/copyright']"
     assert_select "h3 a[href*='f%5Bplace_hierarchy_ssim%5D%5B%5D=Oceania']", "Oceania"
-    assert_select "a.browse__link[href*='Oceania%7CAustralia']", text: /Australia\s+12 records/
-    assert_select "details summary", "Places in Australia (1)"
+    assert_select "a.browse__link[href*='Oceania%7CAustralia']", text: "Australia"
+    assert_select "details summary", "Places in Australia" # no count
     assert_select "details a[href*='Oceania%7CAustralia%7CVictoria%7CMelbourne']", text: /Melbourne/
     assert_no_match(/tile\.openstreetmap\.org[^"]*"\s*(src|href)=/, response.body)
     assert_select "link[href*='leaflet']"

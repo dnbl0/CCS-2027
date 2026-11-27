@@ -20,7 +20,6 @@
   outline: 3px solid var(--ccs-focus-ring); outline-offset: 2px;
 }
 .timeline__label { font-size: var(--ccs-font-size-xl); font-weight: var(--ccs-font-weight-semibold); }
-.timeline__count { font-size: var(--ccs-font-size-sm); color: var(--ccs-text-secondary); }
 .timeline__images { display: flex; gap: var(--ccs-space-1); }
 .timeline__images img { width: 4rem; height: 4rem; object-fit: contain; background: var(--ccs-surface-subtle); }
 .timeline__zoom { display: inline-flex; align-items: center; min-height: 44px; color: var(--ccs-text-link); text-decoration: underline; }
@@ -37,7 +36,6 @@
   border: 1px solid var(--ccs-border-strong); border-radius: var(--ccs-radius-circle); color: var(--ccs-text-link); text-decoration: none;
 }
 .explore-chips__chip:hover { text-decoration: underline; }
-.explore-chips__count { color: var(--ccs-text-secondary); }
 
 /* The map beside its lists on wide screens, the lists under it on narrow ones */
 .explore-places { display: grid; gap: var(--ccs-space-6); }

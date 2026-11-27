@@ -64,7 +64,6 @@
   color: var(--ccs-text-link-hover);
 }
 
-.browse-list__count,
 .browse-list__span {
   flex: none;
   color: var(--ccs-text-secondary);

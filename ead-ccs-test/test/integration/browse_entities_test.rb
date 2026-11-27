@@ -69,7 +69,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     assert_select ".browse-facts dd", text: "29 September 1864 – 25-May-47"
     assert_select ".browse-facts dd", text: "1816 to 2019"
     assert_select ".result-card", count: 1
-    assert_select "a.btn[href*='f%5Bcreator_ssim%5D%5B%5D=Bunny%2C+Rupert']", text: /See all 730 records/
+    assert_select "a.btn[href*='f%5Bcreator_ssim%5D%5B%5D=Bunny%2C+Rupert']", text: "See all records"
     assert_select ".browse-related a", text: "Australia"
     assert_select ".browse-related a", text: "Tiny, Tim"
     assert_select ".browse-related a", text: "Unknown", count: 0
@@ -97,7 +97,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
 
   test "an entity page searches the records of every variant of the entity" do
     browse entity_path("subjects", "Portraits")
-    assert_select "a.btn[href*='f_inclusive']", text: /See all 730 records/
+    assert_select "a.btn[href*='f_inclusive']", text: "See all records"
     assert_equal [ %(subject_ssim:("Portraits" OR "portraits")) ], @seen.find { |params| params[:fq] }[:fq]
   end
 
@@ -157,7 +157,7 @@ class BrowseEntitiesTest < ActionDispatch::IntegrationTest
     with_env_indexing do
       browse entity_path("makers", "Bunny, Rupert")
       assert_select "link[rel=canonical][href$=?]", entity_path("makers", "Bunny, Rupert")
-      assert_select "meta[name=description][content*='730 records']"
+      assert_select "meta[name=description][content^='Records in the University']" # no count in the description
       assert_select "meta[name=robots]", count: 1 do |tag|
         assert_no_match(/noindex/, tag.first["content"])
       end

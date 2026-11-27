@@ -15,7 +15,7 @@
               <%= link_to search_catalog_path(f: { CatalogConfig::Facets::COLOUR_FIELD => [ colour.name ] }), class: "colours__link" do %>
                 <span class="colours__swatch colours__swatch--<%= colour.name %>" aria-hidden="true"></span>
                 <span class="colours__name"><%= colour_facet_label(colour.name) %></span>
-                <span class="colours__count"><%= t("colours.count", count: colour.count, formatted: number_with_delimiter(colour.count)) %></span>
+
               <% end %>
             </li>
           <% end %>

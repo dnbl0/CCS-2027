@@ -1,9 +1,6 @@
 en:
   # Explore by time and by place (ExploreController, docs/time-and-place.md). Placeholder wording: the collections team has not approved it.
   explore_pages:
-    count:
-      one: "%{number} record"
-      other: "%{number} records"
     unavailable_html: "This page cannot be shown right now. Please try again in a few minutes, or %{link}."
     search_all: "search all records"
     links_label: "Explore by time or place"
@@ -25,7 +22,7 @@ en:
       title: "Explore by place"
       intro: "Where the objects were made: on a map, and as lists of regions, countries and places. Each opens its records in the search."
       map: "Map"
-      map_note: "The map shows %{count} places, grouped where they are close together: zoom in to separate them. The map is drawn from OpenStreetMap: your browser contacts its server only when you show the map. Every place on the map is also in the lists of regions and countries."
+      map_note: "The map shows the places, grouped where they are close together: zoom in to separate them. The map is drawn from OpenStreetMap: your browser contacts its server only when you show the map. Every place on the map is also in the lists of regions and countries."
       show_map: "Show the map"
       hide_map: "Hide the map"
       map_label: "Map of the places objects were made"
