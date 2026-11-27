@@ -82,11 +82,11 @@ src/scss/custom-bootstrap.scss   Bootstrap 5.3.3 theme source (see Styling)
 tests/                      Plain-Node test scripts (see Develop, test and deploy)
 config/redirects.json      Documentation-only list of legacy redirects (nothing reads it at runtime; config/hosting.json and .htaccess are authoritative)
 assets/                     Source material for content: spreadsheets, CSVs, help/landing-page copy (.docx), original images. Not deployed (scripts/build-pages.js copies public/ only)
-.github/workflows/          ci.yml, rails-ci.yml, pages.yml (deploy to GitHub Pages), azure-deploy.yml, acr-push.yml
+.github/workflows/          ci.yml (the 2026 prototype's checks), rails-ci.yml, azure-deploy.yml, acr-push.yml (by hand only)
 .agents/rules/              PR workflow rule for coding agents
 verify-bootstrap.sh         Checks Bootstrap references in pages (run by npm test)
 config/hosting.json          Clean URLs + legacy redirects; read by scripts/dev-server.js and scripts/build-pages.js
-scripts/build-pages.js      Builds public/ into dist/ for GitHub Pages (base-path prefixing, /item/:code via 404.html, redirect pages); `npm run build:pages`
+scripts/build-pages.js      Builds public/ into dist/ for local viewing (base-path prefixing, /item/:code via 404.html, redirect pages); `npm run build:pages`
 design.md, github.md, jira-mvp-mapping.md, BOOTSTRAP-DEPENDENCIES.md   Supporting docs
 ```
 
@@ -257,7 +257,7 @@ Clean URLs (`/search/search-results`, `/collections/record`) only resolve on a h
 
 ### Hosting
 
-The Rails app is deployed to Azure Container Apps (see `.github/workflows/acr-push.yml`, `azure-deploy.yml` and `infra/azure/`). The static prototype in `public/` is no longer published: the GitHub Pages workflow was removed (see `docs/decoupling-from-2026.md`). `scripts/build-pages.js` still builds it into `dist/` for local use.
+Hosting is undecided: the Azure set-up (`.github/workflows/acr-push.yml`, run by hand only, `azure-deploy.yml` and `infra/azure/`) is kept for when it is. The static prototype in `public/` is no longer published: the GitHub Pages workflow was removed (see `docs/decoupling-from-2026.md`). `scripts/build-pages.js` still builds it into `dist/` for local use.
 
 - `scripts/build-pages.js` prefixes links with the Pages base path, serves `/item/:code` through `404.html` and writes redirect pages for the legacy URLs.
 - `config/hosting.json`: `cleanUrls: true`, `trailingSlash: false`, and 301 redirects from the legacy `*.dc.html` names and from `/search` and `/search.html` to `/search/search-results`. It is the redirect configuration: `scripts/dev-server.js` and `scripts/build-pages.js` read it.
@@ -271,7 +271,7 @@ Some files are written by scripts; edit their source, then run the script (`npm 
 | Edit | Run | Writes |
 |---|---|---|
 | `src/partials/*.html` (header, search overlay, footer, browse-collections) | `npm run sync:partials` | the header, overlay and footer of every page in `public/`, and the Browse collections cards on the Collections page |
-| `public/styles/tokens`, `components`, `pages` and `public/images` | `npm run sync:rails` | the Rails copies in `ead-ccs-test/app/assets` (no longer checked by `npm test` or CI; the Rails copies are now edited in the Rails app, see `docs/decoupling-from-2026.md`) |
+| `public/styles/tokens`, `components`, `pages` and `public/images` | none: **do not run `npm run sync:rails`**, it would overwrite the Rails app's own edits | the Rails copies in `ead-ccs-test/app/assets` are edited in the Rails app (`docs/decoupling-from-2026.md`) |
 
 `npm run lint` runs ESLint and Stylelint. The Rails app and the plan to keep both
 codebases clean are described in `ead-ccs-test/README.md` and `docs/code-quality-plan.md`.
@@ -283,7 +283,7 @@ codebases clean are described in `ead-ccs-test/README.md` and `docs/code-quality
 - **Accession numbers**: 15 of 735 records have no accession number (the data owner needs to supply them). `npm test` reports `accession number present on 720/735 records`.
 - **Unpopulated spec fields**: Editions, Source URL, Related child record and Producer are supported by `build()` but no record sets them (reported as test warnings).
 - **`search.html`** redirect stub has no `<h1>` (test warning).
-- **Hosting behaviour unverified**: the redirects in `config/hosting.json` are applied by `scripts/build-pages.js` for GitHub Pages; check them on the live site after changing them.
+- **Hosting behaviour unverified**: the redirects in `config/hosting.json` are applied by `scripts/build-pages.js` to the local `dist/` build only; the prototype is no longer published.
 - **Thin audio/video data**: only two audio/video items exist, so the sound-recording and film browse tiles map to small keyword searches.
 - **Object type facet is long**: object types are free text (about 370 distinct values), so the Object type facet is long and uneven.
 - **Accessibility**: axe-core scans of the pages were clean except for the items above; there has been no formal WCAG audit, manual screen-reader pass or certification.
@@ -291,7 +291,7 @@ codebases clean are described in `ead-ccs-test/README.md` and `docs/code-quality
 - **Jira mapping**: several requirement rows in `jira-mvp-mapping.md` are marked as not re-verified.
 
 ### Free catalog API (2026-10-04)
-- `api/catalog.js` is a serverless function that serves `/catalog.json` and `/catalog/:id.json` in the Blacklight JSON shape (see `jira-mvp-mapping.md`). It is not deployed: GitHub Pages hosts static files only, so the results page defaults to the local catalogue and `npm run dev` serves the function for local use.
+- `api/catalog.js` is a serverless function that serves `/catalog.json` and `/catalog/:id.json` in the Blacklight JSON shape (see `jira-mvp-mapping.md`). It is not deployed (the prototype is no longer published), so the results page defaults to the local catalogue and `npm run dev` serves the function for local use.
 
 ### Search acceptance criteria (2026-10-04)
 - CCS-158: a "Did you mean" notice appears above results for misspelt or partial words and runs the corrected search.
