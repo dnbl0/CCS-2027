@@ -29,7 +29,7 @@ class DynamicFiltersSystemTest < ApplicationSystemTestCase
   test "a page reached any other way says nothing, and opens only the filter that has a value chosen" do
     visit search_catalog_path(q: "", any_assets: "1", f: { collection_ssim: [ "Medical History Museum" ] })
     assert_selector "#sidebar .accordion-button[aria-expanded=true]", count: 1
-    sleep 0.4
+    wait_for_settled_page
     assert_empty find("#sidebar [role=status]", visible: :all).text(:all).strip
   end
 

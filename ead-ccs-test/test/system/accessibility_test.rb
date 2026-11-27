@@ -77,7 +77,7 @@ class AccessibilityTest < ApplicationSystemTestCase
 
   # Bootstrap fades a tab pane and a modal in; axe measured mid-fade reads washed-out colours. Waits until the element is fully opaque.
   def wait_until_opaque(selector)
-    Timeout.timeout(5) { sleep 0.05 until page.evaluate_script("getComputedStyle(document.querySelector(#{selector.to_json})).opacity") == "1" }
+    wait_until("#{selector} to be fully opaque") { page.evaluate_script("getComputedStyle(document.querySelector(#{selector.to_json})).opacity") == "1" }
   end
 
   StockRecords::IDS.product(%w[stock branded-stock]).each do |id, prefix|

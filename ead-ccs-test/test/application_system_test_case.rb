@@ -20,6 +20,48 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   AXE_TAGS = %w[wcag2a wcag2aa wcag21a wcag21aa].freeze
   WCAG22_TAGS = %w[wcag22aa best-practice].freeze
 
+  # Waits for a condition instead of for a fixed time (audit T15): a fixed sleep is too short on a busy runner and wasted time
+  # on a quiet one. Polls the block every 50 ms and fails with `what` if it is still false after `timeout` seconds.
+  def wait_until(what, timeout: Capybara.default_max_wait_time)
+    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout
+    until yield
+      flunk "Timed out after #{timeout}s waiting for #{what}" if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
+      sleep 0.05
+    end
+  end
+
+  # Every finite CSS transition and animation on the page (tooltip fades, slide-outs, chevron turns) has finished. Endless
+  # ones (a loading spinner) are ignored, or this would never return.
+  def wait_for_animations
+    wait_until("animations to finish") do
+      page.evaluate_script(<<~JS)
+        document.getAnimations().every(function (a) {
+          return a.playState !== "running" || a.effect.getComputedTiming().endTime === Infinity;
+        })
+      JS
+    end
+  end
+
+  # The page has settled: no request in flight, no animation running, and two frames painted since, so a layout that was going
+  # to change has changed. For a test that proves something does NOT happen (the page does not move, nothing is announced).
+  def wait_for_settled_page
+    page.driver.wait_for_network_idle
+    wait_for_animations
+    page.evaluate_async_script("var done = arguments[0]; requestAnimationFrame(function () { requestAnimationFrame(done) })")
+  end
+
+  # A value read by the block has stopped changing between two reads 100 ms apart (a smooth scroll or a zoom has ended)
+  def wait_until_stable(what)
+    last = Object.new
+    wait_until("#{what} to stop changing") do
+      now = yield
+      stable = now == last
+      last = now
+      sleep 0.1 unless stable
+      stable
+    end
+  end
+
   # Fails with each violation (rule, impact, elements) when axe finds any on the current page. `except` lists rule ids
   # that are known and tracked elsewhere; `tags` are the axe rule sets (AXE_TAGS + WCAG22_TAGS also checks WCAG 2.2 AA).
   def assert_accessible(except: [], tags: AXE_TAGS)
