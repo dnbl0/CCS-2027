@@ -10,7 +10,6 @@ en:
       heading: "Record types"
       see_all: "See all object types"
     place_time:
-      heading: "Place and time"
       places: "Places"
       periods: "Time"
       see_all_places: "See all places"
