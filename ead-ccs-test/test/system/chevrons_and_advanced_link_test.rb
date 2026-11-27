@@ -9,7 +9,7 @@ class ChevronsAndAdvancedLinkTest < ApplicationSystemTestCase
 
   FLIPPED = "matrix(-1, 0, 0, -1, 0, 0)".freeze
 
-  def settle = sleep(0.5) # the chevrons animate
+  def settle = wait_for_animations # the chevrons animate
 
   test "the header's Search collections chevron points up while its menu is open" do
     visit root_path
