@@ -39,7 +39,7 @@ module StockRecordFields
     # Related Record (25): "each line will be identified with a relation type"; the data carries the parent only.
     25 => ->(document) { Array(document["parent_record_ssi"]).map { |value| "Parent - #{value}" } },
     # Advisory (27): the site's own wording, which every record with digital assets carries (Media metadata panel).
-    27 => ->(document) { digital_assets?(document) ? [ NexusCcs::DigitalAssetsComponent::ADVISORY ] : [] },
+    27 => ->(document) { digital_assets?(document) ? [ NexusCcs::DigitalAssetsComponent.default_advisory ] : [] },
     # Terms of Use (28): the rights note without the licence in brackets that starts it (as the Media metadata panel).
     28 => lambda { |document|
       note = Array(document["rights_ssim"]).first.to_s.sub(/\A\s*\[[^\]]*\]\s*/, "").strip

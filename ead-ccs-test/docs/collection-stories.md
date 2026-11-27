@@ -106,6 +106,20 @@ captions or text, for records of one collection in the index.
    (`CollectionStories::Page`). A site built differently needs a test page in `test/models/collection_stories/page_test.rb` first.
 3. Harvest, review, commit, and open a pull request listing which stories matched which records.
 
+## Museums Victoria stories
+
+Museums Victoria has published 19 stories about objects connected with the University (CSIRAC, MUDPAC, the Engineering School,
+the Sigalas family papers, student badges, the Henbury meteorite and others). Those objects and stories are ordinary harvested
+records in the Engineering and Information Technology Collection (`data/harvested.csv`, source "Museums Victoria Collections").
+Each story is also listed in `config/collection_stories_museums_victoria.yml`, with the registration numbers of the objects it is
+about, so those objects' record pages show it under "Stories from the collection". `CollectionStories.default` reads this file
+and `config/collection_stories.yml` together; it is kept apart so a Grainger harvest never overwrites it.
+
+Both files are written by `python3 scripts/museums-victoria/build_harvested_rows.py --stories <unimelb_related_stories.json>`
+(the fetcher's output; see `docs/handover-collection-stories.md`). Then run `bin/rails collections:index_harvested`. The API
+rate-limits: the script stops on a 429 and must not be made to retry around it. Licences were cleared with Museums Victoria by
+the site owner; every story is CC BY 4.0.
+
 ## Tests
 
 `test/models/collection_stories_test.rb` (matching, the committed file), `test/models/collection_stories/*` (page reading, candidates,

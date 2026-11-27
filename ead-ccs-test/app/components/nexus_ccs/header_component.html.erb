@@ -1,7 +1,8 @@
-<header class="site-header" aria-label="Site header" data-controller="site-header"
+<header class="site-header" aria-label="<%= t("nexus_ccs.header.label") %>" data-controller="site-header"
+        data-site-header-menu-label-value="<%= t("nexus_ccs.header.menu") %>" data-site-header-close-label-value="<%= t("nexus_ccs.header.close") %>"
         data-action="click@window->site-header#clickAway keydown.esc@window->site-header#escape focusin@window->site-header#focusAway">
   <div class="site-header__brand">
-    <a href="https://www.unimelb.edu.au" aria-label="The University of Melbourne homepage">
+    <a href="https://www.unimelb.edu.au" aria-label="<%= t("nexus_ccs.footer.homepage") %>">
       <picture>
         <source media="(max-width: 1023px)" srcset="<%= image_path("site/logo-header-mobile.svg") %>">
         <%= image_tag "site/logo-header-desktop.svg", alt: "" %>
@@ -11,7 +12,7 @@
 
   <div class="site-header__main">
     <div class="site-header__utility">
-      <nav aria-label="University of Melbourne">
+      <nav aria-label="<%= t("nexus_ccs.header.university") %>">
         <ul>
           <% audience_links.each do |link| %>
             <li><%= link_to link.label, link.href %></li>
@@ -19,22 +20,22 @@
         </ul>
       </nav>
       <%= render NexusCcs::SavedBarComponent.new(placement: :header) if chrome.saved_bar == :header %>
-      <button type="button" class="site-header__search-toggle" aria-label="Open search" data-action="site-header#openSearch">
+      <button type="button" class="site-header__search-toggle" aria-label="<%= t("nexus_ccs.header.open_search") %>" data-action="site-header#openSearch">
         <%= image_tag "site/icon-search-onaccent.svg", alt: "" %>
       </button>
     </div>
 
     <div class="site-header__bar">
-      <%= link_to "Collections Navigator", root_path, class: "site-header__title", data: { site_header_target: "title" } %>
+      <%= link_to t("nexus_ccs.breadcrumb.site"), root_path, class: "site-header__title", data: { site_header_target: "title" } %>
       <%# Phones: an open menu section's name is shown under the home link as plain text, so the link is never renamed or hidden -%>
       <span class="site-header__title site-header__section" data-site-header-target="section" hidden></span>
 
-      <nav id="site-nav" class="site-nav" aria-label="Primary navigation" data-site-header-target="nav">
+      <nav id="site-nav" class="site-nav" aria-label="<%= t("nexus_ccs.header.primary") %>" data-site-header-target="nav">
         <div class="site-nav__search">
           <%= form_with url: all_records_path, method: :get, html: { role: "search" } do |form| %>
             <%= form.label :q, "Search Collections Navigator", for: "site-nav-q", class: "visually-hidden" %>
-            <%= form.search_field :q, id: "site-nav-q", placeholder: "Search", autocomplete: "off", maxlength: QueryRules::MAX_LENGTH %>
-            <button type="submit" aria-label="Search"><%= image_tag "site/icon-search-onaccent.svg", alt: "" %></button>
+            <%= form.search_field :q, id: "site-nav-q", placeholder: t("nexus_ccs.header.search"), autocomplete: "off", maxlength: QueryRules::MAX_LENGTH %>
+            <button type="submit" aria-label="<%= t("nexus_ccs.header.search") %>"><%= image_tag "site/icon-search-onaccent.svg", alt: "" %></button>
           <% end %>
         </div>
 
@@ -42,12 +43,12 @@
           <li>
             <button type="button" class="site-nav__trigger" aria-expanded="false" aria-controls="site-nav-records"
                     data-site-header-target="trigger" data-action="site-header#toggleSection">
-              <span>Search collections</span><%= image_tag "site/icon-expand.svg", alt: "" %>
+              <span><%= t("nexus_ccs.header.search_collections") %></span><%= image_tag "site/icon-expand.svg", alt: "" %>
             </button>
             <div id="site-nav-records" class="site-nav__panel site-nav__panel--browse">
               <button type="button" class="site-nav__back" data-action="site-header#back"><%= back_label %></button>
               <%= link_to all_records_link_path, class: "site-nav__panel-title" do %>
-                <%= image_tag "site/icon-arrow-footer.svg", alt: "" %>Search all records
+                <%= image_tag "site/icon-arrow-footer.svg", alt: "" %><%= t("nexus_ccs.header.search_all") %>
               <% end %>
               <div class="site-nav__groups">
                 <% browse_groups.each do |group| %>
@@ -62,8 +63,8 @@
                 <% end %>
               </div>
               <ul class="site-nav__browse-more">
-                <li><%= link_to with_images_path do %>Only records with images<% end %></li>
-                <li><%= link_to "Advanced search", helpers.advanced_search_catalog_path %></li>
+                <li><%= link_to with_images_path do %><%= t("nexus_ccs.header.with_images") %><% end %></li>
+                <li><%= link_to t("nexus_ccs.header.advanced_search"), helpers.advanced_search_catalog_path %></li>
               </ul>
             </div>
           </li>
@@ -91,7 +92,7 @@
           <li>
             <button type="button" class="site-nav__trigger" aria-expanded="false" aria-controls="site-nav-help"
                     data-site-header-target="trigger" data-action="site-header#toggleSection">
-              Help<%= image_tag "site/icon-expand.svg", alt: "" %>
+              <%= t("nexus_ccs.header.help") %><%= image_tag "site/icon-expand.svg", alt: "" %>
             </button>
             <div id="site-nav-help" class="site-nav__panel">
               <button type="button" class="site-nav__back" data-action="site-header#back"><%= back_label %></button>
@@ -108,7 +109,7 @@
           <li>
             <button type="button" class="site-nav__trigger" aria-expanded="false" aria-controls="site-nav-saved"
                     data-site-header-target="trigger" data-action="site-header#toggleSection">
-              My saved items<%= image_tag "site/icon-expand.svg", alt: "" %>
+              <%= t("nexus_ccs.header.saved") %><%= image_tag "site/icon-expand.svg", alt: "" %>
             </button>
             <div id="site-nav-saved" class="site-nav__panel">
               <button type="button" class="site-nav__back" data-action="site-header#back"><%= back_label %></button>
@@ -125,7 +126,7 @@
           <% end %>
         </ul>
 
-        <ul class="site-nav__audience" aria-label="University of Melbourne">
+        <ul class="site-nav__audience" aria-label="<%= t("nexus_ccs.header.university") %>">
           <% audience_links.each do |link| %>
             <li><%= link_to link.label, link.href %></li>
           <% end %>
@@ -138,7 +139,7 @@
           data-site-header-target="menu" data-action="site-header#toggleMenu">
     <svg class="site-header__menu-open" viewBox="0 0 24 24" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
     <svg class="site-header__menu-close" viewBox="0 0 24 24" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19" /><line x1="19" y1="5" x2="5" y2="19" /></svg>
-    <span data-site-header-target="menuLabel">Menu</span>
+    <span data-site-header-target="menuLabel"><%= t("nexus_ccs.header.menu") %></span>
   </button>
 </header>
 
