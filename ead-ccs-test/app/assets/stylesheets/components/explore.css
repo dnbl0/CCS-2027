@@ -204,5 +204,93 @@
 }
 
 /* Record types, Places and Time are their own sections (explore-kinds, explore-places, explore-periods): a heading with its See all link beside it,
-   then the site's result cards in the mosaic (ExploreCardComponent, components/film_polish.css). */
+   then the site's result cards in the mosaic (ExploreCardComponent, the mosaic rules below). */
 .explore__row-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--ccs-space-2) var(--ccs-space-5); }
+
+/* The "all collections" and row tiles (the home page mosaic below replaces the --all masonry) */
+@media (min-width: 600px) {
+  .explore__tiles--all, .explore__tiles--row { --grid-lanes-polyfill: 1; display: grid-lanes; align-items: start; }
+  .explore__tiles--all { grid-template-columns: repeat(5, 1fr); }
+  .explore__tiles--row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .explore__tiles--row { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 600px) {
+  :is(.explore__tiles--all, .explore__tiles--row) .explore__tile-link { height: auto; }
+  :is(.explore__tiles--all, .explore__tiles--row) .explore__face--image { aspect-ratio: auto; display: block; }
+  :is(.explore__tiles--all, .explore__tiles--row) .explore__image { width: 100%; height: auto; object-fit: contain; }
+}
+:is(.explore__tiles--all, .explore__tiles--row) .explore__tile-body::after { content: none; }
+:is(.explore__tiles--all, .explore__tiles--row) .explore__tile-body { padding: var(--ccs-space-3); }
+
+/* ---- The Time strip: the page's one dark band (as specific as the home page's alternating-section rule, plus its own class) ---- */
+.explore-periods,
+body.page-home main > .ccs-section.explore-periods:not(.ccs-section--hero) { background: var(--ccs-surface-brand); color: var(--ccs-white); }
+
+.explore-periods .ccs-section__heading,
+.explore-periods .explore__intro { color: var(--ccs-white); }
+
+.explore-periods .card-section__more a,
+.explore-periods .explore__all { color: var(--ccs-white); }
+
+.explore-periods .card-layout .explore-card:focus-within { outline-color: var(--ccs-white); }
+
+/* ---- The collections on the home page: an even mosaic of picture tiles, the first one large ---- */
+/* (the "all collections" masonry above is replaced by this fixed mosaic) */
+.explore__tiles,
+.explore__tiles--all { --grid-lanes-polyfill: 0; display: grid; align-items: stretch; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 11rem; grid-auto-flow: dense; gap: var(--ccs-space-3); }
+
+
+.explore__tiles .explore__tile { position: relative; isolation: isolate; overflow: hidden; border: 0; border-radius: var(--ccs-tile-radius); background: var(--explore-tint, var(--ccs-explore-tint-1)); box-shadow: none; }
+
+.explore__tiles .explore__tile:first-child { grid-column: span 2; grid-row: span 2; }
+
+.explore__tiles .explore__tile-link { position: static; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+
+.explore__tiles .explore__face { position: absolute; inset: 0; z-index: -1; height: auto; padding: 0; border: 0; }
+
+.explore__tiles .explore__face--image { display: block; aspect-ratio: auto; background: var(--ccs-surface-brand); }
+
+.explore__tiles .explore__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; }
+
+/* The name sits at the foot (explore.css lets the body grow to fill the tile) */
+.explore__tiles .explore__tile-body { position: relative; flex: none; height: auto; min-height: 0; margin-block-start: auto; padding: var(--ccs-tile-scrim-fade) var(--ccs-space-4) var(--ccs-space-4); }
+
+.explore__tiles .explore__tile-body::after { display: none; }
+
+.explore__tiles .explore__tile:has(.explore__face--image) .explore__tile-body {
+  background: linear-gradient(to top, var(--ccs-tile-scrim) calc(100% - var(--ccs-tile-scrim-fade)), rgb(0 15 70 / 0));
+}
+
+.explore__tiles .explore__tile:has(.explore__face--image) .explore__tile-title { color: var(--ccs-white); }
+
+.explore__tiles .explore__tile-title { margin: 0; font-size: var(--ccs-font-size-md); }
+
+.explore__tiles .explore__tile:first-child .explore__tile-title { font-size: var(--ccs-heading-card-size); }
+
+.explore__tiles .explore__tile-link:hover .explore__tile-title { text-decoration: underline; text-underline-position: from-font; }
+
+.explore__tiles .explore__tile:has(.explore__face--image) .explore__tile-link:hover .explore__tile-title { color: var(--ccs-white); }
+
+@media (min-width: 600px) {
+  .explore__tiles,
+  .explore__tiles--all { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 12rem; }
+}
+
+@media (min-width: 900px) {
+  .explore__tiles,
+  .explore__tiles--all { grid-template-columns: repeat(5, minmax(0, 1fr)); grid-auto-rows: 12rem; gap: var(--ccs-space-4); }
+}
+
+/* Phones: the collections stay a mosaic of two across (the old one-column list of rows is replaced) */
+@media (max-width: 599px) {
+  .explore__tiles .explore__tile-link { flex-direction: column; align-items: stretch; }
+
+  .explore__tiles .explore__face,
+  .explore__tiles .explore__face--image { width: auto; aspect-ratio: auto; align-self: auto; }
+
+  .explore__tiles .explore__tile-body { min-height: 0; justify-content: flex-end; padding: var(--ccs-space-6) var(--ccs-space-3) var(--ccs-space-3); }
+
+  .explore__tiles .explore__tile-title { font-size: var(--ccs-font-size-sm); overflow-wrap: break-word; hyphens: auto; }
+}

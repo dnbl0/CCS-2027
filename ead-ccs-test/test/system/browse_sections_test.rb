@@ -32,7 +32,7 @@ class BrowseSectionsSystemTest < ApplicationSystemTestCase
     assert_not page.evaluate_script("document.documentElement.scrollWidth > window.innerWidth")
   end
 
-  test "each section has its own layout, and the picture is shown whole on its tile under a navy scrim (card_tiles.css)" do
+  test "each section has its own layout, and the picture is shown whole on its tile under a navy scrim (card_layout.css)" do
     page.current_window.resize_to(1440, 900)
     visit "/browse"
 

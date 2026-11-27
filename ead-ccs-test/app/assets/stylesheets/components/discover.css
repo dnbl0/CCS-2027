@@ -162,3 +162,14 @@ html:not(.no-js) .discover-frame:not([complete]) {
   margin: 0;
   color: var(--ccs-text-secondary);
 }
+
+/* The mosaic of cards: each picture whole at its own shape, the title under it */
+@media (min-width: 600px) {
+  .ccs-mosaic .discover-cards { --grid-lanes-polyfill: 1; display: grid-lanes; align-items: start; }
+  .ccs-mosaic--4 .discover-cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .ccs-mosaic--4 .discover-cards { grid-template-columns: repeat(4, 1fr); }
+}
+.ccs-mosaic .discover-cards { margin-top: var(--ccs-space-4); gap: var(--ccs-space-5); }
+.ccs-mosaic .discover-cards__item .result-card { flex: 0 0 auto; }
