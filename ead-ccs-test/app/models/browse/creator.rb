@@ -29,7 +29,7 @@ module Browse
     # kept for six hours; [] when there is nothing to compare or Solr cannot answer.
     def self.related(entry, facets)
       shared = [ [ "subject_ssim", Array(facets["subject_ssim"]).first(3) ], [ "named_collection_ssim", Array(facets["named_collection_ssim"]).first(2) ] ]
-      clauses = shared.filter_map { |field, pairs| Browse.field_query(field, pairs.map(&:first)) if pairs.any? }
+      clauses = shared.filter_map { |field, pairs| SolrQuery.field(field, pairs.map(&:first)) if pairs.any? }
       return [] if clauses.empty?
 
       Rails.cache.fetch(SuppressedRecord.cache_key("browse/creator_related/v1/#{entry.token}"), expires_in: TTL, skip_nil: true) do

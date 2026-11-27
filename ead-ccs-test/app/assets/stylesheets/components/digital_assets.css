@@ -88,7 +88,8 @@
   display: block;
   width: 5rem;
   height: 5rem;
-  object-fit: cover;
+  object-fit: contain; /* cultural objects are never cropped */
+  background: var(--ccs-surface-subtle);
 }
 
 /* Media metadata: a block under the toolbar, shown when the Media information button opens it */

@@ -1,12 +1,6 @@
 require "test_helper"
 
 class RecordHeadingsTest < ActionDispatch::IntegrationTest
-  def needs_solr
-    Blacklight.default_index.connection.get("select", params: { q: "*:*", rows: 0 })
-  rescue StandardError
-    skip "needs the Solr core at SOLR_URL"
-  end
-
   test "a record page has exactly one h1 (the header block's, seen by everyone) and no redundant landmark labels" do
     needs_solr
     get "/catalog", params: { q: "skull", any_assets: "1", format: :json }

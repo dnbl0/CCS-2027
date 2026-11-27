@@ -15,8 +15,12 @@ on:
       - 'eslint.config.js'
       - '.stylelintrc.json'
       - '.github/workflows/ci.yml'
-  # No run on push to main: the pull request already ran these checks, and a private repo's minutes are limited
+  # No run on push to main: the pull request already ran these checks, and the Actions budget is $0 (public repo)
   workflow_dispatch:
+
+# Read-only token: these jobs only check out and test the code
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

@@ -131,8 +131,8 @@ class DiscoveryPagesTest < ActionDispatch::IntegrationTest
     get "/stories/example-story"
     assert_response :success
     assert_select "h1", "Example story (placeholder)"
-    assert_select ".story__text h2", text: "Lorem ipsum"
-    assert_select ".story__text script", count: 0
+    assert_select ".story-page__text h2", text: "Lorem ipsum"
+    assert_select ".story-page__text script", count: 0
 
     get "/stories/no-such-story"
     assert_response :not_found

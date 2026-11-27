@@ -88,12 +88,16 @@ class RecordView < ApplicationRecord
       pending.clear
       return 0 if rows.empty?
 
-      upsert_all(rows, unique_by: %i[day document_id], on_duplicate: Arel.sql("views = record_views.views + EXCLUDED.views"))
+      begin
+        upsert_all(rows, unique_by: %i[day document_id], on_duplicate: Arel.sql("views = record_views.views + EXCLUDED.views"))
+      rescue StandardError => error
+        # Not lost: the views go back to pending and are saved by the next flush
+        rows.each { |row| pending[[ row[:day], row[:document_id] ]] += row[:views] }
+        Discovery.log_failure("Trending counts", error)
+        return 0
+      end
       prune_if_due
       rows.size
-    rescue StandardError => error
-      Rails.logger.warn("Trending counts not saved: #{error.class}: #{error.message}")
-      0
     end
   end
 

@@ -216,12 +216,6 @@ class PerformanceTest < ActionDispatch::IntegrationTest
 
   # --- Pages that read Solr (skipped where there is no Solr core) ---
 
-  def needs_solr
-    Blacklight.default_index.connection.get("select", params: { q: "*:*", rows: 0 })
-  rescue StandardError
-    skip "needs the Solr core at SOLR_URL"
-  end
-
   test "a results page makes at most 2 Solr requests and 3 database queries, with or without a guest" do
     needs_solr
     get "/catalog", params: { q: "skull" }

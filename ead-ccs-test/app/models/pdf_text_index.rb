@@ -32,7 +32,7 @@ module PdfTextIndex
       response = Blacklight.default_index.connection.get("admin/luke", params: { show: "schema", wt: "json" })
       response.dig("schema", "fields")&.key?(FIELD) || false
     rescue StandardError => e
-      Rails.logger.warn("PDF text search check unavailable: #{e.class}")
+      Discovery.log_failure("PDF text search check", e)
       false
     end
   end

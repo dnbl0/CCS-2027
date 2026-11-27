@@ -221,7 +221,8 @@ body.embed {
   flex: 0 0 4rem;
   width: 4rem;
   height: 4rem;
-  object-fit: cover;
+  object-fit: contain; /* cultural objects are never cropped */
+  background: var(--ccs-surface-subtle);
 }
 
 .embed-gallery__image--none {

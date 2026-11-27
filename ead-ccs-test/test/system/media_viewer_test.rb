@@ -13,12 +13,6 @@ class MediaViewerTest < ApplicationSystemTestCase
 
   teardown { page.current_window.resize_to(1440, 900) }
 
-  def needs_solr
-    Blacklight.default_index.connection.get("select", params: { q: "*:*", rows: 0 })
-  rescue StandardError
-    skip "needs the Solr core at SOLR_URL"
-  end
-
   def sideways_scroll = page.evaluate_script("document.documentElement.scrollWidth - document.documentElement.clientWidth")
 
   test "Zoom and pan swaps the image for a viewer that the keyboard can operate, and closing it puts the image back" do

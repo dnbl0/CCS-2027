@@ -25,7 +25,7 @@ module ActiveSupport
     # Add more helper methods to be used by all tests here...
 
     # The "rails" CI job has no Solr (the system job does): a test that reads the Solr core at SOLR_URL skips itself when it
-    # cannot be reached. Some test files define their own copy of this.
+    # cannot be reached.
     def needs_solr
       Blacklight.default_index.connection.get("select", params: { q: "*:*", rows: 0 })
     rescue StandardError

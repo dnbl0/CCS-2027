@@ -38,13 +38,17 @@ class RecordViewTest < ActiveSupport::TestCase
     assert_empty RecordView.pending_counts
   end
 
-  test "a failed write drops the waiting counts and does not raise" do
+  test "a failed write does not raise and keeps the waiting counts, so the next flush saves them" do
     RecordView.record("emu-1")
     original = RecordView.method(:upsert_all)
     RecordView.define_singleton_method(:upsert_all) { |*, **| raise ActiveRecord::StatementInvalid, "database is down" }
     assert_equal 0, RecordView.flush
+    assert_not_empty RecordView.pending_counts, "the views are kept for the next flush"
 
-    assert_empty RecordView.pending_counts
+    RecordView.define_singleton_method(:upsert_all, &original)
+    original = nil
+    assert_equal 1, RecordView.flush
+    assert_equal 1, RecordView.find_by(document_id: "emu-1").views
   ensure
     RecordView.define_singleton_method(:upsert_all, &original) if original
   end
