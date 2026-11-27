@@ -1,4 +1,0 @@
-/* Stylesheet of the stock Blacklight page (/stock/:id): Bootstrap and Blacklight's CSS only, none of the UoM theme. */
-@import url("bootstrap-stock.css");
-@import url("blacklight.css");
-@import url("blacklight_gallery/osd_viewer.css");

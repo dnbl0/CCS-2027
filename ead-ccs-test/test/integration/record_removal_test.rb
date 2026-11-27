@@ -119,13 +119,6 @@ class RecordRemovalTest < ActionDispatch::IntegrationTest
     assert_gone "/catalog/#{ID}/similar"
   end
 
-  test "the stock record pages are 410 Gone for a removed record" do
-    SuppressedRecord.suppress!("emu-9044", reason: "r")
-
-    assert_gone "/stock/emu-9044"
-    assert_gone "/branded-stock/emu-9044"
-  end
-
   test "the exports, the manifest, the sensitivity choice, the comparison and an access request are 410 Gone" do
     assert_gone "/catalog/#{ID}/metadata"
     assert_gone "/catalog/#{ID}/manifest.json"

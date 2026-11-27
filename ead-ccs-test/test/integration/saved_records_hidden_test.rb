@@ -64,11 +64,4 @@ class SavedRecordsHiddenTest < ActionDispatch::IntegrationTest
     delete "/lists/1"
     assert_response :not_found
   end
-
-  test "the stock record pages do not offer to save the record" do
-    needs_solr
-    get "/stock/emu-9044"
-
-    assert_no_saving
-  end
 end

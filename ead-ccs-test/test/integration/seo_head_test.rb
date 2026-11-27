@@ -2,7 +2,7 @@ require "test_helper"
 require_relative "../support/env_override"
 
 # What each kind of page says in its head, and in X-Robots-Tag, for search engines, social networks and AI crawlers (CCS-128, CCS-127).
-# Record pages are handed a document in place of Solr, as in StockCatalogTest; the results page needs the real core.
+# Record pages are handed a document in place of Solr, the results page needs the real core.
 class SeoHeadTest < ActionDispatch::IntegrationTest
   include EnvOverride
 
@@ -31,13 +31,11 @@ class SeoHeadTest < ActionDispatch::IntegrationTest
   module FakeSolr
     def search_service = DOCS.key?(params[:id]) ? FakeService.new(DOCS.fetch(params[:id])) : super
   end
-  [ CatalogController, StockCatalogController, BrandedStockCatalogController ].each { |controller| controller.prepend(FakeSolr) }
+  CatalogController.prepend(FakeSolr)
 
   setup do
-    Rails.configuration.x.stock_record_ids = %w[open request]
     @env = { "SEO_INDEXING" => "on" }
   end
-  teardown { Rails.configuration.x.stock_record_ids = nil }
 
   SHARE_CARD = "http://www.example.com/share-card.png"
   SHARE_CARD_ALT = "Collections Navigator, University of Melbourne cultural collections"
@@ -146,23 +144,6 @@ class SeoHeadTest < ActionDispatch::IntegrationTest
     assert_equal "\"><script>alert(1)</script>", JSON.parse(css_select("script[type='application/ld+json']").first.text)["name"]
     assert_empty css_select("head script").select { |tag| tag.text.include?("alert") && tag["type"] != "application/ld+json" }
     assert_not_includes css_select("head").to_s.sub(%r{<title>.*?</title>}m, ""), "<script>alert"
-  end
-
-  test "the stock record pages are a copy of the record page: noindex, nofollow and canonical to the record" do
-    %w[/stock/open /branded-stock/open].each do |path|
-      with_env(@env) { get path }
-
-      assert_response :success, path
-      assert_equal "noindex, nofollow, noai, noimageai", robots_meta, path
-      assert_equal "http://www.example.com/catalog/open", canonical, path
-      assert_equal "noindex, nofollow, noai, noimageai", response.headers["X-Robots-Tag"], path
-    end
-  end
-
-  test "a request-tier record's stock page leaks no asset address into the head" do
-    with_env(@env) { get "/stock/request" }
-
-    assert_no_match(/digital-assets/, css_select("head").to_s)
   end
 
   test "with indexing off (a test or staging copy) every page is noindex, nofollow, and has no social tags" do

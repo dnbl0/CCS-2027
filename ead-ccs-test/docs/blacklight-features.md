@@ -81,7 +81,7 @@ default way: AND), `{!tag}/{!ex}` self-exclusion, or hand-built range slider/his
 
 ## Record page licence hover text
 
-The licence badge (`StockLicenceBadgeComponent`) shows the reviewed copy as hover text: "<label> means you can use this item freely."
+**Removed 27 Nov 2026 with the trial record pages (`/stock`, `/branded-stock`), the only pages that showed it.** The licence badge (`StockLicenceBadgeComponent`) showed the reviewed copy as hover text: "<label> means you can use this item freely."
 (public domain, CC0, CC BY, CC BY-SA), "In copyright means you may be able to use this item if you seek permission." ("Copyright -
 Current"), and "means you can use this item with conditions." for CC licences with NC or ND (as on the static site). "Reproduction
 Licence - Current" has no hover text: the copy does not cover it, a stakeholder decision.
