@@ -58,6 +58,7 @@ These are not open questions: the product owner has set them, and every page mus
 | Rule | What it means | Guarded by |
 |---|---|---|
 | Pictures of cultural objects are never cropped | Every picture of an object is shown whole (`object-fit: contain`, on a quiet ground if the frame is a fixed shape). Only site photographs, such as the home page banner, may fill a frame. | `ead-ccs-test/test/lint/no_cropped_images_test.rb` |
+| No counts of records outside the search results | Pages show names and pictures only: no "N records", "(N)", "N categories" or "See all N". Allowed: the search results page's total and its filter counts, and the visitor's own counts (saved records, lists, selections). | `ead-ccs-test/test/integration/no_counts_test.rb` |
 
 ## Earlier decisions
 
