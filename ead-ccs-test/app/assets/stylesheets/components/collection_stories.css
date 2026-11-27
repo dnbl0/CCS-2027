@@ -1,0 +1,188 @@
+/* "Stories from the collection" on the record page (NexusCcs::CollectionStoriesComponent, CollectionStoryComponent), after the
+   National Gallery of Art's article listings (nga.gov/stories/articles): one story is a wide row between two rules, two or more a
+   card grid. Each story is one link (the headline's, stretched over it). Pictures are shown whole, never cropped. */
+
+.collection-stories__description {
+  margin: var(--ccs-space-2) 0 0;
+  font-size: var(--ccs-font-size-md);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-secondary);
+}
+
+/* --- One story: the wide row (a grid card is the search results' card, result_card.css) --- */
+
+.collection-story--feature {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-4);
+}
+
+.collection-story:has(.collection-story__link:focus-visible) {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 4px;
+}
+
+.collection-story__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-3);
+  min-width: 0;
+}
+
+/* The small uppercase label above the headline ("Article") */
+.collection-story__kicker,
+.collection-story__source {
+  margin: 0;
+  font-size: var(--ccs-font-size-sm);
+  font-weight: var(--ccs-font-weight-bold);
+  line-height: var(--ccs-line-height-normal);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ccs-text-primary);
+}
+
+.collection-story__title {
+  margin: 0;
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-2xl);
+  font-weight: var(--ccs-font-weight-regular);
+  line-height: var(--ccs-line-height-tight);
+  overflow-wrap: anywhere;
+}
+
+.collection-story__link {
+  color: var(--ccs-text-brand);
+  text-decoration: none;
+}
+
+/* The headline's box covers the story, so there is one target and no nested link */
+.collection-story__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.collection-story:hover .collection-story__link,
+.collection-story__link:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.collection-story__link:focus-visible {
+  outline: none; /* the story draws the focus ring */
+}
+
+.collection-story__summary {
+  margin: 0;
+  font-size: var(--ccs-font-size-lg);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* The picture: a 3:2 frame on a quiet ground, the picture whole inside it. Drawn above the text, though it follows it in the markup
+   (the headline is read first). */
+.collection-story__media {
+  order: -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: var(--ccs-surface-subtle);
+}
+
+.collection-story__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* --- One story: the wide row --- */
+
+.collection-story--feature {
+  margin-top: var(--ccs-space-6);
+  padding-block: var(--ccs-space-6);
+  border-block: 1px solid var(--ccs-border-default);
+}
+
+.collection-story--feature .collection-story__title {
+  font-size: var(--ccs-font-size-3xl);
+}
+
+.collection-story--feature .collection-story__source {
+  order: -2; /* above the picture and the text on a phone */
+}
+
+/* Source | kicker, headline, summary | picture, as the National Gallery's listing row */
+@media (min-width: 768px) {
+  .collection-story--feature {
+    display: grid;
+    grid-template-columns: minmax(10rem, 1fr) 3fr 2fr;
+    grid-template-areas: "source body media";
+    gap: var(--ccs-space-6);
+    align-items: start;
+  }
+
+  .collection-story--feature .collection-story__source { grid-area: source; }
+  .collection-story--feature .collection-story__body { grid-area: body; }
+  .collection-story--feature .collection-story__media { grid-area: media; }
+
+  /* With no picture, the text takes its place */
+  .collection-story--feature.collection-story--text {
+    grid-template-columns: minmax(10rem, 1fr) 5fr;
+    grid-template-areas: "source body";
+  }
+}
+
+/* --- Two or more stories: the card grid --- */
+
+.collection-story-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ccs-space-5);
+  margin: var(--ccs-space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 600px) {
+  .collection-story-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .collection-story-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.collection-story-grid__item {
+  display: flex;
+}
+
+.collection-story--card {
+  flex: 1;
+}
+
+/* A grid card's picture sits in a fixed 3:2 frame (the story pictures have no known size), shown whole, so nothing shifts as
+   it loads */
+.collection-story--card .result-card__media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 2;
+}
+
+.collection-story--card .result-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* The summary sits between the title and the lines, in the lines' body text */
+.result-card__content > .collection-story__summary {
+  padding-top: var(--ccs-space-3);
+  font-size: var(--ccs-font-size-md);
+}
+

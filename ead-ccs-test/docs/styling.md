@@ -161,5 +161,7 @@ Motion is guarded by `prefers-reduced-motion: no-preference` in the result card,
 - **More like this** (`MoreLikeThisComponent`): one h2 and up to three h3 sub-sections (Related objects, Similar records in its lazy
   frame, Recently viewed), up to four `RecordCardComponent`s each, no tabs. A record with no image the visitor may see is a text
   card (kicker, title, creator and date), never a grey box.
+- **Stories from the collection** (`CollectionStoriesComponent`, `collection_stories.css`): the record cards for articles on a University
+  collection's own site about this object, drawn only when one matches (docs/collection-stories.md). No count.
 - Headings: h1 the title; h2 Key facts, Object details, Copyright and use, About this record, More like this; h3 the sub-sections.
   Wording marked placeholder is in `config/locales/record_page.en.yml`.

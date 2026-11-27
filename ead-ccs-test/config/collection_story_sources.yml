@@ -1,0 +1,17 @@
+# The University collection websites whose stories bin/rails stories:harvest reads (CollectionStories::Source,
+# docs/collection-stories.md). Add a site only when its stories can be matched to records the same exact way: by an accession number
+# in the story's image file names, captions or text, within one collection.
+#
+#   name          the site's name, shown on each story card
+#   collection    the collection_ssim value of its records (config/pages.yml)
+#   index_url     the page that lists the stories
+#   story_prefix  every story's address starts with this; other links on the list are ignored
+#   hold          story address: why a reviewer keeps it off the record pages (it goes to the curator list instead)
+- name: Grainger Museum
+  collection: Grainger Museum Collection
+  index_url: https://grainger.unimelb.edu.au/from-the-collection
+  story_prefix: https://grainger.unimelb.edu.au/from-the-collection/from-the-collection/
+  hold:
+    https://grainger.unimelb.edu.au/from-the-collection/from-the-collection/from-the-collection-march-2018: >-
+      A broad topic (Chinese material in the collection, chosen for a teaching session) rather than a story about one object.
+      Its captions name a headdress (01.3295) and a jacket (04.6872); a curator decides whether it belongs on those records.

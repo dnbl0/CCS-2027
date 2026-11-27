@@ -1,0 +1,10 @@
+en:
+  nexus_ccs:
+    # "Stories from the collection" on a record page (NexusCcs::CollectionStoriesComponent, docs/collection-stories.md).
+    # No number of stories or records is ever shown here: the site owner asked for no counts.
+    collection_stories:
+      heading: "Stories from the collection"
+      # PLACEHOLDER WORDING, NOT YET APPROVED
+      description: "Articles about this object from the University's collection websites."
+      # The small label above each headline, as "Article" on the National Gallery of Art's listings
+      kicker: "Article"
