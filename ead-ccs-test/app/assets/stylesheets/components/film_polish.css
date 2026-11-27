@@ -1,4 +1,4 @@
-/* FILM COPY: layout and spacing fixes found on review (17 Nov). Loaded last. */
+/* Layout and spacing fixes found on review (17 Nov 2026). Loaded last, so its rules win: move each into its component's own file over time (docs/audit-2026-11-27.md, T8). */
 
 /* 1. Blacklight's facet window ("Show more"): the title on the left, Close on the right, not touching */
 dialog.modal .modal-header { display: flex; align-items: center; justify-content: space-between; gap: var(--ccs-space-5); }

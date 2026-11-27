@@ -30,7 +30,7 @@ module ExploreEntryPoints
   Overview = Data.define(:collections, :kinds, :places, :periods, :kind_tiles, :place_tiles, :period_tiles) do
     def any? = [ collections, kinds, places, periods ].any?(&:present?)
   end
-  # FILM COPY: Record types, Places and Time are each a row of this many tiles
+  # Record types, Places and Time are each a row of this many tiles
   ROW = 4
   # The Places section is a row that scrolls sideways, so it holds more than a row of tiles
   PLACES_SHOWN = 8
@@ -137,7 +137,7 @@ module ExploreEntryPoints
     {}
   end
 
-  # FILM COPY: one example picture for each record type, place and period (the same rule as the collection tiles' pictures)
+  # One example picture for each record type, place and period (the same rule as the collection tiles' pictures)
   def self.fetch_link_images(fetched)
     kinds = fetched["kinds"].to_a.to_h { |label, _count, values| [ label, values.any? ? SolrQuery.field(CLASSIFICATION_FIELD, values) : nil ] }
     places = fetched["places"].to_a.to_h { |value, _count| [ value, "#{PLACE_FIELD}:#{SolrQuery.phrase(value)}" ] }
@@ -206,7 +206,7 @@ module ExploreEntryPoints
 
   def self.period_query(first, last) = "#{DATE_FIELD}:[#{first} TO #{last}]"
 
-  # FILM ONLY (private copy for the 2027 showcase clip; never pushed): every University collection as a tile, with the collection
+  # Used only when FILM_ALL_COLLECTIONS is set (made for the 2027 showcase film): every University collection as a tile, with the collection
   # thumbnails supplied for the film. No record counts are shown, as most of these collections have no records in this index yet.
   FILM_COLLECTIONS = [
     [ "University Art Collection", "/film-thumbs/00-university-art-collection.jpg", 1200, 600 ],
