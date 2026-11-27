@@ -31,6 +31,6 @@ module CountsRecordViews
 
     RecordView.record(@document.id)
   rescue StandardError => error
-    Rails.logger.warn("Record view not counted: #{error.class}: #{error.message}")
+    Discovery.log_failure("Record view", error)
   end
 end
