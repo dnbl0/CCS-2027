@@ -57,6 +57,27 @@ class CollectionStoriesTest < ActiveSupport::TestCase
     assert_empty CollectionStories.default.for(doc("00.0039", "University Art Collection"))
   end
 
+  test "the committed Museums Victoria file puts its stories on the objects they are about, read with the Grainger stories" do
+    photograph = CollectionStories.default.for(doc("MM 90899.42", "Engineering and Information Technology Collection"))
+    meteorite = CollectionStories.default.for(doc("E 15613", "Engineering and Information Technology Collection"))
+
+    assert_includes photograph.map(&:title), "CSIRAC Collection"
+    assert_equal [ "Museums Victoria" ], photograph.map(&:site).uniq
+    assert_equal [ "The Henbury Meteorite" ], meteorite.map(&:title)
+    assert_empty CollectionStories.default.for(doc("MM 90899.42", "Grainger Museum Collection"))
+    assert_equal [ "Bridgeport Presentation Baton" ], CollectionStories.default.for(doc("00.0039", "Grainger Museum Collection")).map(&:title)
+  end
+
+  test "load reads several files into one set of stories; a missing file adds nothing" do
+    Dir.mktmpdir do |dir|
+      one, two = File.join(dir, "one.yml"), File.join(dir, "two.yml")
+      File.write(one, { "stories" => [ STORY ] }.to_yaml)
+      File.write(two, { "stories" => [ STORY.merge("title" => "Second", "url" => "https://museum.example/two") ] }.to_yaml)
+
+      assert_equal [ "Hardanger fiddle", "Second" ], CollectionStories.load(one, two, File.join(dir, "missing.yml")).for(doc("00.0099")).map(&:title)
+    end
+  end
+
   test "the committed data file: nothing on the curator list or held by a reviewer is in the stories the site reads" do
     data = YAML.safe_load_file(CollectionStories::PATH)
     shown = Array(data["stories"]).map { |story| story["url"] }
