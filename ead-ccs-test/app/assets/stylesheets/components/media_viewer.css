@@ -282,3 +282,9 @@
   flex: 1 1 auto;
   aspect-ratio: auto;
 }
+
+/* Compare panes: the space round an image is neutral */
+.compare-pane__stage { background: var(--ccs-surface-subtle); border: 1px solid var(--ccs-border-default); }
+.compare-pane__controls { gap: var(--ccs-space-3); margin-top: var(--ccs-space-3); }
+.compare-pane__buttons { gap: var(--ccs-space-2); }
+.compare-pane__header, .compare-pane__details { margin-bottom: var(--ccs-space-3); }

@@ -174,3 +174,89 @@
 
   .card-layout--wall .card-layout__item:first-child .result-card__media, .card-layout--wall .card-layout__item:last-child .result-card__media { aspect-ratio: 4 / 3; }
 }
+
+/*
+ * Card tiles (2026-11-18, Dean: the cards in the sections should read like a picture-led collections site). It changes how a card looks in every layout, not where it sits:
+ *
+ * - The picture is shown whole on the tile's brand ground (object-fit: contain): cultural objects are never cropped.
+ * - The name sits over a navy scrim at the foot of the tile. The scrim is at least 85% navy wherever there is text, so white
+ *   text has more than 4.5:1 contrast whatever the picture (WCAG 1.4.3): the worst case, white under 85% navy, is about 12:1.
+ * - No border and no shadow; the corners are rounded on picture tiles only.
+ * - A tile with no picture keeps its tint and dark text.
+ * - The whole tile is the target (the title link's area is stretched over it); focus shows as a ring around the tile.
+ *
+ * Section headings are centred, with "See all" under the cards (NexusCcs::CardSectionComponent, NexusCcs::ExploreComponent).
+ */
+:root {
+  --ccs-tile-scrim: rgb(0 15 70 / 0.85);
+  --ccs-tile-scrim-fade: 3rem;
+  --ccs-tile-radius: var(--ccs-radius-md);
+}
+
+/* ---- Section frame: centred heading and intro, "See all" under the cards ---- */
+.ccs-section .explore__row-head,
+.ccs-section .explore__header { align-items: center; justify-content: center; max-width: none; margin-inline: auto; text-align: center; }
+
+.ccs-section .explore__row-head .ccs-section__heading,
+.ccs-section .explore__header .ccs-section__heading { margin-inline: auto; }
+
+.ccs-section .explore__intro { max-width: 60ch; margin-inline: auto; text-align: center; }
+
+.card-section__more { display: flex; justify-content: center; margin-block-start: var(--ccs-space-6); }
+
+/* ---- The tile: picture fills, name on the scrim ---- */
+.card-layout .explore-card:not(.explore-card--text) {
+  position: relative;
+  isolation: isolate;
+  border: 0;
+  border-radius: var(--ccs-tile-radius);
+  background: var(--ccs-surface-brand);
+  box-shadow: none;
+}
+
+.card-layout .explore-card:not(.explore-card--text) .result-card__media { position: absolute; inset: 0; z-index: -1; flex: none; height: auto; aspect-ratio: auto; background: var(--ccs-surface-brand); }
+
+.card-layout .explore-card:not(.explore-card--text) .result-card__media img { object-fit: contain; object-position: center; }
+
+.card-layout .explore-card:not(.explore-card--text) .result-card__content {
+  margin-block-start: auto;
+  padding: var(--ccs-tile-scrim-fade) var(--ccs-space-4) var(--ccs-space-4);
+  background: linear-gradient(to top, var(--ccs-tile-scrim) calc(100% - var(--ccs-tile-scrim-fade)), rgb(0 15 70 / 0));
+  color: var(--ccs-white);
+}
+
+.card-layout .explore-card:not(.explore-card--text) .document-title-heading { padding-block: 0; color: var(--ccs-white); }
+
+.card-layout .explore-card:not(.explore-card--text) .document-title-heading a { color: var(--ccs-white); }
+
+.card-layout .explore-card:not(.explore-card--text) .explore-card__intro { margin: var(--ccs-space-1) 0 0; color: rgb(255 255 255 / 0.9); }
+
+/* The title link covers the tile, so the whole picture is one target; the picture's own link stays out of the tab order */
+.card-layout .explore-card .explore-card__link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+
+.card-layout .explore-card { position: relative; }
+
+.card-layout .explore-card:focus-within { outline: 3px solid var(--ccs-focus-ring); outline-offset: 3px; }
+
+.card-layout .explore-card .explore-card__link:focus-visible { outline: none; }
+
+/* A tile in a layout with no height of its own takes a shape: the grid and wall square, the rail and strip from their rules */
+.card-layout--grid .explore-card:not(.explore-card--text),
+.card-layout--wall .explore-card:not(.explore-card--text) { aspect-ratio: 1; }
+
+.card-layout--rail .explore-card:not(.explore-card--text) { height: 18rem; }
+
+@media (max-width: 899px) {
+  .card-layout--strip .explore-card:not(.explore-card--text) { aspect-ratio: 4 / 5; }
+}
+
+/* A tile with no picture: its tint, a dark name at the foot (unchanged contrast), no border */
+.card-layout .explore-card--text { border: 0; border-radius: var(--ccs-tile-radius); padding-block-start: var(--ccs-space-8); }
+
+@media (forced-colors: active) {
+  .card-layout .explore-card:not(.explore-card--text) .result-card__content,
+  .explore__tiles .explore__tile-body { background: Canvas; color: CanvasText; }
+
+  .card-layout .explore-card:not(.explore-card--text) .document-title-heading a,
+  .explore__tiles .explore__tile-title { color: LinkText; }
+}

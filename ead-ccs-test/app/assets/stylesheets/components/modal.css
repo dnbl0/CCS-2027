@@ -126,3 +126,9 @@ dialog.modal .btn-close:focus-visible {
   outline-offset: 3px;
   box-shadow: none;
 }
+
+/* Blacklight's facet window ("Show more"): the title on the left, Close on the right, not touching */
+dialog.modal .modal-header { display: flex; align-items: center; justify-content: space-between; gap: var(--ccs-space-5); }
+dialog.modal .modal-header .modal-title { margin: 0; min-width: 0; }
+dialog.modal .modal-header > :is(.btn-close, .modal-close, button) { position: static; flex: none; margin: 0; }
+dialog.modal .facet-values li { padding-block: var(--ccs-space-1); }
