@@ -14,7 +14,7 @@
 class SearchService < Blacklight::SearchService
   def search_results
     response = super
-    correction = SpellingCorrection.from(search_state.query_param, response)
+    correction = SpellingCorrection.from(search_state.query_param, response, method(:near_hits))
     response = retry_with(correction) || response if correction
     count_filter_removals(relate(count_without_filters(response)))
   end
@@ -73,6 +73,13 @@ class SearchService < Blacklight::SearchService
   def count_for(params)
     builder = search_builder.with(search_state.reset(params)).merge(rows: 0, facet: false, stats: false, spellcheck: false)
     repository.search(params: builder).total
+  end
+
+  # How many records hold a spelling collation's words within a few words of each other (one rows=0 request per collation of
+  # several words, made only on an empty page Solr offered collations for; SpellingCorrection.best_collation, CCS-292)
+  def near_hits(collation)
+    state = search_state.reset(search_state.params.merge(q: %("#{collation.delete('"')}"~3)))
+    repository.search(params: search_builder.with(state).merge(rows: 0, facet: false, stats: false, spellcheck: false, hl: false)).total
   end
 
   # This mirrors Blacklight::SearchService#search_results rather than calling

@@ -20,6 +20,10 @@ class SearchBuilderTest < ActiveSupport::TestCase
     assert_equal 80, normal[:start]
   end
 
+  test "a search asks for several spelling collations, so the correction can be chosen (CCS-292)" do
+    assert_equal SpellingCorrection::COLLATIONS, SearchBuilder.new(CatalogController.new).with(q: "gardin of coty").to_h["spellcheck.maxCollations"]
+  end
+
   test "the deepest start can be set by RESULTS_MAX_START" do
     ENV["RESULTS_MAX_START"] = "200"
 

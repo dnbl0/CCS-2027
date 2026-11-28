@@ -13,7 +13,7 @@ class SearchBuilder < Blacklight::SearchBuilder
   # Appending puts this after Blacklight's own add_query_to_solr, so
   # solr_parameters[:q] is the query string Solr will receive.
   self.default_processor_chain += [ :add_minimum_should_match_to_solr, :limit_deep_paging, :add_highlighting_to_solr, :add_cjk_to_description,
-                                    :add_synonyms_to_query ]
+                                    :add_synonyms_to_query, :ask_for_several_collations ]
 
   # Solr's cost grows with how deep a page starts, and nobody reads past page 250: a request deeper than this many records is answered
   # with the last page inside it (the ranking is unchanged). RESULTS_MAX_START overrides it.
@@ -23,6 +23,12 @@ class SearchBuilder < Blacklight::SearchBuilder
     return unless dismax?(solr_parameters)
 
     solr_parameters[:mm] = QuerySyntax.explicit?(search_state.params[:q]) ? BOOLEAN_MM : KEYWORD_MM
+  end
+
+  # Several spelling collations (solrconfig.xml asks for one), so an empty search's correction can be the one whose words sit
+  # together in a record (SpellingCorrection.best_collation, CCS-292). Nothing for a request that turns the spelling check off.
+  def ask_for_several_collations(solr_parameters)
+    solr_parameters["spellcheck.maxCollations"] = SpellingCorrection::COLLATIONS unless solr_parameters[:spellcheck].to_s == "false"
   end
 
   def limit_deep_paging(solr_parameters)
