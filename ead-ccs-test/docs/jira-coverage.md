@@ -56,3 +56,24 @@ violations on the results, record and advanced search pages.
 | CCS-206 History grouped by day | `CCS-2027`; not core for MVP | **Not in prototype** | Was built ahead of the board; removed so the history page is Blacklight's own. |
 | CCS-55 Indigenous data filter | New, not MVP, data not ready | **Gap: data** | Unchanged. |
 | CCS-158 Spelling suggestions | Done, but Remarks say not MVP | **Met** | Built regardless. |
+
+## Recheck against labels CCS-2026, CCS-2027 and MVP (2026-11-28)
+
+[Board filter](https://unimelb.atlassian.net/jira/software/c/projects/CCS/boards/7044/backlog?label=CCS-2026%2CCCS-2027%2CMVP):
+254 tickets (137 stories, 5 bugs, 23 epics, the rest tasks). Each story's description was read and checked against the app and
+`origin/main`. Earlier rows above are kept as they were found; where they disagree, this section is newer.
+
+| Ticket | Jira | App | Notes |
+|---|---|---|---|
+| CCS-482 Shared mailbox address | In Review | **Fixed** (#111) | The Help page used `collections-navigator@unimelb.edu.au` (IT could not create it: over 20 characters); now `coll-navigator@unimelb.edu.au`. |
+| CCS-514 "museums and collections" wording | Done | **Fixed** (#111) | About 30 visitor-facing "cultural collection(s)" became "University of Melbourne's museums and collections". |
+| CCS-292 Spelling banner | Done | **Fixed** (#112) | "gardin of coty" was corrected to "garden of copy" ("copy" is commoner than "city"). The collation whose words sit together in the most records now wins. Search behaviour: to be shown to the dev team (ADR 0011). |
+| CCS-288, 293 Spelling bugs | Done | **Met** | "City of gardin" offers "City of garden". |
+| CCS-53 Activity reporting | New | **Gap: decision** | No analytics. The cookie notice and privacy page promise no analytics or tracking cookies: a tool and a privacy change are the owner's decision. |
+| CCS-164 2027 formats (eBook, Office, Open Office, 3D) | New | **Partial** | `MediaTypes` recognises them and shows the file's name, metadata and download with "cannot be previewed"; no viewer (a new dependency, ADR 0009). The index holds none of these files yet. |
+| CCS-35 Language of origin, AIATSIS/Austlang | New | **Gap: data** | Neither EMu nor Vernon holds a language field (`solr_mapping.yml`). |
+| CCS-59, 60, 136 SSO and signed-in features; CCS-61 sharing with UoM staff only | New | **Not in scope** | Guests only, no sign-in (ADR 0008). Lists are shared by private link instead. |
+| CCS-145, 172 Security, WAF | New | **Not in prototype** | Hosting work, waiting on the owner (audit T5). |
+| Integration and index tickets (EMu M&C, Vernon, Nexus DAM, EMu FEIT: CCS-48, 49, 118, 119, 159-161, 168-170, 183-187, 197, 207-211, 230-245, 263-266, 304, 311-313, 321, 322, 332, 333, 351, 353, 354, 558, 559) | Mostly Done (FEIT New) | **Developers' pipeline** | The University's ingest owns creating, updating and deleting records (ADR 0011); `collections:index` is for development, CI and the demo. |
+| CCS-12, 13, 15 epics (other UoM systems, registration, commercialisation) | New | **Nothing to build** | No stories under them yet. |
+| CCS-472, 519, 520, 521, 523, 439 | various | **Not app work** | Launch, testing, environments and University website placement. |
