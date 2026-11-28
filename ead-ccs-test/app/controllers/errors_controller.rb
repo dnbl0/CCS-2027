@@ -10,9 +10,9 @@ class ErrorsController < ApplicationController
   # Seconds a visitor (or a polite client) is asked to wait before trying again
   RETRY_AFTER = { "429" => 60, "503" => 30 }.freeze
 
-  # A record's address (the site's record page and the stock record pages): the copy is about the record. Blacklight's other
+  # A record's address (the site's record page): the copy is about the record. Blacklight's other
   # /catalog/... pages (advanced, suggest, facet) are not records.
-  RECORD_PATH = %r{\A/(catalog|stock|branded-stock)/(?!advanced\z|suggest\z|facet\z)[^/]+\z}
+  RECORD_PATH = %r{\A/catalog/(?!advanced\z|suggest\z|facet\z)[^/]+\z}
 
   rescue_from StandardError, with: :static_error_file
 

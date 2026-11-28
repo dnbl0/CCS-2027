@@ -136,14 +136,12 @@ class PerformanceTest < ActionDispatch::IntegrationTest
 
   # --- Scripts ---
 
-  test "the OpenSeadragon viewer is preloaded only by the two stock record pages" do
+  test "the OpenSeadragon viewer is never preloaded: the zoom imports it when a visitor opens it" do
     map = Rails.application.importmap
     helpers = ApplicationController.helpers
     site = map.preloaded_module_paths(resolver: helpers, entry_point: "application", cache_key: "perf-site")
-    stock = map.preloaded_module_paths(resolver: helpers, entry_point: "stock_application", cache_key: "perf-stock")
 
-    assert_empty site.grep(/openseadragon|stock_/), "the site's pages preload the record viewer"
-    assert_not_empty stock.grep(/openseadragon/), "the stock record page needs the viewer"
+    assert_empty site.grep(/openseadragon/), "the site's pages preload the record viewer"
     # Each Stimulus controller is one small file, so this count grows with features (53 after the selection and media viewer
     # controllers, 3 Nov 2026; 57 with the Explore disclosure controller; 58 with the record page's sections controller, 11 Nov 2026; 59 with the card rail controller, 17 Nov 2026; 61 with the timeline and place map controllers, 18 Nov 2026; 62 with the story image controller, 26 Nov 2026). The size that matters is the script bytes budget; this only stops a library sneaking in.
     assert_operator site.size, :<=, 62, "the site's pages preload more scripts than the budget allows"

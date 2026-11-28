@@ -13,7 +13,6 @@ app's controls stop.
 | Any other results page (search words, other filters, advanced clauses, page 2 on) | `noindex, follow` | endless near-duplicates; the records they link to are still followed |
 | Record page `/catalog/:id` | indexed | the point of the site |
 | Record page for a record whose asset is withheld (`:request` tier) or that is sensitive | `noindex, follow`, no structured data, no image, a general description | Indigenous cultural material is handled conservatively: its title and description stay out of search results |
-| `/stock/:id`, `/branded-stock/:id` | `noindex, nofollow`, canonical to `/catalog/:id` | comparison copies of the record page |
 | Search history, saved searches and records, lists, access requests, downloads, metadata export, sensitivity choice, citations, facet and range endpoints, error pages | `noindex, nofollow` | personal or action pages |
 | Files under `/digital-assets` | `noindex` | people find records, not bare files |
 
@@ -70,7 +69,7 @@ All are environment variables. "on" is the only value that switches a setting on
 | `BOT_BLOCKED_USER_AGENTS` | empty | comma-separated extra user-agent substrings to 403 |
 | `RATE_LIMIT` | `on` (`off` in the test environment) | `off` stops the rate limit |
 | `RATE_LIMIT_SEARCH_PER_MINUTE` | `120` | `/catalog` results, facet and range requests per IP |
-| `RATE_LIMIT_RECORD_PER_MINUTE` | `240` | record pages (`/catalog/:id`, `/stock/:id`, `/branded-stock/:id`) per IP |
+| `RATE_LIMIT_RECORD_PER_MINUTE` | `240` | record pages (`/catalog/:id`) per IP |
 | `RATE_LIMIT_DOWNLOAD_PER_MINUTE` | `20` | zip downloads and metadata CSV per IP |
 | `RATE_LIMIT_ASSET_PER_MINUTE` | `600` | files under `/digital-assets` per IP (a results page of 96 images loads 96) |
 | `RATE_LIMIT_ALLOW_IPS` | empty | comma-separated addresses never limited (monitoring, a partner) |

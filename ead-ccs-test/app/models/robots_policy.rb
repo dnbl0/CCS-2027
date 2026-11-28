@@ -11,7 +11,7 @@
 #                           the records they link to are worth following), the record pages withheld below, and the browse pages
 #                           that are thin (fewer than 5 records), filtered or past the first page
 #   noindex, nofollow       personal or action pages (history, saved items, lists, shared galleries (link-only), embeds, oEmbed, access requests, downloads, exports, the
-#                           sensitivity choice, citations, Delete my data, the comparison page, IIIF manifests), the facet and range endpoints, the stock comparison record pages
+#                           sensitivity choice, citations, Delete my data, the comparison page, IIIF manifests), the facet and range endpoints
 #                           (a copy of /catalog/:id), the error pages
 #   noindex                 the asset files under /digital-assets
 #
@@ -44,7 +44,7 @@ module RobotsPolicy
 
     ai = BotControls.enabled? ? AI : nil
     return join("noindex", ai) if path.start_with?("/digital-assets/")
-    return join(NOINDEX_NOFOLLOW, ai) if !indexing || personal?(path) || stock?(path)
+    return join(NOINDEX_NOFOLLOW, ai) if !indexing || personal?(path)
     return join(NOINDEX_FOLLOW, ai) if results?(path) && !indexable_results?(params)
     return join(NOINDEX_FOLLOW, ai) if document && withheld?(document)
     return join(NOINDEX_FOLLOW, ai) if thin
@@ -60,8 +60,6 @@ module RobotsPolicy
       path.match?(%r{\A/catalog/(#{CATALOG_SUPPORT.join('|')})(/|\.|\z)}) ||
       path.match?(%r{\A/catalog/[^/]+/(#{PERSONAL_RECORD_ACTIONS.join('|')})\z})
   end
-
-  def self.stock?(path) = path.start_with?("/stock/", "/branded-stock/")
 
   def self.results?(path) = path == "/catalog" || path == "/catalog.json"
 

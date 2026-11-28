@@ -87,14 +87,6 @@ class PageChromeTest < ActiveSupport::TestCase
     assert_equal [], chrome("pages", "home", page: nobody).breadcrumbs
   end
 
-  test "a stock record page (Blacklight's own page in the site header): a record trail and no banner" do
-    stock = PageChrome.stock_record(record_title: "Test record", results_url: "/catalog")
-
-    assert_equal [ [ "Search results", "/catalog" ], [ "Test record", nil ] ], stock.breadcrumbs
-    assert_nil stock.banner
-    assert_equal :breadcrumb, stock.saved_bar
-  end
-
   test "the search history and saved searches pages: a trail with their own name and no banner, as the page brings one" do
     { "search_history" => "Search history", "saved_searches" => "Saved searches", "lists" => "Your lists", "my_data" => "Delete my data" }.each do |controller, name|
       page = chrome(controller, "index")

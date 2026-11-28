@@ -32,7 +32,7 @@ class BrowseSectionsSystemTest < ApplicationSystemTestCase
     assert_not page.evaluate_script("document.documentElement.scrollWidth > window.innerWidth")
   end
 
-  test "each section has its own layout, and the picture is shown whole on its tile under a navy scrim (card_tiles.css)" do
+  test "each section has its own layout, and the picture is shown whole on its tile under a navy scrim (card_layout.css)" do
     page.current_window.resize_to(1440, 900)
     visit "/browse"
 
@@ -67,7 +67,7 @@ class BrowseSectionsSystemTest < ApplicationSystemTestCase
       break if page.evaluate_script("document.querySelector('.browse-places .card-rail__button--next').hidden")
 
       page.execute_script("document.querySelector('.browse-places .card-rail__button--next').focus(); document.querySelector('.browse-places .card-rail__button--next').click()")
-      sleep 0.3
+      wait_until_stable("the places row's scroll") { page.evaluate_script("document.querySelector('.browse-places .card-layout__list').scrollLeft") }
     end
     assert page.evaluate_script("document.querySelector('.browse-places .card-rail__button--next').hidden"), "the row scrolled to its end"
     assert page.evaluate_script("document.activeElement === document.querySelector('.browse-places .card-layout__list')"), "the focus is on the row, not lost"
@@ -89,7 +89,7 @@ class BrowseSectionsSystemTest < ApplicationSystemTestCase
     at_rest = widths.call
     assert_operator at_rest.first, :>, at_rest[1] * 2
     page.execute_script("document.querySelectorAll('.browse-periods .explore-card__link')[3].focus()")
-    sleep 0.6
+    wait_for_animations
     focused = widths.call
     assert_operator focused[3], :>, focused[1] * 2
     assert_operator focused.first, :<, at_rest.first

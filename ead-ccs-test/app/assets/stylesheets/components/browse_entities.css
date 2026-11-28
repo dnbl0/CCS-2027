@@ -262,3 +262,14 @@
   padding-inline: var(--ccs-space-5);
   font-weight: var(--ccs-font-weight-semibold);
 }
+
+/* The records on a browse page as a mosaic: each picture whole at its own shape */
+@media (min-width: 600px) {
+  .browse-records .documents-list { --grid-lanes-polyfill: 1; display: grid-lanes; grid-template-columns: repeat(2, 1fr); align-items: start; }
+}
+@media (min-width: 1024px) {
+  .browse-records .documents-list { grid-template-columns: repeat(4, 1fr); }
+}
+.browse-records .documents-list .result-card__media { aspect-ratio: auto; }
+.browse-records .documents-list .result-card__media img { display: block; width: 100%; height: auto; object-fit: contain; }
+.browse-records .documents-list .result-card { height: auto; }

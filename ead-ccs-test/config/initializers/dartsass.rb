@@ -2,8 +2,7 @@
 # which assets:precompile runs automatically, and watched by `bin/dev`).
 # Bootstrap's own Sass comes from the bootstrap gem, whose asset path dartsass uses as a load path.
 Rails.application.config.dartsass.builds = {
-  "bootstrap-uom.scss" => "bootstrap-uom.css",
-  "bootstrap-stock.scss" => "bootstrap-stock.css"
+  "bootstrap-uom.scss" => "bootstrap-uom.css"
 }
 
 # Bootstrap 5.3 still uses @import and the global-builtin functions internally.
