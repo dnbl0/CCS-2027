@@ -13,7 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "axe-core": "^4.13.0",
-    "stylelint": "^17.16.0",
+    "stylelint": "^18.1.0",
     "stylelint-config-recommended": "^18.0.0"
   }
 }
