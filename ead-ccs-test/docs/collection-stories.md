@@ -4,9 +4,10 @@ A record page shows a **Stories from the collection** section when one of the Un
 article about that object. The Grainger Museum's "From the collection" series (https://grainger.unimelb.edu.au/from-the-collection)
 is the first source. The University has approved linking to these articles.
 
-This is not the same as the site's own **Stories** pages (`/stories`, Markdown files in `content/stories/`, see
-[categories-themes-stories.md](categories-themes-stories.md)): those are online exhibitions written for this site. Collection stories
-are articles on another University site, linked from the record they are about.
+Collection stories are also listed on the site's **Stories** page (`/stories`) beside the stories written for this site
+(`content/stories/`, see [categories-themes-stories.md](categories-themes-stories.md)), and each one **opens on this site**, at
+`/stories/<slug>`, not on the website that first published it (the owner's request, 27 Nov 2026; decision 17 in
+`docs/decisions-2027.md`). See "Read on this site" below.
 
 ## In plain language
 
@@ -30,7 +31,7 @@ stories, after the National Gallery of Art's article listings (nga.gov/stories/a
 
 In every story:
 
-- the headline is an h3 and the link of the whole story (same tab, like every link on the site); it comes first in the reading order;
+- the headline is an h3 and the link of the whole story, to its page on this site (`/stories/<slug>`); it comes first in the reading order;
 - the picture is shown whole (never cropped) in a 3:2 frame and lazy-loaded. Its `alt` is empty: the headline names the story.
 - **Which picture:** the story's own, from the collection's site. That site may refuse it (a Cloudflare check), so
   `story_image_controller.js` then shows the record's own picture of the object, and if there is none, the story becomes text only.
@@ -106,6 +107,26 @@ captions or text, for records of one collection in the index.
    (`CollectionStories::Page`). A site built differently needs a test page in `test/models/collection_stories/page_test.rb` first.
 3. Harvest, review, commit, and open a pull request listing which stories matched which records.
 
+## Read on this site
+
+- **`/stories`**, after the British Museum's blog listing (britishmuseum.org/blog): the newest story large (picture left, text right
+  from 1024px; stacked below), then a grid of cards (three columns, two from 600px, one on a phone). Each card
+  (`NexusCcs::StoryCardComponent`) has the picture in a 16:9 frame, shown whole; "category / date"; the headline, which is the card's
+  one link; the summary; and "Read more" (hidden from screen readers: the headline is the link). A card with no picture has a rule
+  above it instead; no picture is invented. Newest first; Museums Victoria gives no dates, so its stories follow the dated ones, by
+  title. Styles: `stories_index.css`.
+- **`/stories/<slug>`**: category · author · date; the story's picture with its caption and credit (the record's picture when the
+  collection's site refuses it); the text; an "About this story" note naming who first published it and its licence; then
+  "Objects in this story" as record cards.
+- **Museums Victoria** stories show their full text (CC BY, sanitised on the page; links to a story or object the site holds point
+  to the site's own page).
+- **Grainger Museum** stories show their summary and "Read the full story on the Grainger Museum website": its site refuses
+  automated reading (403, checked 27 Nov 2026), so the harvester cannot fetch the text. **Do not work around the block.** If the
+  University web team allows the harvester, add `body` to the entries in `config/collection_stories.yml` and the pages show the
+  full text with no other change.
+- A story's summary is the publisher's own words, so the no-counts check (`test/integration/no_counts_test.rb`) skips
+  `.story-card__summary` ("over 300 objects" is Museums Victoria's sentence, not a count the site makes).
+
 ## Museums Victoria stories
 
 Museums Victoria has published 19 stories about objects connected with the University (CSIRAC, MUDPAC, the Engineering School,
@@ -124,4 +145,6 @@ the site owner; every story is CC BY 4.0.
 
 `test/models/collection_stories_test.rb` (matching, the committed file), `test/models/collection_stories/*` (page reading, candidates,
 harvest), `test/components/nexus_ccs/collection_stories_component_test.rb` (the section) and
-`test/integration/record_collection_stories_test.rb` (the record page; needs Solr).
+`test/integration/record_collection_stories_test.rb` (the record page; needs Solr), `test/models/stories_from_collections_test.rb`
+and `test/integration/stories_pages_test.rb` (the stories pages), and the axe check of `/stories` and a story to WCAG 2.2 AA in
+`test/system/accessibility_test.rb`.

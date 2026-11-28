@@ -12,7 +12,9 @@ Added 2026-11-18, with Dean's approval of new page types (recorded in `../../doc
 - **Collection and named collection pages** (`/browse/collections/...`, `/browse/named-collections/...`): an introduction, highlights with
   pictures, the commonest object types, eras and named collections as links that narrow the search, and "See all N records".
 - **Themes** (`/themes`): curated searches from `config/themes.yml`, each a page like a collection page.
-- **Stories** (`/stories`): online exhibitions written as Markdown files in `content/stories/`, with record and search embeds.
+- **Stories** (`/stories`): online exhibitions written as Markdown files in `content/stories/`, with record and search embeds, and
+  the collection stories (Grainger Museum, Museums Victoria; [collection-stories.md](collection-stories.md)), each read on this site.
+  A Markdown story with `draft: true` is not listed, though its address works (the placeholder `example-story.md` is one).
 - **Home page**: On this day, Recently viewed and links to Stories, Themes and Browse by category, after the Explore sections.
 - **Header**: Browse is now a menu (Browse the collections, Browse by category, Themes, Stories). My saved items links to a short
   explainer of saving, lists and shared galleries on `/lists`.

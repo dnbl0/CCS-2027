@@ -1,0 +1,218 @@
+/* /stories (NexusCcs::StoryCardComponent) after the British Museum's blog listing (britishmuseum.org/blog): the newest story
+   large, then a grid of cards. And a story's own page (/stories/<slug>): its picture with caption and credit, and the "About this
+   story" note. Each card is one link (the headline's, stretched over it). Pictures are shown whole, never cropped. */
+
+/* --- The index --- */
+
+.stories-index {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ccs-space-6) var(--ccs-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 600px) {
+  .stories-index { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .stories-index { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.stories-index__item {
+  display: flex;
+  min-width: 0;
+}
+
+.stories-index__item--lead {
+  grid-column: 1 / -1;
+}
+
+/* --- One card --- */
+
+.story-card {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--ccs-space-4);
+  min-width: 0;
+}
+
+.story-card:has(.story-card__link:focus-visible) {
+  outline: 3px solid var(--ccs-focus-ring);
+  outline-offset: 4px;
+}
+
+/* A 16:9 frame on a quiet ground, the picture whole inside it, so nothing shifts as it loads */
+.story-card__media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--ccs-surface-subtle);
+}
+
+.story-card__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.story-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ccs-space-2);
+  min-width: 0;
+}
+
+/* "Category / date" */
+.story-card__kicker {
+  margin: 0;
+  font-size: var(--ccs-font-size-sm);
+  font-weight: var(--ccs-font-weight-bold);
+  line-height: var(--ccs-line-height-normal);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ccs-text-secondary);
+}
+
+/* Two classes: .browse-main h2 (the content pages' section headings) would otherwise win */
+.story-card .story-card__title {
+  margin: 0;
+  font-family: var(--ccs-font-heading);
+  font-size: var(--ccs-font-size-2xl);
+  font-weight: var(--ccs-font-weight-regular);
+  line-height: var(--ccs-line-height-tight);
+  overflow-wrap: anywhere;
+}
+
+.story-card__link {
+  color: var(--ccs-text-brand);
+  text-decoration: none;
+}
+
+/* The headline's box covers the card, so there is one target and no nested link */
+.story-card__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.story-card:hover .story-card__link,
+.story-card__link:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.story-card__link:focus-visible {
+  outline: none; /* the card draws the focus ring */
+}
+
+.story-card__summary {
+  margin: 0;
+  font-size: var(--ccs-font-size-md);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.story-card__more {
+  margin: auto 0 0;
+  padding-top: var(--ccs-space-2);
+  font-size: var(--ccs-font-size-sm);
+  font-weight: var(--ccs-font-weight-bold);
+  color: var(--ccs-text-link);
+}
+
+.story-card:hover .story-card__more {
+  color: var(--ccs-text-link-hover);
+}
+
+/* The lead story: picture left, text right from 1024px; stacked below */
+.story-card.story-card--lead .story-card__title {
+  font-size: var(--ccs-font-size-3xl);
+}
+
+.story-card--lead .story-card__summary {
+  font-size: var(--ccs-font-size-lg);
+}
+
+@media (min-width: 1024px) {
+  .story-card--lead {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: var(--ccs-space-6);
+    align-items: center;
+  }
+
+  .story-card--lead.story-card--text {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- A story's page --- */
+
+.story-page__figure {
+  margin: var(--ccs-space-5) 0;
+}
+
+.story-page__picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 70vh;
+  overflow: hidden;
+  background: var(--ccs-surface-subtle);
+}
+
+.story-page__image {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  height: auto;
+  object-fit: contain;
+}
+
+.story-page__caption {
+  margin-top: var(--ccs-space-2);
+  font-size: var(--ccs-font-size-sm);
+  line-height: var(--ccs-line-height-normal);
+  color: var(--ccs-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* "About this story": who first published it and its licence */
+.story-page__source {
+  margin: var(--ccs-space-6) 0;
+  padding: var(--ccs-space-5);
+  border-left: 4px solid var(--ccs-border-brand);
+  background: var(--ccs-surface-subtle);
+}
+
+.story-page__source .story-page__source-heading {
+  margin: 0 0 var(--ccs-space-2);
+  font-size: var(--ccs-font-size-lg);
+}
+
+.story-page__source > :last-child {
+  margin-bottom: 0;
+}
+
+/* A card with no picture (the collection's site refused it and the record had none): a rule above it, so it still reads as a
+   card in the grid, and no invented picture */
+.story-card--text {
+  padding-top: var(--ccs-space-4);
+  border-top: 4px solid var(--ccs-border-brand);
+}
+
+/* "Objects in this story" sits in the story's reading column (48rem): two cards a row there, not the site's four, so the titles
+   are not broken mid-word */
+@media (min-width: 600px) {
+  .story-page .object-cards__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
