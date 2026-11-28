@@ -8,7 +8,7 @@ module RobotsTxt
     /bookmarks /selection /saved_searches /search_history /lists /compare /access_requests /downloads
     /catalog/facet/ /catalog/range_limit /catalog/suggest /catalog/opensearch
     /catalog/*/metadata /catalog/*/sensitivity /catalog/*/citation /catalog/*/manifest.json
-    /stock/ /branded-stock/ /digital-assets/
+    /digital-assets/
   ]).uniq.freeze
 
   def self.to_s(base_url)

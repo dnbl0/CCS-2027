@@ -3,8 +3,8 @@ require_relative "../support/stub_records"
 
 # The record page's layout in every variant a record can be in, at a desktop and a phone width: axe (WCAG 2.2 AA rules too), no
 # sideways scroll, one h1, the headings in order, nothing sticky, and targets at least 24px. The records are stand-ins (the Solr core
-# holds no sensitive or withheld record, and no record of each kind by a known id), given to the record page the way the stock pages'
-# test does (accessibility_test.rb): the controller's search service answers with them.
+# holds no sensitive or withheld record, and no record of each kind by a known id), given to the record page through
+# its controller's search service.
 class RecordPageLayoutSystemTest < ApplicationSystemTestCase
   module RecordSolr
     mattr_accessor :documents

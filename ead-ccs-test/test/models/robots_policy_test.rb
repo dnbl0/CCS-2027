@@ -9,15 +9,15 @@ class RobotsPolicyTest < ActiveSupport::TestCase
   PERSONAL_PATHS = %w[
     /bookmarks /bookmarks/citations /bookmarks/clear /saved_searches /search_history /search_history/12 /lists /lists/3 /lists/3/citations
     /lists/3/items /galleries/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa /galleries/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/citations /embed/records/emu-9044 /embed/galleries/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa /oembed /compare /compare/items /compare/items/emu-9044 /catalog/emu-9044/manifest.json /access_requests/new /access_requests/9 /downloads /downloads/review /catalog/emu-9044/metadata
-    /catalog/emu-9044/sensitivity /catalog/emu-9044/citation /stock/emu-9044/citation /404 /500
+    /catalog/emu-9044/sensitivity /catalog/emu-9044/citation /404 /500
   ].freeze
 
   test "every personal or action page is noindex, nofollow" do
     PERSONAL_PATHS.each { |path| assert_match(/\Anoindex, nofollow/, directive(path), path) }
   end
 
-  test "the facet, range and suggest endpoints are noindex, nofollow, and the stock comparison pages too" do
-    %w[/catalog/facet/collection_ssim /catalog/range_limit /catalog/suggest /catalog/opensearch.xml /stock/emu-9044 /branded-stock/emu-9044].each do |path|
+  test "the facet, range and suggest endpoints are noindex, nofollow" do
+    %w[/catalog/facet/collection_ssim /catalog/range_limit /catalog/suggest /catalog/opensearch.xml].each do |path|
       assert_match(/\Anoindex, nofollow/, directive(path), path)
     end
   end

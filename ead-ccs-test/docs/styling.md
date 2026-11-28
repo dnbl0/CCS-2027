@@ -128,8 +128,8 @@ same. Below 1024px they are the phone drawer's lists.
 ## Colour mode
 
 One design: light, whatever the browser or device is set to. Blacklight's colour mode script would otherwise set Bootstrap's dark
-theme on pages whose own styles are light only (a half-dark page). `config.dark_mode_support = false` on `CatalogController` and
-`StockCatalogController`, and `layouts/_light_theme` in all four layouts (`color-scheme` meta, `data-bs-theme` pinned to light).
+theme on pages whose own styles are light only (a half-dark page). `config.dark_mode_support = false` on `CatalogController`, and
+`layouts/_light_theme` in its layouts (`color-scheme` meta, `data-bs-theme` pinned to light).
 
 ## Not ported yet
 

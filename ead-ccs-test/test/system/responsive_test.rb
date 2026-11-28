@@ -14,8 +14,7 @@ class ResponsiveTest < ApplicationSystemTestCase
     "advanced search" => "/catalog/advanced",
     "help" => "/help",
     "about" => "/about",
-    "the access request form" => "/access_requests/new?document_id=vernon-MHM00394",
-    "the new record page" => "/branded-stock/emu-9044"
+    "the access request form" => "/access_requests/new?document_id=vernon-MHM00394"
   }.freeze
 
   # Controls in the main content that are visible and not a link inside a sentence (the target size rule exempts those)

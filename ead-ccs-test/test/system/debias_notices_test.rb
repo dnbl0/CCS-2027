@@ -67,7 +67,7 @@ class DebiasNoticesSystemTest < ApplicationSystemTestCase
     flagged_record do
       visit RECORD
       top = page.evaluate_script("document.querySelector('.record-details').getBoundingClientRect().top")
-      sleep 0.5
+      wait_for_settled_page
       assert_equal top, page.evaluate_script("document.querySelector('.record-details').getBoundingClientRect().top")
     end
   end

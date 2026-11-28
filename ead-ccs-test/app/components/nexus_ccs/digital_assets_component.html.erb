@@ -1,5 +1,5 @@
 <section id="digital-assets" class="digital-assets" data-controller="media-viewer" aria-labelledby="digital-assets-heading">
-  <h2 id="digital-assets-heading" class="visually-hidden">Digital <%= "asset".pluralize(count + media.size) %></h2>
+  <h2 id="digital-assets-heading" class="visually-hidden"><%= t("nexus_ccs.digital_assets.heading", count: count + media.size) %></h2>
 
   <%# The image sits on the page, whole, at its own shape: the width and height attributes hold its space while it loads (a flat tint,
       never a tall dark band). Dark only in full screen and in the zoom viewer. %>
@@ -41,7 +41,7 @@
           <% if image_downloadable?(index + 1) %>
             <%= link_to large, class: "digital-assets__other", target: "_blank", rel: "noopener",
                   data: { action: "media-viewer#show", media_viewer_large: large, media_viewer_alt: alt(index + 2) } do %>
-              <%= image_tag thumbnail, alt: "#{alt(index + 2)} (opens full size in a new tab)", loading: "lazy", decoding: "async" %>
+              <%= image_tag thumbnail, alt: t("nexus_ccs.digital_assets.opens_full_size", alt: alt(index + 2)), loading: "lazy", decoding: "async" %>
             <% end %>
           <% else %>
             <%# No link to the file: the thumbnail only changes the image on show %>
@@ -71,7 +71,7 @@
         <p class="digital-assets__access digital-assets__access--<%= tier.to_s.dasherize %>" data-testid="access-chip"><%= access_chip %></p>
         <%= render NexusCcs::ClassificationBadgeComponent.new(document: @document) %>
         <% if licence %>
-          <p class="digital-assets__licence"><%= icon("media-copyright") %><span><span class="visually-hidden">Licence: </span><%= licence %></span></p>
+          <p class="digital-assets__licence"><%= icon("media-copyright") %><span><span class="visually-hidden"><%= t("nexus_ccs.digital_assets.licence_prefix") %> </span><%= licence %></span></p>
         <% end %>
       </div>
       <div class="digital-assets__controls">
@@ -94,7 +94,7 @@
   <% if metadata? %>
     <aside id="media-metadata" class="digital-assets__panel" aria-labelledby="media-metadata-heading" aria-hidden="true" data-media-viewer-target="panel">
       <div class="digital-assets__panel-head">
-        <h3 id="media-metadata-heading" class="digital-assets__panel-title">Media metadata</h3>
+        <h3 id="media-metadata-heading" class="digital-assets__panel-title"><%= t("nexus_ccs.digital_assets.metadata_heading") %></h3>
         <button type="button" class="digital-assets__button" data-action="media-viewer#closePanel"><span><%= t("nexus_ccs.record_page.media.close_information") %></span></button>
       </div>
       <dl class="digital-assets__list">

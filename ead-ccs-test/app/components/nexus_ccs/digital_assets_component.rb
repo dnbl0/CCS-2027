@@ -12,9 +12,8 @@ module NexusCcs
   # shown only after the visitor chooses to view them (SensitivityGateComponent). Registered, through NexusCcs::RecordEmbedComponent, as the show
   # page's document_embed_component. Behaviour: controllers/media_viewer_controller.js.
   class DigitalAssetsComponent < Blacklight::Component
-    # The advisory every record carries (the demo's wording)
-    ADVISORY = "Some collection items include terms and views that are not appropriate today. They reflect the " \
-               "period in which they were created and are not the views of the University of Melbourne."
+    # The advisory every record carries (the demo's wording; nexus_ccs.digital_assets.advisory)
+    def self.default_advisory = I18n.t("nexus_ccs.digital_assets.advisory")
 
     ICONS = %w[media-copyright media-info media-fullscreen].freeze
 
@@ -106,12 +105,12 @@ module NexusCcs
     def count = large_paths.size
 
     def title
-      Array(@document["title_tsim"]).first.presence || "Record"
+      Array(@document["title_tsim"]).first.presence || t("nexus_ccs.digital_assets.untitled")
     end
 
     # The image name carries the title and position, so each one is distinguishable.
     def alt(position)
-      count == 1 ? title : "#{title}, image #{position} of #{count}"
+      count == 1 ? title : t("nexus_ccs.digital_assets.image_of", title: title, position: position, count: count)
     end
 
     # The DAM's licence (DA License Type) when the record has DAM assets, else the EMu licence, e.g. "Copyright - Current";
@@ -132,11 +131,11 @@ module NexusCcs
     end
 
     # The DAM's DA Advisory, else the advisory every record carries
-    def advisory = dam_value("advisory") || ADVISORY
+    def advisory = dam_value("advisory") || self.class.default_advisory
 
     # [label, text] rows of the Media metadata panel
     def metadata
-      [ [ "Licence type", licence ], [ "Advisory", advisory ], [ "Terms of use", terms ], [ "Producer", producer ] ].select { |_, text| text.present? }
+      { licence: licence, advisory: advisory, terms: terms, producer: producer }.map { |key, text| [ t("nexus_ccs.digital_assets.metadata.#{key}"), text ] }.select { |_, text| text.present? }
     end
 
     # The first non-blank value of a DAM field across the record's assets (digital_asset_metadata_ssm, written by Dam::SolrWriter):

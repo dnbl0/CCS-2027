@@ -11,7 +11,7 @@
 require "yaml"
 
 ROOT = File.expand_path("..", __dir__)
-OWN_NAMESPACES = %w[nexus_ccs seo catalog].freeze
+OWN_NAMESPACES = %w[nexus_ccs seo catalog browse card_layout card_description colours explore explore_pages].freeze
 
 def flatten(hash, prefix = nil)
   hash.flat_map do |key, value|

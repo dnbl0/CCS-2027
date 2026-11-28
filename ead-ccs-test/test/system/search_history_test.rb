@@ -57,7 +57,7 @@ class SearchHistoryTest < ApplicationSystemTestCase
     assert_equal find("[role=tooltip]")[:id], button[:"aria-describedby"]
 
     find("[role=tooltip]").hover # the pointer moves from the button onto the tooltip
-    sleep 0.4
+    sleep 0.4 # longer than action_tooltip_controller.js's 150 ms hide delay: the tooltip must outlast it, so this waits on purpose
     assert_selector "[role=tooltip]", text: "Save"
 
     first("h1").hover
@@ -102,7 +102,7 @@ class SearchHistoryTest < ApplicationSystemTestCase
 
     first_row_button("Delete").hover
     assert_selector "[role=tooltip]", text: "Delete"
-    sleep 0.5 # the tooltip fades in: axe reads the colours once it has
+    wait_for_animations # the tooltip fades in: axe reads the colours once it has
     assert_accessible
   end
 

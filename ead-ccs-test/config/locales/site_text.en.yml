@@ -1,0 +1,90 @@
+en:
+  nexus_ccs:
+    # Zoom buttons: the record viewer (DeepZoomComponent) and the compare page (compare/show)
+    zoom:
+      toggle: "Zoom and pan"
+      controls: "Zoom controls"
+      controls_for: "Zoom controls for %{title}"
+      zoom_in: "Zoom in"
+      zoom_out: "Zoom out"
+      reset: "Reset view"
+      full_screen: "Full screen"
+    # The record image's media metadata panel and advisory (DigitalAssetsComponent, StockRecordFields)
+    digital_assets:
+      advisory: >-
+        Some collection items include terms and views that are not appropriate today. They reflect the period in which they
+        were created and are not the views of the University of Melbourne.
+      untitled: "Record"
+      heading:
+        one: "Digital asset"
+        other: "Digital assets"
+      opens_full_size: "%{alt} (opens full size in a new tab)"
+      licence_prefix: "Licence:"
+      metadata_heading: "Media metadata"
+      image_of: "%{title}, image %{position} of %{count}"
+      metadata:
+        licence: "Licence type"
+        advisory: "Advisory"
+        terms: "Terms of use"
+        producer: "Producer"
+    # The search page banner (SearchBannerComponent)
+    search_banner:
+      title: "Search the collections"
+      description: >-
+        Explore artworks, objects, manuscripts, photographs and recordings held across the University of Melbourne's cultural
+        collections.
+    persistent_link:
+      field: "Persistent link"
+      copy: "Copy link"
+    # The site header (HeaderComponent, site_header_controller.js)
+    header:
+      label: "Site header"
+      university: "University of Melbourne"
+      open_search: "Open search"
+      primary: "Primary navigation"
+      search: "Search"
+      search_collections: "Search collections"
+      search_all: "Search all records"
+      with_images: "Only records with images"
+      advanced_search: "Advanced search"
+      help: "Help"
+      saved: "My saved items"
+      menu: "Menu"
+      close: "Close"
+    breadcrumb:
+      label: "Breadcrumb"
+      home: "Home"
+      site: "Collections Navigator"
+    skip_link: "Skip to main content"
+    show_more: "Show more"
+    # The University footer (SiteFooterComponent)
+    footer:
+      label: "University of Melbourne footer"
+      acknowledgement_heading: "Acknowledgement of Country"
+      aboriginal_flag: "Aboriginal flag"
+      torres_strait_flag: "Torres Strait Islander flag"
+      acknowledgement: >-
+        We acknowledge Aboriginal and Torres Strait Islander people as the Traditional Owners of the unceded lands on which we work,
+        learn and live. We pay respect to Elders past, present and future, and acknowledge the importance of Indigenous knowledge
+        in the Academy.
+      indigenous_priorities: "Read about our Indigenous priorities"
+      contact_heading: "Contact details"
+      phone: "Phone"
+      international: "International"
+      address: "Address"
+      connect_heading: "Connect with us"
+      homepage: "The University of Melbourne homepage"
+    # The compare page's toolbar and panes (compare/show); the rest of its text is in compare.en.yml
+    compare_page:
+      link_zoom: "Link zoom and pan"
+      add_pane: "Add a pane"
+      remove_pane: "Remove a pane"
+      clear: "Clear comparison"
+      accession_number: "Accession number"
+      licence: "Licence"
+      not_stated: "Not stated"
+      showing: "Showing"
+      image: "Image"
+      image_of: "Image %{position} of %{count}"
+      remove: "Remove"
+      remove_label: "Remove from compare: %{title}"
