@@ -1,5 +1,5 @@
-# Digital assets by accession number. Generated from the static prototype's ASSET_IMAGES
-# (public/collection-data.js); the first file is the thumbnail. Files are the original names;
+# Digital assets by accession number. Generated from the 2026 static prototype's ASSET_IMAGES (since removed); the first file
+# is the thumbnail. Files are the original names;
 # bin/rails digital_assets:thumbnails makes public/digital-assets/thumbs/<name>.jpg from them.
 
 "00.0216":

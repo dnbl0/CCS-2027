@@ -1,5 +1,11 @@
 # Decoupling CCS 2027 from CCS 2026
 
+**Done, 27 Nov 2026.** The owner decided to remove the prototype. `public/`, `src/`, `tests/`, the prototype's `scripts/`,
+`api/`, `eslint.config.js`, `verify-bootstrap.sh` and `ci.yml` are gone (still in the git history). Items 1-4 below are closed:
+the page styles say they were first copied from the prototype, `sync-rails-assets.js` is deleted,
+the root `package.json` holds only axe-core and stylelint for the Rails app (the `system` job now also lints the stylesheets),
+and `digital_assets:thumbnails` needs `SOURCE_DIR` (the made images are committed). The rest of this file is the history.
+
 ## In plain language
 
 CCS 2027 (the Rails app in `ead-ccs-test/`) started life as a copy of the 2026 project, which was a static prototype website. The two were tied together: every style change in 2027 had to match 2026, and a robot checked this on every change. That tie has been cut. 2027 now has its own repository name, its own checks and no link to the 2026 website. One thing remains: the old prototype files are still in this repository, because the 2027 app's page styles were copied from them and a few tools still read them. They do no harm, but they should be retired in a planned step (below).
