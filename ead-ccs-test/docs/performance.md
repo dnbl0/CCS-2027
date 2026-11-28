@@ -15,7 +15,7 @@ so the pages cannot quietly get slower again.
 
 1. The app sent every page uncompressed. Nothing in the container compresses (it runs Puma directly; Thruster is installed but is not started).
 2. The stylesheet was not one file but a list of 48 more files fetched one after another before anything could be drawn.
-3. Every page downloaded a 277 kB picture-viewer library that only the two stock record pages use.
+3. Every page downloaded a 277 kB picture-viewer library that only the record zoom uses.
 4. The home page loaded five collection photos of 450-500 kB each (2 MB in all) where 100 kB each is enough.
 5. A few pages ran database queries they did not need.
 
@@ -172,10 +172,10 @@ All inside the app, with no new gems and no new importmap pins.
 | Change | Files | Effect |
 | --- | --- | --- |
 | **Gzip for HTML, CSS, JavaScript, JSON, SVG and text** (`Rack::Deflater`, over 1 kB, text types only) | `config/initializers/performance.rb` | HTML 46 kB to 9.7 kB. The container's CMD is `rails server` (Puma), so nothing else compressed. A CDN or reverse proxy in front sees `Content-Encoding` already set and leaves it alone |
-| **One stylesheet** instead of 49: after `assets:precompile`, the 48 `@import` lines of `application.css` and `stock_blacklight.css` are replaced by the files' content, in the same order. Every address inside is already fingerprinted, so the CSS is unchanged | `lib/asset_bundle.rb`, `lib/tasks/asset_bundle.rake`; the Dockerfile's existing `assets:precompile` runs it | 48 requests removed, and the wait for the browser to read the first file before it can start the other 48. Development and test still serve the separate files, so editing CSS is unchanged |
+| **One stylesheet** instead of 49: after `assets:precompile`, the 48 `@import` lines of `application.css` are replaced by the files' content, in the same order. Every address inside is already fingerprinted, so the CSS is unchanged | `lib/asset_bundle.rb`, `lib/tasks/asset_bundle.rake`; the Dockerfile's existing `assets:precompile` runs it | 48 requests removed, and the wait for the browser to read the first file before it can start the other 48. Development and test still serve the separate files, so editing CSS is unchanged |
 | **Gzipped copies of the assets** written beside the originals (`name.css.gz`) | same | `ActionDispatch::Static` serves them with no compression work per request: CSS 500 kB to 86 kB, JS to 206 kB |
 | **Cache lifetimes by kind of file**: fingerprinted `/assets` for a year and `immutable`; the records' images (`/digital-assets`) for a year at an address with a version token and revalidated at any other (CCS-425, [media-refresh.md](media-refresh.md); this was a day); other public files (icons, error pages) for an hour. Before, every file in `public/` was cached for a year | `lib/middleware/static_cache_control.rb`, `config/initializers/performance.rb`, `config/environments/production.rb` | repeat visitors fetch none of the assets again; the unfingerprinted images and icons can no longer be stale for a year after they change |
-| **The OpenSeadragon viewer preloaded only on the two stock record pages** (`preload:` names the entry point) | `config/importmap.rb` | 277 kB of script no longer downloaded on every other page; the stock pages still preload it |
+| **The OpenSeadragon viewer never preloaded** (`preload: false`; the record zoom imports it when opened) | `config/importmap.rb` | 277 kB of script no longer downloaded on every page |
 | **Home page images**: five collection photos re-encoded from 2000 px / 450-500 kB to 1100 px / 90-170 kB; banner from 188 kB to 102 kB; `width`, `height`, `loading="lazy"`, `decoding="async"` on the cards; `fetchpriority="high"` on the banner | `app/views/pages/home.html.erb`, `app/assets/images/site/*` (**shared template and assets**) | home page 2.3 MB of images to 0.28 MB; the cards hold their space while they load |
 | **Record page main image**: `fetchpriority="high"`, `decoding="async"`, and `width`/`height` read from the file so the browser holds its space; `width: auto` in the stylesheet keeps the layout as it was | `app/components/nexus_ccs/digital_assets_component.*`, `lib/image_dimensions.rb`, `app/assets/stylesheets/components/digital_assets.css` (**shared component and CSS**) | it is the largest thing on the page, so it is fetched first |
 | **Result card thumbnails**: `decoding="async"` and `width`/`height` (they were already lazy) | `app/components/nexus_ccs/result_card_component.*` (**shared component**) | the mosaic's layout shift on a results page with thumbnails fell from 0.30 to 0.14 |
@@ -187,7 +187,7 @@ differently on every response, so two responses never compress alike. Personal p
 
 Runtime behaviour that is different in production: responses are gzipped for browsers that ask for it; static files have the
 lifetimes above; the first request after a deploy to a new asset address fetches one stylesheet instead of 49; the OpenSeadragon
-library is fetched only when a stock record page is opened.
+library is fetched only when a visitor opens the zoom on a record.
 
 ### Guarded by tests
 
@@ -196,7 +196,7 @@ library is fetched only when a stock record page is opened.
 - gzip on HTML, and none on images;
 - the Cache-Control of fingerprinted assets, the records' images and other public files, and that a private or uncacheable response is never given a lifetime;
 - **no page that sets a cookie, and no personal page, is ever publicly cacheable** (home, help, about, lists, a list, saved searches, search history, access request, saved records);
-- HTML size budgets for home, help and about; one stylesheet and at most two scripts per page; the viewer not preloaded outside the stock pages;
+- HTML size budgets for home, help and about; one stylesheet and at most two scripts per page; the viewer never preloaded;
 - database queries: the lists page (3, and the same for 1 list or 6: an N+1 fails), saved searches (3, the same for 1 search or 9), none for a visitor with no guest row, static pages at most 1 and no Solr;
 - with Solr: a results page (2 Solr requests, 4 queries), a record page (1 Solr request, 6 queries), and the main image's `fetchpriority`, `decoding` and size.
 

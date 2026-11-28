@@ -33,7 +33,7 @@ class SavedSearchesSystemTest < ApplicationSystemTestCase
 
     first("button[data-action-tooltip-text='Delete']").hover
     assert_selector "[role=tooltip]", text: "Delete"
-    sleep 0.5 # the tooltip fades in: axe reads the colours once it has
+    wait_for_animations # the tooltip fades in: axe reads the colours once it has
     assert_accessible
   end
 

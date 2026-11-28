@@ -8,6 +8,7 @@ const PHONE = "(max-width: 1023px)"
 // home link, which stays visible and keeps its own name. While the drawer covers the page, everything outside the header is inert.
 export default class extends Controller {
   static targets = ["nav", "menu", "menuLabel", "trigger", "title", "section"]
+  static values = { menuLabel: { type: String, default: "Menu" }, closeLabel: { type: String, default: "Close" } }
 
   connect() {
     this.phone = window.matchMedia(PHONE)
@@ -77,7 +78,7 @@ export default class extends Controller {
 
   setMenu(open) {
     this.menuTarget.setAttribute("aria-expanded", String(open))
-    this.menuLabelTarget.textContent = open ? "Close" : "Menu"
+    this.menuLabelTarget.textContent = open ? this.closeLabelValue : this.menuLabelValue
     this.navTarget.classList.toggle("is-open", open)
     if (open) inertOutside(this, this.element)
     else releaseInert(this)

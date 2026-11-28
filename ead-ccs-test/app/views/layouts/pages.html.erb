@@ -15,7 +15,7 @@
     <%= content_for(:head) %>
   </head>
   <body class="<%= content_for(:body_class) %>">
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a href="#main-content" class="skip-link"><%= t("nexus_ccs.skip_link") %></a>
     <%= render "layouts/cookie_notice" %>
     <%= render "layouts/noscript_notice" %>
     <%= render blacklight_config.header_component.new(blacklight_config: blacklight_config) %>

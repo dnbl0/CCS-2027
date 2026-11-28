@@ -65,10 +65,10 @@ class BotGuardTest < ActionDispatch::IntegrationTest
   test "past its limit an IP gets 429 with Retry-After; before it, and with a person's pace, requests are untouched" do
     with_env("RATE_LIMIT" => "on", "RATE_LIMIT_RECORD_PER_MINUTE" => "5") do
       5.times do
-        get "/stock/emu-9044", headers: BROWSER
+        get "/catalog/emu-9044", headers: BROWSER
         assert_not_equal 429, response.status
       end
-      get "/stock/emu-9044", headers: BROWSER
+      get "/catalog/emu-9044", headers: BROWSER
 
       assert_response :too_many_requests
       assert response.headers["Retry-After"].to_i.between?(1, 60), response.headers["Retry-After"]
@@ -86,7 +86,7 @@ class BotGuardTest < ActionDispatch::IntegrationTest
       get "/catalog/advanced", headers: BROWSER # not a record: its own page, not counted
       assert_response :success
 
-      get "/stock/emu-9044", headers: BROWSER.merge("REMOTE_ADDR" => "203.0.113.9")
+      get "/catalog/emu-9044", headers: BROWSER.merge("REMOTE_ADDR" => "203.0.113.9")
       assert_not_equal 429, response.status
     end
   end
@@ -108,11 +108,11 @@ class BotGuardTest < ActionDispatch::IntegrationTest
 
   test "RATE_LIMIT_ALLOW_IPS exempts an address, and RATE_LIMIT=off stops the limit" do
     with_env("RATE_LIMIT" => "on", "RATE_LIMIT_RECORD_PER_MINUTE" => "1", "RATE_LIMIT_ALLOW_IPS" => "127.0.0.1") do
-      3.times { get "/stock/emu-9044", headers: BROWSER }
+      3.times { get "/catalog/emu-9044", headers: BROWSER }
       assert_not_equal 429, response.status
     end
     with_env("RATE_LIMIT" => "off", "RATE_LIMIT_RECORD_PER_MINUTE" => "1") do
-      3.times { get "/stock/emu-9044", headers: BROWSER }
+      3.times { get "/catalog/emu-9044", headers: BROWSER }
       assert_not_equal 429, response.status
     end
   end
@@ -130,7 +130,7 @@ class BotGuardTest < ActionDispatch::IntegrationTest
     with_env("RATE_LIMIT" => "on", "RATE_LIMIT_STORE" => "cache", "RATE_LIMIT_RECORD_PER_MINUTE" => "1") do
       original = Rails.cache
       Rails.cache = ActiveSupport::Cache::MemoryStore.new
-      2.times { get "/stock/emu-9044", headers: BROWSER }
+      2.times { get "/catalog/emu-9044", headers: BROWSER }
       assert_response :too_many_requests
     ensure
       Rails.cache = original

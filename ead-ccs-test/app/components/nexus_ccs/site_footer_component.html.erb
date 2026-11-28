@@ -1,17 +1,17 @@
-<footer class="site-footer" aria-label="University of Melbourne footer">
+<footer class="site-footer" aria-label="<%= t("nexus_ccs.footer.label") %>">
   <div class="site-footer__acknowledgement">
     <div class="site-footer__inner">
       <div>
-        <h2>Acknowledgement of Country</h2>
+        <h2><%= t("nexus_ccs.footer.acknowledgement_heading") %></h2>
         <div class="site-footer__flags">
-          <%= image_tag "site/flag-aboriginal.svg", alt: "Aboriginal flag" %>
-          <%= image_tag "site/flag-torres-strait.svg", alt: "Torres Strait Islander flag" %>
+          <%= image_tag "site/flag-aboriginal.svg", alt: t("nexus_ccs.footer.aboriginal_flag") %>
+          <%= image_tag "site/flag-torres-strait.svg", alt: t("nexus_ccs.footer.torres_strait_flag") %>
         </div>
       </div>
       <div>
-        <p>We acknowledge Aboriginal and Torres Strait Islander people as the Traditional Owners of the unceded lands on which we work, learn and live. We pay respect to Elders past, present and future, and acknowledge the importance of Indigenous knowledge in the Academy.</p>
+        <p><%= t("nexus_ccs.footer.acknowledgement") %></p>
         <%= link_to "https://www.unimelb.edu.au/reconciliation", class: "arrow-link arrow-link--inverse" do %>
-          <%= image_tag "site/icon-arrow-footer.svg", alt: "" %>Read about our Indigenous priorities
+          <%= image_tag "site/icon-arrow-footer.svg", alt: "" %><%= t("nexus_ccs.footer.indigenous_priorities") %>
         <% end %>
       </div>
     </div>
@@ -30,13 +30,13 @@
       </ul>
 
       <div class="site-footer__contact">
-        <h2 class="site-footer__label">Contact details</h2>
-        <p>Phone <a href="tel:136352">13 MELB (13 6352)</a><br>International <a href="tel:+61390355511">+61 3 9035 5511</a></p>
-        <address><strong>Address</strong><br>The University of Melbourne<br>Grattan Street, Parkville<br>Victoria 3010<br>Australia</address>
+        <h2 class="site-footer__label"><%= t("nexus_ccs.footer.contact_heading") %></h2>
+        <p><%= t("nexus_ccs.footer.phone") %> <a href="tel:136352">13 MELB (13 6352)</a><br><%= t("nexus_ccs.footer.international") %> <a href="tel:+61390355511">+61 3 9035 5511</a></p>
+        <address><strong><%= t("nexus_ccs.footer.address") %></strong><br>The University of Melbourne<br>Grattan Street, Parkville<br>Victoria 3010<br>Australia</address>
       </div>
 
       <div>
-        <h2 class="site-footer__label">Connect with us</h2>
+        <h2 class="site-footer__label"><%= t("nexus_ccs.footer.connect_heading") %></h2>
         <ul class="site-footer__social">
           <% social_links.each do |label, href, icon| %>
             <li><%= link_to href, aria: { label: label } do %><%= image_tag icon, alt: "" %><% end %></li>
@@ -45,7 +45,7 @@
       </div>
 
       <div class="site-footer__brand">
-        <a href="https://www.unimelb.edu.au" aria-label="The University of Melbourne homepage"><%= image_tag "site/uom-logo-vert-ondark.svg", alt: "" %></a>
+        <a href="https://www.unimelb.edu.au" aria-label="<%= t("nexus_ccs.footer.homepage") %>"><%= image_tag "site/uom-logo-vert-ondark.svg", alt: "" %></a>
       </div>
     </div>
   </div>

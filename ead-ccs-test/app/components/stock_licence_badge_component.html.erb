@@ -1,7 +1,0 @@
-<%= content_tag(url ? :a : :span, **wrapper_options) do %>
-  <% icons.each do |view_box, path| %>
-    <svg class="flex-shrink-0" width="1.25em" height="1.25em" viewBox="<%= view_box %>" fill="currentColor" aria-hidden="true" focusable="false"><path d="<%= path %>" /></svg>
-  <% end %>
-  <span><%= licence %></span>
-  <% if url %><span class="visually-hidden">(opens in new window)</span><% end %>
-<% end %>

@@ -10,7 +10,6 @@
 #   advanced     as above                          /catalog/advanced
 #   results      the search words or collection    /catalog + what changes results
 #   record       the record's description          /catalog/:id                   CreativeWork or VisualArtwork
-#   stock        the record's (a comparison copy)  /catalog/:id (noindex)
 #   browse       Browse::Meta (hubs, entity pages) the page + its letter / page; JSON-LD CollectionPage (noindex when thin, filtered or on page 2 on)
 #
 # The share image (og:image, twitter:image) is the record's own only when its pictured image is open (StructuredData.image):
@@ -33,7 +32,7 @@ class PageMeta
     @type = type_of(controller, action)
     @path = path.to_s
     @title = title.to_s
-    @document = document if %i[record stock].include?(@type)
+    @document = document if @type == :record
     @browse = browse if @type == :browse
     @canonical_url = canonical_for(base_url, path, params)
     @robots = RobotsPolicy.directive(path, params, document: @document, thin: thin_browse_page?(params))
@@ -60,7 +59,6 @@ class PageMeta
     in [ "catalog", "index" ] then :results
     in [ "catalog", "show" ] then :record
     in [ "catalog", "advanced_search" ] then :advanced
-    in [ "stock_catalog" | "branded_stock_catalog", "show" ] then :stock
     in [ "browse" | "browse_entities" | "categories" | "collection_landings" | "themes" | "stories", _ ] then :browse
     else :other
     end
@@ -96,7 +94,7 @@ class PageMeta
     when :home, :advanced then I18n.t("seo.description.#{@type}")
     when :page then I18n.t("seo.description.#{PAGE_DESCRIPTIONS.fetch(@path.delete_prefix('/').split('/').first, 'about')}")
     when :results then results_description(params)
-    when :record, :stock then @document && !RobotsPolicy.withheld?(@document) ? StructuredData::Description.of(@document) : I18n.t("seo.description.record_withheld")
+    when :record then @document && !RobotsPolicy.withheld?(@document) ? StructuredData::Description.of(@document) : I18n.t("seo.description.record_withheld")
     end
   end
 

@@ -21,8 +21,22 @@ class ErrorPagesTest < ActionDispatch::IntegrationTest
     assert_select ".error-page__code", "Error 404"
   end
 
+  # The search answers "no such record" without a Solr core
+  module NoSuchRecord
+    mattr_accessor :on
+
+    def search_service
+      return super unless NoSuchRecord.on
+
+      Struct.new(:id) { def fetch(*) = raise(Blacklight::Exceptions::RecordNotFound) }.new(params[:id])
+    end
+  end
+  CatalogController.prepend(NoSuchRecord)
+
   test "an unknown record is a 404 about the record, not about a page" do
-    as_production { get "/stock/no-such-record" }
+    NoSuchRecord.on = true
+    as_production { get "/catalog/no-such-record" }
+    NoSuchRecord.on = false
 
     assert_response :not_found
     assert_select ".page-banner h1", "We can't find this record"

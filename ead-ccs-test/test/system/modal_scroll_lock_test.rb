@@ -23,10 +23,10 @@ class ModalScrollLockTest < ApplicationSystemTestCase
   def push_the_page
     page.execute_script("document.activeElement && document.activeElement.blur()")
     page.driver.browser.page.command("Input.dispatchMouseEvent", type: "mouseWheel", x: 8, y: 360, deltaX: 0, deltaY: 900)
-    sleep 0.3
+    wait_until_stable("the page's scroll position") { scroll_y }
     keyboard = page.driver.browser.keyboard
     %i[page_down space down end].each { |key| keyboard.type(key) }
-    sleep 0.3
+    wait_until_stable("the page's scroll position") { scroll_y }
   end
 
   def assert_locked_and_unmoved(start_y)
