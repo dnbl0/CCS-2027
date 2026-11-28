@@ -306,3 +306,11 @@ form.advanced .advanced-search-start-over {
   font-size: var(--ccs-font-size-md);
   line-height: 1.5;
 }
+
+/* A filter's checkboxes: a tidy list (a 20px box, the label beside it, 40px rows) */
+form.advanced .advanced-facet-limits .accordion-body { padding: var(--ccs-space-3) 1.25rem var(--ccs-space-4); }
+form.advanced .advanced-facet-limits .facet-values li { display: flex; align-items: center; gap: var(--ccs-space-3); min-height: 2.5rem; padding: 0; border-bottom: 1px solid var(--ccs-border-subtle); }
+form.advanced .advanced-facet-limits .facet-values li:last-child { border-bottom: 0; }
+form.advanced .advanced-facet-limits .facet-checkbox { display: inline-flex; align-items: center; }
+form.advanced .advanced-facet-limits .facet-checkbox input { width: 1.25rem; height: 1.25rem; margin: 0; accent-color: var(--ccs-navy-1100); cursor: pointer; }
+form.advanced .advanced-facet-limits .facet-label-and-count label { align-items: center; gap: var(--ccs-space-4); min-height: 2.5rem; margin: 0; font-size: var(--ccs-font-size-md); line-height: 1.35; cursor: pointer; }

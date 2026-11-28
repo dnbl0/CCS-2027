@@ -1,7 +1,8 @@
 namespace :digital_assets do
   desc "Make the thumbnails (800 px) and large images (1600 px) listed in config/digital_assets.yml (SOURCE_DIR holds the originals; needs vipsthumbnail)"
   task thumbnails: :environment do
-    source_dir = Pathname(ENV.fetch("SOURCE_DIR") { Rails.root.join("../public/assets/images/collections") })
+    # The originals were in the 2026 prototype (public/assets/images/collections, removed 27 Nov 2026; still in the git history)
+    source_dir = Pathname(ENV.fetch("SOURCE_DIR") { abort "Set SOURCE_DIR to the folder of original images (docs/blacklight-features.md)" })
     sizes = { "thumbs" => 800, "large" => 1600 }
     sizes.each_key { |dir| FileUtils.mkdir_p(Rails.root.join("public/digital-assets", dir)) }
 

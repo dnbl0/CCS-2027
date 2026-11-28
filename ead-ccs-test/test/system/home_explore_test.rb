@@ -59,7 +59,7 @@ class HomeExploreSystemTest < ApplicationSystemTestCase
     assert_empty small_targets
     assert_not sideways_scroll?
     boxes = page.evaluate_script("[...document.querySelectorAll('ul.explore__tiles > .explore__tile')].map(t => { const r = t.getBoundingClientRect(); return [Math.round(r.top), Math.round(r.width)] })")
-    assert_operator boxes[0][1], :>, boxes[1][1] * 1.8, "the first collection tile is the large one (card_tiles.css)"
+    assert_operator boxes[0][1], :>, boxes[1][1] * 1.8, "the first collection tile is the large one (explore.css)"
     assert_equal boxes[0][0], boxes[1][0], "the next tiles start beside it"
     assert_operator boxes.last[0], :>, boxes[0][0], "the tiles wrap onto a second row"
     assert_selector ".explore-kinds .card-layout--bento, .explore-places .card-layout--rail, .explore-periods .card-layout--strip", count: 3

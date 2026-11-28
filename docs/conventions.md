@@ -14,7 +14,7 @@
   (static) and `/catalog` (Rails).
 - **CSS classes** follow BEM (`block__element--modifier`). The static pages scope a page's rules with a `page-<name>` class
   on `<body>`; the Rails pages use the same classes (they are generated from the static styles).
-- **Design tokens** are the static site's `public/styles/tokens/tokens.css` (three tiers: primitives, semantic, component).
+- **Design tokens** are the Rails app's `ead-ccs-test/app/assets/stylesheets/tokens/` (three tiers: primitives, semantic, component).
   The Rails app's own results styles use its `--ccs-*` tokens; the content pages use the static ones.
 - **Collections are listed alphabetically** by name wherever they are all shown (header dropdown, Browse collections
   cards, contact groups): Grainger, Harry Brookes Allen, Henry Forman Atkinson, Medical History, University Art.
@@ -31,15 +31,13 @@ The words used for the product are in [CONTEXT.md](../CONTEXT.md); decisions tha
 
 | Change | Edit | Then |
 |---|---|---|
-| Styles or images shared by the pages | `public/styles`, `public/images` | none: edit the Rails copies in `ead-ccs-test/app/assets`; **do not run `npm run sync:rails`** (it overwrites them; `docs/decoupling-from-2026.md`) |
-| Header, search overlay, footer, Browse collections cards (static) | `src/partials/` | `npm run sync:partials` |
 | Header and Browse collections cards (Rails) | `NexusCcs::HeaderComponent`, `app/views/pages/_browse_collections.html.erb` | the Rails app owns it (the static partials are a 2026 prototype) |
 | Page copy | the static page and the Rails view / `config/pages.yml` | none |
 | Rails results, record, filters | `ead-ccs-test/app` | `bin/rails test`, `bin/rails test:system` |
 
 ## Accessibility checklist (both sites)
 
-Automated: axe-core (WCAG 2.1 A and AA) runs on the static pages (`tests/accessibility.test.js`) and the Rails pages
+Automated: axe-core (WCAG 2.1 A and AA) runs on the Rails pages
 (`test/system/accessibility_test.rb`). Check by hand when a page changes:
 
 - Keyboard: every control reachable and operable, visible focus, no keyboard trap (dialogs trap focus and close on Esc).

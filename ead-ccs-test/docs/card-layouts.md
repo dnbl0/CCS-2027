@@ -20,11 +20,11 @@ visit after a day does, and a cache entry that is being rebuilt is still served 
 
 - **The picture fills its tile** (`object-fit: cover`, centred), since 2026-11-18 (Dean asked for picture-led sections like Google Arts &
   Culture's, in our own words and tokens). No layout needs the picture's size, so the DAM's pictures work. The record page always shows the
-  whole picture. Styles: `components/card_tiles.css`, loaded last in `application.css`.
+  whole picture. Styles: the card tile rules at the end of `components/card_layout.css`.
 - **The name sits on a navy scrim** at the foot of the tile: at least 85% navy wherever there is text, so white text keeps about 12:1 or more
   contrast whatever the picture. In forced-colours mode the caption takes the system colours.
 - **Sections are centred** (heading and intro) with **See all** under the cards (`CardSectionComponent`). The home Time section is the
-  page's one navy band. The home collections are a mosaic of picture tiles led by a large one (`ExploreComponent`, over `film_polish.css`'s masonry).
+  page's one navy band. The home collections are a mosaic of picture tiles led by a large one (`ExploreComponent`; the rules at the end of `components/explore.css`).
 - **A card with no picture** is its name on one of the Explore tints, as large as the cell.
 - **The markup is the same in every layout**: a list of articles, each with one heading link. The wall's panel sits after the first card in
   the source, so the reading order follows what is seen.

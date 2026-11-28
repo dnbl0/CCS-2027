@@ -1,4 +1,4 @@
-/* Generated from public/styles/pages/help.css by scripts/sync-rails-assets.js. Edit the static file, not this copy. */
+/* First copied from the 2026 prototype (public/styles/pages/help.css); now this app\'s own file. */
 /* help: styles moved out of inline style="" attributes. Class names are semantic (block__element) and scoped by the page class on <body> (page-help), which gives them the precedence the inline styles had over shared component CSS. Do not reintroduce inline styles. */
 body.page-help .help-page__group {
   min-height: 100vh;

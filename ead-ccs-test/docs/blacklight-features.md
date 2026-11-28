@@ -36,8 +36,10 @@ Configuration-only use of Blacklight 9.2.1 and its official plugins, in `Catalog
   (`Collections::DigitalAssets`) adds `thumbnail_path_ssi`, `digital_asset_paths_ssim` and
   `digital_asset_large_paths_ssim` and `has_digital_asset_bsi`; thumbnails (800 px) and large images
   (1600 px) are JPEGs in `public/digital-assets/thumbs` and `/large`, made from the originals by
-  `bin/rails digital_assets:thumbnails` (needs `vipsthumbnail`; originals are not in this repo, they
-  live in the static site's `public/assets/images/collections`). `config.index.thumbnail_field`
+  `SOURCE_DIR=<folder> bin/rails digital_assets:thumbnails` (needs `vipsthumbnail`). The originals were in the 2026
+  prototype's `public/assets/images/collections`, removed on 27 Nov 2026; to get them back, find the removing commit with
+  `git log --diff-filter=D --oneline -- public/assets/images/collections` and run
+  `git archive <that commit>^ public/assets/images/collections | tar -x -C <folder>`. `config.index.thumbnail_field`
   shows them in both views (the list shows one only when a record has an asset); the mosaic shows
   a placeholder otherwise, and mosaic placeholders vary in shape so the masonry still reads as a mosaic.
   On a record's page `NexusCcs::DigitalAssetsComponent` (the show page's `document_embed_component`)

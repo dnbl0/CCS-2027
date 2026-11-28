@@ -72,7 +72,7 @@ Eg:
 
 ## Content pages (home, collections, help, about)
 
-`PagesController` serves the pages of the static prototype (`public/` in the repository root) so the two sites match:
+`PagesController` serves the content pages (first built to match the 2026 static prototype, since removed):
 `/` (home), `/collections` (the Browse collections list), `/help` (one page; sections `#faq`, `#indigenous`, `#copyright`, `#contact-us`,
 with the University's jump navigation beside them) and `/about`. The search results live at `/catalog`.
 
@@ -84,7 +84,7 @@ with the University's jump navigation beside them) and `/about`. The search resu
   `config/pages.yml`. The Browse collections cards on the home and collections pages are one partial,
   `pages/_browse_collections.html.erb` (the home page has its own listing); the Help text is all in `pages/help.html.erb`, and the
   jump navigation highlight is the `jump-nav` Stimulus controller. `HelpTopic` lists the sections for the header's Help menu.
-* The styles and images were generated once from the 2026 static prototype (`node scripts/sync-rails-assets.js`, see `docs/decoupling-from-2026.md`): `app/assets/stylesheets/pages`, `tokens/static_site.css` and `app/assets/images/site/`. Nothing checks them against the prototype any more, so edit them here; their "Generated from ..." header comments are historical, and re-running the script would overwrite local changes. The page copy is `config/pages.yml` and the views. The header and footer are the existing
+* The styles and images were first copied from the 2026 static prototype (removed from this repository on 27 Nov 2026): `app/assets/stylesheets/pages`, `tokens/static_site.css` and `app/assets/images/site/` are this app's own files now. The page copy is `config/pages.yml` and the views. The header and footer are the existing
   `NexusCcs` components.
 
 ## UI

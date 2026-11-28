@@ -1,1 +1,0 @@
-Classification marking images (G, PG, M, MA 15+, R 18+, X 18+, Check the Classification) were downloaded on 2026-10-03 from https://www.classification.gov.au/classification-ratings/what-are-ratings. The markings belong to the Australian Government Classification Board; use them only to show an official rating.
