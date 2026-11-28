@@ -5,7 +5,7 @@ en:
     title: "Browse"
     footer_link: "Browse the collections"
     periods: "Periods"
-    description: "Browse the University of Melbourne's cultural collections by object type, place, period, maker and subject, with no search term needed."
+    description: "Browse the University of Melbourne's museums and collections by object type, place, period, maker and subject, with no search term needed."
     hub_description: "A list of every value, each opening its records."
     cards:
       see_all: "See all %{kind}"
@@ -29,8 +29,8 @@ en:
     pagination: "Pages of %{kind}"
     entity:
       title: "%{name} — %{kind} — Collections Navigator — University of Melbourne"
-      description: "Records in the University of Melbourne's cultural collections: %{name}."
-      description_dates: "Records in the University of Melbourne's cultural collections: %{name}, from %{span}."
+      description: "Records in the University of Melbourne's museums and collections: %{name}."
+      description_dates: "Records in the University of Melbourne's museums and collections: %{name}, from %{span}."
       facts: "At a glance"
       records: "Records"
       date_span: "Dates"
@@ -51,7 +51,7 @@ en:
       pagination: "Pages of records"
     period:
       title: "%{period} — Periods — Collections Navigator — University of Melbourne"
-      description: "Records in the University of Melbourne's cultural collections from %{span}."
+      description: "Records in the University of Melbourne's museums and collections from %{span}."
       within: "Within this period"
       parent: "Century"
       before: "Before %{year}"

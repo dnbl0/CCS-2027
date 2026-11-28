@@ -38,7 +38,7 @@ class SeoHeadTest < ActionDispatch::IntegrationTest
   end
 
   SHARE_CARD = "http://www.example.com/share-card.png"
-  SHARE_CARD_ALT = "Collections Navigator, University of Melbourne cultural collections"
+  SHARE_CARD_ALT = "Collections Navigator, University of Melbourne's museums and collections"
 
   def robots_meta = css_select("meta[name=robots]").first&.[]("content")
   def canonical = css_select("link[rel=canonical]").first&.[]("href")
@@ -50,7 +50,7 @@ class SeoHeadTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal "http://www.example.com/", canonical
-    assert_match(/cultural collections/, meta("description"))
+    assert_match(/museums and collections/, meta("description"))
     assert_equal "website", meta("og:type")
     assert_equal "Collections Navigator - University of Melbourne", meta("og:title")
     assert_equal SHARE_CARD, meta("og:image"), "a page with no record image shares the site's card"
@@ -71,7 +71,7 @@ class SeoHeadTest < ActionDispatch::IntegrationTest
 
     with_env(@env) { get "/about" }
     assert_equal "http://www.example.com/about", canonical
-    assert_match(/rich and diverse cultural collections/, meta("description"))
+    assert_match(/rich and diverse museums and collections/, meta("description"))
   end
 
   test "the advanced search page is indexed, with its canonical" do

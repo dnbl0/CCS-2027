@@ -22,7 +22,7 @@ class PageMeta
 
   # The site's own share card, 1200 x 630 (public/share-card.png, drawn from public/share-card.svg)
   SHARE_CARD = "/share-card.png"
-  SHARE_CARD_ALT = "Collections Navigator, University of Melbourne cultural collections"
+  SHARE_CARD_ALT = "Collections Navigator, University of Melbourne's museums and collections"
 
   attr_reader :canonical_url, :robots, :description, :title, :og_image, :json_ld
 
