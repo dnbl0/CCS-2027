@@ -19,6 +19,17 @@ class AccessibilityTest < ApplicationSystemTestCase
     end
   end
 
+  # The stories index (after the British Museum's blog) and a collection story read on the site, to WCAG 2.2 AA
+  test "the stories index and a collection story have no axe violations" do
+    visit stories_path
+    assert_selector ".story-card", minimum: 2
+    assert_accessible tags: AXE_TAGS + WCAG22_TAGS
+
+    visit story_path("csirac-collection")
+    assert_selector ".story-page__source"
+    assert_accessible tags: AXE_TAGS + WCAG22_TAGS
+  end
+
   test "the check fails on a page with a violation, so a pass means something" do
     visit "/contact"
     page.execute_script("document.body.insertAdjacentHTML('beforeend', '<img src=\"/icon.png\"><button></button>')")

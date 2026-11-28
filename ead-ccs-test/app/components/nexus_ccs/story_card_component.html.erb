@@ -1,0 +1,16 @@
+<%# One story on /stories: picture (decorative: the headline names the story), "category / date", the headline link (stretched over
+    the card by stories_index.css), the summary, and "Read more" (hidden from screen readers: the headline is the link). %>
+<%= tag.article class: classes, data: { controller: "story-image", story_image_fallback_value: fallback, story_image_text_class_value: "story-card--text" }.compact do %>
+  <% if picture %>
+    <div class="story-card__media" data-story-image-target="media">
+      <%= image_tag picture, alt: "", class: "story-card__image", loading: lead? ? "eager" : "lazy", decoding: "async",
+                             data: { story_image_target: "image", action: "error->story-image#fail" } %>
+    </div>
+  <% end %>
+  <div class="story-card__body">
+    <% if kicker %><p class="story-card__kicker"><%= kicker %></p><% end %>
+    <h2 class="story-card__title"><%= link_to story.title, story.path, class: "story-card__link" %></h2>
+    <% if story.summary.present? %><p class="story-card__summary"><%= story.summary %></p><% end %>
+    <p class="story-card__more" aria-hidden="true"><%= t("nexus_ccs.stories.read_more") %></p>
+  </div>
+<% end %>

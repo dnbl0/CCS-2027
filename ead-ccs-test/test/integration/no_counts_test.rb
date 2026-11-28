@@ -12,10 +12,12 @@ class NoCountsTest < ActionDispatch::IntegrationTest
              /explore/places /explore/colours /stories /discover].freeze
 
   # The visible text of the page, without the parts that may count (the visitor's own saved bar and selections) and without
-  # record cards, whose titles are the records' own ("Unused certificates (3)")
+  # record cards, whose titles are the records' own ("Unused certificates (3)"), and story summaries, which are the publisher's
+  # own words ("The CSIRAC Computer collection consists of over 300 objects", Museums Victoria): the site counts nothing there
   def visible_text
     page = Nokogiri::HTML(response.body)
-    page.css("script, style, template, .saved-bar, .selection-stepper, [hidden], [data-document-id], .object-card").each(&:remove)
+    page.css("script, style, template, .saved-bar, .selection-stepper, [hidden], [data-document-id], .object-card, .story-card__summary")
+        .each(&:remove)
     page.at("body")&.text.to_s.squish
   end
 

@@ -7,7 +7,7 @@
     <% if story.site.present? %><p class="collection-story__source"><%= story.site %></p><% end %>
     <div class="collection-story__body">
       <p class="collection-story__kicker"><%= t("nexus_ccs.collection_stories.kicker") %></p>
-      <h3 class="collection-story__title"><%= link_to story.title, story.url, class: "collection-story__link" %></h3>
+      <h3 class="collection-story__title"><%= link_to story.title, story.path, class: "collection-story__link" %></h3>
       <% if story.summary.present? %><p class="collection-story__summary"><%= story.summary %></p><% end %>
     </div>
     <% if picture %>
@@ -18,14 +18,14 @@
     <% end %>
   <% else %>
     <% if picture %>
-      <%= link_to story.url, class: "result-card__media", tabindex: -1, "aria-hidden": true, data: { story_image_target: "media" } do %>
+      <%= link_to story.path, class: "result-card__media", tabindex: -1, "aria-hidden": true, data: { story_image_target: "media" } do %>
         <%= image_tag picture, alt: "", loading: "lazy", decoding: "async",
                                data: { story_image_target: "image", action: "error->story-image#fail" } %>
       <% end %>
     <% end %>
     <div class="result-card__content">
       <header class="documentHeader">
-        <h3 class="document-title-heading h5"><%= link_to story.title, story.url %></h3>
+        <h3 class="document-title-heading h5"><%= link_to story.title, story.path %></h3>
       </header>
       <% if story.summary.present? %><p class="collection-story__summary"><%= story.summary %></p><% end %>
       <ul class="result-card__lines">

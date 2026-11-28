@@ -1,13 +1,33 @@
-<%# One story (Stories): its text, sanitised, with each record and search embed drawn as the site's record cards %>
+<%# One story (Stories): its text, sanitised, with each record and search embed drawn as the site's record cards. A story about
+    collection objects (Stories.from_collection) also has its picture, where it was first published, and the records it is about. %>
 <% content_for :title, "#{@story.title} — #{t('nexus_ccs.stories.title')} — Collections Navigator — University of Melbourne" %>
 <% content_for :body_class, "page-browse page-story" %>
 <%= render NexusCcs::PageBannerComponent.new(title: @story.title, description: @story.summary) %>
 <main class="browse-main" id="main-content">
   <article class="browse-main__inner story-page" aria-labelledby="story-title">
     <h2 id="story-title" class="visually-hidden"><%= @story.title %></h2>
-    <p class="story-page__meta"><%= [ (t("nexus_ccs.stories.by", author: @story.author) if @story.author), t("nexus_ccs.stories.published", date: l(@story.date, format: "%-d %B %Y")) ].compact.join(" · ") %></p>
+    <% date = (t("nexus_ccs.stories.published", date: l(@story.date, format: @story.source ? "%B %Y" : "%-d %B %Y")) if @story.date) %>
+    <p class="story-page__meta"><%= [ @story.category, (t("nexus_ccs.stories.by", author: @story.author) if @story.author), date ].compact.join(" · ") %></p>
+    <% first_record = @embedded[:records][@story.records.first] %>
+    <% pictures = first_record.nil? || (AccessPolicy.view?(first_record) && !Sensitivity.sensitive?(first_record)) %>
+    <% if @story.image && pictures %>
+      <% fallback = (AssetVersion.url(first_record["thumbnail_path_ssi"].presence) if first_record) %>
+      <%= tag.figure class: "story-page__figure", data: { controller: "story-image", story_image_fallback_value: fallback, story_image_text_class_value: "story-page__figure--none" }.compact do %>
+        <div class="story-page__picture" data-story-image-target="media">
+          <%= image_tag @story.image.url, alt: @story.image.alt, class: "story-page__image", decoding: "async",
+                                          data: { story_image_target: "image", action: "error->story-image#fail" } %>
+        </div>
+        <% if @story.image.caption.present? || @story.image.credit.present? %>
+          <figcaption class="story-page__caption"><%= [ @story.image.caption.presence, @story.image.credit.presence ].compact.join(". ") %></figcaption>
+        <% end %>
+      <% end %>
+    <% end %>
     <% hero = @embedded[:records][@story.hero] %>
     <% if hero %><div class="story-page__embed story-page__embed--hero"><%= render NexusCcs::RecordCardComponent.new(document: hero) %></div><% end %>
+    <% if @story.source && !@story.source.full_text %>
+      <div class="story-page__text"><p><%= @story.summary %></p></div>
+      <p class="story-page__more"><%= link_to t("nexus_ccs.stories.full_text", site: @story.source.name), @story.source.url, class: "arrow-link" %></p>
+    <% end %>
     <% @parts.each_with_index do |part, index| %>
       <% if part.is_a?(Stories::Embed) && part.kind == :record %>
         <% document = @embedded[:records][part.value] %>
@@ -25,6 +45,21 @@
       <% else %>
         <div class="story-page__text"><%= part %></div>
       <% end %>
+    <% end %>
+    <% if @story.source %>
+      <aside class="story-page__source" aria-labelledby="story-source-heading">
+        <h2 id="story-source-heading" class="story-page__source-heading"><%= t("nexus_ccs.stories.source.heading") %></h2>
+        <p>
+          <%= t("nexus_ccs.stories.source.published_html", site: link_to(@story.source.name, @story.source.url)) %>
+          <% if @story.source.licence && @story.source.licence_url %>
+            <%= t("nexus_ccs.stories.source.licence_html", licence: link_to(@story.source.licence, @story.source.licence_url)) %>
+          <% end %>
+        </p>
+      </aside>
+    <% end %>
+    <% objects = @story.records.filter_map { |id| @embedded[:records][id] }.select { |document| Discovery.listable?(document) } %>
+    <% if objects.any? %>
+      <%= render NexusCcs::RecordCardsComponent.new(id: "story-objects", heading: t("nexus_ccs.stories.objects"), documents: objects) %>
     <% end %>
   </article>
 </main>
