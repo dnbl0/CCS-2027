@@ -4,7 +4,7 @@ require "zlib"
 
 # Finishes the precompiled assets in public/assets for production (run after assets:precompile, see lib/tasks/asset_bundle.rake).
 #
-# 1. Propshaft leaves the @import lines of the CSS manifests (application.css, stock_blacklight.css) as they are, with each file's
+# 1. Propshaft leaves the @import lines of the CSS manifests (application.css) as they are, with each file's
 #    fingerprinted address, so a browser fetches the manifest and then about fifty more stylesheets, each one a request that blocks
 #    the first paint. flatten_css puts the imported files into the manifest itself, in the same order, so it is one request.
 #    Every address inside is already fingerprinted and absolute (/assets/name-digest.ext), so the content is unchanged. The manifest

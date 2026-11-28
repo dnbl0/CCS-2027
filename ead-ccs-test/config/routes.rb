@@ -56,20 +56,9 @@ Rails.application.routes.draw do
   # Asking for access to a record (CCS-69): the form, and the confirmation only the requester's own session can open
   resources :access_requests, only: [ :new, :create, :show ]
 
-  # The new record page, for the records in StockRecords only (any other id is a 404): Blacklight out of the box (StockCatalogController),
-  # and the same page in the UoM header, breadcrumb and footer (BrandedStockCatalogController). The site's own record page, /catalog/:id,
-  # is unchanged.
-  constraints(->(request) { StockRecords.include?(request.path_parameters[:id]) }) do
-    scope constraints: { id: %r{[^/]+} } do
-      resources :stock_documents, only: [ :show ], path: "/stock", controller: "stock_catalog" do
-        member { get "citation" }
-      end
-
-      resources :branded_stock_documents, only: [ :show ], path: "/branded-stock", controller: "branded_stock_catalog" do
-        member { get "citation" }
-      end
-    end
-  end
+  # The October trial record pages (/stock/:id, /branded-stock/:id) are gone: an old link opens the record's own page
+  get "stock/:id(/citation)", to: redirect("/catalog/%{id}", status: 301), constraints: { id: %r{[^/]+} }
+  get "branded-stock/:id(/citation)", to: redirect("/catalog/%{id}", status: 301), constraints: { id: %r{[^/]+} }
 
   # Browse collections is gone (the sitemap keeps Blacklight's own pages): its address goes to the collection cards on the home
   # page, and each old collection landing page goes to the results filtered to that collection.

@@ -51,8 +51,7 @@ probe pings). A new way of asking Solr has to go through the client, or the test
 
 ## What a visitor or a crawler sees
 
-The pages that **name** the record answer **410 Gone**: its record page, citation and Similar records, `/stock/` and
-`/branded-stock/`, the metadata export, the IIIF manifest (no body), the sensitivity choice, the comparison and the access request
+The pages that **name** the record answer **410 Gone**: its record page, citation and Similar records, the metadata export, the IIIF manifest (no body), the sensitivity choice, the comparison and the access request
 form, the embed (a short message inside the frame) and oEmbed (no body). The page is the site's error page ("This record has been
 removed"), `noindex, nofollow`, with no title, description, image, structured data or asset address. A search engine that
 asks for the address learns the record is gone for good, which is the quickest way for it to drop the page.

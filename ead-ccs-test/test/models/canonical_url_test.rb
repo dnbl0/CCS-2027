@@ -28,7 +28,7 @@ class CanonicalUrlTest < ActiveSupport::TestCase
   end
 
   test "all three record pages, and a record's citation, have the record page as canonical" do
-    %w[/catalog/emu-9044 /stock/emu-9044 /branded-stock/emu-9044 /catalog/emu-9044/citation].each do |path|
+    %w[/catalog/emu-9044 /catalog/emu-9044/citation].each do |path|
       assert_equal "#{BASE}/catalog/emu-9044", CanonicalUrl.for(BASE, path, { "q" => "x", "utm_source" => "y" }), path
     end
   end

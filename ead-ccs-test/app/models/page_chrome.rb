@@ -8,7 +8,7 @@
 #                for a page with no trail), :hero (over the home page's photo, pages/home.html.erb), or :page (a content
 #                page draws its own strip, PageBreadcrumbsComponent)
 #
-# HeaderComponent renders it; a header for a page the rules do not know (StockHeaderComponent) builds its own.
+# HeaderComponent renders it.
 PageChrome = Data.define(:breadcrumbs, :banner, :saved_bar) do
   # The chrome of a page of the site, from its controller and action. `searching` is whether the catalog has a search
   # to show; `page` answers record_title and results_url, and is asked only on a record page.
@@ -36,10 +36,6 @@ PageChrome = Data.define(:breadcrumbs, :banner, :saved_bar) do
     else new(breadcrumbs: [], banner: nil, saved_bar: :header)
     end
   end
-
-  # Blacklight's own record page inside the site header (/branded-stock/:id): a record's trail, and no banner, as the
-  # page under it brings its own title.
-  def self.stock_record(record_title:, results_url:) = with_trail(record_trail(record_title, results_url), banner: nil)
 
   def self.record_trail(title, results_url) = [ [ "Search results", results_url ], [ title, nil ] ]
 
