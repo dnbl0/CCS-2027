@@ -7,7 +7,7 @@ require "erb"
 # lists records. The responsive snippet fills its column up to the width, at the same height.
 class EmbedCode
   PROVIDER = "Collections Navigator, University of Melbourne"
-  GENERIC_TITLE = "A record in the University of Melbourne's cultural collections"
+  GENERIC_TITLE = "A record in the University of Melbourne's museums and collections"
   RECORD_WIDTH = 480
   GALLERY_WIDTH = 600
   GALLERY_HEIGHT = 560

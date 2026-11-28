@@ -2,17 +2,17 @@ en:
   # Meta descriptions (CCS-128). The page titles are the pages' own. A record page's description is the record's (StructuredData::Description).
   seo:
     description:
-      home: "Search and explore the University of Melbourne's cultural collections in one place: art, museum objects, archives and more, with images and details for each record."
+      home: "Search and explore the University of Melbourne's museums and collections in one place: art, museum objects, archives and more, with images and details for each record."
       help: "Help for Collections Navigator: how to search, filter and save records, how digital assets can be used, and how to contact the collection teams."
-      about: "Collections Navigator brings together the University of Melbourne's rich and diverse cultural collections into a single discovery experience."
+      about: "Collections Navigator brings together the University of Melbourne's rich and diverse museums and collections into a single discovery experience."
       accessibility: "How accessible Collections Navigator is, how it is checked, and how to report a problem. Placeholder wording until the University approves it."
       privacy: "What Collections Navigator stores about visitors, why, and how to remove it. Placeholder wording until the University approves it."
       language: "Why some records carry a notice about offensive or outdated language, how it works, and how to suggest a correction. Placeholder wording until the collections team approves it."
-      advanced: "Advanced search for Collections Navigator: combine fields, words and dates to find records in the University of Melbourne's cultural collections."
-      results: "Search results from the University of Melbourne's cultural collections."
-      results_query: "Search results for “%{query}” in the University of Melbourne's cultural collections."
-      results_collection: "Browse the %{collection} in Collections Navigator, the University of Melbourne's cultural collections search."
-      record_withheld: "A record in the University of Melbourne's cultural collections. Some details of this record are held back; see the record page for what can be shown."
+      advanced: "Advanced search for Collections Navigator: combine fields, words and dates to find records in the University of Melbourne's museums and collections."
+      results: "Search results from the University of Melbourne's museums and collections."
+      results_query: "Search results for “%{query}” in the University of Melbourne's museums and collections."
+      results_collection: "Browse the %{collection} in Collections Navigator, the search for the University of Melbourne's museums and collections."
+      record_withheld: "A record in the University of Melbourne's museums and collections. Some details of this record are held back; see the record page for what can be shown."
     llms_txt:
-      summary: "Collections Navigator is the University of Melbourne's search for its cultural collections: art, museum objects, archives and more."
+      summary: "Collections Navigator is the University of Melbourne's search for its museums and collections: art, museum objects, archives and more."
       rights: "PLACEHOLDER WORDING, NOT YET APPROVED. Records describe collection items held by the University of Melbourne. Many digital assets are protected by copyright or are Indigenous Cultural and Intellectual Property, and may be viewed or downloaded only as each record says. Please contact the relevant collection team before reusing a record's images or text, including to train an AI system."
